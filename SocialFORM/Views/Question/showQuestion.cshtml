@@ -1,0 +1,21 @@
+﻿@model SocialFORM.Models.Question.QuestionModel
+
+@{
+    ViewBag.Title = "showQuestion";
+}
+
+<h2>showQuestion</h2>
+
+<div class="question"></div>
+
+@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+<script type="text/javascript">
+    $(function () {
+        $.get("/Question/sQuestion", { id: '1' })
+            .success(function (data) {
+                $(".question").html(data.TextQuestion);
+            })
+            .error(function () { alert("No");});
+    });
+</script>
+

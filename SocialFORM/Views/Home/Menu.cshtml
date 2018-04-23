@@ -1,0 +1,38 @@
+﻿@using SocialFORM.Models.Menu
+@model IEnumerable<MenuItem>
+
+@helper BuildMenu(IEnumerable<MenuItem> data, int? parentId = null)
+{
+var items = data.Where(d => d.ParentId == parentId).OrderBy(i => i.Order);
+if (items.Any())
+{
+        <ul class="menu">
+            @if (User.IsInRole("Admin"))
+            {
+                foreach (var it in items.Where(a => a.RoleId == 1))
+                {
+                    <li>
+                        @Ajax.ActionLink(@it.Header, @it.Url, new AjaxOptions { UpdateTargetId = "Tables" })
+                        @BuildMenu(data, it.Id)
+                    </li>
+                }
+            }
+            @if (User.IsInRole("Operator"))
+            {
+                foreach (var it in items.Where(a => a.RoleId == 2))
+                {
+                    <li>
+                        @Ajax.ActionLink(@it.Header, @it.Url, new AjaxOptions { UpdateTargetId = "Tables" })
+                        @BuildMenu(data, it.Id)
+                    </li>
+                }
+            }
+        </ul>
+}
+}
+
+<div id="cssmenu">
+    @BuildMenu(Model)
+</div>
+
+

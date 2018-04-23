@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SocialFORM.Models.Form.BlankModel>
+@{
+    ViewBag.Title = "TableResultBlank";
+}
+
+<h2>TableResultBlank</h2>
+
+
+<table>
+    @{
+        int QID = 0;
+        foreach (var item in Model)
+        {
+
+            @:<tr>
+                if (QID == item.QuestionID)
+                {
+              @:      <td></td>
+                }
+                else
+                {
+                @:    <td>Вопрос: @item.QuestionID</td>
+                }
+                if (item.AnswerIndex == 0)
+                {
+                @:    <td>Текст : @item.Text </td>
+                }
+                else
+                {
+              @:      <td> Индекс: @item.AnswerIndex </td>
+                }
+            @:</tr>
+            QID = item.QuestionID;
+        }
+    }
+</table>

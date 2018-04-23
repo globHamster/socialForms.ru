@@ -1,0 +1,139 @@
+﻿@model SocialFORM.Models.UserViewModel
+
+
+<h2>Изменить пользователя</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IdView)
+    <div class="form-horizontal">
+        <h4>Изменить</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <p class="control-label col-md-2">Логин :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LoginView, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LoginView, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Пароль :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.PasswordView, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.PasswordView, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Имя :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.NameView, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.NameView, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Фамилия :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FamilyView, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FamilyView, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Возраст :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AgeView, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.AgeView, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Пол :</p>
+            <div class="col-md-10">
+                <div>
+                    @Html.RadioButtonFor(model => model.FoolView, "Мужской")
+                    <span>Мужской</span>
+                </div>
+                <div>
+                    @Html.RadioButtonFor(model => model.FoolView, "Женский")
+                    <span>Женский</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Почта :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.EmailView, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.EmailView, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Роль :</p>
+            <div class="col-md-10">
+                @Html.DropDownList("Role")
+            </div>
+        </div>
+
+
+    </div>
+
+}
+<button class="CreatUser">Изменить</button>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+@Scripts.Render("~/scripts/jquery-1.10.2.js")
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".CreatUser").click(function () {
+
+            var ID = $("#IdView").val();
+            var NAME = $("#NameView").val();
+            var FAMILY = $("#FamilyView").val();
+            var AGE = $("#AgeView").val();
+            var FOOL = $('input[name=FoolView]:checked').val()
+            var EMAIL = $("#EmailView").val();
+            var LOGIN = $("#LoginView").val();
+            var PASSWORD = $("#PasswordView").val();
+            var ROLEID = $("#Role").val();
+            var query = {
+                IdView: ID,
+                NameView: NAME,
+                FamilyView: FAMILY,
+                AgeView: AGE,
+                FoolView: FOOL,
+                EmailView: EMAIL,
+                LoginView: LOGIN,
+                PasswordView: PASSWORD,
+                RoleIdView: ROLEID
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/Account/UpdateUser",
+                data: query,
+                datatype: "html",
+                success: function () {
+                    $('#Tables').load("/Home/Users");
+                },
+                error: function () {
+                    alert("Erorr");
+                },
+                failure: function () {
+                    alert("No");
+                }
+            });
+        })
+    })
+</script>

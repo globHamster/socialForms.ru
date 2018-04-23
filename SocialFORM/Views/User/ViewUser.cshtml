@@ -1,0 +1,33 @@
+﻿@model IEnumerable<SocialFORM.Models.UserViewModel>
+
+<div class="container">
+
+    <div class="row">
+        <h2>Информация</h2>
+    </div>
+    <div class="row">
+        @Html.ActionLink("Изменить", "#")
+    </div>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6">
+                <p>Логин: @Html.DisplayFor(modelItem => item.LoginView)</p>
+                <p>Пароль: @Html.DisplayFor(modelItem => item.PasswordView)</p>
+                <p>Роль: @Html.DisplayFor(modelItem => item.RoleView)</p>
+            </div>
+            <div class="col-md-6">
+                <p>Имя: @Html.DisplayFor(modelItem => item.NameView)</p>
+                <p>Фамилия: @Html.DisplayFor(modelItem => item.FamilyView)</p>
+                <p>Пол: @Html.DisplayFor(modelItem => item.FoolView)</p>
+                <p>Возраст: @Html.DisplayFor(modelItem => item.AgeView)</p>
+                <p>Почта: @Html.DisplayFor(modelItem => item.EmailView)</p>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        Инфо блок
+    </div>
+</div>
+

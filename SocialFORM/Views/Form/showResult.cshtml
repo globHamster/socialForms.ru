@@ -1,0 +1,476 @@
+﻿@model List<SocialFORM.Models.Form.Result>
+@{
+    ViewBag.Title = "showResult";
+}
+
+<h2>showResult</h2>
+<style>
+    .quest {
+        padding: 18px;
+        background-color: #72afff;
+        border-radius: 10px;
+        height: auto;
+        border: 1px solid black;
+    }
+
+    .answer {
+        background-color: #bbb;
+    }
+
+    .question {
+        background-color: #fff;
+    }
+
+    .answer_panel {
+        background-color: #d4d4d4;
+        border: 1px ridge black;
+    }
+
+    .button_save {
+        background-color: #ddd;
+        text-align: center;
+        font-size: 30px;
+    }
+
+    .change_panel {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .error_input_phone {
+        background-color: #de2a2a;
+    }
+
+    span.error_input_phone {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    div.changes {
+        width: 100%;
+        height: 300px;
+        overflow-y: auto;
+    }
+</style>
+<div class="changes">
+
+    @*@foreach (var item in Model)
+        {
+
+            <div class="quest" id="@item.questionResult.Id>
+
+            </div>
+        }*@
+</div>
+<div class="phone_number" style="margin-top: 20px; margin-bottom: 20px;">
+    <span>Введите номер телефона </span>
+    <input type="text" id="phone_number" name="phone_number" />
+</div>
+<br />
+<button class="save_data">Сохраниеть данные на сервере</button>
+
+
+@Scripts.Render("~/Scripts/pdfmake.min.js")
+@Scripts.Render("~/Scripts/vfs_fonts.js")
+@Scripts.Render("~/Scripts/jquery.maskedinput.js")
+
+<script type="text/javascript">
+
+    $(function () {
+
+        console.info("Выгрузка данных ... ", result);
+        console.info("Выгрузка данных ... ", text_other);
+        console.info("Выгрузка данных ... ", massiv_question_id);
+
+        /*  $.each(massiv_question_id, function (i, data) {
+              var code = '<div class="quest" id="' + data + '"></div>';
+              $('.changes').append(code);
+          });
+
+          $('div.quest').each(function () {
+              // $(this).append($(this).attr('id'))
+
+              var div_text = $(this);
+              $.get("/Question/getQuestion", { id: div_text.attr('id') })
+                  .success(function (data) {
+                      id_project = data.ProjectID;
+                      var type_q = data.TypeQuestion;
+                      div_text.html('<h3>Вопрос</h3><div class="question" id="' + div_text.attr('id') + '">' + data.TextQuestion + '</div>');
+                      div_text.append('<h3>Выбраны ответы</h3>');
+                      $.get("/Form/getAnswer", { id_q: div_text.attr('id') })
+                          .success(function (data) {
+                              var i_result = 0;
+                              for (var k = 0, iter = massiv_question_id[k]; k < massiv_question_id.length; k++ , iter = massiv_question_id[k]) {
+
+                                  if (iter == div_text.attr('id')) {
+                                      i_result = k;
+                                  }
+                              }
+
+
+                              var massiv = result[i_result];
+                              if (type_q == 4) {
+                                  var row_text;
+                                  $.ajax({
+                                      type: "GET",
+                                      url: "/Question/getTableRow",
+                                      async: false,
+                                      data: { id_q: div_text.attr('id') },
+                                      success: function (data) {
+                                          row_text = data;
+                                      }
+                                  });
+                                  var answer_id = [];
+                                  for (var i = 0; i < data.length; i++) {
+                                      answer_id.push(data[i].Id);
+                                  }
+                                  for (var i = 0; i < massiv.length; i++) {
+                                      var index_answer = answer_id.indexOf(Number(massiv[i]));
+                                      var code = '<p class="answer" id="' + div_text.attr('id') + '"><span>' + row_text[i].TableRowText + '</span> ' + data[index_answer].AnswerText + '</p>';
+                                      div_text.append(code);
+                                  }
+                              } else if (type_q != 3) {
+                                  $.each(data, function (i, data) {
+                                      for (var k = 0; k < massiv.length; k++) {
+                                          if (massiv[k] == data.Id) {
+                                              var code = '<p class="answer" id="' + div_text.attr('id') + '">' + data.AnswerText + '</p>';
+                                              div_text.append(code);
+                                          }
+                                      }
+                                  });
+                              } else {
+                                  $.each(data, function (i, data) {
+                                      if (massiv.length == 1 && massiv[0] == 0) {
+                                          var code = '<p class="answer" id="' + div_text.attr('id') + '">Jump</p>';
+                                          div_text.append(code);
+
+                                      } else {
+
+                                          for (var k = 0; k < massiv.length; k++) {
+                                              if (Number(massiv[k].substr(0, massiv[k].indexOf('#'))) == data.Id) {
+                                                  var code = '<p class="answer" id="' + div_text.attr('id') + '">' + massiv[k].substr(massiv[k].indexOf('#') + 1) + '</p>';
+                                                  div_text.append(code);
+                                              }
+                                          }
+                                      }
+                                  });
+                              }
+                          });
+                  })
+                  .error(function () {
+                      alert("Error");
+                  });
+          });*/
+    });
+
+    $('input[name=phone_number]').focus(function () {
+        $(this).removeClass('error_input_phone');
+        $('span.error_input_phone').remove();
+    });
+
+    $("#phone_number").mask("8(999) 999-9999");
+
+    $('.save_data').click(function () {
+        var string_answer = [];
+        $('body').append('<div class="waiting_screen"><p>Идет сохранение</p></div>');
+        $('div.waiting_screen').css({
+            'position': 'fixed',
+            'left': 0,
+            'top': 0,
+            'width': '100%',
+            'height': '100%',
+            'background-color': 'rgba(200, 200, 200, 0.7)'
+        }).find('p').css({
+            'position': 'absolute',
+            'top': '40%',
+            'left': '40%',
+            'font-size': '70px'
+        });
+        if ($('input[name=phone_number]').val().length == 0) {
+            $('input[name=phone_number]').blur();
+            $('input[name=phone_number]').addClass('error_input_phone');
+            $('input[name=phone_number]').after('<span class="error_input_phone">Введите номер телефона</span>')
+            return;
+        }
+        
+        var coord;
+        var query, query_q = {};
+        var count = 0;
+        $.each(massiv_question_id, function (i, item) {
+
+            switch (list_question[item].TypeQuestion) {
+                case 1:
+                    query_q[count] = {
+                        Id: Number(result[i]),
+                        QuestionID: Number(item),
+                        Text: String(text_other[i])
+                    }
+                    count++;
+                    break;
+                case 2:
+                    var mas = String(text_other[i]).split(',');
+                    var tmp_mas = {};
+                    $.each(mas, function (i, data) {
+                        var tmp = data.split('#');
+                        tmp_mas[tmp[0]] = tmp[1];
+                    })
+                    console.info('text --- ', tmp_mas);
+                    $.each(result[i], function (i, data) {
+                        query_q[count] = {
+                            Id: Number(data),
+                            QuestionID: Number(item),
+                            Text: String(tmp_mas[data])
+                        }
+                        count++;
+                    })
+                    break;
+                case 3:
+                    console.info("index ---- ", i);
+                    console.info("result ---- ", result[i]);
+                    var mas = String(result[i]).split(',');
+                    console.info("mas ---- ", mas);
+                    var tmp_mas = [];
+                    $.each(mas, function (i, data) {
+                        var tmp = data.split('#');
+                        tmp_mas.push(tmp);
+                    })
+                    console.info('text --- ', tmp_mas);
+                    $.each(tmp_mas, function (i, data) {
+                        query_q[count] = {
+                            Id: Number(data[0]),
+                            QuestionID: Number(item),
+                            Text: String(data[1])
+                        }
+                        count++;
+                    })
+                    break;
+                case 4:
+                    var mas = result[i];
+                    $.each(mas, function (i, data) {
+                        query_q[count] = {
+                            Id: Number(data),
+                            QuestionID: Number(item),
+                            Text: String('null')
+                        }
+                        count++;
+                    })
+                    break;
+                default:
+                    break;
+            }
+
+        })
+        console.info("query_q ---- ", query_q);
+        query = {
+            name: $('p.name_operator').text(),
+            project_id: id_project,
+            phone_number: $("#phone_number").val().replace(/[^0-9]/ig, ''),
+            list: query_q
+        }
+        sendData(query);
+    });
+
+    function sendData(query) {
+
+        $.post("/Form/SaveData", query)
+            .success(function (data) {
+                alert('Result ID -> ' + data);
+                $('#Tables').load('/Home/BeginForm?id_p=' + id_project, '', function () { $('div.waiting_screen').remove(); });
+            })
+            .error(function () {
+                alert("Error");
+                $('div.waiting_screen').remove();
+            })
+    }
+
+    $('.changes').on('mouseenter', '.quest', function () {
+        $(this).css('opacity', 0.6);
+    });
+
+    $('.changes').on('mouseleave', '.quest', function () {
+        $(this).css('opacity', 1);
+    })
+    var type_change_q;
+    $('.changes').on('click', '.quest', function () {
+        if ($('.change_panel').length == 0) {
+            var code_change;
+            var div_text = $(this);
+            $.ajax({
+                type: "GET",
+                url: "/Question/getQuestion",
+                async: false,
+                data: { id: div_text.attr('id') },
+                success: function (data) {
+                    var type_q = data.TypeQuestion;
+                    type_change_q = type_q;
+                    code_change = '<div class="change_panel"><table width="100%"><tr><td width="92%">' +
+                        '<h3>Вопрос</h3><div class="question" id=' + data.Id + '>' + data.TextQuestion + '</div>' +
+                        '<div id=' + type_q + ' name="TypeQuestion" style="display: none"></div><table class="change_answer_table">';
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/Form/getAnswer",
+                        async: false,
+                        dataType: 'json',
+                        data: { id_q: data.Id },
+                        success: function (data) {
+                            var code;
+                            var ready_answer;
+                            var all_answer = data;
+                            var massiv = result[massiv_question_id.indexOf(Number(div_text.attr('id')))];
+
+                            $.each(all_answer, function (i, data) {
+                                switch (type_q) {
+                                    case 1:
+                                        for (var k = 0; k < massiv.length; k++) {
+                                            if (massiv[k] == data.Id) {
+
+                                                code = '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + data.Id + '" checked/><span>' + data.AnswerText + '</span></td></tr>';
+                                                break;
+                                            }
+                                            else {
+                                                code = '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + data.Id + '"/><span>' + data.AnswerText + '</span></td></tr>';
+                                            }
+                                        }
+                                        code_change += code;
+                                        break;
+                                    case 2:
+                                        for (var k = 0; k < massiv.length; k++) {
+                                            if (massiv[k] == data.Id) {
+                                                code = '<tr class="tool_layer"><td><input type="checkBox" name="group" id ="' + data.Id + '" checked/><span>' + data.AnswerText + '</span></td></tr>';
+                                                break;
+                                            }
+                                            else {
+                                                code = '<tr class="tool_layer"><td><input type="checkBox" name="group" id ="' + data.Id + '"/><span>' + data.AnswerText + '</span></td></tr>';
+                                            }
+                                        }
+                                        code_change += code;
+                                        break;
+                                    case 3:
+                                        for (var k = 0; k < massiv.length; k++) {
+                                            if (Number(massiv[k].substr(0, massiv[k].indexOf('#'))) == data.Id) {
+                                                code = '<tr class="tool_layer"><td><span>' + data.AnswerText + '</span> <input type="text" name="group" id ="' + data.Id + '" value="' + massiv[k].substr(massiv[k].indexOf('#') + 1) + '"/></td></tr>';
+                                            }
+                                        }
+                                        code_change += code;
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+
+                            });
+                            code_change += '</table></td><td class="button_save" width="8%">></td></tr></table></div>';
+                            div_text.replaceWith(code_change);
+                        },
+                        error: function () { alert('Can not get ready question ') }
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    });
+    $('.changes').on('mouseenter', '.button_save', function () {
+        $(this).css('background-color', '#72afff');
+    });
+    $('.changes').on('mouseleave', '.button_save', function () {
+        $(this).css('background-color', '#ddd');
+    });
+    $('.changes').on('click', '.button_save', function () {
+        var div_text = $('.change_panel .question');
+        var code_change = '<div class="quest" id="' + div_text.attr('id') + '">';
+
+        $.when(goNext(div_text)).then(function () {
+            var id_question = div_text.attr('id');
+
+            code_change += '<h3>Вопрос</h3><div class="question" id="' + div_text.attr('id') + '">' + div_text.html() + '</div>';
+            code_change += '<h3>Выбраны ответы</h3>';
+
+            $.ajax({
+                type: "GET",
+                url: "/Form/getAnswer",
+                async: false,
+                data: { id_q: id_question },
+                success: function (data) {
+                    var massiv = result[massiv_question_id.indexOf(Number(id_question))];
+                    //$.each(data, function (i, data) {
+                    //    for (var k = 0; k < massiv.length; k++) {
+                    //        if (massiv[k] == data.Id) {
+                    //            var code = '<p class="answer" id="' + div_text.attr('id') + '">' + data.AnswerText + '</p>';
+                    //            code_change += code;
+                    //        }
+                    //    }
+                    //    //var code = '<p class="answer" id="' + div_text.attr('id') + '">' + data.AnswerText + '</p>';
+                    //    //code_change += code;
+                    //});
+                    $.each(data, function (i, data) {
+                        if (type_q != 3) {
+                            for (var k = 0; k < massiv.length; k++) {
+                                if (massiv[k] == data.Id) {
+                                    var code = '<p class="answer" id="' + div_text.attr('id') + '">' + data.AnswerText + '</p>';
+                                    code_change += code;
+                                }
+                            }
+                        } else {
+
+                            for (var k = 0; k < massiv.length; k++) {
+                                if (Number(massiv[k].substr(0, massiv[k].indexOf('#'))) == data.Id) {
+                                    var code = '<p class="answer" id="' + div_text.attr('id') + '">' + massiv[k].substr(massiv[k].indexOf('#') + 1) + '</p>';
+                                    code_change += code;
+                                }
+                            }
+                        }
+
+                    });
+                    $('.change_panel').replaceWith(code_change);
+                }
+            });
+        });
+    });
+
+    function goNext(div_text) {
+        id_q = div_text.attr('id');
+        type_q = $('div[name=TypeQuestion]').attr('id');
+        var mas = [];
+        switch (type_q) {
+            case '1':
+                id_a = $("input:radio:checked").attr('id');
+                var data = 'id_q=' + id_q + '&id_a=' + id_a;
+                result[massiv_question_id.indexOf(Number(id_q))] = [id_a];
+                break;
+            case '2':
+                $.each($("input:checkbox:checked"), function () {
+                    mas.push($(this).attr('id'));
+                });
+
+                result[massiv_question_id.indexOf(Number(id_q))] = mas;
+                break;
+            case '3':
+                $('input:text[name=group]').each(function () {
+                    mas.push($(this).attr('id') + "#" + $(this).val());
+                });
+                result[massiv_question_id.indexOf(Number(id_q))] = mas;
+                break;
+            default:
+                break;
+        }
+    }
+
+    $('.change_answer_table').off("click", ".tool_layer");
+    $('.change_answer_table').on("click", ".tool_layer", function () {
+        if (type_change_q == 2) {
+            if (!$(this).children('td').children('input').is(':checked')) {
+                $(this).children('td').children('input').prop('checked', true);
+            }
+            else {
+                $(this).children('td').children('input').prop('checked', false);
+            }
+        } else {
+            $(this).children('td').children('input').prop('checked', true);
+        }
+    });
+</script>

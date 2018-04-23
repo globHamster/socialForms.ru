@@ -1,0 +1,12 @@
+﻿<button class="delete">Удалить</button>
+@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('button.delete').click(function () {
+            $.get('/Home/delete_click')
+                .success(function () { alert("Item is deleted"); })
+        })
+
+    })
+</script>

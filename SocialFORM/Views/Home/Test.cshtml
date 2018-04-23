@@ -1,0 +1,78 @@
+﻿
+@{
+    ViewBag.Title = "Test";
+}
+
+<h2>Test</h2>
+
+@model IEnumerable<SocialFORM.Models.UserViewModel>
+
+<p>
+    @Html.ActionLink("Изменить", "#")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.IdView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LoginView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PasswordView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NameView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FamilyView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AgeView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FoolView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EmailView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PrivilegeView)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LoginView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PasswordView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NameView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FamilyView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AgeView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FoolView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmailView)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrivilegeView)
+            </td>
+        </tr>
+    }
+
+</table>

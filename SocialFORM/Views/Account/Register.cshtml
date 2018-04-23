@@ -1,0 +1,140 @@
+﻿@model SocialFORM.Models.Authentication.RegisterModel
+
+@{
+    ViewBag.Title = "Register";
+}
+
+<h2>Добавить пользователя</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Регистрация</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <p class="control-label col-md-2">Логин :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Пароль :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Имя :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Фамилия :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Family, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Family, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Возраст :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Age, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Age, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Пол :</p>
+            <div class="col-md-10">
+                <div>
+                    @Html.RadioButtonFor(model => model.Fool, "Мужской")
+                    <span>Мужской</span>
+                </div>
+                <div>
+                    @Html.RadioButtonFor(model => model.Fool, "Женский")
+                    <span>Женский</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <p class="control-label col-md-2">Почта :</p>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="control-label col-md-2">Роль :</p>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.RoleId, ViewBag.Role as SelectList)
+            </div>
+        </div>
+
+
+    </div>
+
+}
+<button class="CreatUser">Добавить</button>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+@Scripts.Render("~/scripts/jquery-1.10.2.js")
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".CreatUser").click(function () {
+
+            var NAME = $("#Name").val();
+            var FAMILY = $("#Family").val();
+            var AGE = $("#Age").val();
+            var FOOL = $('input[name=Fool]:checked').val()
+            var EMAIL = $("#Email").val();
+            var LOGIN = $("#Login").val();
+            var PASSWORD = $("#Password").val();
+            var ROLEID = $("#RoleId").val();
+
+            var query = {
+                Name: NAME,
+                Family: FAMILY,
+                Age: AGE,
+                Fool: FOOL,
+                Email: EMAIL,
+                Login: LOGIN,
+                Password: PASSWORD,
+                RoleId: ROLEID
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/Account/RegisterUser",
+                data: query,
+                datatype: "html",
+                success: function () {
+                    $('#Tables').load("/Home/Users");
+                },
+                error: function () {
+                    alert("Erorr");
+                },
+                failure: function () {
+                    alert("No");
+                }
+            });
+        })
+    })
+</script>

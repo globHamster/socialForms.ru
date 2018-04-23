@@ -1,0 +1,794 @@
+﻿@model SocialFORM.Models.Question.QuestionModel
+<link type="text/css" rel="stylesheet" href="~/Scripts/jquery-te-1.4.0.css">
+<link rel="stylesheet" href="~/Scripts/minified/themes/square.min.css" />
+
+@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+@Scripts.Render("~/Scripts/jquery-te-1.4.0.js")
+
+<style>
+
+    .jqte_tool_1 .jqte_tool_lable {
+        height: 26px;
+    }
+
+    .jqte_editor textarea {
+        box-sizing: border-box;
+    }
+
+    #modal_form {
+        width: 300px;
+        height: 300px; /* Рaзмеры дoлжны быть фиксирoвaны */
+        border-radius: 5px;
+        border: 3px #000 solid;
+        background: #fff;
+        position: fixed; /* чтoбы oкнo былo в видимoй зoне в любoм месте */
+        top: 45%; /* oтступaем сверху 45%, oстaльные 5% пoдвинет скрипт */
+        left: 50%; /* пoлoвинa экрaнa слевa */
+        margin-top: -150px;
+        margin-left: -150px; /* тут вся мaгия центрoвки css, oтступaем влевo и вверх минус пoлoвину ширины и высoты сooтветственнo =) */
+        display: none; /* в oбычнoм сoстoянии oкнa не дoлжнo быть */
+        opacity: 0; /* пoлнoстью прoзрaчнo для aнимирoвaния */
+        z-index: 5; /* oкнo дoлжнo быть нaибoлее бoльшем слoе */
+        padding: 20px 10px;
+    }
+        /* Кнoпкa зaкрыть для тех ктo в тaнке) */
+        #modal_form #modal_close {
+            width: 21px;
+            height: 21px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            display: block;
+        }
+    /* Пoдлoжкa */
+    #overlay {
+        z-index: 3; /* пoдлoжкa дoлжнa быть выше слoев элементoв сaйтa, нo ниже слoя мoдaльнoгo oкнa */
+        position: fixed; /* всегдa перекрывaет весь сaйт */
+        background-color: #000; /* чернaя */
+        opacity: 0.8; /* нo немнoгo прoзрaчнa */
+        -moz-opacity: 0.8; /* фикс прозрачности для старых браузеров */
+        filter: alpha(opacity=80);
+        width: 100%;
+        height: 100%; /* рaзмерoм вo весь экрaн */
+        top: 0; /* сверху и слевa 0, oбязaтельные свoйствa! */
+        left: 0;
+        cursor: pointer;
+        display: none; /* в oбычнoм сoстoянии её нет) */
+    }
+
+    .massk {
+        display: none;
+    }
+</style>
+
+@Html.Hidden("id", Model.Id)
+<input type="text" value="@Model.Id" class="Id" hidden />
+<input type="text" value="@Model.TypeQuestion" class="Type_Question" hidden />
+@Html.Label("Текст вопроса")
+<textarea id="example" style="width: 80%; height: 300px; display: none;"></textarea>
+
+<table>
+    <tr>
+        <td> @Html.Label("Тип вопроса")</td>
+        <td>
+            @Html.EnumDropDownListFor(model => model.TypeQuestion, "Выберите тип вопроса", new { id = "typequestion", value = Model.TypeQuestion })
+
+            <span style="margin-left: 10px">Использовать переход <input type="checkbox" class="set_transition" /></span>
+        </td>
+        <td>
+            <div class="massk">
+                @Html.Label("Тип маски")
+                @Html.EnumDropDownListFor(model => model.TypeMassk, "Выберите тип маски", new { id = "typemassk", value = Model.TypeMassk })
+            </div>
+        </td>
+    </tr>
+</table>
+<hr style="margin-top: 10px; margin-bottom: 10px; color: red; background-color: red; height: 2px;">
+<div id="change_panel" class="table_answe">
+    <table class="manager_panel"></table>
+</div>
+<div class="question_form"></div>
+<div class="panel_base_answer" style="display:none">
+    <select class="base_answer"></select>
+    <button class="add_base_answer">Добавить</button>
+</div>
+<button class="save_question">Сохраниеть вопрос</button>
+<button class="delete_question" style="margin-left: 20px;">Удалить вопрос</button>
+
+
+@*Подключение скриптов*@
+<script src="~/Scripts/minified/sceditor.min.js"></script>
+<script src="~/Scripts/minified/formats/xhtml.js"></script>
+<script src="~/Scripts/minified/icons/monocons.js"></script>
+<script src="~/Scripts/tableform_script.js" type="text/javascript"></script>
+
+@*Исполняймый скрип*@
+<script type="text/javascript">
+    var list_answer_base;
+    var id_list_answer_base = [];
+    var list_answer_base_1 = [];
+
+    var textarea = document.getElementById('example');
+    sceditor.create(textarea, {
+        resizeEnabled: false,
+        format: 'xhtml',
+        icons: 'monocons',
+        style: '/Scripts/minified/themes/content/default.min.css',
+        toolbar: 'bold,italic,underline|left,center,right,justify|font,size,color,removeformat|code,quote,horizontalrule|source,maximize'
+    });
+
+    $.ajax({
+        type: "GET",
+        url: "/Question/getListAnswerBase",
+        async: false,
+        data: {},
+        success: function (data) {
+            $.each(data, function (i, item) {
+                id_list_answer_base.push(item.Id);
+                list_answer_base_1.push(item);
+            })
+        }
+    })
+
+    $(function () {
+       
+        var id_q = $(".Id").attr('value');
+        var type_q;
+        if (!is_loaded) {
+            is_loaded = true;
+        $.ajax({
+            type: "GET",
+            url: "/Question/getQuestion",
+            async: false,
+            data: { id: id_q },
+            success: function (data) {
+
+
+
+                $(".jqte_editor").html(data.TextQuestion);
+                sceditor.instance(textarea).val(data.TextQuestion);
+                if (data.TypeQuestion == '3') {
+                    $('.massk').show();
+                    $("#typemassk").val(data.TypeMassk);
+                }
+                $("#typequestion").val(data.TypeQuestion);
+                type_q = $("#typequestion").val();
+                $.ajax({
+                    type: "GET",
+                    url: "/Question/getAnswer",
+                    async: false,
+                    data: { id_question: id_q },
+                    success: function (data) {
+                        switch (type_q) {
+                            case '1':
+                                $(".question_form").load("/Group/SingleForm");
+                                setTimeout(function () {
+                                    $.each(data, function (i, data) {
+                                        if (data.isFreeArea)
+                                            var code = '<tr><td><input type="radio" value="' + data.Index + '" class="edittext" disabled/><span id="' + data.Id + '" class="edittext">' + data.AnswerText + '</span><span style="border: 1px solid black; padding: 5px; margin-left: 5px;"> Добавить сободный ответ <input class="is_free_area" type="checkbox" checked/></span><button id="' + data.Id + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
+                                        else
+                                            var code = '<tr><td><input type="radio" value="' + data.Index + '" class="edittext" disabled/><span id="' + data.Id + '" class="edittext">' + data.AnswerText + '</span><span style="border: 1px solid black; padding: 5px; margin-left: 5px;"> Добавить сободный ответ <input class="is_free_area" type="checkbox"/></span><button id="' + data.Id + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
+                                        $(".manager_panel").append(code);
+
+                                    });
+                                    $.ajax({
+                                        type: "GET",
+                                        url: "/Question/getAnswerAll",
+                                        async: false,
+                                        data: { question_id: id_q },
+                                        success: function (data) {
+                                            $.each(data, function (i, item) {
+                                                //  alert(list_answer_base.length);
+                                                if (item.AnswerType == 2) {
+
+                                                    code = '<tr class="base_answer" id="' + list_answer_base[item.AnswerKey - 2].BaseIndex + '"><td><input type="radio" class="base_answer" name="group" id ="' + list_answer_base[item.AnswerKey - 2].Id + '"/><span class="base_answer ' + list_answer_base[item.AnswerKey - 2].Transcription + '">' + list_answer_base[item.AnswerKey - 2].AnswerText + '</span><input type="checkbox" class="is_free_area" hidden/><button id="' + item.Id + '" class="delete_answer_base" style="margin-left: 10px">X</button></td></tr>';
+                                                    $(".manager_panel").append(code);
+                                                }
+                                            });
+                                        },
+                                        error: function () { alert("ERROR"); }
+                                    })
+                                }, 100);
+                                break;
+                            case '2':
+                                $(".question_form").load("/Group/MultipleForm");
+                                setTimeout(function () {
+                                    $.each(data, function (i, data) {
+                                        if (data.isFreeArea)
+                                            var code = '<tr><td><input type="checkBox" value="' + data.Index + '" class="edittext" disabled/><span id="' + data.Id + '" class="edittext">' + data.AnswerText + '</span><span style="border: 1px solid black; padding: 5px; margin-left: 5px;"> Добавить сободный ответ <input class="is_free_area" type="checkbox" checked/></span><button id="' + data.Id + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
+                                        else
+                                            var code = '<tr><td><input type="checkBox" value="' + data.Index + '" class="edittext" disabled/><span id="' + data.Id + '" class="edittext">' + data.AnswerText + '</span><span style="border: 1px solid black; padding: 5px; margin-left: 5px;"> Добавить сободный ответ <input class="is_free_area" type="checkbox"/></span><button id="' + data.Id + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
+                                        $(".manager_panel").append(code);
+                                    });
+                                    $.ajax({
+                                        type: "GET",
+                                        url: "/Question/getAnswerAll",
+                                        async: false,
+                                        data: { question_id: id_q },
+                                        success: function (data) {
+                                            $.each(data, function (i, item) {
+                                                //  alert(list_answer_base.length);
+                                                if (item.AnswerType == 2) {
+                                                    code = '<tr class="base_answer" id="' + list_answer_base[item.AnswerKey - 2].BaseIndex + '"><td><input type="checkbox" class="base_answer" name="group" id ="' + list_answer_base[item.AnswerKey - 2].Id + '"/><span class="base_answer ' + list_answer_base[item.AnswerKey - 2].Transcription + '">' + list_answer_base[item.AnswerKey - 2].AnswerText + '</span><input type="checkbox" class="is_free_area" hidden/><button id="' + item.Id + '" class="delete_answer_base" style="margin-left: 10px">X</button></td></tr>';
+                                                    $(".manager_panel").append(code);
+                                                }
+                                            });
+                                        },
+                                        error: function () { alert("ERROR"); }
+                                    })
+                                }, 100);
+                                break;
+                            case '3':
+
+                                $('.question_form').load("/Group/FreeForm");
+
+                                $.each(data, function (i, data) {
+                                    var code = '<tr><td><span id="' + data.Id + '" class="edittext">' + data.AnswerText + '</span> <input type="text" value="1" class="edittext" disabled/><button id="' + data.Id + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
+                                    $(".manager_panel").append(code);
+
+                                });
+                                break;
+                            case '4':
+                                var query_table = { id_q: id_q, id_a: 0 };
+                                $.get("/Question/getTableRow", query_table)
+                                    .success(function (data_row) {
+                                        var row_length = data_row.length;
+                                        var colum_length = data.length;
+                                        code = '<table class="table_answer">';
+                                        for (var row_iter = 0; row_iter <= row_length; row_iter++) {
+                                            if (row_iter == 0)
+                                                code += '<tr id=' + row_iter + ' class="table_answer">';
+                                            else
+                                                code += '<tr id=' + row_iter + ' name="' + data_row[row_iter - 1].Id + '" class="table_answer">';
+                                            for (var colum_iter = 0; colum_iter <= colum_length; colum_iter++) {
+                                                if (row_iter == 0 && colum_iter != 0) {
+                                                    code += '<td id=' + colum_iter + ' class="item_answer table_answer"><span class="edittext" id="' + data[colum_iter - 1].Id + '">' + data[colum_iter - 1].AnswerText + '</td>'
+                                                } else {
+                                                    if (row_iter != 0 && colum_iter != 0) {
+                                                        code += '<td id=' + colum_iter + ' class="check_td table_answer"><input type="radio" name="group' + row_iter + '"/></td>';
+                                                    } else {
+                                                        if (row_iter != 0 && colum_iter == 0)
+                                                            code += '<td id=' + colum_iter + ' class="item_question table_answer"><span class="row_text" id="' + data_row[row_iter - 1].Id + '">' + data_row[row_iter - 1].TableRowText + '</td>';
+                                                        else
+                                                            code += '<td id=' + colum_iter + ' class="table_answer"></td>';
+                                                    }
+                                                }
+                                            }
+                                            code += '</tr>';
+                                        }
+                                        code += '</table>';
+                                        code += '<button class="add_row">Добавить строку</button>';
+                                        code += '<button class="add_colum">Добавить столбец</button>';
+                                        $('div#change_panel').append(code);
+                                        $('.question_form').load("/Group/TableForm");
+                                    })
+                                    .error(function () { console.error("Ошибка выгрузки данных ... /Question/getTableRow") });
+
+                                break;
+                            case '5':
+                                break;
+                            default:
+                                break;
+                        }
+
+
+                    },
+                    error: function () { console.error("Ошибка выгрузки данных ... /Question/getAnswer") }
+                });
+            }
+            });
+        is_loaded = false;
+        bkLib.onDomLoaded(function () { nicEditors.allTextAreas() });
+
+    }
+    });
+
+    function sortFn(prop) {
+        return function (a, b) {
+            return a[prop] - b[prop];
+        }
+    }
+
+    $(".save_question").click(function () {
+        var text_question = sceditor.instance(textarea).val();
+        var type_question = $("#typequestion").val();
+        var query;
+        if (type_question != 3) {
+            if ($('input.binding_question').is(':checked')) {
+                query = {
+                    Id: $("#id").attr('value'),
+                    TypeQuestion: type_question,
+                    TextQuestion: text_question,
+                    ProjectID: $('input[name=project_id]').val(),
+                    Bind: $('select.id_bind_question option:checked').val()
+                };
+            } else {
+                query = {
+                    Id: $("#id").attr('value'),
+                    TypeQuestion: type_question,
+                    TextQuestion: text_question,
+                    ProjectID: $('input[name=project_id]').val()
+                };
+            }
+        } else {
+            query = {
+                Id: $("#id").attr('value'),
+                TypeQuestion: type_question,
+                TextQuestion: text_question,
+                ProjectID: $('input[name=project_id]').val(),
+                TypeMassk: $('#typemassk').val()
+            }
+        }
+        var question_id;
+        $.ajax({
+            type: "POST",
+            url: "/Question/Question",
+            data: query,
+            success: function (data) {
+                if (type_question == 5) {
+                    alert("Вопрос сохранен");
+                    $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
+                    return;
+                }
+                var massiv_table_row = [];
+                var massiv_text_answer = []
+                question_id = data;
+                var tmp = $('input.edittext');
+                //  alert(tmp);
+                tmp.sort(sortFn('value'));
+                if (type_question == 4) {
+                    var iter = 1;
+                    $('span.row_text').each(function () {
+                        var row_id;
+                       
+                        if ($(this).attr('id') != null) {
+                            row_id = $(this).attr('id');
+                        } else {
+                            row_id = 0;
+                        }
+                        if ($(this).parent().find('input.own_index').length != 0) {
+                            var query_q = {
+                                Id: row_id,
+                                TableID: question_id,
+                                TableRowText: $(this).text(),
+                                IndexRow: $(this).parent().find('input.own_index').val()
+                            };
+                        } else {
+                            var query_q = {
+                                Id: row_id,
+                                TableID: question_id,
+                                TableRowText: $(this).text(),
+                                IndexRow: iter
+                            };
+                        }
+                        massiv_table_row.push(query_q);
+                        iter++;
+                    });
+                    $('span.edittext').each(function () {
+                        var answer_id;
+                        if ($(this).attr('id') != null) {
+                            answer_id = $(this).attr('id');
+                        } else {
+                            answer_id = 0;
+                        }
+                        var query_a = {
+                            Id: answer_id,
+                            AnswerText: $(this).text(),
+                            QuestionID: question_id,
+                            Index: $(this).parent().find('input.index').attr('id')
+                        };
+                        massiv_text_answer.push(query_a);
+                    });
+                    var query = {
+                        id_q: question_id,
+                        text_row: massiv_table_row,
+                        data: massiv_text_answer
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "/Question/setTableRow",
+                        async: false,
+                        data: query,
+                        success: function () { }
+                    });
+                    alert("Вопрос сохранен");
+                    $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
+                    return;
+                }
+                tmp.each(function () {
+                    var answer_id;
+                    if ($(this).next().attr('id') != null) {
+                        answer_id = $(this).next().attr('id');
+                    } else {
+                        answer_id = 0;
+                    }
+                    var query_answer;
+                    if (type_question == 3) {
+                        query_answer = {
+                            Id: answer_id,
+                            AnswerText: $(this).prev().text(),
+                            QuestionID: question_id,
+                            Index: $(this).attr('value')
+                        };
+                        $.ajax({
+                            type: "POST",
+                            url: "/Question/Answer",
+                            async: false,
+                            data: query_answer,
+                            success: function () { }
+                        });
+                    } else {
+                        if ($(this).next().hasClass('base_answer')) {
+                            query_answer = {
+                                AnswerKey: $(this).next().attr('id'),
+                                AnswerType: 2,
+                                QuestionID: question_id
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: "/Question/setAnswerAll",
+                                async: false,
+                                data: query_answer,
+                                success: function () {
+
+                                }
+                            });
+                        } else {
+                            //   alert($(this).parent().find('input.is_free_area').prop('checked'));
+                            query_answer = {
+                                Id: answer_id,
+                                AnswerText: $(this).next().text(),
+                                QuestionID: question_id,
+                                Index: $(this).attr('value'),
+                                isFreeArea: $(this).parent().find('input.is_free_area').prop('checked')
+                            };
+                            // alert(query_answer);
+                            $.ajax({
+                                type: "POST",
+                                url: "/Question/Answer",
+                                async: false,
+                                data: query_answer,
+                                success: function () { }
+                            });
+                        }
+
+                    }
+
+                });
+                alert("Вопрос сохранен");
+                $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
+            },
+            error: function () {
+
+            }
+        });
+
+
+        setTimeout(function () {
+
+        }, 500);
+
+    });
+
+    $(document).ready(function () { // вся мaгия пoсле зaгрузки стрaницы
+        $('#add_question').click(function (event) { // лoвим клик пo ссылки с id="go"
+            event.preventDefault(); // выключaем стaндaртную рoль элементa
+            $('#overlay').fadeIn(400, // снaчaлa плaвнo пoкaзывaем темную пoдлoжку
+                function () { // пoсле выпoлнения предъидущей aнимaции
+                    $('#modal_form')
+                        .css('display', 'block') // убирaем у мoдaльнoгo oкнa display: none;
+                        .animate({ opacity: 1, top: '50%' }, 200); // плaвнo прибaвляем прoзрaчнoсть oднoвременнo сo съезжaнием вниз
+                });
+        });
+        /* Зaкрытие мoдaльнoгo oкнa, тут делaем тo же сaмoе нo в oбрaтнoм пoрядке */
+        $('#modal_close, #overlay, .add_group').click(function () { // лoвим клик пo крестику или пoдлoжке
+            $('#modal_form')
+                .animate({ opacity: 0, top: '45%' }, 200,  // плaвнo меняем прoзрaчнoсть нa 0 и oднoвременнo двигaем oкнo вверх
+                function () { // пoсле aнимaции
+                    $(this).css('display', 'none'); // делaем ему display: none;
+                    $('#overlay').fadeOut(400); // скрывaем пoдлoжку
+                }
+                );
+        });
+    });
+
+
+    $(".delete_question").click(function () {
+        var id_question = $("#id").attr('value');
+
+        //$.post("/Question/deleteAllAnswer", { id_question: id_question })
+        //    .success(function () { })
+        //    .error(function (data) { alert(data + "No answer"); });
+
+        $.ajax({
+            type: "POST",
+            url: "/Question/deleteQuestion",
+            async: false,
+            data: { id: id_question },
+            success: function () {
+                $("#" + id_question).remove();
+                //$(".editor").empty();
+                $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
+            }
+        })
+
+        //$.post("/Question/deleteQuestion", { id: id_question })
+        //    .success(function () { })
+        //    .error(function (data) { alert(data + "No question"); });
+        //$(".tree_view").ready(function () {
+        //    $("#" + id_question).remove();
+        //});
+        //setTimeout(function () {
+        //    $(".editor").empty();
+        //    $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
+        //}, 100);
+
+    });
+
+
+
+    $("#typequestion").change(function () {
+        var type = $(this).val();
+        switch (type) {
+            case '1':
+                $('.manager_panel input').each(function () {
+                    $(this).attr('type', 'radio');
+                });
+                $(".question_form").load("/Group/SingleForm");
+                break;
+            case '2':
+                $('.manager_panel input').each(function () {
+                    $(this).attr('type', 'checkBox');
+                });
+                $(".question_form").load("/Group/MultipleForm");
+                break;
+            case '3':
+                $('.manager_panel').empty();
+                $('.question_form').load("/Group/FreeForm");
+                $('div.massk').show();
+                break;
+            case '4':
+                $('.manager_panel').empty();
+                $('.question_form').load("/Group/TableForm");
+                break;
+            case '5':
+                $('.manager_panel').empty();
+                $('.question_form').empty();
+                break;
+            default:
+                break;
+        }
+    });
+
+    $(".manager_panel").off("dblclick", ".edittext");
+    $(".manager_panel").on("dblclick", ".edittext", function (e) {
+        var t = e.target || e.srcElement;
+        var elm_name = t.tagName.toLowerCase();
+        if (elm_name == 'input') return false;
+        var val = $(this).html();
+        var code = '<input type="text" id="edit" value="' + val + '" />';
+        $(this).empty().append(code);
+        $("#edit").focus();
+        $("#edit").blur(function () {
+            var val = $(this).val();
+            $(this).parent().empty().html(val);
+        });
+        $(window).keydown(function (e) {
+            if (e.keyCode == 13) {
+                $("#edit").blur();
+            }
+        });
+
+    });
+
+    /*
+        Данный блок будет перемещен в функцию при загруске вопроса типа Single и Multiple
+        BEGIN CODE
+    */
+
+    if ($('.Type_Question').attr('value') == 'Single' || $('.Type_Question').attr('value') == 'Multiple') {
+
+        $.get('/Question/getListAnswerBase')
+            .success(function (data) {
+                $('div.panel_base_answer').fadeIn(1000);
+                var code;
+                $.each(data, function (i, item) {
+                    code += '<option value="' + item.Id + '" name="' + item.Transcription + '">' + item.AnswerText + '</option>';
+                });
+                $('select.base_answer').append(code);
+            });
+    }
+
+    $('button.add_base_answer').bind('click', function () {
+        alert("Add answer");
+        if ($('.manager_panel').find('span.' + $('select.base_answer option:selected').attr('name')).length == 0) {
+            var code = '<tr><td><input type="radio" value="' + 99 + '" class="edittext" disabled/><span id="' + $('select.base_answer option:selected').attr('value') + '" class="edittext base_answer ' + $('select.base_answer option:selected').attr('name') + '">' + $('select.base_answer option:selected').text() + '</span><button id="' + 1 + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
+            $(".manager_panel").append(code);
+        } else {
+            alert("Уже есть");
+        }
+    });
+
+    $.ajax({
+        type: "GET",
+        url: "/Question/getListTransitionQuestion",
+        async: false,
+        data: { id_q: $('input.Id').val() },
+        success: function (data) {
+            if (data.length != 0) {
+                $('input.set_transition').prop('checked', true);
+                DrawPanelTransition($('input.set_transition'));
+            }
+        }
+    });
+
+
+    /*
+     *Создание панети управления переходами о вопроса к вопросу
+     */
+    $('input.set_transition').click(function (event) {
+        if ($(this).is(':checked')) {
+            DrawPanelTransition($(this));
+
+        } else {
+            $('div.panel_transition').remove();
+            $('div.slide_line').remove();
+            $.post("/Question/deleteAllTransition", { id_question: $('input.Id').val() })
+                .success(function () { alert('Таблица переходов удалена'); })
+        }
+    })
+
+
+    /*
+    * Функция отрисовки панели переходов
+    */
+    function DrawPanelTransition(checkbox_flag) {
+        var checkbox_transition = checkbox_flag;
+        var code = '<div class="panel_transition"><div class="button_close">X</div></div>';
+        checkbox_transition.parent().parent().parent().parent().parent().after(code);
+        $('div.panel_transition').css({
+            'background-color': '#A9A9A9',
+            'border': '1px solid black',
+            'width': '100%',
+            'height': 'auto',
+            'display': 'none',
+            'padding': '15px'
+        });
+        $('div.panel_transition').slideDown(500);
+        $('div.button_close').css({
+            'position': 'relative',
+            'border': '1px solid red',
+            'border-radius': '20px',
+            'background-color': '#fff',
+            'left': '100%',
+            'top': -10,
+            'width': '20px',
+            'height': '20px',
+            'text-align': 'center',
+            'opacity': '0',
+            'cursor': 'pointer'
+        }).animate({ left: '-=10', opacity: 1 }, 500).bind('click', function () {
+            $('div.panel_transition').slideUp(500, function () {
+                $('div.panel_transition').after('<div class="slide_line" style="width: 100%; height: 5px; background-color: #A9A9A9;"><div class="slide_down_panel"><img src="/Content/slide_down.png" alt="img" style="width: 100%; height: 100%;"/></div></div>');
+                $('div.slide_down_panel').css({
+                    'position': 'relative',
+                    'text-align': 'center',
+                    'left': '100%',
+                    'top': '-10px',
+                    'background-color': '#fff',
+                    'border': '1px solid black',
+                    'border-radius': '25px',
+                    'width': '25px',
+                    'height': '25px'
+                }).bind('click', function () { $('div.slide_down_panel').fadeOut(1000); $('div.slide_line').fadeOut(500); $('div.panel_transition').slideDown(500); });
+            })
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "/Group/getGroup",
+            async: false,
+            data: { id_p: $('input[name=project_id]').val() },
+            success: function (data) {
+                code = '<span> Выберите вопрос для перехода <select class="toQuestion">';
+                $.each(data, function (i, item) {
+                    code += '<option value="' + item.QuestionID + '">' + item.GroupName + '</option>'
+                });
+                code += '</select></span>';
+                $('div.panel_transition').append(code);
+            }
+        });
+        $.ajax({
+            type: "GET",
+            url: "/Question/getAnswerAll",
+            async: false,
+            data: { question_id: $('input.Id').val() },
+            success: function (data) {
+                var list_answer_normal = [];
+                var id_list_answer_normal = [];
+                code = '<span> Выберите ответ <select class="TriggerAnswer">';
+                $.each(data, function (i, item) {
+                    if (item.AnswerType == 1) {
+                        $.ajax({
+                            type: "GET",
+                            url: "/Question/getAnswer",
+                            async: false,
+                            data: { id_question: $('input.Id').val() },
+                            success: function (data) {
+                                $.each(data, function (i, item) {
+                                    id_list_answer_normal.push(item.Id);
+                                    list_answer_normal.push(item);
+                                })
+                            }
+                        })
+                        code += '<option value="' + item.AnswerKey + '">' + list_answer_normal[id_list_answer_normal.indexOf(item.AnswerKey)].AnswerText + '</option>'
+                    } else {
+                        code += '<option value="' + item.AnswerKey + '">' + list_answer_base_1[id_list_answer_base.indexOf(item.AnswerKey)].AnswerText + '</option>'
+                    }
+                });
+                code += '</select></span>';
+                $('div.panel_transition').append(code);
+            }
+        });
+        $('div.panel_transition').append('<button class="save_transition" style="margin-left: 15px;">Сохраниеть</button>');
+        LoadListTransition();
+
+        $('button.save_transition').click(function () {
+            var is_exist = false;
+            $('span[name=transition_answer_id]').each(function () {
+                if (Number($(this).text()) == Number($('select.TriggerAnswer option:checked').attr('value'))) {
+                    alert('Переход для данного ответа уже существует');
+                    is_exist = true;
+                }
+
+            })
+            if (!is_exist) {
+                var query = {
+                    fromQuestion: $('input.Id').val(),
+                    toQuestion: $('select.toQuestion option:checked').attr('value'),
+                    ProjectID: $('input[name=project_id]').val(),
+                    TriggerAnswer: $('select.TriggerAnswer option:checked').attr('value')
+                }
+                $.post("/Question/setTransition", query)
+                    .success(function () { alert('Переход добавлен'); LoadListTransition(); });
+            }
+        })
+    }
+
+    /*
+    * Загрузка листа переходов
+    */
+    function LoadListTransition() {
+        $('div.list_transition').remove();
+        $.ajax({
+            type: "GET",
+            url: "/Question/getListTransition",
+            async: false,
+            data: { id_p: $('input[name=project_id]').val() },
+            success: function (data) {
+                code = '<div class="list_transition" style="overflow-y: auto; margin: 10px; background: #87CEFA"></div>';
+                $('div.panel_transition').append(code);
+                $.each(data, function (i, item) {
+                    if (item.fromQuestion == Number($('input.Id').val())) {
+                        code = '<p> From_Question: ' + item.fromQuestion + ' -> ToQuestion: ' + item.toQuestion + ' || AnswerTrigger: <span name="transition_answer_id">' + item.TriggerAnswer + '</span><button class="delete_transition" id="' + item.Id + '">X</button></p>'
+                        $('div.list_transition').append(code);
+                    }
+                })
+                $('button.delete_transition').click(function () {
+                    $.post("/Question/deleteTransition", { id_transition: $(this).attr('id') });
+                    $(this).parent().remove();
+                });
+            },
+            error: function () { alert("ERROR"); }
+        });
+    }
+
+    /*
+    *Функиция удаления базового ответа
+    */
+    $('.manager_panel').on('click', '.delete_answer_base', function () {
+        $.post("/Question/deleteAnswerAll", { id_answer: $(this).attr('id') });
+        $(this).parent().remove();
+    });
+</script>

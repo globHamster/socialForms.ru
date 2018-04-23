@@ -1,0 +1,37 @@
+﻿@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+
+<style>
+    button .delete_answer {
+        padding-left: 10px;
+    }
+</style>
+
+<p> <button id="adding">Добавить ответ</button></p>
+
+
+<script type="text/javascript">
+
+    var index = 1;
+
+
+    $("#adding").click(function () {
+        if ($('.manager_panel input[value]').length != 0) {
+            var max=0;
+            $('.manager_panel input[value]').each(function () {
+                if (Number($(this).attr('value')) > max)
+                    max = Number($(this).attr('value'));
+            });
+            index = ++max;
+        }
+        var code = '<tr><td><span class="edittext">ответ</span> <input type="text" class="edittext" disabled/><button class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
+        index++;
+        $(".manager_panel").append(code);
+    });
+
+    $(".manager_panel").on("click", ".delete_answer", function () {
+        $.post("/Question/deleteAnswer", { Id: $(this).attr('id') });
+        $(this).parent('td').parent('tr').remove();
+    });
+
+
+</script>

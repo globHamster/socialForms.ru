@@ -1,0 +1,76 @@
+﻿@{
+    ViewBag.Title = "Личный кабинет";
+}
+<div class="row">
+    <div class="col-md-3">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <h3>
+                        Добро пожаловать :
+                    </h3>
+                </div>
+                <div class="row">
+                    <p class="name_operator">
+                        @ViewData["Name"]  @ViewData["Family"]
+                    </p>
+                    <p>
+                        (@ViewData["Role"])
+                    </p>
+
+                </div>
+                <div class="row">
+                    <p>
+                        Инфо. блок
+                        @ViewData["test"]
+                    </p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6" id="timedisplay">
+
+                    </div>
+                    <div class="col-md-6">
+                        @Html.ActionLink("Выйти", "Logoff", "Account")
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3>Меню</h3>
+            @Html.Action("Menu", "Home")
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div id="Tables" class="Tables">
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+        window.onbeforeunload = function (evt) {
+        var message = "Document 'foo' is not saved. You will lost the changes if you leave the page.";
+        if (typeof evt == "undefined") {
+            evt = window.event;
+        }
+        if (evt) {
+            evt.returnValue = message;
+        }
+        return message;
+    }
+
+    function getDate() {
+        var date = new Date();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        //По надобности условие ниже повторить с minutes и hours
+        if (seconds < 10) {
+            seconds = '0' + seconds;
+        }
+        document.getElementById('timedisplay').innerHTML = hours + ':' + minutes + ':' + seconds;
+    }
+    setInterval(getDate, 0);
+
+
+</script>

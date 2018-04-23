@@ -1,0 +1,57 @@
+﻿@model IEnumerable<SocialFORM.Models.Project.ProjectModel>
+
+
+@Styles.Render("~/Content/loading.css")
+
+<h2>Список проектов</h2>
+
+
+<table class="table">
+    
+    @foreach (var item in Model)
+    {
+        <tr class="project_layer">
+            <td id="@item.Id">
+                @Html.DisplayFor(modelItem => item.NameProject)
+            </td>
+           
+        </tr>
+    }
+
+</table>
+
+
+@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+<script type="text/javascript">
+    $(document).on({
+        ajaxStart: function () { }
+    });
+    $(document).ready(function () {
+   
+
+        $(".table").on("click", "td", function () {
+            
+
+            $("#Tables").load("/Home/BeginForm?id_p=" + $(this).attr('id'), '', function () { $('.loading').hide(); });
+           
+           
+            
+            //location.href = "/Group/Manager?id_project=" + id;
+        });
+        
+        //$(".table").on("click", "button", function () {
+        //    alert("ewrqweq");
+        //    $("#Tables").load("/Form/SingleFormView?id_q=1");
+        //});
+        
+
+    });
+    $(".table").on('mouseenter', '.project_layer', function () {
+        $(this).css('background-color', '#72afff');
+    });
+    $(".table").on('mouseleave', '.project_layer', function () {
+        $(this).css('background-color', '#fff');
+    });
+
+
+</script>
