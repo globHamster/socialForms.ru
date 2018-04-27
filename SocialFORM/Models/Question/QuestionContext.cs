@@ -17,6 +17,7 @@ namespace SocialFORM.Models.Question
         public DbSet<AnswerBaseModel> SetAnswerBaseModels { get; set; }
         public DbSet<AnswerAll> SetAnswerAll { get; set; }
         public DbSet<Transition> SetTransition { get; set; }
+        public DbSet<Block> SetBlock { get; set; }
         public DbSet<Massk> GetMassk { get; set; }
     }
 }

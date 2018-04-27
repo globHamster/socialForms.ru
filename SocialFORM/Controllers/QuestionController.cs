@@ -463,5 +463,52 @@ namespace SocialFORM.Controllers
         {
             return Json(db.GetMassk.ToList(), JsonRequestBehavior.AllowGet);
         }
+
+        /*
+         *РАбота с блокировками.
+         * 
+         */
+
+        [HttpGet]
+        public JsonResult getListBlocks(int id_p)
+        {
+            return Json(db.SetBlock.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult getListBlocksQuestion(int id_q)
+        {
+            return Json(db.SetBlock.Where(u => u.fromQuestion == id_q).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public void setBlock(Block block)
+        {
+            db.SetBlock.Add(block);
+            db.SaveChanges();
+        }
+
+        [HttpPost]
+        public void deleteBlocks(int id_block)
+        {
+            Block tmp = db.SetBlock.FirstOrDefault(u => u.Id == id_block);
+            db.SetBlock.Remove(tmp);
+            db.SaveChanges();
+        }
+
+        [HttpPost]
+        public void deleteAllBlocks(int id_question)
+        {
+            List<Transition> list_transition = db.SetTransition.Where(u => u.fromQuestion == id_question).ToList();
+            db.SetTransition.RemoveRange(list_transition);
+            db.SaveChanges();
+        }
+
+        [HttpGet]
+        public JsonResult getListQuestionForBlocks(int id_p)
+        {
+            return Json(db.SetQuestions.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
