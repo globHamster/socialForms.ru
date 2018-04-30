@@ -484,7 +484,9 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void setBlock(Block block)
         {
+            QuestionModel tmp = db.SetQuestions.FirstOrDefault(u => u.Id == block.fromQuestion);
             db.SetBlock.Add(block);
+            tmp.Bind_Blocks = block.toQuestion;
             db.SaveChanges();
         }
 

@@ -17,6 +17,7 @@ namespace SocialFORM.Models.Question
         public string TextQuestion { get; set; }
         public int ProjectID { get; set; }
         public int? Bind { get; set; }
+        public int? Bind_Blocks { get; set; }
         public ProjectModel Project { get; set; }
 
         public ICollection<GroupModel> Groups { get; set; }

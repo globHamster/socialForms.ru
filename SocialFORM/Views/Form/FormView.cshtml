@@ -113,7 +113,7 @@
     //Блок выгрузки данных
     {
         //подгрузка листа сс базовыми ответами
-        q1 =$.get("/Question/getListAnswerBase")
+        q1 = $.get("/Question/getListAnswerBase")
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
                     list_base_answer[item.Id] = item;
@@ -123,7 +123,7 @@
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListAnswerBase ", err) });
         //Подгрузка таблицы переходов
-       q2 = $.get("/Question/getListTransition", { id_p: $('div[name=projectID]').attr('id') })
+        q2 = $.get("/Question/getListTransition", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (data) {
                 list_transition = data;
                 console.info('Загрузка таблицы переходов успешна ---', list_transition);
@@ -141,7 +141,7 @@
             })
             .error(function (err) { console.error('Ошибка загрузки таблицы блокировок .../Question/getListBlocks ', err); });
         //Подгузка листа вопросов относящихся к проекту
-       q3 = $.get("/Question/getListQuestion", { id_p: $('div[name=projectID]').attr('id') })
+        q3 = $.get("/Question/getListQuestion", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
                     list_question[item.Id] = item;
@@ -183,19 +183,19 @@
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
         })
-       /* var interval1 = setInterval(function () {
-            if (is_load_id) {
-                clearInterval(interval1);
-               q5 = $.get("/Question/getAllAnswerGrow", { massiv: massiv_question_id.join() })
-                    .success(function (server_data) {
-                        $.each(server_data, function (i, item) {
-                            list_answer[item.Id] = item;
-                        })
-                        console.info("Успешная выгрузка данных --- ", list_answer);
-                    })
-                    .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
-            }
-        }, 50);*/
+        /* var interval1 = setInterval(function () {
+             if (is_load_id) {
+                 clearInterval(interval1);
+                q5 = $.get("/Question/getAllAnswerGrow", { massiv: massiv_question_id.join() })
+                     .success(function (server_data) {
+                         $.each(server_data, function (i, item) {
+                             list_answer[item.Id] = item;
+                         })
+                         console.info("Успешная выгрузка данных --- ", list_answer);
+                     })
+                     .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
+             }
+         }, 50);*/
         //Подгрузка листа id всех ответов
         $.when(q4).then(function () {
             q6 = $.get("/Question/getIdAnswerAllGrow", { massiv: massiv_question_id.join() })
@@ -206,17 +206,17 @@
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getIdAnswerAllGrow", err) })
         })
-    /*    var interval2 = setInterval(function () {
-            if (is_load_id) {
-                clearInterval(interval2);
-             q6 =   $.get("/Question/getIdAnswerAllGrow", { massiv: massiv_question_id.join() })
-                    .success(function (server_data) {
-                        list_id_answer_all = server_data;
-                        console.info("Успешная выгрузка данных --- ", list_id_answer_all);
-                    })
-                    .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getIdAnswerAllGrow", err) })
-            }
-        }, 50);*/
+        /*    var interval2 = setInterval(function () {
+                if (is_load_id) {
+                    clearInterval(interval2);
+                 q6 =   $.get("/Question/getIdAnswerAllGrow", { massiv: massiv_question_id.join() })
+                        .success(function (server_data) {
+                            list_id_answer_all = server_data;
+                            console.info("Успешная выгрузка данных --- ", list_id_answer_all);
+                        })
+                        .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getIdAnswerAllGrow", err) })
+                }
+            }, 50);*/
         //Подгрузка листа строк табличного вопроса
         $.when(q4).then(function () {
             q7 = $.get("/Question/getAllTableRow", { massiv: massiv_question_id.join() })
@@ -227,17 +227,17 @@
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllTableRow", err) })
         })
-   /*     var interval3 = setInterval(function () {
-            if (is_load_id) {
-                clearInterval(interval3);
-              q7 =  $.get("/Question/getAllTableRow", { massiv: massiv_question_id.join() })
-                    .success(function (server_data) {
-                        list_table_row = server_data;
-                        console.info("Успешная выгрузка данных --- ", list_table_row);
-                    })
-                    .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllTableRow", err) })
-            }
-        }, 50); */
+        /*     var interval3 = setInterval(function () {
+                 if (is_load_id) {
+                     clearInterval(interval3);
+                   q7 =  $.get("/Question/getAllTableRow", { massiv: massiv_question_id.join() })
+                         .success(function (server_data) {
+                             list_table_row = server_data;
+                             console.info("Успешная выгрузка данных --- ", list_table_row);
+                         })
+                         .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllTableRow", err) })
+                 }
+             }, 50); */
 
         //Выгрузка листа путей файлов для фильтрующего вопроса
         
@@ -271,10 +271,13 @@
             switch (type_q) {
                 // Прорисовка ответос Single
                 case 1:
+                    var skip = false;
                     if (CheckCountAnswer(id_q) > 25 && result[massiv_question_id[index]] == undefined) ShowListSearchAnswer();
                     else {
                         $.each(list_id_answer_all, function (i, item) {
                             if (item.QuestionID == id_q) {
+                                skip = Check_blocks(item);
+                                if (skip) { skip = false; return; }
                                 if (item.AnswerType == 1) {
                                     if (list_answer[item.AnswerKey].isFreeArea) {
                                         $('.answer_table').append('<tr class="tool_layer"><td><input type="radio" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden checked/></td></tr>')
@@ -289,10 +292,13 @@
                     }
                     FindAnswer();
                     break;
-                    // Прорисовка ответов Multi
+                // Прорисовка ответов Multi
                 case 2:
+                    var skip = false;
                     $.each(list_id_answer_all, function (i, item) {
                         if (item.QuestionID == id_q) {
+                            skip = Check_blocks(item);
+                            if (skip) { skip = false; return; }
                             if (item.AnswerType == 1)
                                 if (list_answer[item.AnswerKey].isFreeArea) {
                                     $('.answer_table').append('<tr class="tool_layer"><td><input type="checkbox" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden checked/></td></tr>')
@@ -323,6 +329,7 @@
                     FindAnswer();
                     break;
                 case 4:
+                    var skip = false;
                     var tmp_table_row = {};
                     var count_table_row = 1;
                     var count_table_colum = 1;
@@ -341,6 +348,9 @@
                             if (item.IndexRow != null && item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index)
                                 return;
                         }
+                        console.info(item)
+                        skip = Check_blocks_Row(item);
+                        if (skip) { skip = false; return; }
                         code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
                         for (var c = 1; c < count_table_colum; c++) {
                             code += '<td class="table_answer"><input type="radio" name="group' + count_table_row + '" id="' + c + '"></td>';
@@ -437,7 +447,7 @@
                     SaveResult();
                     index++;
                     getStart();
-                 //   goNext();
+                    //   goNext();
                 } else {
                     $('div.wrong_choise').fadeIn('slow');
                 }
@@ -603,9 +613,9 @@
                     $.each(mas_ans, function (i, item) {
                         var tmp = $('.answer_table').find('input[id=' + item[0] + ']');
                         tmp.val(item[1]);
-                       /* if (tmp.parent().parent().hasClass('base_answer')) {
-                            checkedAnswerBase(tmp.parent().parent());
-                        } */
+                        /* if (tmp.parent().parent().hasClass('base_answer')) {
+                             checkedAnswerBase(tmp.parent().parent());
+                         } */
                     })
                     break;
                 case 4:
@@ -613,7 +623,7 @@
                     console.info("massiv result ---- ", massive);
                     var count = 0;
                     for (var i = 1; i <= massive.length; i++) {
-                        var id_radio = $('tr.beginer td[name="' + massive[i-1] + '"').attr('id');
+                        var id_radio = $('tr.beginer td[name="' + massive[i - 1] + '"').attr('id');
                         $('tr[id="' + i + '"').find('input[id="' + id_radio + '"]').prop('checked', true);
                     }
                     break;
@@ -646,8 +656,8 @@
     function ShowListSearchAnswer() {
         var code = '<input type="type" class="search_answer"/>';
         $('.answer_table').append(code);
-      
-       
+
+
         $('input.search_answer').keyup(function () {
             $('.answer_table').find('div.change_answer_table').remove();
             var text_search = $(this).val();
@@ -696,7 +706,7 @@
     function goNext() {
         // alert(index);
         id_q = $('.view_form').attr('id');
-        
+
         }
 
         var code_transition = find_transition_move(id_q, result[index]);
@@ -1032,6 +1042,67 @@
 
 
     //Дополнительные функции
+    function Check_blocks(item) {
+        var skip = false;
+                if (list_question[id_q].Bind_Blocks != null) {
+                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
+                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                            if (item.AnswerType != 2) {
+                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
+                                    skip = true; return;
+                            }
+                        });
+                    }
+                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
+                        console.info("result ---- ", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
+                        skip = true;
+                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                            if (item.AnswerType != 2) {
+                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index) {
+                                    skip = false; return;
+                                }
+                            }
+                            else {
+                                skip = false;
+                            }
+                        });
+                    }
+                }
+        console.info(skip);
+        return skip;
+    }
+    function Check_blocks_Row(item) {
+        var skip = false;
+        if (list_question[id_q].Bind_Blocks != null) {
+            if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
+                $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                    if (item.AnswerType != 2) {
+                        if (item.IndexRow == list_answer[Number(item_tmp)].Index)
+                            skip = true; return;
+                    }
+                });
+            }
+            if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
+                console.info("result ---- ", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
+                skip = true;
+                $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                    if (item.AnswerType != 2) {
+                        console.info("Index ---- ", item.IndexRow);
+                        console.info("IndexRow ---- ", list_answer[Number(item_tmp)].Index);
+
+                        if (item.IndexRow == list_answer[Number(item_tmp)].Index) {
+                            skip = false; return;
+                        }
+                    }
+                    else {
+                        skip = false;
+                    }
+                });
+            }
+        }
+        console.info(skip);
+        return skip;
+    }
 
     function checkedAnswer(tmp) {
         if (type_q == 2) {

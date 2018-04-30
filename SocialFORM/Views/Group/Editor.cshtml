@@ -757,10 +757,6 @@
                 ProjectID: $('input[name=project_id]').val(),
                 typeBlock: $('select.typeBlocks option:checked').attr('value')
             }
-            alert(query.fromQuestion);
-            alert(query.toQuestion);
-            alert(query.ProjectID);
-            alert(query.typeBlock);
             $.post("/Question/setBlock", query)
                 .success(function () { alert('Блок добавлен'); LoadListBlocks(); });
             //}
