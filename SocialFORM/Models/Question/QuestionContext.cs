@@ -19,5 +19,6 @@ namespace SocialFORM.Models.Question
         public DbSet<Transition> SetTransition { get; set; }
         public DbSet<Block> SetBlock { get; set; }
         public DbSet<Massk> GetMassk { get; set; }
+        public DbSet<File> GetFiles { get; set; }
     }
 }

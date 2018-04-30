@@ -209,6 +209,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Content Include="Content\ajax-loader.gif" />
     <Content Include="Content\contextmenu.css" />
+    <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\jquery.contextmenu.css" />
     <Content Include="Content\loading.css" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -238,6 +239,7 @@
     <Compile Include="Models\Question\AnswerBaseModel.cs" />
     <Compile Include="Models\Question\AnswerModel.cs" />
     <Compile Include="Models\Question\Block.cs" />
+    <Compile Include="Models\Question\File.cs" />
     <Compile Include="Models\Question\Massk.cs" />
     <Compile Include="Models\Question\QuestionContext.cs" />
     <Compile Include="Models\Question\QuestionModel.cs" />
@@ -256,6 +258,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\radio-button.css" />
     <Content Include="Content\slide_down.png" />
+    <Content Include="Content\test_file.txt" />
     <Content Include="Helpers\nicEditorIcons.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -280,6 +283,8 @@
     <Content Include="Scripts\jquery-te-1.4.0.js" />
     <Content Include="Scripts\jquery-te-1.4.0.min.js" />
     <Content Include="Scripts\jquery-te.png" />
+    <Content Include="Scripts\jquery-ui.js" />
+    <Content Include="Scripts\jquery.autocomplete.js" />
     <Content Include="Scripts\jquery.contextmenu.js" />
     <Content Include="Scripts\jquery.maskedinput.js" />
     <Content Include="Scripts\jquery.ui-contextmenu.js" />
@@ -328,6 +333,7 @@
     <Content Include="Views\Group\FreeForm.cshtml" />
     <Content Include="Views\Group\TableForm.cshtml" />
     <Content Include="Views\Home\BeginForm.cshtml" />
+    <Content Include="Views\Group\FilterForm.cshtml" />
     <None Include="Views\Home\demo01.cshtml" />
     <Content Include="Views\Home\emoticons\alien.png" />
     <Content Include="Views\Home\emoticons\angel.png" />

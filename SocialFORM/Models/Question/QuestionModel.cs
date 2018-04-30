@@ -35,7 +35,8 @@ namespace SocialFORM.Models.Question
         Multiple = 2,
         Free = 3,
         Table = 4,
-        Text = 5
+        Text = 5,
+        Filter = 6
     }
     public enum TypeMassk : int
     {

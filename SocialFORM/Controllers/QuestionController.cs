@@ -510,5 +510,10 @@ namespace SocialFORM.Controllers
             return Json(db.SetQuestions.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult GetListFile(int id_p)
+        {
+            return Json(db.GetFiles.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        }
     }
 }

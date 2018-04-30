@@ -270,6 +270,21 @@
                                     break;
                                 case '5':
                                     break;
+                                case '6':
+                                    $.get("/Group/CheckFile", { id_q: id_q })
+                                        .success(function (server_data) {
+                                            if (server_data != null) {
+                                                code = '<p class="path_file">' + server_data + ' </p><input type="button" class="delete_file" value="X">';
+                                                $('.question_form').append(code);
+                                                $('input.delete_file').click(function () {
+                                                    alert("er")
+                                                    $.post("/Group/DeleteFile", { path: $('p.path_file').text() })
+                                                })
+                                            }
+
+                                        })
+                                        .error(function (err) { console.error("Ошибка выгрузки файла ---- /Group/CheckFile", err); })
+                                    break;
                                 default:
                                     break;
                             }
@@ -557,6 +572,10 @@
             case '5':
                 $('.manager_panel').empty();
                 $('.question_form').empty();
+                break;
+            case '6':
+                $('.manager_panel').empty();
+                $('.question_form').load("/Group/FilterForm");
                 break;
             default:
                 break;

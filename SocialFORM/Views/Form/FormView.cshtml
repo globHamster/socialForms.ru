@@ -53,12 +53,11 @@
         margin: 0;
     }
 </style>
-
+<link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
 <div class="title">@ViewBag.Title</div>
 <div name="projectID" id="@ViewBag.ProjectID" style="display: none;" />
 <div name="questionID" id="@ViewBag.QuestionID" style="display: none;" />
 <div>
-    Новый код для теста
     <br />
     <div class="show_result">
         <table width="100%">
@@ -89,7 +88,7 @@
 
 </div>
 
-
+<script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
     var type_q;
     var id_q, id_a;
@@ -107,6 +106,7 @@
     var list_id_answer_all = {};
     var list_table_row;
     var list_massk = {};
+    var list_file = {};
     var is_load_id = false;
     var q1, q2, q3, q4, q5, q6, q7;
     var count_ajax = 0;
@@ -239,12 +239,21 @@
             }
         }, 50); */
 
-      
-
+        //Выгрузка листа путей файлов для фильтрующего вопроса
+        
+        $.get("/Question/GetListFile", { id_p: $('div[name=projectID]').attr('id') })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    list_file[item.QuestionID] = item;
+                })
+                console.info("Успешная выгрузка листа путей файла --- ", list_file);
+            })
+            .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/GetListFile", err); })
+            
     }
 
     var interval = setInterval(function () {
-        if (count_ajax == 8) {
+        if (count_ajax > 8) {
             clearInterval(interval);
             getStart();
         }
@@ -345,6 +354,37 @@
                 case 5:
                     break;
                 case 6:
+                    var availableTags = [];
+                    var path_file = list_file[massiv_question_id[index]].PathFile;
+                    console.info("path --- ", path_file);
+                    $.get("/Group/Load", { path: path_file })
+                        .success(function (server_massiv) {
+                            var tmp_massive = {};
+                            $.each(server_massiv, function (i, item) {
+                                var tmp_str = item.split('#');
+                                availableTags.push(tmp_str[0]);
+                                tmp_massive[tmp_str[0]] = tmp_str[1];
+                            })
+                            console.info("List of file ----- ", availableTags);
+                            $('.answer_table').append('<input id="autocomplete" title="type &quot;a&quot;" class="ui-autocomplete-input" autocomplete="off">');
+
+                            $("#autocomplete").autocomplete({
+                                source: availableTags,
+                                response: function (event, ui) {
+                                    // ui.content is the array that about to be sent to the response callback.
+                                    if (ui.content.length === 0) {
+                                        alert("Результат не найден")
+                                    }
+                                }
+                            });
+                            $("#autocomplete").keyup(function (event) {
+                                if (event.keyCode == 13) {
+                                    $('span.uik').remove();
+                                    $('#autocomplete').after('<span class="uik">' + tmp_massive[$(this).val()] + '</span>');
+                                }
+                            })
+                        });
+
                     break;
                 default:
                     break;
@@ -404,6 +444,12 @@
                 break;
             case 5:
                 SaveResult();
+                index++;
+                getStart();
+                break;
+            case 6:
+                SaveResult();
+                console.info("result -- // ", result[index]);
                 index++;
                 getStart();
                 break;
@@ -472,6 +518,10 @@
             case 5:
                 result[index] = [-1];
                 text_other[index] = ['null'];
+                break;
+            case 6:
+                result[index] = Number($('span.uik').text());
+                text_other[index] = $('input#autocomplete').val();
                 break;
             default:
                 break;

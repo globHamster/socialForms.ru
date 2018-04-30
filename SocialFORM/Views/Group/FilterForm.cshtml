@@ -1,0 +1,40 @@
+﻿<input type="file" id="filter_file" multiple />
+<input type="button" class="upload_file" value="Загрузить файл" />
+<input type="button" class="load_file" value="Сохранить файл" />
+<script>
+
+    $('input.upload_file').click(function (e) {
+        e.preventDefault();
+        var files = document.getElementById('filter_file').files;
+        if (files.length > 0) {
+            if (window.FormData != undefined) {
+                var data = new FormData();
+                for (var i = 0; i < files.length; i++)
+                    data.append('file' + i, files[i]);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Group/Upload",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (server_data) {
+                        $.post("/Group/BindIDFilter", { id_p: $('input[name=project_id]').val(), id_q: $('input.Id').val(), path: server_data });
+                    },
+                    error: function (xhr, status, p3) {
+                        alert(xhr.responseText)
+                    }
+                })
+            }
+        }
+    })
+
+    $('input.load_file').click(function () {
+        $.get("/Group/Load")
+            .success(function (server_str) {
+                alert(server_str);
+            })
+            .error(function () { alert("ERror") });
+    })
+</script>
+
