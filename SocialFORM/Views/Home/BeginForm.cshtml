@@ -38,7 +38,6 @@
 </style>
 <div class="begin_form">
     <button class="begin_form">Начать анкету</button>
-    <input type="file" id="my_file" multiple />
 </div>
 
 <script type="text/javascript">
@@ -53,19 +52,6 @@
                 $("#Tables").load("/Form/FormView?id_p=" + @ViewBag.ProjectID, '', function () { $('.loading').hide(); });
             
         })
-
-
-        var control = document.getElementById("my_file");
-        control.addEventListener("change", function (event) {
-            var i = 0, files = control.files, len = files.length;
-
-            for (; i < len; i++) {
-                console.log("Filename: " + files[i].name);
-                console.log("Type: " + files[i].type);
-                console.log("Size: " + files[i].size + " bytes");
-            }
-        }, false);
-
     })
     
 </script>
