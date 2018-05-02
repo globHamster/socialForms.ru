@@ -273,13 +273,19 @@
                                 case '6':
                                     $.get("/Group/CheckFile", { id_q: id_q })
                                         .success(function (server_data) {
-                                            if (server_data != null) {
+                                            if (server_data != null && server_data.length > 0) {
                                                 code = '<p class="path_file">' + server_data + ' </p><input type="button" class="delete_file" value="X">';
                                                 $('.question_form').append(code);
                                                 $('input.delete_file').click(function () {
                                                     alert("er")
                                                     $.post("/Group/DeleteFile", { path: $('p.path_file').text() })
                                                 })
+                                                $.get("/Group/Load", { path: $('p.path_file').text() })
+                                                    .success(function (server_file) {
+
+                                                    })
+                                            } else {
+                                                $('.question_form').load("/Group/FilterForm");
                                             }
 
                                         })

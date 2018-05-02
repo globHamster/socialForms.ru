@@ -80,6 +80,8 @@
 
     $(function () {
 
+        $('button.all_again').remove();
+
         console.info("Выгрузка данных ... ", result);
         console.info("Выгрузка данных ... ", text_other);
         console.info("Выгрузка данных ... ", massiv_question_id);
@@ -170,7 +172,7 @@
         $('span.error_input_phone').remove();
     });
 
-    $("#phone_number").mask("8(999) 999-9999");
+    $("#phone_number").mask("9(999) 999-9999");
 
     $('.save_data').click(function () {
         var string_answer = [];
@@ -256,6 +258,14 @@
                         }
                         count++;
                     })
+                    break;
+                case 6:
+                    query_q[count] = {
+                        Id: Number(result[i]),
+                        QuestionID: Number(item),
+                        Text: String(text_other[i])
+                    }
+                    count++;
                     break;
                 default:
                     break;

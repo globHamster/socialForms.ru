@@ -156,7 +156,10 @@ namespace SocialFORM.Controllers
                 {
                     tmp.QuestionID = item.QuestionID;
                     tmp.AnswerID = item.Id;
-                    tmp.AnswerIndex = db.SetAnswers.FirstOrDefault(u => u.Id == item.Id).Index;
+                    if (db.SetAnswers.FirstOrDefault(u => u.Id == item.Id) != null)
+                        tmp.AnswerIndex = db.SetAnswers.FirstOrDefault(u => u.Id == item.Id).Index;
+                    else
+                        tmp.AnswerIndex = item.Id;
                     if (item.Text != "null" && item.Text != "undefined")
                     {
                         tmp.Text = item.Text;

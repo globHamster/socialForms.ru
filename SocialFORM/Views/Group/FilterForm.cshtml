@@ -30,6 +30,19 @@
         }
     })
 
+
+    $('input#filter_file').change(function () {
+        var fr = new FileReader();
+        fr.onload = function (info) {
+            $('.question_form').append('<textarea class="text_file" disabled></textarea>');
+            $('.text_file').val(String(info.target.result));
+            
+        }
+        fr.readAsText(this.files[0]);
+    });
+
+
+
     $('input.load_file').click(function () {
         $.get("/Group/Load")
             .success(function (server_str) {

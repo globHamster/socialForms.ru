@@ -180,15 +180,16 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void deleteResults(int id)
         {
-            ResultModel tmp = db.SetResultModels.Where(u => u.Id == id).First();
-            List<BlankModel> tmp2 = db.SetBlankModels.Where(u => u.BlankID == tmp.BlankID).ToList();
-            foreach (BlankModel item in tmp2)
+            List<ResultModel> tmp = db.SetResultModels.Where(u => u.ProjectID == id).ToList();
+            List<BlankModel> tmp2 = new List<BlankModel>();
+            foreach (var item in tmp)
             {
-                db.SetBlankModels.Remove(item);
-                db.SaveChanges();
+                tmp2.AddRange(db.SetBlankModels.Where(u => u.BlankID == item.Id).ToList());
             }
-            tmp2 = null;
-            db.SetResultModels.Remove(tmp);
+
+            db.SetBlankModels.RemoveRange(tmp2);
+            db.SaveChanges();
+            db.SetResultModels.RemoveRange(tmp);
             db.SaveChanges();
         }
 
