@@ -258,7 +258,6 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\radio-button.css" />
     <Content Include="Content\slide_down.png" />
-    <Content Include="Content\test_file.txt" />
     <Content Include="Helpers\nicEditorIcons.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
