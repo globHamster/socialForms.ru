@@ -7,6 +7,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using System.Data.Entity;
 using SocialFORM.Models;
+using SocialFORM.Models.Project;
 
 namespace SocialFORM
 {
@@ -15,6 +16,7 @@ namespace SocialFORM
         protected void Application_Start()
         {
             Database.SetInitializer<ApplicationContext>(null);
+            Database.SetInitializer<ProjectContext>(null);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

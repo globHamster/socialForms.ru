@@ -193,5 +193,12 @@ namespace SocialFORM.Controllers
             db.SaveChanges();
         }
 
+        public void actionProject(int id)
+        {
+            ProjectModel projectModel = db2.SetProjectModels.Where(u => u.Id == id).FirstOrDefault();
+            if (projectModel.ActionProject == true) { projectModel.ActionProject = false; }
+            else { projectModel.ActionProject = true; }
+            db2.SaveChanges();
+        }
     }
 }

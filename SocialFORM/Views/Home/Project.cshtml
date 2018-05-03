@@ -19,11 +19,12 @@
             @Html.DisplayFor(modelItem => item.NameProject)
         </td>
         <td>
-            @Html.ActionLink("Изменить", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("База данных", "Details", new { id=item.Id }) 
-            <button class="show_blanks" id="@item.Id">+</button>|
+            @Html.ActionLink("Изменить", "Edit", new { id = item.Id }) |
+            <button class="show_blanks" id="@item.Id">База данных</button>|
             @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
-            @Html.ActionLink("Удалить", "Delete", new { id=item.Id })
+            @Html.ActionLink("Удалить", "Delete", new { id = item.Id })
+            @if (item.ActionProject == true) { @Html.ActionLink("Разблокировать", "actionProject", new { id = item.Id }); }
+            else {@Html.ActionLink("Заблокировать", "actionProject", new { id = item.Id }); }
         </td>
     </tr>
 }
@@ -85,6 +86,16 @@
             .error(function () { alert('Не удалось добавить проект')});
         
     });
+
+    //$('ActionProjectYes').click(function () {
+    //    var id_project = $(this).attr('id');
+    //    $.ajax({
+    //        type: "POST",
+    //        url: "/Home/actionProject",
+
+    //    })
+    //});
+
     $('.show_blanks').click(function () {
         var id_project = $(this).attr('id');
         $.ajax({
