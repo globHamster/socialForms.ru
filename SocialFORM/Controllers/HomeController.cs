@@ -95,7 +95,7 @@ namespace SocialFORM.Controllers
         [Authorize(Roles = "Operator")]
         public ActionResult ProjectOperator()
         {
-            return PartialView(db4.SetProjectModels);
+            return PartialView(db4.SetProjectModels.Where(u => u.ActionProject == true));
         }
 
         [Authorize(Roles ="Operator")]
@@ -193,6 +193,7 @@ namespace SocialFORM.Controllers
             db.SaveChanges();
         }
 
+        [HttpPost]
         public void actionProject(int id)
         {
             ProjectModel projectModel = db2.SetProjectModels.Where(u => u.Id == id).FirstOrDefault();
