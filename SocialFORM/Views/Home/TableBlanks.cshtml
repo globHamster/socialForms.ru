@@ -1,8 +1,9 @@
-﻿@model IEnumerable<SocialFORM.Models.Form.ResultModel>
+﻿@*@model IEnumerable<SocialFORM.Models.Form.ResultModel>*@
 @{
     ViewBag.Title = "TableBlanks";
 }
-
+@model PagedList.IPagedList<SocialFORM.Models.Form.ResultModel>
+@using PagedList.Mvc;
 <style>
     div.title {
         padding: 20px;
@@ -74,7 +75,7 @@
 <button class="clear_blanks" style="margin: 10px;">Очистить базу</button>
 <button class="export_button" style="margin: 10px;">Экспорт</button>
 <div class="table_blanks" style="overflow:auto" id="@Model.First().ProjectID">
-
+    <p>@Model.First().ProjectID"</p>
     <table class="export_table">
         <thead>
             <tr class="name_colum">
@@ -90,26 +91,26 @@
             @foreach (var item in Model)
             {
 
-            <tr id="@item.Id" name="@item.Id" class="answer_row">
-                <td>@item.Id</td>
-                <td>@item.UserName</td>
-                <td>@item.PhoneNumber</td>
-                <td>@item.Data</td>
-                <td>@item.Time</td>
-                <td class="item_coord">@item.CoordWidth,@item.CoordHeight</td>
-            </tr>
+                <tr id="@item.Id" name="@item.Id" class="answer_row">
+                    <td>@item.Id</td>
+                    <td>@item.UserName</td>
+                    <td>@item.PhoneNumber</td>
+                    <td>@item.Data</td>
+                    <td>@item.Time</td>
+                    <td class="item_coord">@item.CoordWidth,@item.CoordHeight</td>
+                </tr>
 
             }
         </tbody>
     </table>
-
+    @Html.PagedListPager(Model, page => Url.Action("TableBlanks","Home", new { page }), PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "table_blanks" }))
 </div>
 
 <script src="https://api-maps.yandex.ru/2.1/?load=package.standard&lang=ru-RU" type="text/javascript"></script>
 <script src="~/Scripts/FileSaver.js" type="text/javascript"></script>
 <script src="~/Scripts/tableexport.js" type="text/javascript"></script>
 <script type="text/javascript">
-   
+
     var list_base_answer = [];
     var id_list_base_answer = [];
     $.ajax({
@@ -167,7 +168,7 @@
                                 count_answer = count;
                             }
                         });
-                        
+
                         for (var i = 1; i <= count_answer; i++) {
                             code += '<th class="question_colum" id="' + item.Id + '" name="multiple">Вопрос ' + item.Id + '_' + i + '</th>';
                         }
@@ -189,7 +190,7 @@
                             }
                         })
                         $('tr.name_colum').append(code);
-                        
+
                         code = '';
                         break;
                     case 3:
@@ -269,9 +270,9 @@
             var index = id_result_list.indexOf(Number($(this).attr('id')));
             var is_other = $(this).hasClass('other');
             if ($(this).hasClass('other'))
-                element_answer.append('<td class="other" id="'+$(this).attr('id')+'"></td>');
-            else 
-                element_answer.append('<td class="normal" id="' + $(this).attr('id') + '" name="' + $(this).attr('name')+'"></td>');
+                element_answer.append('<td class="other" id="' + $(this).attr('id') + '"></td>');
+            else
+                element_answer.append('<td class="normal" id="' + $(this).attr('id') + '" name="' + $(this).attr('name') + '"></td>');
         });
         var index_td = 0;
         var last_multi_question;
@@ -290,7 +291,7 @@
                     if (last_multi_question != item.QuestionID) index_td = 0;
                     last_multi_question = item.QuestionID;
                     elem[index_td].append(item.AnswerIndex);
-                    
+
                     if (item.Text != null) {
                         element_answer.find('td.other[id=' + item.QuestionID + ']').each(function () {
                             if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false; }
@@ -303,7 +304,7 @@
                     if (item.AnswerID == 404) break;
                     var is_find = true;
                     element_answer.find('td.normal[id=' + item.QuestionID + ']').each(function () {
-                        if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false;}
+                        if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false; }
                     });
                     break;
                 case 'table':
@@ -332,9 +333,9 @@
     });
 
     function remove(arr, indexes) {
-        var arrayOfIndexes = [].slice.call(arguments, 1);  
-        return arr.filter(function (item, index) {         
-            return arrayOfIndexes.indexOf(index) == -1;      
+        var arrayOfIndexes = [].slice.call(arguments, 1);
+        return arr.filter(function (item, index) {
+            return arrayOfIndexes.indexOf(index) == -1;
         });
     }
 

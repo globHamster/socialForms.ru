@@ -11,6 +11,8 @@ using SocialFORM.Models.Authentication;
 using SocialFORM.Models.Question;
 using SocialFORM.Models.Group;
 using SocialFORM.Models.Form;
+using PagedList.Mvc;
+using PagedList;
 
 namespace SocialFORM.Controllers
 {
@@ -98,7 +100,7 @@ namespace SocialFORM.Controllers
             return PartialView(db4.SetProjectModels.Where(u => u.ActionProject == true));
         }
 
-        [Authorize(Roles ="Operator")]
+        [Authorize(Roles = "Operator")]
         public ActionResult BeginForm(int id_p)
         {
             ViewBag.ProjectID = id_p;
@@ -154,14 +156,19 @@ namespace SocialFORM.Controllers
         //    return viewuser;
         //}
 
-        public ActionResult TableBlanks(int id_project)
+        List<ResultModel> tmp_tableBlanks = null;
+        public ActionResult TableBlanks(int? page)
         {
+            System.Diagnostics.Debug.WriteLine("------>" + 22 + "   " + page);
             using (ProjectContext project_db = new ProjectContext())
             {
-                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_project).NameProject;
+                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == 22).NameProject;
             }
-            List<ResultModel> tmp = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
-            return PartialView(tmp);
+            tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == 22).ToList();
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            return PartialView(tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
+            //return PartialView(tmp);
         }
 
         [HttpGet]
