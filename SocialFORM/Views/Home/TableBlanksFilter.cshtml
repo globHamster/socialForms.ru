@@ -1,6 +1,6 @@
 ﻿@*@model IEnumerable<SocialFORM.Models.Form.ResultModel>*@
 @{
-    ViewBag.Title = "TableBlanks";
+    ViewBag.Title = "TableBlanksFilter";
 }
 @model PagedList.IPagedList<SocialFORM.Models.Form.ResultModel>
 @using PagedList.Mvc;
@@ -73,11 +73,8 @@
         }
 </style>
 
-<div class="title">@ViewBag.ProjectName</div>
-<button class="clear_blanks" style="margin: 10px;">Очистить базу</button>
-<button class="export_button" style="margin: 10px;">Экспорт</button>
 <div id="table_blanks_new">
-        @Html.Partial("_TableBlanks", Model)
+        @Html.Partial("_TableBlanksFilter", Model)
 </div>
 
 
