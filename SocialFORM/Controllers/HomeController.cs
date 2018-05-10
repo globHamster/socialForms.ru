@@ -313,6 +313,44 @@ namespace SocialFORM.Controllers
             {
                 tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_project && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
             }
+            //
+            //Количество анкет
+            //
+            ViewBag.countBlanks = tmp_tableBlanksFilter.Count;
+            //
+            //Вычисляем среднее время анкеты
+            //
+            double seconds = 0;
+            double secondsOT = 0;
+            TimeSpan min = new TimeSpan(59, 59, 59);
+            TimeSpan max = new TimeSpan(0, 0, 0);
+
+            foreach (ResultModel item in tmp_tableBlanksFilter)
+            {
+                System.Diagnostics.Debug.WriteLine(DateTime.Parse(item.Time).Subtract(item.Data));
+                if (min >= DateTime.Parse(item.Time).Subtract(item.Data)) { min = DateTime.Parse(item.Time).Subtract(item.Data); }
+                if (max <= DateTime.Parse(item.Time).Subtract(item.Data)) { max = DateTime.Parse(item.Time).Subtract(item.Data); }
+                seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
+            }
+            seconds = seconds / tmp_tableBlanksFilter.Count;
+            foreach (ResultModel item in tmp_tableBlanksFilter)
+            {
+                secondsOT += Math.Pow(DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds - seconds,2);
+            }
+            secondsOT /= (tmp_tableBlanksFilter.Count - 1);
+            secondsOT = Math.Sqrt(secondsOT);
+            int minutesOt = (int)Math.Floor(secondsOT / 60);
+            int minutes = (int)Math.Floor(seconds / 60);
+            seconds -= minutes * 60;
+            secondsOT -= minutesOt * 60;
+            DateTime tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
+            DateTime tmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
+
+            ViewBag.min = min;
+            ViewBag.max = max;
+            ViewBag.SrTime = tmp.ToLongTimeString();
+            ViewBag.SrTimeOT = tmp2.ToLongTimeString();
+            System.Diagnostics.Debug.WriteLine("Total seconds ---- > " + tmp.ToLongTimeString());
             int pageSize = 15;
             int pageNumber = (page ?? 1);
             return PartialView(tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
@@ -344,6 +382,17 @@ namespace SocialFORM.Controllers
             {
                 tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_pr && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
             }
+            double seconds = 0;
+            foreach (ResultModel item in tmp_tableBlanksFilter)
+            {
+                System.Diagnostics.Debug.WriteLine(DateTime.Parse(item.Time).Subtract(item.Data));
+                seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
+            }
+            seconds = seconds / tmp_tableBlanksFilter.Count;
+            int minutes = (int)Math.Floor(seconds / 60);
+            seconds -= minutes * 60;
+            DateTime tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
+            System.Diagnostics.Debug.WriteLine("Total seconds ---- > " + tmp.ToLongTimeString());
             int pageSize = 15;
             int pageNumber = (page ?? 1);
             System.Diagnostics.Debug.WriteLine(tmp_tableBlanksFilter.Count());

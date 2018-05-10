@@ -26,9 +26,7 @@
 <div id="resultDiv" class="resultDiv">
 
 </div>
-<div class="resDiv">
 
-</div>
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 @Scripts.Render("~/Scripts/moment.min.js")
@@ -150,27 +148,7 @@
                 } else {
                     alert("Список пуст");
                 }
-                setTimeout(function () {
-                    var code = '<p>Количество анкет за проект : ' + data.length + '</p>';
-                    var count = 0;
-                    var totalTime = 0;
-                    $('td.lengthTime').each(function () {
-                        var string_tmp = $(this).text().split(":");
-                        var minute = Number(string_tmp[0]);
-                        console.info("minute", minute);
-                        var second = Number(string_tmp[1]);
-                        console.info("second", second);
-                        totalTime += minute * 60 + second;
-                        count++;
-                    });
-                    totalTime = totalTime / count;
-                    var goodTime = new Date;
-                    goodTime.setMinutes(Math.floor(totalTime / 60), Math.floor(totalTime % 60), 0);
-                    if (goodTime.getSeconds() < 10) { var s = "0" + goodTime.getSeconds(); } else { var s = goodTime.getSeconds(); }
-                    if (goodTime.getMinutes() < 10) { var m = "0" + goodTime.getMinutes(); } else { var m = goodTime.getMinutes(); }
-                    code += '<p>Среднее время анкет: ' + m + ":" + s + '</p>';;
-                    $('div.resDiv').append(code);
-                },5000);
+
                }
         });
     })

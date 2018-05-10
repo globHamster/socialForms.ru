@@ -32,14 +32,17 @@
 </div>
 <div id="contentPager">
     @Html.PagedListPager(
-                    Model,
-                    page => Url.Action("_TableBlanksFilter", "Home", new { id_project = ViewBag.Id_Project_Next,
-                        id_operator = ViewBag.Id_Operator_Next,
-                        startTime = ViewBag.startTimeNext,
-                        endTime = ViewBag.endTimeNext,
-                        page = page }),
-                    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "table_blanks_new" })
-                    )
+                        Model,
+                        page => Url.Action("_TableBlanksFilter", "Home", new
+                        {
+                            id_project = ViewBag.Id_Project_Next,
+                            id_operator = ViewBag.Id_Operator_Next,
+                            startTime = ViewBag.startTimeNext,
+                            endTime = ViewBag.endTimeNext,
+                            page = page
+                        }),
+                        PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "table_blanks_new" })
+                        )
 </div>
 <script src="https://api-maps.yandex.ru/2.1/?load=package.standard&lang=ru-RU" type="text/javascript"></script>
 <script src="~/Scripts/FileSaver.js" type="text/javascript"></script>
