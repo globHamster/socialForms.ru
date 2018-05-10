@@ -11,9 +11,13 @@ using SocialFORM.Models.Authentication;
 using SocialFORM.Models.Question;
 using SocialFORM.Models.Group;
 using SocialFORM.Models.Form;
+
 using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using PagedList.Mvc;
+using PagedList;
+
 
 namespace SocialFORM.Controllers
 {
@@ -65,6 +69,7 @@ namespace SocialFORM.Controllers
                 RoleView = Role.Name
             }
             );
+            ViewBag.operator_id = result.First().IdView;
             ViewData["Name"] = result.First().NameView;
             ViewData["Family"] = result.First().FamilyView;
             ViewData["Role"] = result.First().RoleView;
@@ -98,7 +103,7 @@ namespace SocialFORM.Controllers
         [Authorize(Roles = "Operator")]
         public ActionResult ProjectOperator()
         {
-            return PartialView(db4.SetProjectModels);
+            return PartialView(db4.SetProjectModels.Where(u => u.ActionProject == true));
         }
 
         [Authorize(Roles = "Operator")]
@@ -157,14 +162,41 @@ namespace SocialFORM.Controllers
         //    return viewuser;
         //}
 
-        public ActionResult TableBlanks(int id_project)
+        //
+        //Отрисовка блока с результатами (НАЧАЛО)
+        //
+        List<ResultModel> tmp_tableBlanks = null;
+        [HttpGet]
+        public ActionResult TableBlanks(int id_project, int? page)
         {
+            ViewBag.Id_Project_Next = id_project;
             using (ProjectContext project_db = new ProjectContext())
             {
                 ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_project).NameProject;
             }
-            List<ResultModel> tmp = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
-            return PartialView(tmp);
+            tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            return PartialView(tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
+            //return PartialView(tmp);
+        }
+
+        //
+        //Отрисовка блока с результатами (ПО ПАНЕЛИ)
+        //
+        [HttpGet]
+        public ActionResult _TableBlanks(string id_project, int? page)
+        {
+            ViewBag.Id_Project_Next = id_project;
+            int id_pr = Convert.ToInt32(id_project);
+            using (ProjectContext project_db = new ProjectContext())
+            {
+                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_pr).NameProject;
+            }
+            tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_pr).ToList();
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            return PartialView("_TableBlanks", tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
         }
 
         [HttpGet]
@@ -370,7 +402,134 @@ namespace SocialFORM.Controllers
             Response.Write(sw.ToString());
 
             Response.End();
+    }
 
+
+        [HttpPost]
+        public void actionProject(int id)
+        {
+            ProjectModel projectModel = db2.SetProjectModels.Where(u => u.Id == id).FirstOrDefault();
+            if (projectModel.ActionProject == true) { projectModel.ActionProject = false; }
+            else { projectModel.ActionProject = true; }
+            db2.SaveChanges();
+        }
+
+        //
+        //Статистика
+        //
+        public ActionResult Statistics()
+        {
+            List<ResultModel> tmp_statFilter = db.SetResultModels.ToList();
+            return PartialView(tmp_statFilter);
+        }
+
+        public JsonResult Statistics_project()
+        {
+            return Json(db2.SetProjectModels.ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult Statistics_operator()
+        {
+            IQueryable<UserViewModel> result = (
+            from User in db.SetUser
+            join DataUsers in db.SetDataUsers on User.Id equals DataUsers.UserId
+            join Role in db.SetRoles on User.RoleId equals Role.Id
+            select new UserViewModel
+            {
+                IdView = User.Id,
+                LoginView = User.Login,
+                PasswordView = User.Password,
+                NameView = DataUsers.Name,
+                FamilyView = DataUsers.Family,
+                AgeView = DataUsers.Age,
+                FoolView = DataUsers.Fool,
+                EmailView = DataUsers.Email,
+                RoleIdView = Role.Id,
+                RoleView = Role.Name
+            }
+            );
+            return Json(result.Where(u => u.RoleIdView == 2).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult getResultListFilter(int id_project, int id_operator, string startTime, string endTime)
+        {
+            DateTime startTimeDT = Convert.ToDateTime(startTime.Replace("_", " "));
+            DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_", " "));
+            System.Diagnostics.Debug.WriteLine("-------------(--->" + id_project + "   " + id_operator);
+            if (id_operator > 0)
+            {
+                return Json(db.SetResultModels.Where(u => u.ProjectID == id_project && u.UserID == id_operator).ToList(), JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(db.SetResultModels.Where(u => u.ProjectID == id_project && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList(), JsonRequestBehavior.AllowGet);
+            }
+        }
+        //
+        //Отрисовка блока с результатами (НАЧАЛО)
+        //
+        List<ResultModel> tmp_tableBlanksFilter = null;
+        [HttpGet]
+        public ActionResult TableBlanksFilter(int id_project,int id_operator,string startTime, string endTime, int? page)
+        {
+            ViewBag.Id_Project_Next = id_project;
+            ViewBag.Id_Operator_Next = id_operator;
+            ViewBag.startTimeNext = startTime;
+            ViewBag.endTimeNext = endTime;
+            DateTime startTimeDT = Convert.ToDateTime(startTime.Replace("_"," "));
+            DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_"," "));
+            System.Diagnostics.Debug.WriteLine(startTimeDT);
+            System.Diagnostics.Debug.WriteLine(endTimeDT);
+
+            using (ProjectContext project_db = new ProjectContext())
+            {
+                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_project).NameProject;
+            }
+            if (id_operator > 0)
+            {
+                
+                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_project && u.UserID == id_operator && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
+            }
+            else
+            {
+                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_project && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
+            }
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            return PartialView(tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
+            //return PartialView(tmp);
+        }
+
+        //
+        //Отрисовка блока с результатами (ПО ПАНЕЛИ)
+        //
+        [HttpGet]
+        public ActionResult _TableBlanksFilter(string id_project, string id_operator, string startTime, string endTime, int? page)
+        {
+            ViewBag.Id_Project_Next = id_project;
+            int id_pr = Convert.ToInt32(id_project);
+            int id_op = Convert.ToInt32(id_operator);
+            DateTime startTimeDT = Convert.ToDateTime(startTime.Replace("_", " "));
+            DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_", " "));
+            System.Diagnostics.Debug.WriteLine(startTimeDT);
+            System.Diagnostics.Debug.WriteLine(endTimeDT);
+            using (ProjectContext project_db = new ProjectContext())
+            {
+                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_pr).NameProject;
+            }
+            if (id_op > 0)
+            {
+                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_pr && u.UserID == id_op && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
+            }
+            else
+            {
+                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_pr && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
+            }
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            System.Diagnostics.Debug.WriteLine(tmp_tableBlanksFilter.Count());
+            return PartialView("_TableBlanksFilter", tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
 
         }
     }

@@ -54,8 +54,12 @@
     }
 </style>
 <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
+<link href="~/Content/chosen.css" rel="stylesheet" />
+
+<script src="~/Scripts/chosen.jquery.js" type="text/javascript"></script>
 <div class="title">@ViewBag.Title</div>
 <div name="projectID" id="@ViewBag.ProjectID" style="display: none;" />
+<div name="operatorID" id="@ViewBag.ProjectID" style="display: none;" />
 <div name="questionID" id="@ViewBag.QuestionID" style="display: none;" />
 <div>
     <br />
@@ -89,10 +93,14 @@
 </div>
 
 <script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
+
+
 <script type="text/javascript">
+
     var type_q;
     var id_q, id_a;
     var id_project = $('div[name=projectID]').attr('id');
+    var id_operator = $('div[name=operatorID]').attr('id');
     var isReload = false;
     var index = 0, max_index = 0;
     var massiv_question_id;
@@ -107,11 +115,20 @@
     var list_table_row;
     var list_massk = {};
     var list_file = {};
+    var list_text_file = {};
+    var begin_time; //Время начала анкетирования
     var is_load_id = false;
     var q1, q2, q3, q4, q5, q6, q7;
     var count_ajax = 0;
     //Блок выгрузки данных
     {
+        $.get("/Group/GetTimeBegin")
+            .success(function (server_date_time) {
+                console.info("Time of begining ---- ", server_date_time);
+                begin_time = server_date_time;
+            })
+
+
         //подгрузка листа сс базовыми ответами
         q1 = $.get("/Question/getListAnswerBase")
             .success(function (server_data) {
@@ -229,16 +246,22 @@
         })
 
         //Выгрузка листа путей файлов для фильтрующего вопроса
-        
+
         $.get("/Question/GetListFile", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
                     list_file[item.QuestionID] = item;
+                    console.info("Path file ---- ", item.PathFile);
+                    $.get("/Group/Load", { path: item.PathFile })
+                        .success(function (server_file) {
+                            list_text_file[item.QuestionID] = server_file;
+                        });
                 })
                 console.info("Успешная выгрузка листа путей файла --- ", list_file);
+                console.info("Успешная выгрузка листа текста файла --- ", list_text_file);
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/GetListFile", err); })
-            
+
     }
 
     var interval = setInterval(function () {
@@ -332,20 +355,27 @@
                     })
                     code += '</tr>';
                     $.each(list_table_row, function (i, item) {
-                        if (list_question[massiv_question_id[index]].Bind != null) {
-                            console.info("index ---- ", list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]]);
-                            if (item.IndexRow != null && item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index)
-                                return;
+                        if (item.TableID == id_q) {
+                            if (list_question[massiv_question_id[index]].Bind != null) {
+                                //console.info("index ---- ", list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]]);
+
+                                if (list_question[list_question[massiv_question_id[index]].Bind].TypeQuestion == 6) {
+                                    if (item.IndexRow != null && item.IndexRow != result[massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind)]) {
+                                        return;
+                                    }
+                                } else if (item.IndexRow != null && item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index)
+                                    return;
+                            }
+                            console.info(item)
+                            skip = Check_blocks_Row(item);
+                            if (skip) { skip = false; return; }
+                            code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
+                            for (var c = 1; c < count_table_colum; c++) {
+                                code += '<td class="table_answer"><input type="radio" name="group' + count_table_row + '" id="' + c + '"></td>';
+                            }
+                            code += '</tr>';
+                            count_table_row++;
                         }
-                        console.info(item)
-                        skip = Check_blocks_Row(item);
-                        if (skip) { skip = false; return; }
-                        code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
-                        for (var c = 1; c < count_table_colum; c++) {
-                            code += '<td class="table_answer"><input type="radio" name="group' + count_table_row + '" id="' + c + '"></td>';
-                        }
-                        code += '</tr>';
-                        count_table_row++;
                     })
                     $('.answer_table').append(code);
                     FindAnswer();
@@ -354,36 +384,30 @@
                     break;
                 case 6:
                     var availableTags = [];
-                    var path_file = list_file[massiv_question_id[index]].PathFile;
-                    console.info("path --- ", path_file);
-                    $.get("/Group/Load", { path: path_file })
-                        .success(function (server_massiv) {
-                            var tmp_massive = {};
-                            $.each(server_massiv, function (i, item) {
-                                var tmp_str = item.split('#');
-                                availableTags.push(tmp_str[0]);
-                                tmp_massive[tmp_str[0]] = tmp_str[1];
-                            })
-                            console.info("List of file ----- ", availableTags);
-                            $('.answer_table').append('<input id="autocomplete" title="type &quot;a&quot;" class="ui-autocomplete-input" autocomplete="off">');
+                    //var path_file = list_file[massiv_question_id[index]].PathFile;
+                    // console.info("path --- ", path_file);
 
-                            $("#autocomplete").autocomplete({
-                                source: availableTags,
-                                response: function (event, ui) {
-                                    // ui.content is the array that about to be sent to the response callback.
-                                    if (ui.content.length === 0) {
-                                        alert("Результат не найден")
-                                    }
-                                }
-                            });
-                            $("#autocomplete").keyup(function (event) {
-                                if (event.keyCode == 13) {
-                                    $('span.uik').remove();
-                                    $('#autocomplete').after('<span class="uik">' + tmp_massive[$(this).val()] + '</span>');
-                                }
-                            })
-                        });
-
+                    var tmp_massive = {};
+                    $.each(list_text_file[massiv_question_id[index]], function (i, item) {
+                        var tmp_str = item.split('#');
+                        availableTags.push(tmp_str[0]);
+                        tmp_massive[tmp_str[0]] = tmp_str[1];
+                    })
+                    console.info("List of file ----- ", availableTags);
+                    var code = '';
+                    code += '<select data-placeholder="Choose a Country..." class="chosen-select-new">';
+                    code += '<option value="">Выберите вариант ответа.</option>';
+                    $.each(availableTags, function (i, item) {
+                        code += '<option value="' + tmp_massive[item] + '">' + item + '</option>';
+                    })
+                    code += '</select>'
+                    $('.answer_table').append(code);
+                    $('.chosen-select-new').chosen();
+                    $('.chosen-select-new').change(function () {
+                        $('span.uik').remove();
+                        code = '<span class="uik">' + $(this).find('option:checked').val() + '</span>';
+                        $('.answer_table').append(code);
+                    })
                     break;
                 default:
                     break;
@@ -519,8 +543,13 @@
                 text_other[index] = ['null'];
                 break;
             case 6:
-                result[index] = Number($('span.uik').text());
-                text_other[index] = $('input#autocomplete').val();
+                if (!isNaN($('span.uik').text())) {
+                    result[index] = Number($('span.uik').text());
+                    text_other[index] = $('select.chosen-select-new option:checked').text();
+                } else {
+                    result[index] = Number($('select.chosen-select-new option:checked').text());
+                    text_other[index] = $('span.uik').text();
+                }
                 break;
             default:
                 break;
@@ -1033,30 +1062,30 @@
     //Дополнительные функции
     function Check_blocks(item) {
         var skip = false;
-                if (list_question[id_q].Bind_Blocks != null) {
-                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
-                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
-                            if (item.AnswerType != 2) {
-                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
-                                    skip = true; return;
-                            }
-                        });
+        if (list_question[id_q].Bind_Blocks != null) {
+            if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
+                $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                    if (item.AnswerType != 2) {
+                        if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
+                            skip = true; return;
                     }
-                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
-                        console.info("result ---- ", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
-                        skip = true;
-                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
-                            if (item.AnswerType != 2) {
-                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index) {
-                                    skip = false; return;
-                                }
-                            }
-                            else {
-                                skip = false;
-                            }
-                        });
+                });
+            }
+            if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
+                console.info("result ---- ", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
+                skip = true;
+                $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                    if (item.AnswerType != 2) {
+                        if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index) {
+                            skip = false; return;
+                        }
                     }
-                }
+                    else {
+                        skip = false;
+                    }
+                });
+            }
+        }
         console.info(skip);
         return skip;
     }

@@ -1,0 +1,179 @@
+﻿@model IList<SocialFORM.Models.Form.ResultModel>
+@using PagedList.Mvc;
+<link rel="stylesheet" type="text/css" href="~/Content/daterangepicker.css" />
+
+<div id="filterDiv">
+    <div>
+        <select class="select_project" name="select_project" id="select_project">
+            <option disabled>Выберите проект</option>
+            <option selected value="Все">Все</option>
+        </select>
+    </div>
+    <div>
+        <select class="select_operator" name="select_operator" id="select_operator">
+            <option disabled>Выберите оператора</option>
+            <option selected value="0">Все</option>
+        </select>
+    </div>
+    <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%">
+        <i class="fa fa-calendar"></i>&nbsp;
+        <span></span> <i class="fa fa-caret-down"></i>
+    </div>
+    <div>
+        <button class="filter_button" id="">Фильтровать</button>
+    </div>
+</div>
+<div id="resultDiv" class="resultDiv">
+
+</div>
+<div class="resDiv">
+
+</div>
+
+@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+@Scripts.Render("~/Scripts/moment.min.js")
+@Scripts.Render("~/Scripts/daterangepicker.js")
+
+<script type="text/javascript">
+    //
+    //Запрос на список проекта
+    //
+    $.get("/Home/Statistics_project")
+        .success(function (server_data) {
+            $.each(server_data, function (i, data) {
+                var code = '<option value="' + data.Id + '">' + data.NameProject + '</option>';
+                $('select.select_project').append(code);
+            })
+            console.info("Успешная выгрузка листа проектов ---- ", server_data);
+        })
+        .error(function (err) { console.error("Ошибка выгрузка данных ... /Home/Statistics_project", err) })
+    //
+    //Запрос на список Операторов
+    //
+    $.get("/Home/Statistics_operator")
+        .success(function (server_data) {
+            $.each(server_data, function (i, data) {
+                var code = '<option value="' + data.IdView + '">' + data.FamilyView + ' ' + data.NameView + '</option>';
+                $('select.select_operator').append(code);
+            })
+            console.info("Успешная выгрузка листа операторов ---- ", server_data);
+        })
+        .error(function (err) { console.error("Ошибка выгрузка данных ... /Home/Statistics_operator", err) })
+
+    //
+    //Календрь
+    //
+    $(function () {
+
+        var start = moment();
+        var end = moment();
+
+        function cb(start, end) {
+            $('#reportrange span').html(start.format('DD.MM.YYYY_H:mm:ss') + '-' + end.format('DD.MM.YYYY_HH:mm:ss'));
+        }
+
+        $('#reportrange').daterangepicker({
+            startDate: start,
+            endDate: end,
+            timePicker: true,
+            timePicker24Hour: true,
+            parentEl: "div.Tables",
+            ranges: {
+                'Сегодня': [moment(), moment()],
+                'Вчера': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                '7 дней назад': [moment().subtract(6, 'days'), moment()],
+                '30 дней назад': [moment().subtract(29, 'days'), moment()],
+                'Этот месяц': [moment().startOf('month'), moment()],
+                'Предыдущий месяц': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            locale: {
+                "format": "DD.MM.YYYY HH:mm:ss",
+                "separator": "-",
+                "applyLabel": "Применить",
+                "cancelLabel": "Отменить",
+                "fromLabel": "От",
+                "toLabel": "До",
+                "customRangeLabel": "Выбрать",
+                "weekLabel": "W",
+                "daysOfWeek": [
+                    "Вс",
+                    "Пн",
+                    "Вт",
+                    "Ср",
+                    "Чт",
+                    "Пт",
+                    "Суб"
+                ],
+                "monthNames": [
+                    "Январь",
+                    "Февраль",
+                    "Март",
+                    "Апрель",
+                    "Май",
+                    "Июнь",
+                    "Июль",
+                    "Август",
+                    "Сентябрь",
+                    "Октябрь",
+                    "Ноябрь",
+                    "Декабрь"
+                ],
+                "firstDay": 1,
+            }
+        }, cb);
+        cb(start, end);
+
+    });
+
+    $('.filter_button').click(function () {
+        $('div.resDiv').empty();
+        var id_project = document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value;
+        var id_operator = document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].value;
+        var string = $('#reportrange span').text().split('-');
+        var startTime = string[0];
+        var endTime = string[1];
+        console.info("Start Time", startTime);
+        console.info("End Time",endTime);
+        $.ajax({
+            type: "GET",
+            url: "/Home/getResultListFilter",
+            async: false,
+            data: {
+                id_project: id_project,
+                id_operator: id_operator,
+                startTime: startTime,
+                endTime: endTime
+            },
+            success: function (data) {
+                if (data.length != 0) {
+                    $('.resultDiv').load('/Home/TableBlanksFilter?id_project=' + id_project + '&id_operator=' + id_operator + '&startTime=' + startTime + '&endTime=' + endTime);
+                } else {
+                    alert("Список пуст");
+                }
+                setTimeout(function () {
+                    var code = '<p>Количество анкет за проект : ' + data.length + '</p>';
+                    var count = 0;
+                    var totalTime = 0;
+                    $('td.lengthTime').each(function () {
+                        var string_tmp = $(this).text().split(":");
+                        var minute = Number(string_tmp[0]);
+                        console.info("minute", minute);
+                        var second = Number(string_tmp[1]);
+                        console.info("second", second);
+                        totalTime += minute * 60 + second;
+                        count++;
+                    });
+                    totalTime = totalTime / count;
+                    var goodTime = new Date;
+                    goodTime.setMinutes(Math.floor(totalTime / 60), Math.floor(totalTime % 60), 0);
+                    if (goodTime.getSeconds() < 10) { var s = "0" + goodTime.getSeconds(); } else { var s = goodTime.getSeconds(); }
+                    if (goodTime.getMinutes() < 10) { var m = "0" + goodTime.getMinutes(); } else { var m = goodTime.getMinutes(); }
+                    code += '<p>Среднее время анкет: ' + m + ":" + s + '</p>';;
+                    $('div.resDiv').append(code);
+                },5000);
+               }
+        });
+    })
+
+
+</script>

@@ -1,0 +1,334 @@
+﻿@model PagedList.IPagedList<SocialFORM.Models.Form.ResultModel>
+@using PagedList.Mvc;
+<div class="table_blanks" style="overflow:auto" id="@Model.First().ProjectID">
+    <table class="export_table">
+        <thead>
+            <tr class="name_colum">
+                <th>Номер бланка</th>
+                <th>ФИО</th>
+                <th>Номер телефона</th>
+                <th>Начало Анкеты</th>
+                <th>Завершение Анкеты</th>
+                <th>Длительность</th>
+                <th>Коордитаны</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr id="@item.Id" name="@item.Id" class="answer_row">
+                    <td>@item.Id</td>
+                    <td>@item.UserName</td>
+                    <td>@item.PhoneNumber</td>
+                    <td>@item.Data</td>
+                    <td>@item.Time</td>
+                    <td class="lengthTime">@DateTime.Parse(item.Time).Subtract(item.Data).ToString(@"mm\:ss")</td>
+                    <td class="item_coord">@item.CoordWidth,@item.CoordHeight</td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>
+<div id="contentPager">
+    @Html.PagedListPager(
+                    Model,
+                    page => Url.Action("_TableBlanksFilter", "Home", new { id_project = ViewBag.Id_Project_Next,
+                        id_operator = ViewBag.Id_Operator_Next,
+                        startTime = ViewBag.startTimeNext,
+                        endTime = ViewBag.endTimeNext,
+                        page = page }),
+                    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "table_blanks_new" })
+                    )
+</div>
+<script src="https://api-maps.yandex.ru/2.1/?load=package.standard&lang=ru-RU" type="text/javascript"></script>
+<script src="~/Scripts/FileSaver.js" type="text/javascript"></script>
+<script src="~/Scripts/tableexport.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    var list_base_answer = [];
+    var id_list_base_answer = [];
+    $.ajax({
+        type: "GET",
+        url: "/Question/getListAnswerBase",
+        async: false,
+        data: {},
+        success: function (list) {
+            $.each(list, function (i, item) {
+                id_list_base_answer.push(item.Id);
+                list_base_answer.push(item);
+            })
+        }
+    })
+
+    //Создание шапки таблицы результатов ответов
+    $.ajax({
+        type: "GET",
+        url: "/Question/getListQuestion",
+        async: false,
+        data: { id_p: $('div.table_blanks').attr('id') },
+        success: function (list_question) {
+            var code = '';
+            $.each(list_question, function (i, item) {
+                switch (item.TypeQuestion) {
+                    case 1:
+                        //Проверка на вхождение ответа с полем "Другое"
+                        var has_area_other = false;
+                        $.ajax({
+                            type: "GET",
+                            url: "/Question/getAnswer",
+                            async: false,
+                            data: { id_question: item.Id },
+                            success: function (items_answer) {
+                                $.each(items_answer, function (i, data) {
+                                    if (data.isFreeArea) has_area_other = true;
+                                })
+                            }
+                        })
+                        //
+                        code += '<th class="question_colum" id="' + item.Id + '" name="single">Вопрос ' + item.Id + '</th>';
+                        if (has_area_other) code += '<th class="question_colum other" id="' + item.Id + '" name="single">Вопрос ' + item.Id + '_др</th>';
+                        $('tr.name_colum').append(code);
+                        code = '';
+                        break;
+                    case 2:
+                        var count_answer = 0;
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/Question/getAnswerAllCount",
+                            async: false,
+                            data: { question_id: item.Id },
+                            success: function (count) {
+                                count_answer = count;
+                            }
+                        });
+
+                        for (var i = 1; i <= count_answer; i++) {
+                            code += '<th class="question_colum" id="' + item.Id + '" name="multiple">Вопрос ' + item.Id + '_' + i + '</th>';
+                        }
+                        //Проверка на вхождение ответа с полем "Другое"
+                        var change_count = 1;
+                        $.ajax({
+                            type: "GET",
+                            url: "/Question/getAnswer",
+                            async: false,
+                            data: { id_question: item.Id },
+                            success: function (items_answer) {
+                                $.each(items_answer, function (i, data) {
+
+                                    if (data.isFreeArea) {
+                                        code += '<th class="question_colum other" id="' + item.Id + '" name="multiple">Вопрос ' + item.Id + '_' + change_count + '_др</th>';
+                                        change_count++;
+                                    }
+                                })
+                            }
+                        })
+                        $('tr.name_colum').append(code);
+
+                        code = '';
+                        break;
+                    case 3:
+                        $.ajax({
+                            type: "GET",
+                            url: "/Question/getAnswerAllCount",
+                            async: false,
+                            data: { question_id: item.Id },
+                            success: function (count) {
+                                if (Number(count) > 1) {
+                                    for (var i = 1; i <= count; i++)
+                                        code += '<th class="question_colum" id="' + item.Id + '" name="free">Вопрос ' + item.Id + '_' + i + '</th>';
+                                    $('tr.name_colum').append(code);
+                                    code = '';
+                                } else {
+                                    code += '<th class="question_colum" id="' + item.Id + '" name="free">Вопрос ' + item.Id + '</th>';
+                                    $('tr.name_colum').append(code);
+                                    code = '';
+                                }
+
+                            }
+                        })
+                        break;
+                    case 4:
+                        $.ajax({
+                            type: "GET",
+                            url: "/Question/getTableRowCount",
+                            async: false,
+                            data: { id_q: item.Id },
+                            success: function (count) {
+                                for (var i = 1; i <= count; i++) {
+                                    code += '<th class="question_colum" id="' + item.Id + '" name="table">Вопрос ' + item.Id + '_' + i + '</th>';
+                                }
+                                $('tr.name_colum').append(code);
+                                code = '';
+                            }
+                        })
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        var has_area_other = false;
+                        //
+                        code += '<th class="question_colum" id="' + item.Id + '" name="filter">Вопрос ' + item.Id + '</th>';
+                        code += '<th class="question_colum other" id="' + item.Id + '" name="filter">Вопрос ' + item.Id + '_др</th>';
+                        $('tr.name_colum').append(code);
+                        code = '';
+                    default:
+                        break;
+                }
+
+            })
+
+        }
+    })
+
+    //Формировка таблицы с результатами ответов
+    $('tr.answer_row').each(function () {
+        var result_list = [];
+        var id_result_list = [];
+
+        $.ajax({
+            type: "GET",
+            url: "/Home/TableResultBlank",
+            async: false,
+            data: { id_blank: $(this).attr('id') },
+            success: function (data) {
+                $.each(data, function (i, item) {
+                    result_list.push(item);
+                    id_result_list.push(item.QuestionID);
+                });
+            }
+        })
+        var code = '';
+        var element_answer = $(this);
+        $('th.question_colum').each(function () {
+            var index = id_result_list.indexOf(Number($(this).attr('id')));
+            var is_other = $(this).hasClass('other');
+            if ($(this).hasClass('other'))
+                element_answer.append('<td class="other" id="' + $(this).attr('id') + '"></td>');
+            else
+                element_answer.append('<td class="normal" id="' + $(this).attr('id') + '" name="' + $(this).attr('name') + '"></td>');
+        });
+        var index_td = 0;
+        var last_multi_question;
+        $.each(result_list, function (i, item) {
+            var type_q = element_answer.find('td.normal[id=' + item.QuestionID + ']').attr('name');
+            switch (type_q) {
+                case 'single':
+                    if (item.AnswerID == 404) break;
+                    element_answer.find('td.normal[id=' + item.QuestionID + ']').text(item.AnswerIndex);
+                    if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').text(item.Text);
+                    break;
+                case 'multiple':
+                    if (item.AnswerID == 404) break;
+                    var elem = element_answer.find('td.normal[id=' + item.QuestionID + ']');
+                    var is_find = true;
+                    if (last_multi_question != item.QuestionID) index_td = 0;
+                    last_multi_question = item.QuestionID;
+                    elem[index_td].append(item.AnswerIndex);
+
+                    if (item.Text != null) {
+                        element_answer.find('td.other[id=' + item.QuestionID + ']').each(function () {
+                            if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false; }
+                        });
+                    }
+                    is_find = true;
+                    index_td++;
+                    break;
+                case 'free':
+                    if (item.AnswerID == 404) break;
+                    var is_find = true;
+                    element_answer.find('td.normal[id=' + item.QuestionID + ']').each(function () {
+                        if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false; }
+                    });
+                    break;
+                case 'table':
+                    if (item.AnswerID == 404) break;
+
+                    var is_find = true;
+                    element_answer.find('td.normal[id=' + item.QuestionID + ']').each(function () {
+                        if ($(this).text() == '' && is_find) { $(this).text(item.AnswerIndex); is_find = false; }
+                    })
+                    is_find = true;
+                    break;
+                case 'filter':
+                    if (item.AnswerID == 404) break;
+
+                    element_answer.find('td.normal[id=' + item.QuestionID + ']').text(item.AnswerIndex);
+                    if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').text(item.Text);
+                    break;
+                default:
+                    break;
+            }
+        })
+
+        $('td[name=free]').css('color', 'red');
+        $('td.other').css('color', 'blue');
+
+    });
+
+    function remove(arr, indexes) {
+        var arrayOfIndexes = [].slice.call(arguments, 1);
+        return arr.filter(function (item, index) {
+            return arrayOfIndexes.indexOf(index) == -1;
+        });
+    }
+
+    $('button.clear_blanks').click(function () {
+        $.post("/Home/deleteResults", { id: $('div.table_blanks').attr('id') });
+        alert("База очищена");
+        $("#Tables").load("/Home/Project");
+    });
+    $('tr.answer_row').click(function () {
+
+        $('body div.body-content').append('<div class="back_end"><div class="map_yandex" id="map"></div></div>');
+        $('div.map_yandex').css({
+            'position': 'fixed',
+            'width': '60%',
+            'height': '60%',
+            'left': '20%',
+            'top': '20%',
+            'background-color': 'rgba(200, 200, 200, 0.7)',
+            'display': 'block'
+        });
+        $('div.back_end').css({
+            'position': 'fixed',
+            'width': '100%',
+            'height': '100%',
+            'left': '0',
+            'top': '0',
+            'background-color': 'rgba(200, 200, 200, 0.7)',
+            'display': 'block'
+        });
+        $('div.map_yandex').mouseenter(function () {
+            $('div.body-content').off('click', 'div.back_end');
+        });
+        $('div.map_yandex').mouseleave(function () {
+            $('div.body-content').on('click', 'div.back_end', function () {
+                $('div.body-content').off('click', 'div.back_end');
+                $(this).remove();
+            });
+        });
+
+        var coord = $(this).find('td.item_coord').text().split(',');
+
+        var coordX = Number(coord[0]), coordY = Number(coord[1]);
+        alert(coordX + " " + coordY);
+        var myMap = new ymaps.Map('map', {
+            center: [coordX, coordY],
+            zoom: 15
+        }, {
+                searchControlProvider: 'yandex#search'
+            });
+
+        myMap.geoObjects.add(new ymaps.Placemark([coordX, coordY], {
+
+            hintContent: 'Метка'
+        },
+            {
+                preset: 'islands#blueCircleDotIcon'
+            }));
+
+    })
+
+</script>

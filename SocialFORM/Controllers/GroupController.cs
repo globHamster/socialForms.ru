@@ -178,5 +178,12 @@ namespace SocialFORM.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult GetTimeBegin()
+        {
+            string tmp = DateTime.Now.ToString();
+            return Json(tmp, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

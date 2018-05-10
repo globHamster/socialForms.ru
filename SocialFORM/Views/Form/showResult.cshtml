@@ -276,8 +276,10 @@
         query = {
             name: $('p.name_operator').text(),
             project_id: id_project,
+            operator_id: id_operator,
             phone_number: $("#phone_number").val().replace(/[^0-9]/ig, ''),
-            list: query_q
+            list: query_q,
+            time_begin: begin_time
         }
         sendData(query);
     });

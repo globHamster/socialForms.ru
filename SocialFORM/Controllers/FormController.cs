@@ -123,12 +123,12 @@ namespace SocialFORM.Controllers
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<int> SaveData(string name, int project_id, string phone_number, List<SaveDataModel> list)
+        public async Task<int> SaveData(string name, int project_id, int operator_id, string phone_number, List<SaveDataModel> list, string time_begin)
         {
 
             ResultModel result = new ResultModel();
             result.ProjectID = project_id;
-            result.UserID = 1;
+            result.UserID = operator_id;
             result.UserName = name;
 
             //!!!Переделать присвоение ииндексов!!!
@@ -137,8 +137,8 @@ namespace SocialFORM.Controllers
 
 
             result.PhoneNumber = phone_number;
-            result.Data = DateTime.Now;
-            result.Time = DateTime.Now.ToLongTimeString();
+            result.Data = DateTime.Parse(time_begin);
+            result.Time = DateTime.Now.ToString();
             result.CoordWidth = "0";
             result.CoordHeight = "0";
             db2.SetResultModels.Add(result);

@@ -9,5 +9,6 @@ namespace SocialFORM.Models.Project
     {
         public int Id { get; set; }
         public string NameProject { get; set; }
+        public bool? ActionProject { get; set; }
     }
 }
