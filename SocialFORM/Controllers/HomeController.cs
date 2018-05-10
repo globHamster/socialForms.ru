@@ -11,8 +11,13 @@ using SocialFORM.Models.Authentication;
 using SocialFORM.Models.Question;
 using SocialFORM.Models.Group;
 using SocialFORM.Models.Form;
+
+using System.IO;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 using PagedList.Mvc;
 using PagedList;
+
 
 namespace SocialFORM.Controllers
 {
@@ -84,7 +89,7 @@ namespace SocialFORM.Controllers
 
         public ActionResult Menu()
         {
-            List<MenuItem> menuItems = db.SetMenuItems.ToList();
+            List<Models.Menu.MenuItem> menuItems = db.SetMenuItems.ToList();
             return PartialView(menuItems);
         }
 
@@ -222,6 +227,183 @@ namespace SocialFORM.Controllers
             db.SetResultModels.RemoveRange(tmp);
             db.SaveChanges();
         }
+
+
+        public void ExportToEXCEL(int id_p)
+        {
+            List<ResultModel> listResultExport = db.SetResultModels.Where(u => u.ProjectID == id_p).ToList();
+            Dictionary<int, List<BlankModel>> listBlankExport = new Dictionary<int, List<BlankModel>>();
+            foreach (var item in listResultExport)
+            {
+                listBlankExport.Add(item.Id, db.SetBlankModels.Where(u => u.BlankID == item.Id).ToList());
+            }
+
+            List<GroupModel> listGroupExport = new List<GroupModel>();
+            using (GroupContext group_context = new GroupContext())
+            {
+                listGroupExport.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u => u.IndexQuestion).ToList());
+            }
+
+            Dictionary<int, QuestionModel> listQuestionExport = new Dictionary<int, QuestionModel>();
+            using (QuestionContext q_context = new QuestionContext())
+            {
+                foreach (var item in listGroupExport)
+                {
+                    listQuestionExport.Add((int)item.QuestionID, q_context.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID));
+                }
+            }
+
+            Dictionary<int, List<AnswerModel>> listAnswerAllExport = new Dictionary<int, List<AnswerModel>>();
+            foreach (var item in listQuestionExport)
+            {
+                using (QuestionContext q_context = new QuestionContext())
+                {
+                    listAnswerAllExport.Add(item.Key, q_context.SetAnswers.Where(u => u.QuestionID == item.Key).ToList());
+                }
+            }
+
+            var products = new System.Data.DataTable();
+
+            products.Columns.Add("Номер");
+            products.Columns.Add("ФИО");
+            products.Columns.Add("Номер телефона");
+            products.Columns.Add("Начало анкеты");
+            products.Columns.Add("Конец анкеты");
+
+            foreach (var item in listGroupExport)
+            {
+                QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
+                switch (tmp.TypeQuestion)
+                {
+                    case Models.Question.Type.Single:
+                        products.Columns.Add(item.GroupName);
+                        if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
+                        {
+                            products.Columns.Add(item.GroupName + "_др");
+                        }
+                        break;
+                    case Models.Question.Type.Multiple:
+                        int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
+                        for (int i = 1; i <= tmp_count; i++)
+                        {
+                            products.Columns.Add(item.GroupName + "_" + i);
+                        }
+                        if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
+                        {
+                            products.Columns.Add(item.GroupName + "_др");
+                        }
+                        else if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 1)
+                        {
+                            int count = 1;
+                            foreach (var item_answer in listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true))
+                            {
+                                products.Columns.Add(item.GroupName + "_др_" + count);
+                                count++;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            List<string> tmp_str = new List<string>();
+
+            foreach (var item in listResultExport)
+            {
+                tmp_str.Add(item.Id.ToString());
+                tmp_str.Add(item.UserName);
+                tmp_str.Add(item.PhoneNumber);
+                tmp_str.Add(item.Data.ToString());
+                tmp_str.Add(item.Time);
+                List<BlankModel> tmp_blank = listBlankExport[item.Id];
+                System.Diagnostics.Debug.WriteLine("Count blanks --- > " + tmp_blank.Count());
+                
+                for (int j=0; j< tmp_blank.Count -1; j++ )
+                {
+                    
+                    QuestionModel tmp = listQuestionExport[tmp_blank[j].QuestionID];
+                    switch (tmp.TypeQuestion)
+                    {
+                        case Models.Question.Type.Single:
+                            tmp_str.Add(tmp_blank[j].AnswerIndex.ToString());
+                            if (listAnswerAllExport[tmp_blank[j].QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
+                            {
+                                if (tmp_blank[j].Text != null)
+                                {
+                                    tmp_str.Add(tmp_blank[j].Text);
+                                }
+                                else
+                                {
+                                    tmp_str.Add(" ");
+                                }
+                            }
+                            break;
+                        case Models.Question.Type.Multiple:
+                            int count_all_answer = listAnswerAllExport[tmp.Id].Count()+j-1;
+                            int count_all_result = tmp_blank.Where(u=>u.QuestionID == tmp.Id).Count() + j - 1;
+                            int count_other_column = listAnswerAllExport[tmp.Id].Where(u => u.isFreeArea == true).Count();
+                            List<string> other_column = new List<string>(); 
+                            for (int i = j; i<=count_all_answer; i++)
+                            {
+
+                                if (i <= count_all_result)
+                                {
+                                    tmp_str.Add(tmp_blank[i].AnswerIndex.ToString());
+                                    if (tmp_blank[i].Text != null)
+                                    {
+                                        other_column.Add(tmp_blank[i].Text);
+                                    }
+                                }
+                                else
+                                    tmp_str.Add(" ");
+
+                            }
+
+                            j = count_all_result;
+                        
+                            if (other_column.Count > 0)
+                            {
+                                tmp_str.AddRange(other_column);
+                                j += count_other_column - 1;
+                            }
+                            break;
+                            
+                        default:
+                            break;
+                    }
+                    
+                }
+                
+                products.Rows.Add(tmp_str.ToArray());
+                tmp_str.Clear();
+            }
+
+            var grid = new GridView();
+
+            grid.DataSource = products;
+            //grid.DataSource = from code in listBlankExport 
+            //                  select new
+            //                  {
+            //                    q1 = code.AnswerIndex
+
+            //                  };
+            grid.DataBind();
+
+            Response.ClearContent();
+            Response.AddHeader("content-disposition", "attachment; filename=Exported_Diners.xls");
+            Response.ContentType = "application/excel";
+            Response.ContentEncoding = System.Text.Encoding.GetEncoding("UTF-8");
+            StringWriter sw = new StringWriter();
+            HtmlTextWriter htmlTextWriter = new HtmlTextWriter(sw);
+
+            grid.RenderControl(htmlTextWriter);
+
+            Response.Write(sw.ToString());
+
+            Response.End();
+    }
+
 
         [HttpPost]
         public void actionProject(int id)
@@ -397,6 +579,7 @@ namespace SocialFORM.Controllers
             int pageNumber = (page ?? 1);
             System.Diagnostics.Debug.WriteLine(tmp_tableBlanksFilter.Count());
             return PartialView("_TableBlanksFilter", tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
+
         }
     }
 }
