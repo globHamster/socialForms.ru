@@ -18,7 +18,6 @@ using System.Web.UI.WebControls;
 using PagedList.Mvc;
 using PagedList;
 
-
 namespace SocialFORM.Controllers
 {
     public class HomeController : Controller
@@ -66,6 +65,7 @@ namespace SocialFORM.Controllers
                 AgeView = DataUsers.Age,
                 FoolView = DataUsers.Fool,
                 EmailView = DataUsers.Email,
+                SchoolDayView = User.SchoolDay,
                 RoleView = Role.Name
             }
             );
@@ -73,6 +73,19 @@ namespace SocialFORM.Controllers
             ViewData["Name"] = result.First().NameView;
             ViewData["Family"] = result.First().FamilyView;
             ViewData["Role"] = result.First().RoleView;
+            //
+            // Проверка учебного дня
+            //
+            int UID = result.First().IdView;
+            if (result.First().SchoolDayView == true)
+            {
+                if (db.SetSchoolDay.FirstOrDefault(u => u.UserId == UID && DbFunctions.TruncateTime(u.Date) == DbFunctions.TruncateTime(DateTime.Now)) == null)
+                {
+                    db.SetSchoolDay.Add(new Models.SchoolDay { UserId = UID, Date = DateTime.Now });
+                    db.SaveChanges();
+                }
+            }
+
 
             return View();
         }
@@ -97,6 +110,7 @@ namespace SocialFORM.Controllers
         [Authorize(Roles = "Admin")]
         public ActionResult Project()
         {
+
             return PartialView(db4.SetProjectModels);
         }
 

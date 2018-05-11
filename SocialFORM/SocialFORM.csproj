@@ -254,6 +254,7 @@
     <Compile Include="Models\Question\QuestionModel.cs" />
     <Compile Include="Models\Question\TableRow.cs" />
     <Compile Include="Models\Question\Transition.cs" />
+    <Compile Include="Models\SchoolDay.cs" />
     <Compile Include="Models\Session\SessionModel.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserViewModel.cs" />

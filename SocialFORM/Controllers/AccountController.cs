@@ -98,7 +98,7 @@ namespace SocialFORM.Controllers
                     // создаем нового пользователя
                     using (ApplicationContext db = new ApplicationContext())
                     {
-                        db.SetUser.Add(new User { Login = model.Login, Password = model.Password, RoleId = model.RoleId });
+                        db.SetUser.Add(new User { Login = model.Login, Password = model.Password, RoleId = model.RoleId, SchoolDay = model.SchoolDay});
                         db.SaveChanges();
                         db.SetDataUsers.Add(new DataUser { Name = model.Name, Family = model.Family, Age = model.Age, Fool = model.Fool, Email = model.Email, UserId = db.SetUser.First(u => u.Login == model.Login).Id });
                         db.SaveChanges();
@@ -134,6 +134,7 @@ namespace SocialFORM.Controllers
                 UPuser.Login = model.LoginView;
                 UPuser.Password = model.PasswordView;
                 UPuser.RoleId = model.RoleIdView;
+                UPuser.SchoolDay = model.SchoolDayView;
 
                 UPdataUser.Name = model.NameView;
                 UPdataUser.Family = model.FamilyView;

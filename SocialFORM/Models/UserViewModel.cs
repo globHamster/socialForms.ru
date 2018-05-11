@@ -18,5 +18,6 @@ namespace SocialFORM.Models
         public int PrivilegeView { get; set; }
         public string RoleView { get; set; }
         public int RoleIdView { get; set; }
+        public bool? SchoolDayView { get; set; }
     }
 }

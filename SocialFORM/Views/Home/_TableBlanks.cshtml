@@ -16,10 +16,10 @@
             @foreach (var item in Model)
             {
                 <tr id="@item.Id" name="@item.Id" class="answer_row">
-                    <td>@item.Id</td>
+                    <td><input type="hidden" name="UserID" value="@item.UserID" /> @item.Id</td>
                     <td>@item.UserName</td>
                     <td>@item.PhoneNumber</td>
-                    <td>@item.Data</td>
+                    <td class="startDATE">@item.Data</td>
                     <td>@item.Time</td>
                     <td class="item_coord">@item.CoordWidth,@item.CoordHeight</td>
                 </tr>
@@ -41,6 +41,7 @@
 <script type="text/javascript">
 
     var list_base_answer = [];
+    var list_schoolDay = [];
     var id_list_base_answer = [];
     $.ajax({
         type: "GET",
@@ -54,7 +55,20 @@
             })
         }
     })
-
+    //
+    //Лист учебных дней
+    //
+    $.ajax({
+        type: "GET",
+        url: "/Question/getSchoolDay",
+        async: false,
+        data: {},
+        success: function (list) {
+            $.each(list, function (i, item) {
+                list_schoolDay.push(item.split('#'));
+            })
+        }
+    })
     //Создание шапки таблицы результатов ответов
     $.ajax({
         type: "GET",
@@ -178,6 +192,17 @@
 
     //Формировка таблицы с результатами ответов
     $('tr.answer_row').each(function () {
+        var UserID = $(this).find('input[name=UserID]').val();
+        var startDATE = $(this).find('.startDATE').text().split(' ');
+        var tmp_this = $(this); 
+        $.each(list_schoolDay, function (i, item) {
+          //  var tmp = item.Date.toString();
+            // var string = tmp.split(' ');
+            console.info(item[0], UserID, item[1], startDATE[0])
+            if (item[0] == UserID && item[1] == startDATE[0]) {
+                tmp_this.css("background-color", "grey");
+            }
+        })
         var result_list = [];
         var id_result_list = [];
 

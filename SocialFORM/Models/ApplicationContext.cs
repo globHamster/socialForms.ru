@@ -20,6 +20,7 @@ namespace SocialFORM.Models
         public DbSet<ResultModel> SetResultModels { get; set; }
         public DbSet<SessionModel> SetSession { get; set; }
         public DbSet<BlankModel> SetBlankModels { get; set; }
+        public DbSet<SchoolDay> SetSchoolDay { get; set; }
 
     }
 }

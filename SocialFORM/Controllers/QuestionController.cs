@@ -8,6 +8,7 @@ using System.Data.Entity;
 using SocialFORM.Models.Question;
 using SocialFORM.Models.Project;
 using SocialFORM.Models.Group;
+using SocialFORM.Models;
 using Newtonsoft.Json;
 using SocialFORM.Models.Utilite;
 
@@ -16,6 +17,7 @@ namespace SocialFORM.Controllers
     public class QuestionController : Controller
     {
         QuestionContext db = new QuestionContext();
+        ApplicationContext db2 = new ApplicationContext();
         // GET: Question
 
 
@@ -517,6 +519,19 @@ namespace SocialFORM.Controllers
         public JsonResult GetListFile(int id_p)
         {
             return Json(db.GetFiles.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult getSchoolDay()
+        {
+            List<string> tmp = new List<string>();
+            foreach(var item in db2.SetSchoolDay.ToList())
+            {
+                string tmp_str = "";
+                tmp_str += item.UserId + "#" + item.Date.ToShortDateString();
+                tmp.Add(tmp_str);
+            }
+            return Json(tmp, JsonRequestBehavior.AllowGet);
         }
     }
 }

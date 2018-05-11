@@ -14,6 +14,7 @@ namespace SocialFORM.Models.Authentication
     {
         public string Login { get; set; }
         public string Password { get; set; }
+        public bool? SchoolDay { get; set; }
         public int Age { get; set; }
         public string Fool { get; set; }
         public string Email { get; set; }
