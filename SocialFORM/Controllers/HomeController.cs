@@ -229,7 +229,7 @@ namespace SocialFORM.Controllers
         }
 
 
-        public void ExportToEXCEL(int id_p)
+        public void ExportToEXCEL(int id_p, string name_file)
         {
             List<ResultModel> listResultExport = db.SetResultModels.Where(u => u.ProjectID == id_p).ToList();
             Dictionary<int, List<BlankModel>> listBlankExport = new Dictionary<int, List<BlankModel>>();
@@ -254,13 +254,16 @@ namespace SocialFORM.Controllers
             }
 
             Dictionary<int, List<AnswerModel>> listAnswerAllExport = new Dictionary<int, List<AnswerModel>>();
+            Dictionary<int, List<Models.Question.TableRow>> listTableRow = new Dictionary<int, List<Models.Question.TableRow>>();
             foreach (var item in listQuestionExport)
             {
                 using (QuestionContext q_context = new QuestionContext())
                 {
                     listAnswerAllExport.Add(item.Key, q_context.SetAnswers.Where(u => u.QuestionID == item.Key).ToList());
+                    listTableRow.Add(item.Key, q_context.SetTableRows.Where(u => u.TableID == item.Key).ToList());
                 }
             }
+
 
             var products = new System.Data.DataTable();
 
@@ -269,7 +272,7 @@ namespace SocialFORM.Controllers
             products.Columns.Add("Номер телефона");
             products.Columns.Add("Начало анкеты");
             products.Columns.Add("Конец анкеты");
-
+            products.Columns.Add("Учебный день");
             foreach (var item in listGroupExport)
             {
                 QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
@@ -283,24 +286,48 @@ namespace SocialFORM.Controllers
                         }
                         break;
                     case Models.Question.Type.Multiple:
-                        int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
-                        for (int i = 1; i <= tmp_count; i++)
                         {
-                            products.Columns.Add(item.GroupName + "_" + i);
-                        }
-                        if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
-                        {
-                            products.Columns.Add(item.GroupName + "_др");
-                        }
-                        else if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 1)
-                        {
-                            int count = 1;
-                            foreach (var item_answer in listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true))
+                            int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
+                            for (int i = 1; i <= tmp_count; i++)
                             {
-                                products.Columns.Add(item.GroupName + "_др_" + count);
-                                count++;
+                                products.Columns.Add(item.GroupName + "_" + i);
+                            }
+                            if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
+                            {
+                                products.Columns.Add(item.GroupName + "_др");
+                            }
+                            else if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 1)
+                            {
+                                int count = 1;
+                                foreach (var item_answer in listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true))
+                                {
+                                    products.Columns.Add(item.GroupName + "_др_" + count);
+                                    count++;
+                                }
                             }
                         }
+                        break;
+                    case Models.Question.Type.Free:
+                        {
+                            int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
+                            for (int i = 1; i <= tmp_count; i++)
+                            {
+                                products.Columns.Add(item.GroupName + "_" + i);
+                            }
+                        }
+                        break;
+                    case Models.Question.Type.Table:
+                        {
+                            int count_row = listTableRow[(int)item.QuestionID].Count();
+                            for (int i = 1; i <= count_row; i++)
+                            {
+                                products.Columns.Add(item.GroupName + "_" + i);
+                            }
+                        }
+                        break;
+                    case Models.Question.Type.Filter:
+                        products.Columns.Add(item.GroupName + "_инд");
+                        products.Columns.Add(item.GroupName + "_текст");
                         break;
                     default:
                         break;
@@ -316,12 +343,12 @@ namespace SocialFORM.Controllers
                 tmp_str.Add(item.PhoneNumber);
                 tmp_str.Add(item.Data.ToString());
                 tmp_str.Add(item.Time);
+                tmp_str.Add(" ");
                 List<BlankModel> tmp_blank = listBlankExport[item.Id];
-                System.Diagnostics.Debug.WriteLine("Count blanks --- > " + tmp_blank.Count());
-                
-                for (int j=0; j< tmp_blank.Count -1; j++ )
+
+                for (int j = 0; j < tmp_blank.Count; j++)
                 {
-                    
+
                     QuestionModel tmp = listQuestionExport[tmp_blank[j].QuestionID];
                     switch (tmp.TypeQuestion)
                     {
@@ -340,58 +367,100 @@ namespace SocialFORM.Controllers
                             }
                             break;
                         case Models.Question.Type.Multiple:
-                            int count_all_answer = listAnswerAllExport[tmp.Id].Count()+j-1;
-                            int count_all_result = tmp_blank.Where(u=>u.QuestionID == tmp.Id).Count() + j - 1;
-                            int count_other_column = listAnswerAllExport[tmp.Id].Where(u => u.isFreeArea == true).Count();
-                            List<string> other_column = new List<string>(); 
-                            for (int i = j; i<=count_all_answer; i++)
                             {
-
-                                if (i <= count_all_result)
+                                int count_all_answer = listAnswerAllExport[tmp.Id].Count() + j - 1;
+                                int count_all_result = tmp_blank.Where(u => u.QuestionID == tmp.Id).Count() + j - 1;
+                                int count_other_column = listAnswerAllExport[tmp.Id].Where(u => u.isFreeArea == true).Count();
+                                List<string> other_column = new List<string>();
+                                for (int i = j; i <= count_all_answer; i++)
                                 {
-                                    tmp_str.Add(tmp_blank[i].AnswerIndex.ToString());
-                                    if (tmp_blank[i].Text != null)
+
+                                    if (i <= count_all_result)
                                     {
-                                        other_column.Add(tmp_blank[i].Text);
+                                        tmp_str.Add(tmp_blank[i].AnswerIndex.ToString());
+                                        if (tmp_blank[i].Text != null)
+                                        {
+                                            other_column.Add(tmp_blank[i].Text);
+                                        }
+                                    }
+                                    else
+                                        tmp_str.Add(" ");
+
+                                }
+
+                                j = count_all_result;
+
+                                for (int i = 0; i < count_other_column; i++)
+                                {
+                                    if (i <= (other_column.Count - 1))
+                                    {
+                                        tmp_str.Add(other_column[i]);
+                                    }
+                                    else
+                                    {
+                                        tmp_str.Add(" ");
                                     }
                                 }
-                                else
-                                    tmp_str.Add(" ");
-
-                            }
-
-                            j = count_all_result;
-                        
-                            if (other_column.Count > 0)
-                            {
-                                tmp_str.AddRange(other_column);
-                                j += count_other_column - 1;
                             }
                             break;
-                            
+                        case Models.Question.Type.Free:
+                            {
+                                int count_all_answer = listAnswerAllExport[tmp.Id].Count() + j - 1;
+                                int count_all_result = tmp_blank.Where(u => u.QuestionID == tmp.Id).Count() + j - 1;
+                                for (int i = j; i <= count_all_answer; i++)
+                                {
+
+                                    if (i <= count_all_result)
+                                    {
+                                        tmp_str.Add(tmp_blank[i].Text);
+                                    }
+                                    else
+                                        tmp_str.Add(" ");
+
+                                }
+
+                                j = count_all_result;
+                            }
+                            break;
+                        case Models.Question.Type.Table:
+                            int count_row = listTableRow[tmp.Id].Count() + j - 1;
+                            int count_row_result = tmp_blank.Where(u => u.QuestionID == tmp.Id).Count() + j - 1;
+                          
+                            for (int i = j; i <= count_row; i++)
+                            {
+
+                               
+
+
+                                if (i <= count_row_result)
+                                {
+                                    tmp_str.Add(tmp_blank[i].AnswerIndex.ToString());
+                                }
+                                else
+                                {
+                                    tmp_str.Add(" ");
+                                }
+                            }
+                            j = count_row_result;
+                            break;
+                        case Models.Question.Type.Filter:
+                            tmp_str.Add(tmp_blank[j].AnswerIndex.ToString());
+                            tmp_str.Add(tmp_blank[j].Text);
+                            break;
                         default:
                             break;
                     }
-                    
+
                 }
-                
                 products.Rows.Add(tmp_str.ToArray());
                 tmp_str.Clear();
             }
-
             var grid = new GridView();
 
             grid.DataSource = products;
-            //grid.DataSource = from code in listBlankExport 
-            //                  select new
-            //                  {
-            //                    q1 = code.AnswerIndex
-
-            //                  };
             grid.DataBind();
-
             Response.ClearContent();
-            Response.AddHeader("content-disposition", "attachment; filename=Exported_Diners.xls");
+            Response.AddHeader("content-disposition", "attachment; filename="+name_file+".xls");
             Response.ContentType = "application/excel";
             Response.ContentEncoding = System.Text.Encoding.GetEncoding("UTF-8");
             StringWriter sw = new StringWriter();
@@ -402,7 +471,7 @@ namespace SocialFORM.Controllers
             Response.Write(sw.ToString());
 
             Response.End();
-    }
+        }
 
 
         [HttpPost]
@@ -471,14 +540,14 @@ namespace SocialFORM.Controllers
         //
         List<ResultModel> tmp_tableBlanksFilter = null;
         [HttpGet]
-        public ActionResult TableBlanksFilter(int id_project,int id_operator,string startTime, string endTime, int? page)
+        public ActionResult TableBlanksFilter(int id_project, int id_operator, string startTime, string endTime, int? page)
         {
             ViewBag.Id_Project_Next = id_project;
             ViewBag.Id_Operator_Next = id_operator;
             ViewBag.startTimeNext = startTime;
             ViewBag.endTimeNext = endTime;
-            DateTime startTimeDT = Convert.ToDateTime(startTime.Replace("_"," "));
-            DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_"," "));
+            DateTime startTimeDT = Convert.ToDateTime(startTime.Replace("_", " "));
+            DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_", " "));
             System.Diagnostics.Debug.WriteLine(startTimeDT);
             System.Diagnostics.Debug.WriteLine(endTimeDT);
 
@@ -488,7 +557,7 @@ namespace SocialFORM.Controllers
             }
             if (id_operator > 0)
             {
-                
+
                 tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_project && u.UserID == id_operator && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
             }
             else
@@ -502,37 +571,38 @@ namespace SocialFORM.Controllers
             //
             //Вычисляем среднее время анкеты
             //
-            if (tmp_tableBlanksFilter.Count > 1) { 
-            double seconds = 0;
-            double secondsOT = 0;
-            TimeSpan min = new TimeSpan(23, 59, 59);
-            TimeSpan max = new TimeSpan(0, 0, 0);
+            if (tmp_tableBlanksFilter.Count > 1)
+            {
+                double seconds = 0;
+                double secondsOT = 0;
+                TimeSpan min = new TimeSpan(23, 59, 59);
+                TimeSpan max = new TimeSpan(0, 0, 0);
 
-            foreach (ResultModel item in tmp_tableBlanksFilter)
-            {
-                System.Diagnostics.Debug.WriteLine(DateTime.Parse(item.Time).Subtract(item.Data));
-                if (min >= DateTime.Parse(item.Time).Subtract(item.Data)) { min = DateTime.Parse(item.Time).Subtract(item.Data); }
-                if (max <= DateTime.Parse(item.Time).Subtract(item.Data)) { max = DateTime.Parse(item.Time).Subtract(item.Data); }
-                seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
-            }
-            seconds = seconds / tmp_tableBlanksFilter.Count;
-            foreach (ResultModel item in tmp_tableBlanksFilter)
-            {
-                secondsOT += Math.Pow(DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds - seconds,2);
-            }
-            secondsOT /= (tmp_tableBlanksFilter.Count - 1);
-            secondsOT = Math.Sqrt(secondsOT);
-            int minutesOt = (int)Math.Floor(secondsOT / 60);
-            int minutes = (int)Math.Floor(seconds / 60);
-            seconds -= minutes * 60;
-            secondsOT -= minutesOt * 60;
-            DateTime tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
-            DateTime tmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
-            ViewBag.min = min;
-            ViewBag.max = max;
-            ViewBag.SrTime = tmp.ToLongTimeString();
-            ViewBag.SrTimeOT = tmp2.ToLongTimeString();
-            System.Diagnostics.Debug.WriteLine("Total seconds ---- > " + tmp.ToLongTimeString());
+                foreach (ResultModel item in tmp_tableBlanksFilter)
+                {
+                    System.Diagnostics.Debug.WriteLine(DateTime.Parse(item.Time).Subtract(item.Data));
+                    if (min >= DateTime.Parse(item.Time).Subtract(item.Data)) { min = DateTime.Parse(item.Time).Subtract(item.Data); }
+                    if (max <= DateTime.Parse(item.Time).Subtract(item.Data)) { max = DateTime.Parse(item.Time).Subtract(item.Data); }
+                    seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
+                }
+                seconds = seconds / tmp_tableBlanksFilter.Count;
+                foreach (ResultModel item in tmp_tableBlanksFilter)
+                {
+                    secondsOT += Math.Pow(DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds - seconds, 2);
+                }
+                secondsOT /= (tmp_tableBlanksFilter.Count - 1);
+                secondsOT = Math.Sqrt(secondsOT);
+                int minutesOt = (int)Math.Floor(secondsOT / 60);
+                int minutes = (int)Math.Floor(seconds / 60);
+                seconds -= minutes * 60;
+                secondsOT -= minutesOt * 60;
+                DateTime tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
+                DateTime tmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
+                ViewBag.min = min;
+                ViewBag.max = max;
+                ViewBag.SrTime = tmp.ToLongTimeString();
+                ViewBag.SrTimeOT = tmp2.ToLongTimeString();
+                System.Diagnostics.Debug.WriteLine("Total seconds ---- > " + tmp.ToLongTimeString());
             }
             int pageSize = 15;
             int pageNumber = (page ?? 1);

@@ -55,7 +55,7 @@
     $(document).ready(function () {
 
         $('button.export_result').click(function () {
-            document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id');
+            document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id') + "&name_file=" + $(this).parent().parent().find('td').first().text();
         })
 
         $(".table").on("click", "td", function () {

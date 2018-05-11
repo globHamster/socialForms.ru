@@ -134,6 +134,7 @@ namespace SocialFORM.Controllers
                     AnswerModel answer = db.SetAnswers.Where(u => u.Id == tmp.Id).FirstOrDefault();
                     answer.QuestionID = question.Id;
                     answer.AnswerText = tmp.AnswerText;
+                    answer.isFreeArea = tmp.isFreeArea;
                     db.SaveChanges();
                     //answerAll.AnswerKey = tmp.Id;
                     //answerAll.QuestionID = tmp.QuestionID;
