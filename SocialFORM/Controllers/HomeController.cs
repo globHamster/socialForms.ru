@@ -502,9 +502,10 @@ namespace SocialFORM.Controllers
             //
             //Вычисляем среднее время анкеты
             //
+            if (tmp_tableBlanksFilter.Count > 1) { 
             double seconds = 0;
             double secondsOT = 0;
-            TimeSpan min = new TimeSpan(59, 59, 59);
+            TimeSpan min = new TimeSpan(23, 59, 59);
             TimeSpan max = new TimeSpan(0, 0, 0);
 
             foreach (ResultModel item in tmp_tableBlanksFilter)
@@ -527,12 +528,12 @@ namespace SocialFORM.Controllers
             secondsOT -= minutesOt * 60;
             DateTime tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
             DateTime tmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
-
             ViewBag.min = min;
             ViewBag.max = max;
             ViewBag.SrTime = tmp.ToLongTimeString();
             ViewBag.SrTimeOT = tmp2.ToLongTimeString();
             System.Diagnostics.Debug.WriteLine("Total seconds ---- > " + tmp.ToLongTimeString());
+            }
             int pageSize = 15;
             int pageNumber = (page ?? 1);
             return PartialView(tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
