@@ -287,6 +287,7 @@
     <Content Include="Scripts\device.js" />
     <Content Include="Scripts\FileSaver.js" />
     <Content Include="Scripts\FileSaver.min.js" />
+    <Content Include="Scripts\ifvisible.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -337,6 +338,7 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\script.js" />
+    <Content Include="Scripts\socket.js" />
     <Content Include="Scripts\tableexport.js" />
     <Content Include="Scripts\tableexport.min.js" />
     <Content Include="Scripts\tableform_script.js" />
