@@ -293,7 +293,7 @@ namespace SocialFORM.Controllers
                 switch (tmp.TypeQuestion)
                 {
                     case Models.Question.Type.Single:
-                        products.Columns.Add(item.GroupName);
+                        products.Columns.Add(item.GroupName.ToString());
                         if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
                         {
                             products.Columns.Add(item.GroupName + "_др");
@@ -360,106 +360,112 @@ namespace SocialFORM.Controllers
                 tmp_str.Add(" ");
                 List<BlankModel> tmp_blank = listBlankExport[item.Id];
 
-                for (int j = 0; j < tmp_blank.Count; j++)
+                foreach (var group_item in listGroupExport)
                 {
-
-                    QuestionModel tmp = listQuestionExport[tmp_blank[j].QuestionID];
-                    switch (tmp.TypeQuestion)
+                    QuestionModel question_item = listQuestionExport[(int)group_item.QuestionID];
+                    switch (question_item.TypeQuestion)
                     {
                         case Models.Question.Type.Single:
-                            tmp_str.Add(tmp_blank[j].AnswerIndex.ToString());
-                            if (listAnswerAllExport[tmp_blank[j].QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
                             {
-                                if (tmp_blank[j].Text != null)
+                                if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID) != null)
                                 {
-                                    tmp_str.Add(tmp_blank[j].Text);
-                                }
-                                else
+                                    if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex != -404)
+                                        tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex.ToString());
+                                    else
+                                        tmp_str.Add(" ");
+                                    if (listAnswerAllExport[(int)group_item.QuestionID].Where(u=>u.isFreeArea == true).Count() > 0 )
+                                    {
+                                        if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).Text != null)
+                                        {
+                                            tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).Text);
+                                        }
+                                        else
+                                        {
+                                            tmp_str.Add(" ");
+                                        }
+                                    } 
+                                } else
                                 {
                                     tmp_str.Add(" ");
+                                    if (listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
+                                        tmp_str.Add(" ");
                                 }
                             }
                             break;
                         case Models.Question.Type.Multiple:
                             {
-                                int count_all_answer = listAnswerAllExport[tmp.Id].Count() + j - 1;
-                                int count_all_result = tmp_blank.Where(u => u.QuestionID == tmp.Id).Count() + j - 1;
-                                int count_other_column = listAnswerAllExport[tmp.Id].Where(u => u.isFreeArea == true).Count();
-                                List<string> other_column = new List<string>();
-                                for (int i = j; i <= count_all_answer; i++)
+                                if (tmp_blank.Where(u=>u.QuestionID == group_item.QuestionID).Count() > 0)
                                 {
-
-                                    if (i <= count_all_result)
+                                    List<BlankModel> tmp_list_blank = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
+                                    int count_all_answer = listAnswerAllExport[(int)group_item.QuestionID].Count();
+                                    int count_other_column = listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count();
+                                    List<string> other_column = new List<string>();
+                                    foreach (var blank_item in tmp_list_blank)
                                     {
-                                        tmp_str.Add(tmp_blank[i].AnswerIndex.ToString());
-                                        if (tmp_blank[i].Text != null)
+                                        if (blank_item.AnswerIndex != -404)
+                                            tmp_str.Add(blank_item.AnswerIndex.ToString());
+                                        else
+                                            tmp_str.Add(" ");
+                                        if (blank_item.Text != null)
+                                            other_column.Add(blank_item.Text);
+                                        count_all_answer--;
+                                    }
+                                    for(int i =0; i<count_all_answer; i++)
+                                    {
+                                        tmp_str.Add(" ");
+                                    }
+                                    for (int i = 0; i<count_other_column; i++)
+                                    {
+                                        if (i <= other_column.Count() - 1)
                                         {
-                                            other_column.Add(tmp_blank[i].Text);
+                                            tmp_str.Add(other_column[i]);
                                         }
-                                    }
-                                    else
-                                        tmp_str.Add(" ");
-
-                                }
-
-                                j = count_all_result;
-
-                                for (int i = 0; i < count_other_column; i++)
-                                {
-                                    if (i <= (other_column.Count - 1))
-                                    {
-                                        tmp_str.Add(other_column[i]);
-                                    }
-                                    else
-                                    {
-                                        tmp_str.Add(" ");
+                                        else
+                                        {
+                                            tmp_str.Add(" ");
+                                        }
                                     }
                                 }
                             }
                             break;
                         case Models.Question.Type.Free:
                             {
-                                int count_all_answer = listAnswerAllExport[tmp.Id].Count() + j - 1;
-                                int count_all_result = tmp_blank.Where(u => u.QuestionID == tmp.Id).Count() + j - 1;
-                                for (int i = j; i <= count_all_answer; i++)
+                                int count_all_answer = listAnswerAllExport[(int)group_item.QuestionID].Count();
+                                int count_all_result = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).Count();
+                                List<BlankModel> _blank_list = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
+                                for (int i = 0; i < count_all_answer; i++)
                                 {
-
-                                    if (i <= count_all_result)
+                                    if (i <= count_all_result-1)
                                     {
-                                        tmp_str.Add(tmp_blank[i].Text);
+                                        tmp_str.Add(_blank_list[i].Text);
                                     }
                                     else
                                         tmp_str.Add(" ");
 
                                 }
-
-                                j = count_all_result;
                             }
                             break;
                         case Models.Question.Type.Table:
-                            int count_row = listTableRow[tmp.Id].Count() + j - 1;
-                            int count_row_result = tmp_blank.Where(u => u.QuestionID == tmp.Id).Count() + j - 1;
-                          
-                            for (int i = j; i <= count_row; i++)
                             {
-
-                               
-
-
-                                if (i <= count_row_result)
+                                int count_row = listTableRow[(int)group_item.QuestionID].Count();
+                                int count_row_result = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).Count();
+                                List<BlankModel> _blank_list = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
+                                for (int i = 0; i < count_row; i++)
                                 {
-                                    tmp_str.Add(tmp_blank[i].AnswerIndex.ToString());
-                                }
-                                else
-                                {
-                                    tmp_str.Add(" ");
+
+                                    if (i <= count_row_result-1)
+                                    {
+                                        if (_blank_list[i].AnswerIndex != -404)
+                                            tmp_str.Add(_blank_list[i].AnswerIndex.ToString());
+                                        else
+                                            tmp_str.Add(" ");
+                                    }
+                                    else
+                                    {
+                                        tmp_str.Add(" ");
+                                    }
                                 }
                             }
-                            j = count_row_result;
-                            break;
-                        case Models.Question.Type.Filter:
-                            tmp_str.Add(tmp_blank[j].AnswerIndex.ToString());
-                            tmp_str.Add(tmp_blank[j].Text);
                             break;
                         default:
                             break;
@@ -474,7 +480,7 @@ namespace SocialFORM.Controllers
             grid.DataSource = products;
             grid.DataBind();
             Response.ClearContent();
-            Response.AddHeader("content-disposition", "attachment; filename="+name_file+".xls");
+            Response.AddHeader("content-disposition", "attachment; filename=" + name_file + ".xls");
             Response.ContentType = "application/excel";
             Response.ContentEncoding = System.Text.Encoding.GetEncoding("UTF-8");
             StringWriter sw = new StringWriter();

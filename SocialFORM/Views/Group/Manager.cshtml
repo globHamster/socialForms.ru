@@ -174,9 +174,25 @@
 <div id="overlay"></div><!-- Пoдлoжкa -->
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
+<script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
     var is_loaded = false;
     var list_answer_base;
+
+    $('ul.tree_view').sortable({
+        stop: function (event, ui) {
+            var count = 1;
+            var list_id_question = [];
+            $('ul.tree_view li').each(function () {
+                $(this).text("Вопрос " + count); 
+                list_id_question.push(Number($(this).attr('id')))
+                count++;
+            })
+            $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
+        }
+    });
+    $('ul.tree_view').disableSelection();
+
     $('.drop span').mouseenter(function () {
         if ($(this).parent().attr('name') != "checked") {
             $(this).css('background-color', '#aaa');

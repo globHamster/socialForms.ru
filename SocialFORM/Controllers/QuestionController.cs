@@ -405,7 +405,17 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public JsonResult getListQuestion(int id_p)
         {
-            return Json(db.SetQuestions.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+            List<GroupModel> tmp_list_group = new List<GroupModel>();
+            using (GroupContext group_context = new GroupContext())
+            {
+                tmp_list_group.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u=>u.IndexQuestion).ToList());
+            }
+            List<QuestionModel> tmp_list_question = new List<QuestionModel>();
+            foreach(var item in tmp_list_group)
+            {
+                tmp_list_question.Add(db.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID));
+            }
+            return Json(tmp_list_question, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

@@ -32,7 +32,7 @@ namespace SocialFORM.Controllers
                 get_id_project = id_project;
                 ViewBag.ProjectID = id_project;
             }
-            return PartialView(result);
+            return PartialView(result.OrderBy(u=>u.IndexQuestion).ToList());
         }
 
         public ActionResult SingleForm()
@@ -93,7 +93,7 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public JsonResult getGroup(int id_p)
         {
-            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).ToList(), JsonRequestBehavior.AllowGet);
+            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u=>u.IndexQuestion).ToList(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -185,5 +185,18 @@ namespace SocialFORM.Controllers
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public void ChangeIndexQuestion(List<int> new_set)
+        {
+            int count = 1;
+            foreach(var item in new_set)
+            {
+                GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.QuestionID == item);
+                group_item.IndexQuestion = count;
+                group_item.GroupName = "Вопрос " + count;
+                db.SaveChanges();
+                count++;
+            }
+        }
     }
 }
