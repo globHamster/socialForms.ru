@@ -274,6 +274,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="images\icon\status.png" />
+    <Content Include="images\icon\status_busy.png" />
+    <Content Include="images\icon\status_offline.png" />
     <Content Include="Scripts\BLOCKS.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -422,10 +425,10 @@
     <Content Include="Views\Home\Statistics.cshtml" />
     <Content Include="Views\Home\TableBlanksFilter.cshtml" />
     <Content Include="Views\Home\_TableBlanksFilter.cshtml" />
+    <Content Include="Views\Home\Monitoring.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="images\" />
     <Folder Include="Views\Home\Users\" />
   </ItemGroup>
   <ItemGroup>

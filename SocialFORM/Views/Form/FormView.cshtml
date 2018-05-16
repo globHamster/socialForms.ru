@@ -500,7 +500,7 @@
                 break;
             case 3:
                 $('input.free_text').each(function () {
-                    mas.push($(this).attr('id') + "#" + $(this).val());
+                    mas.push($(this).attr('id') + "#" + $(this).val().replace(',',';'));
                 });
                 console.info("mas result ---- ", mas);
                 result[index] = mas;

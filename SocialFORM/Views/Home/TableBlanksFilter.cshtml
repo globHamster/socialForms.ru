@@ -78,14 +78,46 @@
 </div>
 <div class="resDiv">
 
+    <table border="1">
+        <tr>
+        <th>Дата</th>
+        <th>Количество анкет за проект</th>
+        <th>Среднее время анкет</th>
+        <th>Минимальная длительность</th>
+        <th>Максимальная длительность</th>
+        <th>Стандартное отклонение</th>
+        <th>Время входа</th>
+        <th>Время выхода</th>
+        <th>Время работы</th>
+        <th>Время бездействия</th>
+        </tr>
+        @foreach (string i in ViewBag.list)
+        {
+            <tr>
+            @foreach (var item in i.Split('/'))
+            {
+                <td>@item</td>
+            }
+            </tr>
+        }
+    </table>
 </div>
-<script type="text/javascript">
-                
-                var code = '<p>Количество анкет за проект : @ViewBag.countBlanks </p>';
-                code += '<p>Среднее время анкет: @ViewBag.SrTime </p>';
-                    code += '<p>Минимальная длительность : @ViewBag.min </p>';
-                    code += '<p>Максимальная длительность : @ViewBag.max </p>';
-                    code += '<p>Стандартное отклонение  : @ViewBag.SrTimeOT </p>';
-                $('div.resDiv').append(code);
-   
-</script>
+@*<script type="text/javascript">
+
+    var code = '<table border="1">';
+    code += '<tr> <th></th> <th>Дата</th></tr>';
+    code += '<tr><td>Количество анкет за проект : </td><td>@ViewBag.countBlanks</td></tr>';
+    if (@ViewBag.countBlanks > 1) {
+        code += '<tr><td>Среднее время анкет : </td><td>@ViewBag.SrTime</td></tr>';
+        code += '<tr><td>Минимальная длительность : </td><td>@ViewBag.min</td></tr>';
+        code += '<tr><td>Максимальная длительность : </td><td>@ViewBag.max</td></tr>';
+        code += '<tr><td>Стандартное отклонение : </td><td>@ViewBag.SrTimeOT</td></tr>';
+    }
+    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
+    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
+    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
+    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
+    code += '</table >';
+    $('div.resDiv').append(code);
+
+</script>*@

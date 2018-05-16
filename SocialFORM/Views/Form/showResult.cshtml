@@ -289,7 +289,10 @@
         $.post("/Form/SaveData", query)
             .success(function (data) {
                 alert('Result ID -> ' + data);
-                $('#Tables').load('/Home/BeginForm?id_p=' + id_project, '', function () { $('div.waiting_screen').remove(); });
+                $('#Tables').load('/Home/BeginForm?id_p=' + id_project, '', function () {
+                    $.post("/Account/getTimeOutBeginEnd", { time: d("result3").innerText, userId: $('div[name=operatorID]').attr('id') });
+                    $('div.waiting_screen').remove();
+                });
             })
             .error(function () {
                 alert("Error");

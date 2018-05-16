@@ -14,5 +14,6 @@ namespace SocialFORM.Models.Session
         public string SetTimeUp { get; set; }
         public string TimeOut { get; set; }
         public string AllTime { get; set; }
+        public int StatusTime { get; set; }
     }
 }

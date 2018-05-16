@@ -7,6 +7,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Ajax;
@@ -42,13 +43,15 @@ namespace SocialFORM.Controllers
                         SessionModel date = db.SetSession.FirstOrDefault(u => u.UserId == user.Id && u.Date == someDateTime.Date);
                         if (date == null)
                         {
-                            db.SetSession.Add(new Models.Session.SessionModel { UserId = user.Id, Date = someDateTime.Date, TimeUp = someDateTime.ToShortTimeString(), SetTimeUp = someDateTime.ToShortTimeString(), AllTime = "00:00:00" });
+                            db.SetSession.Add(new Models.Session.SessionModel { UserId = user.Id, Date = someDateTime.Date, TimeUp = someDateTime.ToLongTimeString(), SetTimeUp = someDateTime.ToLongTimeString(), TimeOut = someDateTime.ToLongTimeString(), AllTime = "00:00:00", StatusTime = 1 });
                             db.SaveChanges();
                         }
                         if (date != null)
                         {
                             SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
-                            UPSetTimeUp.SetTimeUp = someDateTime.ToShortTimeString();
+                            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
+                            UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
+                            UPSetTimeUp.StatusTime = 1;
                             db.Entry(UPSetTimeUp).State = EntityState.Modified;
                             db.SaveChanges();
                         }
@@ -98,7 +101,7 @@ namespace SocialFORM.Controllers
                     // создаем нового пользователя
                     using (ApplicationContext db = new ApplicationContext())
                     {
-                        db.SetUser.Add(new User { Login = model.Login, Password = model.Password, RoleId = model.RoleId, SchoolDay = model.SchoolDay});
+                        db.SetUser.Add(new User { Login = model.Login, Password = model.Password, RoleId = model.RoleId, SchoolDay = model.SchoolDay });
                         db.SaveChanges();
                         db.SetDataUsers.Add(new DataUser { Name = model.Name, Family = model.Family, Age = model.Age, Fool = model.Fool, Email = model.Email, UserId = db.SetUser.First(u => u.Login == model.Login).Id });
                         db.SaveChanges();
@@ -151,13 +154,66 @@ namespace SocialFORM.Controllers
             //}
         }
 
-
         public ActionResult Logoff()
         {
             DateTime someDateTime = DateTime.Now;
             HttpCookie cookieReq = Request.Cookies["cookieAuth"];
+            string cookieString = null;
+            if (cookieReq != null)
+            {
+                cookieString = CryporEngine.Decrypt(cookieReq["Login"], true);
+                System.Diagnostics.Debug.WriteLine(cookieString);
 
+                HttpCookie cookie = new HttpCookie("cookieAuth");
+                cookie.Expires = DateTime.Now.AddDays(-1);
+                Response.Cookies.Add(cookie);
+                if (ModelState.IsValid)
+                {
+                    // поиск пользователя в бд
+                    User user = null;
+                    using (ApplicationContext db = new ApplicationContext())
+                    {
+                        user = db.SetUser.Where(u => u.Login == cookieString).First();
 
+                    }
+                    if (user != null)
+                    {
+                        using (ApplicationContext db = new ApplicationContext())
+                        {
+                            SessionModel date = db.SetSession.FirstOrDefault(u => u.UserId == user.Id && u.Date == someDateTime.Date);
+                            if (date != null)
+                            {
+                                if (date.TimeUp == date.SetTimeUp)
+                                {
+                                    SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
+                                    UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
+                                    UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.TimeUp))).ToString()).ToLongTimeString();
+                                    UPSetTimeUp.StatusTime = 0;
+                                    db.Entry(UPSetTimeUp).State = EntityState.Modified;
+                                }
+                                else
+                                {
+                                    SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
+                                    UPSetTimeUp.TimeOut = someDateTime.ToShortTimeString();
+                                    UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToLongTimeString();
+                                    UPSetTimeUp.StatusTime = 0;
+                                    db.Entry(UPSetTimeUp).State = EntityState.Modified;
+                                }
+                                db.SaveChanges();
+                            }
+                        }
+                    }
+                }
+                FormsAuthentication.SignOut();
+            }
+            return RedirectToAction("_Index", "Home");
+        }
+
+        [HttpPost]
+        public void Logofff()
+        {
+            DateTime someDateTime = DateTime.Now;
+            HttpCookie cookieReq = Request.Cookies["cookieAuth"];
             string cookieString = null;
             if (cookieReq != null)
             {
@@ -188,15 +244,17 @@ namespace SocialFORM.Controllers
                             if (date.TimeUp == date.SetTimeUp)
                             {
                                 SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
-                                UPSetTimeUp.TimeOut = someDateTime.ToShortTimeString();
-                                UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToShortTimeString()) - DateTime.Parse(UPSetTimeUp.TimeUp))).ToString()).ToShortTimeString();
+                                UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
+                                UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.TimeUp))).ToString()).ToLongTimeString();
+                                UPSetTimeUp.StatusTime = 0;
                                 db.Entry(UPSetTimeUp).State = EntityState.Modified;
                             }
                             else
                             {
                                 SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
-                                UPSetTimeUp.TimeOut = someDateTime.ToShortTimeString();
-                                UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToShortTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToShortTimeString();
+                                UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
+                                UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToLongTimeString();
+                                UPSetTimeUp.StatusTime = 0;
                                 db.Entry(UPSetTimeUp).State = EntityState.Modified;
                             }
                             db.SaveChanges();
@@ -205,7 +263,53 @@ namespace SocialFORM.Controllers
                 }
             }
             FormsAuthentication.SignOut();
-            return RedirectToAction("_Index", "Home");
+        }
+
+        [HttpPost]
+        public async Task getTimeOut(string time, string userID)
+        {
+            ApplicationContext db = new ApplicationContext();
+            DateTime someDateTime = DateTime.Parse(time);
+            // поиск пользователя в бд
+            int uID = Convert.ToInt32(userID);
+            DateTime date = DateTime.Now.Date;
+            SessionModel UPSetTimeUp = await db.SetSession.Where(u => u.UserId == uID && u.Date == date).FirstAsync();
+            UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
+            UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToLongTimeString();
+            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
+            UPSetTimeUp.StatusTime = 0;
+            db.Entry(UPSetTimeUp).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        public async Task getTimeOutBeginEnd(string time, string userID)
+        {
+            ApplicationContext db = new ApplicationContext();
+            DateTime someDateTime = DateTime.Parse(time);
+            // поиск пользователя в бд
+            int uID = Convert.ToInt32(userID);
+            DateTime date = DateTime.Now.Date;
+            SessionModel UPSetTimeUp = await db.SetSession.Where(u => u.UserId == uID && u.Date == date).FirstAsync();
+            UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
+            UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToLongTimeString();
+            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
+            db.Entry(UPSetTimeUp).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        public async Task getSetTimeUp(string time, string userID)
+        {
+            DateTime someDateTime = DateTime.Parse(time);
+            DateTime date = DateTime.Now.Date;
+            int uID = Convert.ToInt32(userID);
+            ApplicationContext db = new ApplicationContext();
+            SessionModel UPSetTimeUp = await db.SetSession.Where(u => u.UserId == uID && u.Date == date).FirstAsync();
+            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
+            UPSetTimeUp.StatusTime = 1;
+            db.Entry(UPSetTimeUp).State = EntityState.Modified;
+            await db.SaveChangesAsync();
         }
     }
     public class CryporEngine
@@ -269,5 +373,5 @@ namespace SocialFORM.Controllers
         }
     }
 
-  
+
 }
