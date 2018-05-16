@@ -357,7 +357,17 @@ namespace SocialFORM.Controllers
                 tmp_str.Add(item.PhoneNumber);
                 tmp_str.Add(item.Data.ToString());
                 tmp_str.Add(item.Time);
-                tmp_str.Add(" ");
+                List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
+                string is_introduce_day = "0";
+                foreach(var item_schoolday in list_schoolday)
+                {
+                    if (item.UserID == item_schoolday.UserId && item.Data.Date == item_schoolday.Date.Date)
+                    {
+                        is_introduce_day = "1";
+                        break;
+                    }
+                }
+                tmp_str.Add(is_introduce_day);
                 List<BlankModel> tmp_blank = listBlankExport[item.Id];
 
                 foreach (var group_item in listGroupExport)
