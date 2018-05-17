@@ -27,10 +27,6 @@ namespace SocialFORM.Controllers
 
         public ActionResult Index()
         {
-
-            //var privileges = db.SetPriveleges.Include(a => a.User);
-            //ViewBag.Privileges = privileges;
-            //var datasets = db.SetDataUsers.Include(a => a.User);
             return View();
         }
 
@@ -352,7 +348,7 @@ namespace SocialFORM.Controllers
 
             foreach (var item in listResultExport)
             {
-                tmp_str.Add(item.Id.ToString());
+                tmp_str.Add(item.BlankID.ToString());
                 tmp_str.Add(item.UserName);
                 tmp_str.Add(item.PhoneNumber);
                 tmp_str.Add(item.Data.ToString());

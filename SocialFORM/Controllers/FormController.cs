@@ -133,8 +133,6 @@ namespace SocialFORM.Controllers
 
             //!!!Переделать присвоение ииндексов!!!
             result.ResultIndex = 1;
-            result.ResultIndex = 1;
-
 
             result.PhoneNumber = phone_number;
             result.Data = DateTime.Parse(time_begin);
@@ -145,6 +143,9 @@ namespace SocialFORM.Controllers
             await db2.SaveChangesAsync();
 
             //Выгрузка данных анкетирования в базу
+            int blank_id = db2.SetResultModels.Where(u => u.ProjectID == project_id).Count();
+            result.BlankID = blank_id;
+            await db2.SaveChangesAsync();
             int result_id = db2.SetResultModels.Where(u => u.ProjectID == result.ProjectID).ToList().Last().Id;
 
             List<BlankModel> tmp_list = new List<BlankModel>();
@@ -190,7 +191,7 @@ namespace SocialFORM.Controllers
             db2.SetBlankModels.AddRange(tmp_list);
             await db2.SaveChangesAsync();
 
-            return result_id;
+            return blank_id;
         }
 
         [HttpGet]
