@@ -12,7 +12,7 @@
                 @:<li class="question_view" id="@i.Question.Id" style="cursor: pointer;"><span> @i.GroupName</span></li>
             } else
             {
-                @:<li style="cursor: default"> down <ul>
+                @:<li style="cursor: default" class="group_list"> @i.GroupName <ul>
                 @Html.Partial("_TreeList", Model.Where(u=>u.GroupID==i.Group || u.Group==i.Group).ToList())
                 @:</ul></li>
             }

@@ -11,5 +11,6 @@ namespace SocialFORM.Models.Question
         public int AnswerKey { get; set; }
         public int AnswerType { get; set; }
         public int QuestionID { get; set; }
+        public int? BindGroup { get; set; }
     }
 }

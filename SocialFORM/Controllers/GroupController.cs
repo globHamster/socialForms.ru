@@ -32,7 +32,7 @@ namespace SocialFORM.Controllers
                 get_id_project = id_project;
                 ViewBag.ProjectID = id_project;
             }
-            return PartialView(result.OrderBy(u=>u.IndexQuestion).ToList());
+            return PartialView(result.OrderBy(u => u.IndexQuestion).ToList());
         }
 
         public ActionResult SingleForm()
@@ -58,6 +58,40 @@ namespace SocialFORM.Controllers
         public ActionResult FilterForm()
         {
             return PartialView();
+        }
+
+        [HttpGet]
+        public JsonResult GetListGroup(int id_p)
+        {
+            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p).OrderBy(u => u.IndexQuestion).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        //Добавление новой группы вопросов
+        [HttpPost]
+        public void AddNewGroup(int id_p)
+        {
+            GroupModel tmp = new GroupModel();
+            if (db.SetGroupModels.Where(u => u.ProjectID == id_p && u.Group != null).Max(u => u.Group) == 0)
+            {
+                tmp.Group = 1;
+                tmp.GroupID = 0;
+                tmp.GroupName = "Группа " + tmp.Group;
+                tmp.ProjectID = id_p;
+                tmp.IndexQuestion = db.SetGroupModels.Where(u => u.ProjectID == id_p).Max(u => u.IndexQuestion) + 1;
+                db.SetGroupModels.Add(tmp);
+                db.SaveChanges();
+            }
+            else
+            {
+                int max_index_group = (int)db.SetGroupModels.Where(u => u.ProjectID == id_p && u.Group != null).Max(u => u.Group);
+                tmp.Group = max_index_group + 1;
+                tmp.GroupID = 0;
+                tmp.GroupName = "Группа " + tmp.Group;
+                tmp.IndexQuestion = db.SetGroupModels.Where(u => u.ProjectID == id_p).Max(u => u.IndexQuestion) + 1;
+                tmp.ProjectID = id_p;
+                db.SetGroupModels.Add(tmp);
+                db.SaveChanges();
+            }
         }
 
         [HttpPost]
@@ -93,13 +127,13 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public JsonResult getGroup(int id_p)
         {
-            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u=>u.IndexQuestion).ToList(), JsonRequestBehavior.AllowGet);
+            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u => u.IndexQuestion).ToList(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
         public JsonResult getIdQuestionGroup(int id_p)
         {
-            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u => u.IndexQuestion).Select(u => u.QuestionID).ToList(), JsonRequestBehavior.AllowGet);
+            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u => u.IndexQuestion).Select(u => u.QuestionID).ToList(), JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
         public JsonResult Upload()
@@ -189,14 +223,85 @@ namespace SocialFORM.Controllers
         public void ChangeIndexQuestion(List<int> new_set)
         {
             int count = 1;
-            foreach(var item in new_set)
+            int count_group = 1;
+            int count_answer = 1;
+            foreach (var item in new_set)
             {
                 GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.QuestionID == item);
-                group_item.IndexQuestion = count;
-                group_item.GroupName = "Вопрос " + count;
+                if (group_item == null)
+                {
+                    group_item = db.SetGroupModels.FirstOrDefault(u => u.Group == item);
+                    group_item.IndexQuestion = count;
+                    group_item.GroupName = "Группа " + count_group;
+                    count_group++;
+                }
+                else
+                {
+                    group_item.IndexQuestion = count;
+                    group_item.GroupName = "Вопрос " + count_answer;
+                    count_answer++;
+                }
                 db.SaveChanges();
                 count++;
             }
         }
+
+        [HttpPost]
+        public void DeleteGroup(int id_group, int id_project)
+        {
+            List<GroupModel> tmp = new List<GroupModel>();
+            tmp.AddRange(db.SetGroupModels.Where(u => u.GroupID == id_group && u.ProjectID == id_project).ToList());
+            List<QuestionModel> question_tmp = new List<QuestionModel>();
+            foreach(var item in tmp)
+            {
+                question_tmp.Add(db2.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID));
+            }
+            List<AnswerAll> answerAll_tmp = new List<AnswerAll>();
+            foreach(var item in question_tmp)
+            {
+                answerAll_tmp.AddRange(db2.SetAnswerAll.Where(u => u.QuestionID == item.Id).ToList());
+            }
+            db2.SetAnswerAll.RemoveRange(answerAll_tmp);
+            db2.SetQuestions.RemoveRange(question_tmp);
+            db2.SaveChanges();
+            tmp.Clear();
+            tmp.Add(db.SetGroupModels.FirstOrDefault(u => u.Group == id_group && u.ProjectID == id_project));
+            db.SetGroupModels.Remove(tmp.First());
+            db.SaveChanges();
+        }
+
+        [HttpGet]
+        public JsonResult GetListALLGoup(int id_p)
+        {
+            return Json(db.SetGroupModels.Where(u => u.ProjectID == id_p && (u.GroupID != null && u.Group == null)).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public void SetBindGroup(int id_q, int id_a, int id_g)
+        {
+            AnswerAll tmp = db2.SetAnswerAll.FirstOrDefault(u => u.QuestionID == id_q && u.AnswerKey == id_a);
+            tmp.BindGroup = id_g;
+            db2.SaveChanges();
+        }
+
+        [HttpPost]
+        public void DeleteBindGroup(int id_q, int id_a)
+        {
+            AnswerAll tmp = db2.SetAnswerAll.FirstOrDefault(u => u.QuestionID == id_q && u.AnswerKey == id_a);
+            tmp.BindGroup = null;
+            db2.SaveChanges();
+        }
+
+        [HttpPost]
+        public void RemoveAllBindGroup(int id_q)
+        {
+            List<AnswerAll> tmp_list = db2.SetAnswerAll.Where(u => u.QuestionID == id_q).ToList();
+            foreach(var item in tmp_list)
+            {
+                item.BindGroup = null;
+            }
+            db2.SaveChanges();
+        }
+
     }
 }

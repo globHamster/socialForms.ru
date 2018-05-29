@@ -60,6 +60,20 @@
     .massk {
         display: none;
     }
+    span.chain_group{
+        border: 1px solid black;
+        border-radius: 5%;
+        background-color: #72afff;
+        height: 100%;
+        padding: 5px;
+        margin: 5px;
+        box-shadow: 5px 5px 5px;
+    }
+
+    button.chain_group_delete{
+        border-radius: 50%;
+        margin: 5px;
+    }
 </style>
 
 @Html.Hidden("id", Model.Id)
@@ -76,6 +90,7 @@
 
             <span style="margin-left: 10px">Использовать переход <input type="checkbox" class="set_transition" /></span>
             <span style="margin-left: 10px">Использовать блокировку <input type="checkbox" class="set_blocks" /></span>
+            <span style="margin-left: 10px">Связать с группой <input type="checkbox" class="set_group" /></span>
         </td>
         <td>
             <div class="massk">
@@ -134,7 +149,8 @@
     })
 
     $(function () {
-
+       
+        
         var id_q = $(".Id").attr('value');
         var type_q;
         if (!is_loaded) {
@@ -295,14 +311,14 @@
                                     break;
                             }
 
-
+                            CheckGroup();
                         },
                         error: function () { console.error("Ошибка выгрузки данных ... /Question/getAnswer") }
                     });
                 }
             });
             is_loaded = false;
-            bkLib.onDomLoaded(function () { nicEditors.allTextAreas() });
+
 
         }
     });
@@ -408,6 +424,7 @@
                         text_row: massiv_table_row,
                         data: massiv_text_answer
                     }
+                    console.log("Table data : ", query);
                     $.ajax({
                         type: "POST",
                         url: "/Question/setTableRow",
@@ -965,4 +982,196 @@
         $.post("/Question/deleteAnswerAll", { id_answer: $(this).attr('id') });
         $(this).parent().remove();
     });
+
+    $('input.set_group').change(function () {
+        if (!$(this).is(":checked")) {
+            $('div.panel_group').remove();
+            $.post("/Group/RemoveAllBindGroup", { id_q: $('input.Id').val() });
+;        } else {
+            DrawPanelGroup($(this));
+        }
+    });
+
+    function CheckGroup() {
+        $.get("/Question/getIdAnswerAllGrow", { massiv: $('input.Id').val() })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    if (item.BindGroup != null) {
+                        $('input.set_group').prop("checked", true);
+                        $.when(DrawPanelGroup($('input.set_group'))).then(function () {
+                            var code;
+                            var wait_interval = setInterval(function () {
+                                if ($('div.list_bind_group').length > 0) {
+                                    $.each(server_data, function (i, item) {
+                                        if (item.BindGroup != null) {
+                                            code = '<p id=' + item.AnswerKey + ' style="padding: 5px; background-color: #72afff">' + item.AnswerKey + '=>' + item.BindGroup + '<button class="deleteBindGroup" onclick="DeleteBindGroup()">X</button></p>';
+                                            $('div.list_bind_group').append(code);
+                                            $('span.edittext[id=' + item.AnswerKey + ']')
+                                                .parent()
+                                                .append('<span class="chain_group" id=' + item.AnswerKey + '>'
+                                                + 'Связь: Группа ' + item.BindGroup + '<button class="chain_group_delete">X</button></span>');
+                                        }
+                                    })
+                                    clearInterval(wait_interval);
+                                }
+                            }, 100);
+                            
+                        });
+                        return false;
+                    }
+                })
+            })
+    }
+
+    function DrawPanelGroup(checkbox_flag) {
+        var checkbox_transition = checkbox_flag;
+        var code = '<div class="panel_group"><div class="button_close">X</div></div>';
+        checkbox_transition.parent().parent().parent().parent().parent().after(code);
+        $('div.panel_group').css({
+            'background-color': '#A9A9A9',
+            'border': '1px solid black',
+            'width': '100%',
+            'height': 'auto',
+            'display': 'none',
+            'padding': '15px'
+        });
+        $('div.panel_group').slideDown(500);
+        $('div.button_close').css({
+            'position': 'relative',
+            'border': '1px solid red',
+            'border-radius': '20px',
+            'background-color': '#fff',
+            'left': '100%',
+            'top': -10,
+            'width': '20px',
+            'height': '20px',
+            'text-align': 'center',
+            'opacity': '0',
+            'cursor': 'pointer'
+        }).animate({ left: '-=10', opacity: 1 }, 500).bind('click', function () {
+            $('div.panel_group').slideUp(500, function () {
+                $('div.panel_group').after('<div class="slide_line_group" style="width: 100%; height: 5px; background-color: #A9A9A9;"><div class="slide_down_panel_group"><img src="/Content/slide_down.png" alt="img" style="width: 100%; height: 100%;"/></div></div>');
+                $('div.slide_down_panel_group').css({
+                    'position': 'relative',
+                    'text-align': 'center',
+                    'left': '100%',
+                    'top': '-10px',
+                    'background-color': '#fff',
+                    'border': '1px solid black',
+                    'border-radius': '25px',
+                    'width': '25px',
+                    'height': '25px'
+                }).bind('click', function () { $('div.slide_down_panel_group').fadeOut(1000); $('div.slide_line_group').fadeOut(500); $('div.panel_group').slideDown(500); });
+            })
+        });
+        var list_group_answer;
+        var q = $.get("/Group/GetListGroup", { id_p: $('input[name=project_id]').val() })
+            .success(function (server_data) {
+                var tmp_list_group = {};
+                console.log("Список ответов с группой : ", server_data);
+                list_group_answer = server_data;
+                $.each(server_data, function (i, item) {
+                    if (item.Group != null && item.Group > 0) tmp_list_group[item.Group] = item;
+                })
+                console.log("Список ответов с группой : ", tmp_list_group);
+                code = '<span> Выберите группу <select class="toGroup">';
+                $.each(tmp_list_group, function (i, item) {
+                    code += '<option value="' + item.Group + '">' + item.GroupName + '</option>';
+                })
+                code += '</select></span>';
+                $('div.panel_group').append(code);
+            })
+
+        $.when(q).then(function () {
+            $.ajax({
+                type: "GET",
+                url: "/Question/getAnswerAll",
+                async: false,
+                data: { question_id: $('input.Id').val() },
+                success: function (data) {
+                    var list_answer_normal = [];
+                    var id_list_answer_normal = [];
+                    code = '<span> Выберите ответ <select class="checkAnswer">';
+                    $.each(data, function (i, item) {
+                        if (item.AnswerType == 1) {
+                            $.ajax({
+                                type: "GET",
+                                url: "/Question/getAnswer",
+                                async: false,
+                                data: { id_question: $('input.Id').val() },
+                                success: function (data) {
+                                    $.each(data, function (i, item) {
+                                        id_list_answer_normal.push(item.Id);
+                                        list_answer_normal.push(item);
+                                    })
+                                }
+                            })
+                            code += '<option value="' + item.AnswerKey + '">' + list_answer_normal[id_list_answer_normal.indexOf(item.AnswerKey)].AnswerText + '</option>'
+                        } else {
+                            code += '<option value="' + item.AnswerKey + '">' + list_answer_base_1[id_list_answer_base.indexOf(item.AnswerKey)].AnswerText + '</option>'
+                        }
+                    });
+                    code += '</select></span>';
+                    $('div.panel_group').append(code);
+                    $('div.panel_group').append('<button class="save_group" style="margin-left: 15px;">Сохранить</button>');
+                    
+                    $('div.panel_group').append('<div class="list_bind_group"></div>');
+                }
+            });
+           
+        })
+
+        $('div.panel_group').on("click", ".deleteBindGroup", function () {
+            var id_answer = $(this).parent();
+            $.post("/Group/DeleteBindGroup", { id_q: $('input.Id').val(), id_a: id_answer.attr('id') })
+                .success(function () {
+                    $('span.chain_group[id=' + id_answer.attr('id') + ']').remove();
+                    id_answer.remove();
+                })
+        })
+
+        $('.manager_panel').on('click', '.chain_group_delete', function () {
+            var id_answer = $(this).parent();
+            $.post("/Group/DeleteBindGroup", { id_q: $('input.Id').val(), id_a: id_answer.attr('id') })
+                .success(function () {
+                    $('div.list_bind_group p[id=' + id_answer.attr('id') + ']').remove();
+                    id_answer.remove();
+                })
+        })
+
+        $('div.panel_group').on('click', 'button.save_group', function () {
+            /**
+             * Проверка на повторение
+             */
+            var code;
+            var id_group = $('select.toGroup option:checked').val() - 0;
+            var id_answer = $('select.checkAnswer option:checked').val() - 0;
+            var is_not_busy = false;
+            if ($('div.list_bind_group p').length > 0) {
+               
+                $('div.list_bind_group p').each(function () {
+                    if ($(this).attr('id') == id_answer) {
+                        alert("Busy");
+                        is_not_busy = false;
+                        return false;
+                    } else {
+                        is_not_busy = true;
+                    }
+                })
+            } else { is_not_busy = true; }
+            if (is_not_busy) {
+                $.post("/Group/SetBindGroup", { id_q: $('input.Id').val(), id_a: id_answer, id_g: id_group })
+                    .success(function () {
+                        code = '<p id=' + id_answer + ' style="padding: 5px; background-color: #72afff">' + id_answer + '=>' + id_group + '<button class="deleteBindGroup">X</button></p>';
+                        $('div.list_bind_group').append(code);
+                        $('span.edittext[id=' + id_answer + ']')
+                            .parent()
+                            .append('<span class="chain_group" id=' + id_answer + '>'
+                            + 'Связь: Группа ' + id_group + '<button class="chain_group_delete">X</button></span>');
+                    })
+            }
+            //}
+        });
+
+    }
 </script>

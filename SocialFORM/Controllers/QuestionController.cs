@@ -11,6 +11,8 @@ using SocialFORM.Models.Group;
 using SocialFORM.Models;
 using Newtonsoft.Json;
 using SocialFORM.Models.Utilite;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace SocialFORM.Controllers
 {
@@ -129,7 +131,7 @@ namespace SocialFORM.Controllers
         {
             if (ModelState.IsValid)
             {
-                AnswerAll answerAll = new AnswerAll();
+                
                 if (tmp.Id > 0)
                 {
                     QuestionModel question = db.SetQuestions.Where(u => u.Id == tmp.QuestionID).FirstOrDefault();
@@ -145,13 +147,14 @@ namespace SocialFORM.Controllers
                 }
                 else
                 {
+                    AnswerAll answerAll = new AnswerAll();
                     db.Entry(tmp).State = EntityState.Added;
                     db.SaveChanges();
-                    answerAll.AnswerKey = db.SetAnswers.ToList().Last().Id;
-                    answerAll.QuestionID = db.SetAnswers.ToList().Last().QuestionID;
+                    answerAll.AnswerKey = tmp.Id;
+                    answerAll.QuestionID = tmp.QuestionID;
                     answerAll.AnswerType = 1;
-                    db.SetAnswerAll.Add(answerAll);
-                    db.SaveChanges();
+                    answerAll.BindGroup = null;
+                    setAnswerAll(answerAll);
                 }
             }
 
@@ -191,6 +194,8 @@ namespace SocialFORM.Controllers
                     db.SetTableRows.RemoveRange(table_row_list);
                     db.SaveChanges();
                 }
+                List<AnswerAll> answerAll_tmp = db.SetAnswerAll.Where(u => u.QuestionID == tmp.Id).ToList();
+                db.SetAnswerAll.RemoveRange(answerAll_tmp);
                 db.SetQuestions.Remove(tmp);
                 db.SaveChanges();
                 List<GroupModel> list_tmp = db2.SetGroupModels.Where(u => u.ProjectID == tmp.ProjectID && u.GroupID == item_tmp.GroupID && u.IndexQuestion > item_tmp.IndexQuestion).ToList();
@@ -262,6 +267,7 @@ namespace SocialFORM.Controllers
 
             db.SetTableRows.AddRange(tmp);
             db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine("Length of data answer ---->" + data.Count);
             foreach (var item in data)
             {
                 Answer(item);
@@ -408,7 +414,7 @@ namespace SocialFORM.Controllers
             List<GroupModel> tmp_list_group = new List<GroupModel>();
             using (GroupContext group_context = new GroupContext())
             {
-                tmp_list_group.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u=>u.IndexQuestion).ToList());
+                tmp_list_group.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u=>u.IndexQuestion).ToList());
             }
             List<QuestionModel> tmp_list_question = new List<QuestionModel>();
             foreach(var item in tmp_list_group)
@@ -543,5 +549,7 @@ namespace SocialFORM.Controllers
             }
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
+
+        
     }
 }

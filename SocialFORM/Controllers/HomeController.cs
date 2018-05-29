@@ -251,7 +251,7 @@ namespace SocialFORM.Controllers
             List<GroupModel> listGroupExport = new List<GroupModel>();
             using (GroupContext group_context = new GroupContext())
             {
-                listGroupExport.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u => u.IndexQuestion).ToList());
+                listGroupExport.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u => u.IndexQuestion).ToList());
             }
 
             Dictionary<int, QuestionModel> listQuestionExport = new Dictionary<int, QuestionModel>();
@@ -289,10 +289,16 @@ namespace SocialFORM.Controllers
                 switch (tmp.TypeQuestion)
                 {
                     case Models.Question.Type.Single:
-                        products.Columns.Add(item.GroupName.ToString());
+                        if (item.GroupID > 0)
+                            products.Columns.Add(("Г" + item.GroupID + " " + item.GroupName.ToString()).ToString());
+                        else
+                            products.Columns.Add(item.GroupName.ToString());
                         if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
                         {
-                            products.Columns.Add(item.GroupName + "_др");
+                            if (item.GroupID > 0)
+                                products.Columns.Add("Г" + item.GroupID + "\n\a" + item.GroupName + "_др");
+                            else
+                                products.Columns.Add(item.GroupName + "_др");
                         }
                         break;
                     case Models.Question.Type.Multiple:
@@ -300,18 +306,27 @@ namespace SocialFORM.Controllers
                             int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
                             for (int i = 1; i <= tmp_count; i++)
                             {
-                                products.Columns.Add(item.GroupName + "_" + i);
+                                if (item.GroupID > 0)
+                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
+                                else
+                                    products.Columns.Add(item.GroupName + "_" + i);
                             }
                             if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
                             {
-                                products.Columns.Add(item.GroupName + "_др");
+                                if (item.GroupID > 0)
+                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др");
+                                else
+                                    products.Columns.Add(item.GroupName + "_др");
                             }
                             else if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 1)
                             {
                                 int count = 1;
                                 foreach (var item_answer in listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true))
                                 {
-                                    products.Columns.Add(item.GroupName + "_др_" + count);
+                                    if (item.GroupID > 0)
+                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др_" + count);
+                                    else
+                                        products.Columns.Add(item.GroupName + "_др_" + count);
                                     count++;
                                 }
                             }
@@ -320,9 +335,22 @@ namespace SocialFORM.Controllers
                     case Models.Question.Type.Free:
                         {
                             int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
-                            for (int i = 1; i <= tmp_count; i++)
+                            if (tmp_count == 1)
                             {
-                                products.Columns.Add(item.GroupName + "_" + i);
+                                if (item.GroupID > 0)
+                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName);
+                                else
+                                    products.Columns.Add(item.GroupName.ToString());
+                            }
+                            else
+                            {
+                                for (int i = 1; i <= tmp_count; i++)
+                                {
+                                    if (item.GroupID > 0)
+                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
+                                    else
+                                        products.Columns.Add(item.GroupName + "_" + i);
+                                }
                             }
                         }
                         break;
@@ -331,13 +359,24 @@ namespace SocialFORM.Controllers
                             int count_row = listTableRow[(int)item.QuestionID].Count();
                             for (int i = 1; i <= count_row; i++)
                             {
+                                if (item.GroupID > 0)
+                                products.Columns.Add("Г"+item.GroupID+" "+item.GroupName + "_" + i);
+                                else 
                                 products.Columns.Add(item.GroupName + "_" + i);
                             }
                         }
                         break;
                     case Models.Question.Type.Filter:
-                        products.Columns.Add(item.GroupName + "_инд");
-                        products.Columns.Add(item.GroupName + "_текст");
+                        if (item.GroupID > 0)
+                        {
+                            products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_инд");
+                            products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_текст");
+                        }
+                        else
+                        {
+                            products.Columns.Add(item.GroupName + "_инд");
+                            products.Columns.Add(item.GroupName + "_текст");
+                        }
                         break;
                     default:
                         break;
@@ -355,7 +394,7 @@ namespace SocialFORM.Controllers
                 tmp_str.Add(item.Time);
                 List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
                 string is_introduce_day = "0";
-                foreach(var item_schoolday in list_schoolday)
+                foreach (var item_schoolday in list_schoolday)
                 {
                     if (item.UserID == item_schoolday.UserId && item.Data.Date == item_schoolday.Date.Date)
                     {
@@ -379,7 +418,7 @@ namespace SocialFORM.Controllers
                                         tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex.ToString());
                                     else
                                         tmp_str.Add(" ");
-                                    if (listAnswerAllExport[(int)group_item.QuestionID].Where(u=>u.isFreeArea == true).Count() > 0 )
+                                    if (listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
                                     {
                                         if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).Text != null)
                                         {
@@ -389,8 +428,9 @@ namespace SocialFORM.Controllers
                                         {
                                             tmp_str.Add(" ");
                                         }
-                                    } 
-                                } else
+                                    }
+                                }
+                                else
                                 {
                                     tmp_str.Add(" ");
                                     if (listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
@@ -400,7 +440,7 @@ namespace SocialFORM.Controllers
                             break;
                         case Models.Question.Type.Multiple:
                             {
-                                if (tmp_blank.Where(u=>u.QuestionID == group_item.QuestionID).Count() > 0)
+                                if (tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).Count() > 0)
                                 {
                                     List<BlankModel> tmp_list_blank = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
                                     int count_all_answer = listAnswerAllExport[(int)group_item.QuestionID].Count();
@@ -416,11 +456,11 @@ namespace SocialFORM.Controllers
                                             other_column.Add(blank_item.Text);
                                         count_all_answer--;
                                     }
-                                    for(int i =0; i<count_all_answer; i++)
+                                    for (int i = 0; i < count_all_answer; i++)
                                     {
                                         tmp_str.Add(" ");
                                     }
-                                    for (int i = 0; i<count_other_column; i++)
+                                    for (int i = 0; i < count_other_column; i++)
                                     {
                                         if (i <= other_column.Count() - 1)
                                         {
@@ -441,7 +481,7 @@ namespace SocialFORM.Controllers
                                 List<BlankModel> _blank_list = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
                                 for (int i = 0; i < count_all_answer; i++)
                                 {
-                                    if (i <= count_all_result-1)
+                                    if (i <= count_all_result - 1)
                                     {
                                         tmp_str.Add(_blank_list[i].Text);
                                     }
@@ -459,7 +499,7 @@ namespace SocialFORM.Controllers
                                 for (int i = 0; i < count_row; i++)
                                 {
 
-                                    if (i <= count_row_result-1)
+                                    if (i <= count_row_result - 1)
                                     {
                                         if (_blank_list[i].AnswerIndex != -404)
                                             tmp_str.Add(_blank_list[i].AnswerIndex.ToString());
@@ -488,7 +528,7 @@ namespace SocialFORM.Controllers
             Response.ClearContent();
             Response.AddHeader("content-disposition", "attachment; filename=" + name_file + ".xls");
             Response.ContentType = "application/excel";
-            Response.ContentEncoding = System.Text.Encoding.GetEncoding("UTF-8");
+            Response.ContentEncoding = System.Text.Encoding.GetEncoding("utf-8");
             StringWriter sw = new StringWriter();
             HtmlTextWriter htmlTextWriter = new HtmlTextWriter(sw);
 

@@ -72,11 +72,6 @@
         cursor: pointer;
     }
 
-    .menu_panel {
-        width: auto;
-        height: 80px;
-    }
-
     #modal_form {
         width: 300px;
         height: 300px; /* Рaзмеры дoлжны быть фиксирoвaны */
@@ -129,21 +124,23 @@
             <td colspan="2">
                 <div id="panel">
                     <button class="menu_panel" id="add_question">Добавить вопрос</button>
-                    <button>Добавить группу</button>
+                    <button onclick="AddNewGroup()">Добавить группу</button>
+                    <button onclick="DeleteGroup()">Удалить группу</button>
+                    <button onclick="TestAnswerAll()">Test</button>
                     @*<button class="menu_panel">Удалить группу</button>*@
                 </div>
             </td>
         </tr>
         <tr style="resize: none;">
-            <td width="20%" style="vertical-align: top;">
+            <td width="25%" style="vertical-align: top;">
                 <div class="drop">
                     @ViewBag.ProjectName
-                    <ul class="ul-treefree ul-dropfree tree_view">
-                        @Html.Partial("_TreeList", Model.ToList())
-                    </ul>
+                 @*/   <ul class="ul-treefree ul-dropfree tree_view">
+                  //      @Html.Partial("_TreeList", Model.ToList())
+                  //  </ul>*@
                 </div>
             </td>
-            <td width="80%">
+            <td width="75%">
                 <div style="min-width: 100%; min-height: 100%; position: relative;" class="editor">
 
                 </div>
@@ -180,24 +177,12 @@
     var is_loaded = false;
     var list_answer_base;
 
-    $('ul.tree_view').sortable({
-        stop: function (event, ui) {
-            var count = 1;
-            var list_id_question = [];
-            $('ul.tree_view li').each(function () {
-                $(this).text("Вопрос " + count); 
-                list_id_question.push(Number($(this).attr('id')))
-                count++;
-            })
-            $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
-        }
-    });
-    $('ul.tree_view').disableSelection();
+    
 
     $('.drop span').mouseenter(function () {
         if ($(this).parent().attr('name') != "checked") {
             $(this).css('background-color', '#aaa');
-        } 
+        }
     });
     $('.drop span').mouseleave(function () {
         if ($(this).parent().attr('name') != 'checked')
@@ -221,6 +206,103 @@
 
 
     $(document).ready(function () { // вся мaгия пoсле зaгрузки стрaницы
+        var list_group_block = {};
+        var list_div_group = [];
+        $.get("/Group/GetListGroup", { id_p: $('input[name=project_id]').val() })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    var mas_tmp = [];
+
+                    if (item.Group == null || item.Group>0) {
+                        mas_tmp.push(item);
+                        console.info("tmp-mass --->", item);
+                        if (list_group_block[item.GroupID] != null) {
+                            list_group_block[item.GroupID].push(item);
+                        } else {
+                            list_group_block[item.GroupID] = mas_tmp;
+                        }
+                    } 
+                        
+                })
+
+                var code = '<ul class="ul-treefree ul-dropfree tree_view">'
+                $.each(list_group_block[0], function (i, item) {
+                    if (item.Group == null) {
+                        code += '<li class="question_view quest" id=' + item.QuestionID + '><span>' + item.GroupName + '</span></li>';
+                    } else {
+                        var index = item.Group;
+                        code += '<li class="group" id=' + item.Group + '><span>' + item.GroupName + '</span><ul>';
+                        if (list_group_block[index] != null) {
+                            $.each(list_group_block[index], function (i, item) {
+                                code += '<li class="question_view quest" id=' + item.QuestionID + '><span>' + item.GroupName + '</span></li>';
+                            });
+                        }
+                        code += '</ul ></li >';
+                    }
+                });
+                code += '</ul>';
+                $('div.drop').append(code);
+                $('.drop span').mouseenter(function () {
+                    if ($(this).parent().attr('name') != "checked") {
+                        $(this).css('background-color', '#aaa');
+                    }
+                });
+                $('.drop span').mouseleave(function () {
+                    if ($(this).parent().attr('name') != 'checked')
+                        $(this).css('background-color', '#fff');
+                });
+                $(".ul-dropfree").find("li:has(ul)").prepend('<div class="drop"></div>');
+                $(".ul-dropfree div.drop").click(function () {
+                    if ($(this).nextAll("ul").css('display') == 'none') {
+                        $(this).nextAll("ul").slideDown(400);
+                        $(this).css({ 'background-position': "-11px 0" });
+                    } else {
+                        $(this).nextAll("ul").slideUp(400);
+                        $(this).css({ 'background-position': "0 0" });
+                    }
+                });
+                
+                $('li.quest').bind('click', function () {
+                   // $(this).unbind('click');
+                    loadEditor($(this));
+                });
+              //  $(".ul-dropfree").find("ul").slideUp(400).parents("li").children("div.drop").css({ 'background-position': "0 0" });
+                $('ul.tree_view').sortable({
+                    stop: function (event, ui) {
+                        var count = 1;
+                        var count_group = 1;
+                        var list_id_question = [];
+                        $('ul.tree_view li').each(function () {
+                            if ($(this).hasClass('group')) {
+                                $(this).find('span').text("Группа " + count_group);
+                                count_group++;
+                            }
+                            else {
+                                $(this).text("Вопрос " + count);
+                                count++;
+                            }
+                           
+                            list_id_question.push(Number($(this).attr('id')))
+                           
+                        })
+                        $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
+                    }
+                });
+
+                $('li.group ul').sortable({
+                    stop: function (event, ui) {
+                        var list_id_question = [];
+                        $('ul.tree_view li').each(function () {
+                            list_id_question.push(Number($(this).attr('id')))
+                        })
+                        changeIndexGroup();
+                        $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
+                    }
+                });
+                $('ul.tree_view').disableSelection();
+                console.info("ListGroup ---->", list_group_block);
+            });
+
         $('#add_question, .save_question').click(function (event) { // лoвим клик пo ссылки с id="go"
             event.preventDefault(); // выключaем стaндaртную рoль элементa
             $('#overlay').fadeIn(400, // снaчaлa плaвнo пoкaзывaем темную пoдлoжку
@@ -255,6 +337,7 @@
             data: query,
             ajaxasync: true,
             success: function () {
+                changeIndexGroup();
                 $("#Tables").load("/Group/Manager?id_project=" + @ViewBag.ProjectID);
             },
             error: function () {
@@ -265,7 +348,7 @@
     });
     var countClick = 0;
     //Загрузка экрана редактора вопроса
-    $('.drop').on("mouseleave", ".question_view", function () {
+ /*   $('.drop').on("mouseleave", ".question_view", function () {
         $(this).unbind('click');
     });
     $('.drop').on("mouseenter", ".question_view", function () {
@@ -275,7 +358,7 @@
             loadEditor($(this));
         });
     });
-
+    */
     $.get('/Question/getListAnswerBase')
         .success(function (data) {
             list_answer_base = data;
@@ -286,5 +369,56 @@
         tmp.find('span').css('background-color', '#72afff');
         tmp.attr('name', 'checked');
         $(".editor").load("/Group/Editor?Id=" + tmp.attr('id'));
+    }
+
+    function AddNewGroup() {
+        $.post("/Group/AddNewGroup", { id_p: $('input[name=project_id]').val() })
+            .success(function () {
+                $("#Tables").load("/Group/Manager?id_project=" + @ViewBag.ProjectID);
+            });
+    }
+
+    function DeleteGroup() {
+        var code = '<div class="background_screen" style="position: fixed; top: 0; left:0; width: 100%; height: 100%; background-color: rgba(155,155,155,0.5); z-index:9999; ">';
+        code += '<div style="position: relative; width: 10%; height: auto; background: red; top: 50%; left: 50%;">';
+        code += '<select class="check_group">'
+        $('li.group').each(function () {
+            code += '<option value="' + $(this).attr('id') + '">' + $(this).find('span:first').text()+'</option>'
+        })
+        code += '</select>';
+        code += '<button class="delete_group">Delete</button>'
+        code += '</div></div>';
+        $('body').append(code);
+
+        $('button.delete_group').click(function () {
+           // alert("1212");
+            var id_group = $('select.check_group option:checked').val();
+          //  alert(id_group);
+            $.post("/Group/DeleteGroup", { id_group: id_group, id_project: $('input[name=project_id]').val() })
+                .success(function () {
+                    $('div.background_screen').remove();
+                     $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
+                })
+        })
+    }
+
+    function changeIndexGroup() {
+        var count = 1;
+        var count_group = 1;
+        var list_id_question = [];
+        $('ul.tree_view li').each(function () {
+            if ($(this).hasClass('group')) {
+                $(this).find('span').text("Группа " + count_group);
+                count_group++;
+            }
+            else {
+                $(this).find('span').text("Вопрос " + count);
+                count++;
+            }
+
+            list_id_question.push(Number($(this).attr('id')))
+
+        })
+        $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
     }
 </script>

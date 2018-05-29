@@ -8,7 +8,6 @@
         padding: 20px;
         margin-bottom: 15px;
         background-color: #ccc;
-        height: 250px;
     }
 
     .answer_table {
@@ -113,12 +112,17 @@
     var list_question = {};
     var list_answer = {};
     var list_id_answer_all = {};
+    var list_bind_answer_group = {};
     var list_table_row;
     var list_massk = {};
     var list_file = {};
     var list_text_file = {};
+    var list_id_question_group = {};
+    var list_group = {};
+    var list_question_bind_group = {};
     var begin_time; //Время начала анкетирования
     var is_load_id = false;
+    var active_group = {};
     var q1, q2, q3, q4, q5, q6, q7;
     var count_ajax = 0;
     //Блок выгрузки данных
@@ -196,23 +200,34 @@
                     $.each(server_data, function (i, item) {
                         list_answer[item.Id] = item;
                     })
-                    console.info("Успешная выгрузка данных --- ", list_answer);
+                    console.info("Успешная выгрузка данных листа ответов --- ", list_answer);
                     count_ajax++;
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
         })
-     
+
         //Подгрузка листа id всех ответов
         $.when(q4).then(function () {
             q6 = $.get("/Question/getIdAnswerAllGrow", { massiv: massiv_question_id.join() })
                 .success(function (server_data) {
                     list_id_answer_all = server_data;
-                    console.info("Успешная выгрузка данных --- ", list_id_answer_all);
+                    $.each(server_data, function (i, item) {
+                        if (item.BindGroup != null) {
+                            list_bind_answer_group[item.AnswerKey] = item;
+                            if (list_question_bind_group[item.QuestionID] == null)
+                                list_question_bind_group[item.QuestionID] = [item.BindGroup];
+                            else
+                                list_question_bind_group[item.QuestionID].push(item.BindGroup);
+                        }
+                    })
+                    console.log("Сформирован список вопросов связаных с группой : ", list_question_bind_group);
+                    console.info("Сформировон массив связок с группой --->", list_bind_answer_group);
+                    console.info("Успешная выгрузка данных листа id всех ответов  --- ", list_id_answer_all);
                     count_ajax++;
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getIdAnswerAllGrow", err) })
         })
-      
+
         //Подгрузка листа строк табличного вопроса
         $.when(q4).then(function () {
             q7 = $.get("/Question/getAllTableRow", { massiv: massiv_question_id.join() })
@@ -240,6 +255,26 @@
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/GetListFile", err); })
 
+        //Выгрузка листа групп
+        $.get("/Group/GetListALLGoup", { id_p: $('div[name=projectID]').attr('id') })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    var mas_tmp = [];
+                    if (item.GroupID > 0)
+                        active_group[item.GroupID] = false;
+                    if (list_id_question_group[item.GroupID] == null) {
+                        mas_tmp.push(item);
+                        list_id_question_group[item.GroupID] = mas_tmp;
+                    } else {
+                        list_id_question_group[item.GroupID].push(item);
+                    }
+                    if (item.GroupID > 0)
+                        list_group[item.QuestionID] = item.GroupID;
+                });
+                console.log("Активность группы :", active_group);
+                console.log("Лист группы по вопросам : ", list_group);
+                console.info("list group --->", list_id_question_group);
+            })
     }
 
     //Ожидание выгрузки данных с сервера
@@ -255,6 +290,7 @@
         if (index >= massiv_question_id.length) {
             $(".show_result").load("/Form/showResult");
         } else {
+            console.log("Result list ---->", result[index - 1]);
             console.info("is done");
             id_q = massiv_question_id[index];
             type_q = list_question[id_q].TypeQuestion;
@@ -391,9 +427,50 @@
                     break;
                 default:
                     break;
+                    
             }
         }
     }
+
+    //Проверка активности группы при проходе вперед
+    function CheckGroup() {
+
+        if (list_group[massiv_question_id[index]] != null) {
+            var number_group = list_group[massiv_question_id[index]];
+            if (active_group[number_group] == false) {
+                var length_group = list_id_question_group[number_group].length;
+                for (var i = index; i < index + length_group; i++) {
+                    result[i] = -404;
+                    text_other[i] = ['null'];
+                }
+                index += length_group;
+                CheckGroup();
+            } else {
+
+            }
+        }
+    }
+
+    //Проверка активности группы при возврате назад
+    function CheckGroup_Back() {
+        if (list_group[massiv_question_id[index]] != null) {
+
+            var number_group = list_group[massiv_question_id[index]];
+            if (active_group[number_group] == false) {
+                var length_group = list_id_question_group[number_group].length;
+                for (var i = index; i < index + length_group; i++) {
+                    result[i] = -404;
+                    text_other[i] = ['null'];
+
+                }
+                index -= length_group;
+                CheckGroup_Back();
+            } else {
+
+            }
+        }
+    }
+
     //Осуществление шага вперед по анкете
     $(".next").click(function () {
         //  $.when(function () {
@@ -405,8 +482,10 @@
                 else {
                     $('div.wrong_choise').fadeOut('fast');
                     SaveResult();
-                    console.info("Результат: ", result);
+                    console.info("Результат: ", active_group);
+                    CheckGroupGo();
                     checkTransitionGo();
+                    CheckGroup();
                     getStart();
                     //    goNext();
                 }
@@ -417,7 +496,9 @@
                 else {
                     $('div.wrong_choise').fadeOut('fast');
                     SaveResult();
+                    CheckGroupGo();
                     index++;
+                    CheckGroup();
                     getStart();
                     //    goNext();
                 }
@@ -434,11 +515,16 @@
                 }
                 break;
             case 4:
+                
                 var count_row = $('tr.table_answer').length - 1;
                 if ($('input[name^=group]:checked').length == count_row) {
+                    
                     $('div.wrong_choise').fadeOut('fast');
                     SaveResult();
+                    console.log("IN HERE !!!!");
+                    CheckGroupGo();
                     index++;
+                    CheckGroup();
                     getStart();
                     //   goNext();
                 } else {
@@ -461,6 +547,7 @@
         }
     });
 
+    //Сохранении выбранного ответа в массиве result
     function SaveResult() {
         var mas = [];
         switch (type_q) {
@@ -473,7 +560,6 @@
                     result[index] = [id_a];
                 }
                 if ($("input:radio:checked").parent().find('input.is_free_area').prop('checked')) {
-                    //alert("Yes1");
                     text_other[index] = [$("input:radio:checked").parent().find('textarea.text_free_area').val()];
                 } else {
                     text_other[index] = ['null'];
@@ -500,7 +586,7 @@
                 break;
             case 3:
                 $('input.free_text').each(function () {
-                    mas.push($(this).attr('id') + "#" + $(this).val().replace(',',';'));
+                    mas.push($(this).attr('id') + "#" + $(this).val().replace(',', ';'));
                 });
                 console.info("mas result ---- ", mas);
                 result[index] = mas;
@@ -536,6 +622,7 @@
         }
     }
 
+    //Проверка перехода при проходе вперед
     function checkTransitionGo() {
         var code_transition = find_transition_move(id_q, result[index]);
         if (code_transition >= 0) {
@@ -558,6 +645,7 @@
         }
     }
 
+    //Проверка перехода при возращении назад
     function checkTransitionBack() {
         var code_transition = find_transition_back(massiv_question_id[index]);
         //alert(code_transition);
@@ -570,6 +658,66 @@
         }
     }
 
+    //Проверка выбраного ответа на прикрепленность к переходу к группе
+    function CheckGroupGo() {
+        console.log("Checked --->", result[index]);
+        switch (type_q) {
+            case 1:
+                if (list_bind_answer_group[result[index]] != null) {
+                    var number_group = list_bind_answer_group[result[index]].BindGroup;
+                    var mas_tmp = list_question_bind_group[id_q];
+                    $.each(mas_tmp, function (i, item) {
+                        active_group[item] = false;
+                    })
+                    active_group[number_group] = true;
+                } else if (list_question_bind_group[id_q] != null) {
+                    var mas_tmp = list_question_bind_group[id_q];
+                    $.each(mas_tmp, function (i, item) {
+                        active_group[item] = false;
+                    })
+                }
+                break;
+            case 2: {
+                var mas_tmp = result[index];
+                var mas_tmp_2 = list_question_bind_group[id_q];
+                if (mas_tmp_2 != undefined) {
+                    $.each(mas_tmp_2, function (i, item) {
+                        active_group[item] = false;
+                    })
+                    $.each(mas_tmp, function (i, item) {
+                        if (list_bind_answer_group[item] != null) {
+                            var number_group = list_bind_answer_group[item].BindGroup;
+                            active_group[number_group] = true;
+                        }
+                    })
+                }
+            }
+                break;
+            case 4: {
+                
+                var mas_tmp = result[index];
+                var mas_tmp_2 = list_question_bind_group[id_q];
+               
+                if (mas_tmp_2 != undefined) {
+                    $.each(mas_tmp_2, function (i, item) {
+
+                        active_group[item] = false;
+                    });
+                    $.each(mas_tmp, function (i, item) {
+                        if (list_bind_answer_group[item] != null) {
+                            var number_group = list_bind_answer_group[item].BindGroup;
+                            active_group[number_group] = true;
+                        }
+                    });
+                }
+            }
+                break;
+            default:
+                break;
+        }
+    }
+
+    //Поиск выбранных ответ в массиве result
     function FindAnswer() {
         if (result[index] != null) {
             switch (type_q) {
@@ -692,8 +840,6 @@
                             code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><span>' + item.AnswerText + '</span></td></tr>';
                     }
                 });
-
-
                 code += '</table></div>';
                 $('.answer_table').append(code);
             }
@@ -707,6 +853,7 @@
         if (index > 0) {
             SaveResult();
             checkTransitionBack();
+            CheckGroup_Back();
             getStart();
         }
     });
@@ -729,7 +876,7 @@
             .css('cursor', 'default');
     });
 
-    $('.answer_table').on('click', '.tool_layer');
+    $('.answer_table').off('click', '.tool_layer');
     $('.answer_table').on('click', '.tool_layer', function () {
         checkedAnswer($(this));
         if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
@@ -753,13 +900,6 @@
 
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), '', function () { $('div.waiting_screen').remove(); });
     })
-
-    //$('.answer_table').on('change', 'input:radio.other', function () {
-    //    alert("other");
-    //    $(this).parent().append('<input type="text"/>');
-    //});
-
-
 
 
     //Дополнительные функции
@@ -843,18 +983,20 @@
             }
         } else if (type_q == 4) {
             tmp.find('input[name^=group]').prop('checked', true);
-        /*    if (tmp.find('input.is_free_area').prop('checked')) {
-                if (tmp.find('textarea.text_free_area').length == 0)
-                    tmp.children('td').append('<textarea class="text_free_area"  style="margin-left: 10px; width: 600px; height: 50px; resize: none; display: none"></textarea>');
-                $('textarea.text_free_area').slideDown(100);
-            } else {
-                $('.answer_table').find('textarea.text_free_area').slideUp(200);
-            }*/
+            /*    if (tmp.find('input.is_free_area').prop('checked')) {
+                    if (tmp.find('textarea.text_free_area').length == 0)
+                        tmp.children('td').append('<textarea class="text_free_area"  style="margin-left: 10px; width: 600px; height: 50px; resize: none; display: none"></textarea>');
+                    $('textarea.text_free_area').slideDown(100);
+                } else {
+                    $('.answer_table').find('textarea.text_free_area').slideUp(200);
+                }*/
         } else {
             tmp.children('td').find('input[name=group]').prop('checked', true);
             if (tmp.find('input.is_free_area').prop('checked')) {
-                if (tmp.find('textarea.text_free_area').length == 0)
+                if (tmp.find('textarea.text_free_area').length == 0) {
+                    $('.answer_table').find('textarea.text_free_area').remove();
                     tmp.children('td').append('<textarea class="text_free_area"  style="margin-left: 10px; width: 600px; height: 50px; resize: none; display: none"></textarea>');
+                }
                 $('textarea.text_free_area').slideDown(100);
             } else {
                 $('.answer_table').find('textarea.text_free_area').slideUp(200);
