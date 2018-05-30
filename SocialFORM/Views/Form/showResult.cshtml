@@ -193,7 +193,8 @@
         if ($('input[name=phone_number]').val().length == 0) {
             $('input[name=phone_number]').blur();
             $('input[name=phone_number]').addClass('error_input_phone');
-            $('input[name=phone_number]').after('<span class="error_input_phone">Введите номер телефона</span>')
+            $('input[name=phone_number]').after('<span class="error_input_phone">Введите номер телефона</span>');
+            $('div.waiting_screen').remove();
             return;
         }
         
