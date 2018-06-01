@@ -159,10 +159,17 @@
     <div style="padding: 15px; padding-top: 25px;">
         <span>Выберите группу</span>
         <select class="list_group">
-            <option data-display="Select">Nothing</option>
+            
             @foreach (var item in Model.Where(u => u.Group != null))
             {
-                <option value="@item.Group">Group: @item.Group</option>
+                if (@item.GroupName == null)
+                {
+                <option value="@item.Group">Группа 0</option>
+                }
+                else
+                {
+                <option value="@item.Group">@item.GroupName</option>
+                }
             }
         </select>
         <br />
