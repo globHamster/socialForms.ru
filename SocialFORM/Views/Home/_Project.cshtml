@@ -1,0 +1,169 @@
+﻿@model PagedList.IPagedList<SocialFORM.Models.Project.ProjectModel>
+@using PagedList.Mvc;
+
+<h2>Список проектов</h2>
+
+<p>
+</p>
+<table class="table">
+    <tr>
+        <th>
+
+            <span class="create_project" style="cursor: pointer;">Имя проекта </span><button class="create_project_button">Создать проект</button>
+        </th>
+        <th></th>
+    </tr>
+
+
+    @foreach (var item in Model)
+    {
+        <tr class="project_layer">
+            <td id="@item.Id">
+                @Html.DisplayFor(modelItem => item.NameProject)
+            </td>
+            <td>
+                <button class="infoP" id="@item.Id">?</button>
+                <button class="show_blanks" id="@item.Id">База данных</button>|
+                <button class="export_result" id="@item.Id">Экспорт Excel</button>|
+                @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
+                @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
+                @if (item.ActionProject == true)
+                {<button class="actionProject" id="@item.Id">В работе</button>}
+                else
+                {<button class="actionProject" id="@item.Id">Заблокирован</button>}
+            </td>
+        </tr>
+        <tr class="info_project" id="@item.Id" style="display:none">
+            <td><button class="infoP_close" id="@item.Id">X</button></td>
+            <td class="str_infoP" id="@item.Id"></td>
+        </tr>
+    }
+
+</table>
+<div id="contentPager">
+    @Html.PagedListPager(
+                                         Model,
+                                         page => Url.Action("_Project", "Home", new { page = page }),
+                                         PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
+                                                                 )
+</div>
+@Scripts.Render("~/Scripts/jquery-1.10.2.js")
+<script type="text/javascript">
+
+    $('button.infoP_close').click(function () {
+        var id_project = $(this).attr('id');
+        $('tr.info_project[id =' + id_project + ']').attr('style', 'display:none');
+    });
+
+    $('button.infoP').click(function () {
+        var id_project = $(this).attr('id');
+        $('tr.info_project[id =' + id_project + ']').attr('style', 'display:normal');
+        var code = null;
+        $.get('/Home/getInfoProject', { id_project: id_project })
+            .success(function (str) {
+                if (str != "null") {
+                    var tmp_str = str.split("_");
+                    $('td.str_infoP[id =' + id_project + ']').empty();
+                    code = '<p><b>' + tmp_str[0] + '</b>' + tmp_str[1] + '</p>';
+                    code += '<p><b>' + tmp_str[2] + '</b>' + tmp_str[3] + '</p>';
+                    $('td.str_infoP[id =' + id_project + ']').append(code);
+                }
+                else
+                {
+                    $('td.str_infoP[id =' + id_project + ']').empty();
+                    code = '<p>Список пуст</p>';
+                    $('td.str_infoP[id =' + id_project + ']').append(code);
+                }
+            });
+    });
+
+    $('button.actionProject').click(function () {
+        var id_project = $(this).attr('id');
+        $.ajax({
+            type: "POST",
+            url: "/Home/actionProject",
+            async: false,
+            data: { id: id_project },
+            success: function () {
+                $('.Tables').load('/Home/Project');
+            }
+        })
+    });
+
+    $(document).ready(function () {
+
+        $('button.export_result').click(function () {
+            document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id') + "&name_file=" + $(this).parent().parent().find('td').first().text();
+        })
+
+        $(".table").on("click", "td", function () {
+            var id = $(this).attr('id');
+            $("#Tables").load("/Group/Manager?id_project=" + id);
+            //location.href = "/Group/Manager?id_project=" + id;
+        });
+
+        //$(".table").on("click", "button", function () {
+        //    alert("ewrqweq");
+        //    $("#Tables").load("/Form/SingleFormView?id_q=1");
+        //});
+
+
+    });
+    $(".table").on('mouseenter', '.project_layer', function () {
+        $(this).css('background-color', '#72afff');
+    });
+    $(".table").on('mouseleave', '.project_layer', function () {
+        $(this).css('background-color', '#fff');
+    });
+    $('.create_project').click(function () {
+        var code = '<input type="text" class="name_project" style="display: none;"/>'
+        $(this).after(code);
+        $('.create_project_button').fadeOut('slow');
+        $('.create_project').fadeOut('slow', function () {
+            $('.name_project').fadeIn('slow');
+        });
+    });
+    $('.table').on('keyup', '.name_project', function (event) {
+        if (event.keyCode == 13) {
+            var name_p;
+            name_p = $(this).val();
+            $(this).fadeOut('slow').remove();
+            $('.create_project').text(name_p).fadeIn('slow').css('margin-right', '15px');
+            $('.create_project_button').fadeIn('slow');
+        }
+    });
+    $('.create_project_button').click(function () {
+        $.get('/Home/AddProject', { name_project: $('.create_project').text() })
+            .success(function (data) {
+                var code = '<tr class="project_layer">' +
+                    '<td id="' + data.Id + '" >' + $('.create_project').text() +
+                    '</td><td>' +
+                    '<a href="/Home/Edit?id="' + data.Id + '>Изменить</a>' +
+                    '<a href="/Home/Details?id="' + data.Id + '>База данных</a>' +
+                    '<a href="/Home/Copi?id="' + data.Id + '>Копировать</a>' +
+                    '<a href="/Home/Delete?id="' + data.Id + '>Удалить</a>' +
+                    '</td ></tr >';
+                $('.table').append(code);
+            })
+            .error(function () { alert('Не удалось добавить проект') });
+
+    });
+
+    $('.show_blanks').click(function () {
+        var id_project = $(this).attr('id');
+        $.ajax({
+            type: "GET",
+            url: "/Home/getResultList",
+            async: false,
+            data: { id_project: id_project },
+            success: function (data) {
+                if (data.length != 0) {
+                    $('.Tables').load('/Home/TableBlanks?id_project=' + id_project);
+                } else {
+                    alert("Список пуст");
+                }
+            }
+        })
+
+    });
+</script>

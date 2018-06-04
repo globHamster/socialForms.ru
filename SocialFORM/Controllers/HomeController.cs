@@ -102,13 +102,38 @@ namespace SocialFORM.Controllers
             return PartialView(menuItems);
         }
 
-        ProjectContext db4 = new ProjectContext();
-        [Authorize(Roles = "Admin")]
-        public ActionResult Project()
+        public ActionResult MenuMin()
         {
-
-            return PartialView(db4.SetProjectModels);
+            List<Models.Menu.MenuItem> menuItems = db.SetMenuItems.ToList();
+            return PartialView(menuItems);
         }
+        //
+        //ОТРИСОВКА СПИСКА ПРОЕКТОВ
+        ProjectContext db4 = new ProjectContext();
+        public static List<ProjectModel> listProject = new List<ProjectModel>();
+        public static List<ProjectModel> tmp_listProject = new List<ProjectModel>();
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public ActionResult Project(int? page)
+        {
+            tmp_listProject = db4.SetProjectModels.ToList();
+            listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            return PartialView("_Project", listProject.ToPagedList(pageNumber, pageSize));
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public ActionResult _Project(int? page)
+        {
+            tmp_listProject = db4.SetProjectModels.ToList();
+            listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            return PartialView("_Project", listProject.ToPagedList(pageNumber, pageSize));
+        }
+        //
 
         [Authorize(Roles = "Operator")]
         public ActionResult ProjectOperator()
@@ -123,7 +148,9 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
-        public ActionResult Users()
+        List<UserViewModel> listUsers = null;
+        [HttpGet]
+        public ActionResult Users(int? page)
         {
             IQueryable<UserViewModel> result = (
             from User in db.SetUser
@@ -140,7 +167,35 @@ namespace SocialFORM.Controllers
                 EmailView = DataUsers.Email,
             }
             );
-            return PartialView(result.ToList());
+            listUsers = result.ToList();
+            int pageSize = 14;
+            int pageNumber = (page ?? 1);
+            return PartialView("_Users", listUsers.ToPagedList(pageNumber, pageSize));
+            //return PartialView(result.ToList());
+        }
+
+        [HttpGet]
+        public ActionResult _Users(int? page)
+        {
+            IQueryable<UserViewModel> result = (
+            from User in db.SetUser
+            join DataUsers in db.SetDataUsers on User.Id equals DataUsers.UserId
+            select new UserViewModel
+            {
+                IdView = User.Id,
+                LoginView = User.Login,
+                PasswordView = User.Password,
+                NameView = DataUsers.Name,
+                FamilyView = DataUsers.Family,
+                AgeView = DataUsers.Age,
+                FoolView = DataUsers.Fool,
+                EmailView = DataUsers.Email,
+            }
+            );
+            listUsers = result.ToList();
+            int pageSize = 14;
+            int pageNumber = (page ?? 1);
+            return PartialView("_Users", listUsers.ToPagedList(pageNumber, pageSize));
         }
 
         [HttpGet]
@@ -617,6 +672,212 @@ namespace SocialFORM.Controllers
             DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_", " "));
             System.Diagnostics.Debug.WriteLine(startTimeDT);
             System.Diagnostics.Debug.WriteLine(endTimeDT);
+            DateTime tmp = new DateTime();
+            DateTime tmp2 = new DateTime();
+            TimeSpan min = new TimeSpan();
+            TimeSpan max = new TimeSpan();
+            List<SessionHubModel> session = new List<SessionHubModel>();
+            Dictionary<DateTime, List<ResultModel>> keys = new Dictionary<DateTime, List<ResultModel>>();
+
+            using (ProjectContext project_db = new ProjectContext())
+            {
+                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_project).NameProject;
+            }
+            if (id_operator > 0)
+            {
+                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_project && u.UserID == id_operator && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
+                DateTime BeginData = startTimeDT.Date;
+                DateTime EndData = endTimeDT.Date;
+                int count = 0;
+                double count_ch = 0;
+                while (BeginData <= EndData)
+                {
+                    keys.Add(BeginData, tmp_tableBlanksFilter.Where(u => u.Data.Date == BeginData.Date).ToList());
+                    BeginData = BeginData.AddDays(1);
+                }
+
+                foreach (var i in keys)
+                {
+                    List<ResultModel> tmp_list = i.Value;
+                    //Количество анкет
+                    count = tmp_list.Count();
+                    //Вычисляем Срею время, Мин. - Макс. время, Сре. отклонение
+                    min = new TimeSpan(23, 59, 59); max = new TimeSpan(0, 0, 0);
+                    foreach (ResultModel item in tmp_list)
+                    {
+                        if (min >= DateTime.Parse(item.Time).Subtract(item.Data)) { min = DateTime.Parse(item.Time).Subtract(item.Data); }
+                        if (max <= DateTime.Parse(item.Time).Subtract(item.Data)) { max = DateTime.Parse(item.Time).Subtract(item.Data); }
+                    }
+                    if (count > 1)
+                    {
+                        double seconds = 0; double secondsOT = 0;
+                        foreach (ResultModel item in tmp_list)
+                        {
+                            seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
+                        }
+                        seconds = seconds / tmp_list.Count;
+                        foreach (ResultModel item in tmp_list)
+                        {
+                            secondsOT += Math.Pow(DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds - seconds, 2);
+                        }
+                        secondsOT /= (tmp_list.Count - 1); secondsOT = Math.Sqrt(secondsOT);
+                        int minutesOt = (int)Math.Floor(secondsOT / 60);
+                        int minutes = (int)Math.Floor(seconds / 60);
+                        seconds -= minutes * 60;
+                        secondsOT -= minutesOt * 60;
+                        tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
+                        tmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
+                    }
+                    //
+                    //Количество анкет в час
+                    List<ResultModel> t_tmp = tmp_list.Reverse<ResultModel>().ToList();
+                    System.Diagnostics.Debug.WriteLine("COUNT------------==================>" + count);
+                    if (count != 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("t1------------==================>" + TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
+                        System.Diagnostics.Debug.WriteLine("t1------------==================>" + TimeSpan.Parse(t_tmp.First().Data.ToLongTimeString()));
+                        TimeSpan t1 = TimeSpan.Parse(t_tmp.First().Data.ToLongTimeString()).Subtract(TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
+                        Double t2 = t1.TotalHours;
+                        System.Diagnostics.Debug.WriteLine("t1------------==================>" + t1);
+                        System.Diagnostics.Debug.WriteLine("t2------------==================>" + t2);
+                        count_ch = count / t2;
+                    }
+                    //Время работы
+                    string tmp_new = i.Key.Date.ToShortDateString();
+                    session = db.SetSessionHubModel.Where(u => u.UserId == id_operator && u.Date == tmp_new).ToList();
+                    string sessionStartTime = "";
+                    string sessionEndTime = "";
+                    string sessionTimeInSystem = "00:00:00";
+                    string sessionAfkTime = "00:00:00";
+                    if (session != null)
+                    {
+                        sessionStartTime = session.First().StartTime;
+                        sessionEndTime = session.Reverse<SessionHubModel>().First().EndTime;
+                        foreach (var q in session)
+                        {
+                            sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
+                            if (q.AfkTime != null)
+                            {
+                                sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
+                            }
+                        }
+                    }
+                    if (count != 0)
+                    {
+                        list.Add(i.Key.Date + "/"
+                            + count + "/"
+                            + string.Format("{0:0.##}", count_ch) + "/"
+                            + tmp.ToLongTimeString() + "/"
+                            + min + "/"
+                            + max + "/"
+                            + tmp2.ToLongTimeString() + "/"
+                            + sessionStartTime + "/"
+                            + sessionEndTime + "/"
+                            + sessionTimeInSystem + "/"
+                            + sessionAfkTime
+                            );
+                    }
+                }
+            }
+            else
+            {
+                //Создание списка 
+                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_project && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
+                DateTime BeginData = startTimeDT.Date;
+                DateTime EndData = endTimeDT.Date;
+                int count = 0;
+                double count_ch = 0;
+                while (BeginData <= EndData)
+                {
+                    keys.Add(BeginData, tmp_tableBlanksFilter.Where(u => u.Data.Date == BeginData.Date).ToList());
+                    BeginData = BeginData.AddDays(1);
+                }
+
+                foreach (var i in keys)
+                {
+                    List<ResultModel> tmp_list = i.Value;
+                    //Количество анкет
+                    count = tmp_list.Count();
+                    //Вычисляем Срею время, Мин. - Макс. время, Сре. отклонение
+                    min = new TimeSpan(23, 59, 59); max = new TimeSpan(0, 0, 0);
+                    foreach (ResultModel item in tmp_list)
+                    {
+                        if (min >= DateTime.Parse(item.Time).Subtract(item.Data)) { min = DateTime.Parse(item.Time).Subtract(item.Data); }
+                        if (max <= DateTime.Parse(item.Time).Subtract(item.Data)) { max = DateTime.Parse(item.Time).Subtract(item.Data); }
+                    }
+                    if (count > 1)
+                    {
+                        double seconds = 0; double secondsOT = 0;
+                        foreach (ResultModel item in tmp_list)
+                        {
+                            seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
+                        }
+                        seconds = seconds / tmp_list.Count;
+                        foreach (ResultModel item in tmp_list)
+                        {
+                            secondsOT += Math.Pow(DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds - seconds, 2);
+                        }
+                        secondsOT /= (tmp_list.Count - 1); secondsOT = Math.Sqrt(secondsOT);
+                        int minutesOt = (int)Math.Floor(secondsOT / 60);
+                        int minutes = (int)Math.Floor(seconds / 60);
+                        seconds -= minutes * 60;
+                        secondsOT -= minutesOt * 60;
+                        tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
+                        tmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
+                    }
+                    //
+                    //Количество анкет в час
+                    List<ResultModel> t_tmp = tmp_list.Reverse<ResultModel>().ToList();
+                    System.Diagnostics.Debug.WriteLine("COUNT------------==================>" + count);
+                    if (count != 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("t1------------==================>" + TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
+                        System.Diagnostics.Debug.WriteLine("t1------------==================>" + TimeSpan.Parse(t_tmp.First().Data.ToLongTimeString()));
+                        TimeSpan t1 = TimeSpan.Parse(t_tmp.First().Data.ToLongTimeString()).Subtract(TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
+                        Double t2 = t1.TotalHours;
+                        System.Diagnostics.Debug.WriteLine("t1------------==================>" + t1);
+                        System.Diagnostics.Debug.WriteLine("t2------------==================>" + t2);
+                        count_ch = count / t2;
+                    }
+                    if (count != 0)
+                    {
+                        list.Add(i.Key.Date + "/"
+                            + count + "/"
+                            + string.Format("{0:0.##}", count_ch) + "/"
+                            + tmp.ToLongTimeString() + "/"
+                            + min + "/"
+                            + max + "/"
+                            + tmp2.ToLongTimeString() + "/"
+                            + " /"
+                            + " /"
+                            + " /"
+                            + " "
+                            );
+                    }
+                }
+            }
+            ViewBag.list = list;
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            return PartialView(tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
+            //return PartialView(tmp);
+        }
+
+        //
+        //Отрисовка блока с результатами (ПО ПАНЕЛИ)
+        //
+        [HttpGet]
+        public ActionResult _TableBlanksFilter(int id_project, int id_operator, string startTime, string endTime, int? page)
+        {
+            List<string> list = new List<string>();
+            ViewBag.Id_Project_Next = id_project;
+            ViewBag.Id_Operator_Next = id_operator;
+            ViewBag.startTimeNext = startTime;
+            ViewBag.endTimeNext = endTime;
+            DateTime startTimeDT = Convert.ToDateTime(startTime.Replace("_", " "));
+            DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_", " "));
+            System.Diagnostics.Debug.WriteLine(startTimeDT);
+            System.Diagnostics.Debug.WriteLine(endTimeDT);
             TimeSpan TimeBez = new TimeSpan();
             DateTime tmp = new DateTime();
             DateTime tmp2 = new DateTime();
@@ -763,47 +1024,6 @@ namespace SocialFORM.Controllers
             int pageSize = 15;
             int pageNumber = (page ?? 1);
             return PartialView(tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
-            //return PartialView(tmp);
-        }
-
-        //
-        //Отрисовка блока с результатами (ПО ПАНЕЛИ)
-        //
-        [HttpGet]
-        public ActionResult _TableBlanksFilter(string id_project, string id_operator, string startTime, string endTime, int? page)
-        {
-            ViewBag.Id_Project_Next = id_project;
-            int id_pr = Convert.ToInt32(id_project);
-            int id_op = Convert.ToInt32(id_operator);
-            DateTime startTimeDT = Convert.ToDateTime(startTime.Replace("_", " "));
-            DateTime endTimeDT = Convert.ToDateTime(endTime.Replace("_", " "));
-            using (ProjectContext project_db = new ProjectContext())
-            {
-                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_pr).NameProject;
-            }
-            if (id_op > 0)
-            {
-                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_pr && u.UserID == id_op && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
-            }
-            else
-            {
-                tmp_tableBlanksFilter = db.SetResultModels.Where(u => u.ProjectID == id_pr && u.Data.CompareTo(startTimeDT) == 1 && u.Data.CompareTo(endTimeDT) == -1).ToList();
-            }
-            double seconds = 0;
-            foreach (ResultModel item in tmp_tableBlanksFilter)
-            {
-                System.Diagnostics.Debug.WriteLine(DateTime.Parse(item.Time).Subtract(item.Data));
-                seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
-            }
-            seconds = seconds / tmp_tableBlanksFilter.Count;
-            int minutes = (int)Math.Floor(seconds / 60);
-            seconds -= minutes * 60;
-            DateTime tmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
-            System.Diagnostics.Debug.WriteLine("Total seconds ---- > " + tmp.ToLongTimeString());
-            int pageSize = 15;
-            int pageNumber = (page ?? 1);
-            System.Diagnostics.Debug.WriteLine(tmp_tableBlanksFilter.Count());
-            return PartialView("_TableBlanksFilter", tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
 
         }
 
@@ -834,5 +1054,88 @@ namespace SocialFORM.Controllers
             }
             return Json(monitoring, JsonRequestBehavior.AllowGet);
         }
+
+        //
+        //Вывод информации по проекту
+        //
+        [HttpGet]
+        public JsonResult getInfoProject(int id_project)
+        {
+            string info = "Кол-во анкет : _";
+            if (db.SetResultModels.Where(u => u.ProjectID == id_project).Count() != 0)
+            {
+                info = info
+                    + db.SetResultModels.Where(u => u.ProjectID == id_project).Count().ToString() + "_"
+                    + "  Дата : _"
+                    + db.SetResultModels.Where(u => u.ProjectID == id_project).First().Data.ToShortDateString()
+                    + " - "
+                    + db.SetResultModels.Where(u => u.ProjectID == id_project).ToList().Reverse<ResultModel>().First().Data.ToShortDateString();
+            }
+            else
+            {
+                info = "null";
+            }
+            System.Diagnostics.Debug.WriteLine("-==============>" + info);
+            return Json(info, JsonRequestBehavior.AllowGet);
+        }
+        //
+        //Личный кабинет
+        //
+        public ActionResult PersonalAccount()
+        {
+            HttpCookie cookieReq = Request.Cookies["cookieAuth"];
+            string cookieString = null;
+            if (cookieReq != null)
+            {
+                cookieString = CryporEngine.Decrypt(cookieReq["Login"], true);
+            }
+            IQueryable<UserViewModel> result = (
+            from User in db.SetUser
+            join DataUsers in db.SetDataUsers on User.Id equals DataUsers.UserId
+            join Role in db.SetRoles on User.RoleId equals Role.Id
+            where User.Login == cookieString
+            select new UserViewModel
+            {
+                IdView = User.Id,
+                LoginView = User.Login,
+                PasswordView = User.Password,
+                NameView = DataUsers.Name,
+                FamilyView = DataUsers.Family,
+                AgeView = DataUsers.Age,
+                FoolView = DataUsers.Fool,
+                EmailView = DataUsers.Email,
+                SchoolDayView = User.SchoolDay,
+                RoleView = Role.Name
+            }
+            );
+            return PartialView(result);
+        }
+        public JsonResult listproject()
+        {
+            return Json(db2.SetProjectModels.Where(u => u.ActionProject == true).ToList(), JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult getResultListProject(int id_project, int id_operator)
+        {
+            string info = "Кол-во анкет за проект : _";
+            DateTime BeginData = DateTime.Now.Date;
+            List<ResultModel> tmp_list = db.SetResultModels.ToList();
+
+            if (db.SetResultModels.Where(u => u.ProjectID == id_project && u.UserID == id_operator).Count() != 0)
+            {
+                info = info
+                    + db.SetResultModels.Where(u => u.ProjectID == id_project && u.UserID == id_operator).Count().ToString() + "_"
+                    + "Кол-во анкет за сегодня: _";
+                if (tmp_list.Where(u => u.ProjectID == id_project && u.UserID == id_operator && u.Data.Date == BeginData.Date).Count() != 0)
+                {
+                    info += tmp_list.Where(u => u.ProjectID == id_project && u.UserID == id_operator && u.Data.Date == BeginData.Date).Count().ToString();
+                }
+                else
+                {
+                    info += 0;
+                }
+            }
+            return Json(info, JsonRequestBehavior.AllowGet);
+        }
+        //
     }
 }

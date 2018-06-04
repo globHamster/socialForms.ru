@@ -14,6 +14,7 @@ namespace SocialFORM.Models.Menu
         public int? ParentId { get; set; }  // ссылка на id родительского меню
         public int? RoleId { get; set; }  // ссылка на роль
         public MenuItem Parent { get; set; }    // родительское меню
+        public string UrlIcon { get; set; }
 
         public Role Role { get; set; }      // связь с ролью
         public ICollection<MenuItem> Children { get; set; }   // дочерние пункты меню

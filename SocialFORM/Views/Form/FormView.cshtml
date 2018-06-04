@@ -327,12 +327,13 @@
                         if (item.QuestionID == id_q) {
                             skip = Check_blocks(item);
                             if (skip) { skip = false; return; }
-                            if (item.AnswerType == 1)
+                            if (item.AnswerType == 1) {
                                 if (list_answer[item.AnswerKey].isFreeArea) {
                                     $('.answer_table').append('<tr class="tool_layer"><td><input type="checkbox" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden checked/></td></tr>')
                                 } else {
                                     $('.answer_table').append('<tr class="tool_layer"><td><input type="checkbox" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden/></td></tr>')
                                 }
+                            }
                             else
                                 $('.answer_table').append('<tr class="tool_layer base_answer"><td><input type="checkbox" name="group" id="' + list_base_answer[item.AnswerKey].BaseIndex + '"> ' + list_base_answer[item.AnswerKey].AnswerText + '</td></tr>')
                         }
@@ -382,7 +383,8 @@
                                 } else if (item.IndexRow != null && item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index)
                                     return;
                             }
-                            console.info(item)
+                            console.info("___________>", item);
+                            console.info("________>", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
                             skip = Check_blocks_Row(item);
                             if (skip) { skip = false; return; }
                             code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
@@ -908,6 +910,9 @@
         if (list_question[id_q].Bind_Blocks != null) {
             if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
                 $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                    if (Number(item_tmp) <= 1) {
+                        skip = false; return;
+                    }
                     if (item.AnswerType != 2) {
                         if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
                             skip = true; return;
@@ -915,9 +920,12 @@
                 });
             }
             if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
-                console.info("result ---- ", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
                 skip = true;
                 $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                    console.info("result ---- ", item_tmp);
+                    if (Number(item_tmp) <= 1) {
+                        skip = false; return;
+                    }
                     if (item.AnswerType != 2) {
                         if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index) {
                             skip = false; return;
@@ -947,6 +955,9 @@
                 console.info("result ---- ", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
                 skip = true;
                 $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                    if (Number(item_tmp) <= 1) {
+                        skip = false; return;
+                    }
                     if (item.AnswerType != 2) {
                         console.info("Index ---- ", item.IndexRow);
                         console.info("IndexRow ---- ", list_answer[Number(item_tmp)].Index);

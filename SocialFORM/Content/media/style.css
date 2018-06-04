@@ -1,0 +1,22 @@
+﻿.MinMax {
+    background-color: #fff;
+    border: hidden;
+}
+
+    .MinMax:active, .MinMax:focus {
+        outline: none !important;
+    }
+
+.iconSt img {
+    position: relative;
+}
+
+.adm {
+    z-index: 2;
+}
+
+.sta {
+    z-index: 4;
+    left: -20px;
+    top: 20px;
+}

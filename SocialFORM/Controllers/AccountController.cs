@@ -33,7 +33,8 @@ namespace SocialFORM.Controllers
                 User user = null;
                 using (ApplicationContext db = new ApplicationContext())
                 {
-                    user = db.SetUser.FirstOrDefault(u => u.Login == model.Login && u.Password == model.Password);
+                    string password = CodePass(model.Password);
+                    user = db.SetUser.FirstOrDefault(u => u.Login == model.Login && u.Password == password);
 
                 }
                 if (user != null)
@@ -101,7 +102,8 @@ namespace SocialFORM.Controllers
                     // создаем нового пользователя
                     using (ApplicationContext db = new ApplicationContext())
                     {
-                        db.SetUser.Add(new User { Login = model.Login, Password = model.Password, RoleId = model.RoleId, SchoolDay = model.SchoolDay });
+                        string password = CodePass(model.Password);
+                        db.SetUser.Add(new User { Login = model.Login, Password = password, RoleId = model.RoleId, SchoolDay = model.SchoolDay });
                         db.SaveChanges();
                         db.SetDataUsers.Add(new DataUser { Name = model.Name, Family = model.Family, Age = model.Age, Fool = model.Fool, Email = model.Email, UserId = db.SetUser.First(u => u.Login == model.Login).Id });
                         db.SaveChanges();
@@ -135,7 +137,8 @@ namespace SocialFORM.Controllers
                 DataUser UPdataUser = db.SetDataUsers.Where(c => c.UserId == model.IdView).First();
 
                 UPuser.Login = model.LoginView;
-                UPuser.Password = model.PasswordView;
+
+                UPuser.Password = CodePass(model.PasswordView);
                 UPuser.RoleId = model.RoleIdView;
                 UPuser.SchoolDay = model.SchoolDayView;
 
@@ -225,93 +228,26 @@ namespace SocialFORM.Controllers
             HttpCookie cookie = new HttpCookie("cookieAuth");
             cookie.Expires = DateTime.Now.AddDays(-1);
             Response.Cookies.Add(cookie);
-            if (ModelState.IsValid)
-            {
-                // поиск пользователя в бд
-                User user = null;
-                using (ApplicationContext db = new ApplicationContext())
-                {
-                    user = db.SetUser.Where(u => u.Login == cookieString).First();
-
-                }
-                if (user != null)
-                {
-                    using (ApplicationContext db = new ApplicationContext())
-                    {
-                        SessionModel date = db.SetSession.FirstOrDefault(u => u.UserId == user.Id && u.Date == someDateTime.Date);
-                        if (date != null)
-                        {
-                            if (date.TimeUp == date.SetTimeUp)
-                            {
-                                SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
-                                UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
-                                UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.TimeUp))).ToString()).ToLongTimeString();
-                                UPSetTimeUp.StatusTime = 0;
-                                db.Entry(UPSetTimeUp).State = EntityState.Modified;
-                            }
-                            else
-                            {
-                                SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
-                                UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
-                                UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToLongTimeString();
-                                UPSetTimeUp.StatusTime = 0;
-                                db.Entry(UPSetTimeUp).State = EntityState.Modified;
-                            }
-                            db.SaveChanges();
-                        }
-                    }
-                }
-            }
+            
             FormsAuthentication.SignOut();
         }
 
-        [HttpPost]
-        public async Task getTimeOut(string time, string userID)
+        public static string CodePass(string pass)
         {
-            ApplicationContext db = new ApplicationContext();
-            DateTime someDateTime = DateTime.Parse(time);
-            // поиск пользователя в бд
-            int uID = Convert.ToInt32(userID);
-            DateTime date = DateTime.Now.Date;
-            SessionModel UPSetTimeUp = await db.SetSession.Where(u => u.UserId == uID && u.Date == date).FirstAsync();
-            UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
-            UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToLongTimeString();
-            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
-            UPSetTimeUp.StatusTime = 0;
-            db.Entry(UPSetTimeUp).State = EntityState.Modified;
-            await db.SaveChangesAsync();
-        }
-
-        [HttpPost]
-        public async Task getTimeOutBeginEnd(string time, string userID)
-        {
-            ApplicationContext db = new ApplicationContext();
-            DateTime someDateTime = DateTime.Parse(time);
-            // поиск пользователя в бд
-            int uID = Convert.ToInt32(userID);
-            DateTime date = DateTime.Now.Date;
-            SessionModel UPSetTimeUp = await db.SetSession.Where(u => u.UserId == uID && u.Date == date).FirstAsync();
-            UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
-            UPSetTimeUp.AllTime = Convert.ToDateTime((DateTime.Parse(UPSetTimeUp.AllTime) + (DateTime.Parse(DateTime.Now.ToLongTimeString()) - DateTime.Parse(UPSetTimeUp.SetTimeUp))).ToString()).ToLongTimeString();
-            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
-            db.Entry(UPSetTimeUp).State = EntityState.Modified;
-            await db.SaveChangesAsync();
-        }
-
-        [HttpPost]
-        public async Task getSetTimeUp(string time, string userID)
-        {
-            DateTime someDateTime = DateTime.Parse(time);
-            DateTime date = DateTime.Now.Date;
-            int uID = Convert.ToInt32(userID);
-            ApplicationContext db = new ApplicationContext();
-            SessionModel UPSetTimeUp = await db.SetSession.Where(u => u.UserId == uID && u.Date == date).FirstAsync();
-            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
-            UPSetTimeUp.StatusTime = 1;
-            db.Entry(UPSetTimeUp).State = EntityState.Modified;
-            await db.SaveChangesAsync();
+            byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(pass);
+            string returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
+            byte[] hash = Encoding.ASCII.GetBytes(returnValue);
+            MD5 md5 = new MD5CryptoServiceProvider();
+            byte[] hashenc = md5.ComputeHash(hash);
+            string result = "";
+            foreach (var b in hashenc)
+            {
+                result += b.ToString("x2");
+            }
+            return result;
         }
     }
+
     public class CryporEngine
     {
         public static string Encrypt(string ToEncrypt, bool useHasing)

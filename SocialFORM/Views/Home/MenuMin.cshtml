@@ -12,7 +12,7 @@
                     foreach (var it in items.Where(a => a.RoleId == 1))
                     {
                         <li>
-                            @Ajax.ActionLink(@it.Header, @it.Url, new AjaxOptions { UpdateTargetId = "Tables" })
+                            @Html.Raw(Ajax.ActionLink(@it.Header, @it.Url, "Home", new AjaxOptions { UpdateTargetId = "Tables" }).ToHtmlString().Replace(it.Header, "<img class=\"iconMenu\" src=\"" + it.UrlIcon + "\" title=\"" + it.Header + "\" />"))
                             @BuildMenu(data, it.Id)
                         </li>
                     }
@@ -22,7 +22,7 @@
                     foreach (var it in items.Where(a => a.RoleId == 2))
                     {
                         <li>
-                            @Ajax.ActionLink(@it.Header, @it.Url, new AjaxOptions { UpdateTargetId = "Tables" })
+                            @Html.Raw(Ajax.ActionLink(@it.Header, @it.Url, "Home", new AjaxOptions { UpdateTargetId = "Tables" }).ToHtmlString().Replace(it.Header, "<img class=\"iconMenu\" src=\"" + it.UrlIcon + "\" />"))
                             @BuildMenu(data, it.Id)
                         </li>
                     }
@@ -41,6 +41,11 @@
         list-style-type: none; /* Убираем маркеры */
     }
 
+    .iconMenu {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
     ul {
         margin-left: 0; /* Отступ слева в браузере IE и Opera */
         padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
@@ -50,6 +55,5 @@
 <div id="cssmenu">
     @BuildMenu(Model)
 </div>
-
 
 

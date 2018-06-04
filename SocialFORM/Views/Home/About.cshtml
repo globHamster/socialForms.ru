@@ -1,12 +1,160 @@
-﻿<button class="delete">Удалить</button>
-@Scripts.Render("~/Scripts/jquery-1.10.2.js")
-<script type="text/javascript">
-    $(document).ready(function () {
+﻿@*<button class="delete">Удалить</button>
+    @Scripts.Render("~/Scripts/jquery-1.10.2.js")
+    <script type="text/javascript">
+        $(document).ready(function () {
 
-        $('button.delete').click(function () {
-            $.get('/Home/delete_click')
-                .success(function () { alert("Item is deleted"); })
+            $('button.delete').click(function () {
+                $.get('/Home/delete_click')
+                    .success(function () { alert("Item is deleted"); })
+            })
+
         })
+    </script>*@
+<div class="form">
+    <div class="question q1">
+        <p>
+            1. Как Вы думаете, что такое экстремизм?
+            Вы можете выбрать один или несколько вариантов, но не более 3.
+        </p>
+        <ul>
+            <li><input type="checkbox" name="q1" value="1">Насилие на основе неприязни к другой национальности</li>
+            <li><input type="checkbox" name="q1" value="2">Нетерпимость во всех её проявлениях</li>
+            <li><input type="checkbox" name="q1" value="3">Способ восстановить справедливость</li>
+            <li><input type="checkbox" name="q1" value="4">Пропаганда насилия</li>
+            <li><input type="checkbox" name="q1" value="5">Готовность применять насилие для достижения целей</li>
+            <li><input type="checkbox" name="q1" value="6">Допустимость использования крайних мер</li>
+            <li><input type="checkbox" name="q1" value="7">Другое (напишите)</li>
+            <li><input type="checkbox" name="q1" value="8">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q2">
+        <p>
+            2. Экстремизмом принято называть приверженность в идеологии и политике к крайним позициям во взглядах и выбор таких же средств для достижения определенных целей. Среди таких мер можно отметить провокацию беспорядков, террористические акции, методы партизанской войны. В чем, по Вашему мнению, заключаются основные причины такого явления?
+            Вы можете выбрать один или несколько вариантов, но не более 3.
+        </p>
+        <ul>
+            <li><input type="checkbox" name="q2" value="1">В многонациональности населения, проживающего на территории России</li>
+            <li><input type="checkbox" name="q2" value="2">В низкой правовой культуре населения и недостаточной терпимости людей</li>
+            <li><input type="checkbox" name="q2" value="3">В целенаправленном «разжигании» представителями экстремистско-настроенных организаций националистической агрессии</li>
+            <li><input type="checkbox" name="q2" value="4">В недостаточном правовом просвещении граждан в сфере противодействия (профилактики) экстремизма</li>
+            <li><input type="checkbox" name="q2" value="5">В недостаточном количестве центров досуга и специальных досуговых программ для детей подросткового возраста и взрослого населения</li>
+            <li><input type="checkbox" name="q2" value="6">В кризисе школьного и семейного воспитания</li>
+            <li><input type="checkbox" name="q2" value="7">В деформации системы ценностей в современном обществе</li>
+            <li><input type="checkbox" name="q2" value="8">Другое (напишите)</li>
+            <li><input type="checkbox" name="q2" value="9">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q3">
+        <p>
+            3. Насколько актуальной, по Вашему мнению, является проблема экстремизма для России в целом, для Иркутской области и Вашего населенного пункта, в частности?
+        </p>
+        <div style="padding-left:15%; width:100%;">
+            <table border="1" style="text-align:center">
+                <tr><th></th><th>Актуальна</th><th>Скорее актуальна</th><th>Скорее не актуальна</th><th>Не актуальна</th><th>Затрудняюсь ответить</th></tr>
+                <tr>
+                    <td>Россия</td>
+                    <td><input class="table" type="radio" name="q31" value="1"></td>
+                    <td><input class="table" type="radio" name="q31" value="2"></td>
+                    <td><input class="table" type="radio" name="q31" value="3"></td>
+                    <td><input class="table" type="radio" name="q31" value="4"></td>
+                    <td><input class="table" type="radio" name="q31" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Иркутская область</td>
+                    <td><input class="table" type="radio" name="q32" value="1"></td>
+                    <td><input class="table" type="radio" name="q32" value="2"></td>
+                    <td><input class="table" type="radio" name="q32" value="3"></td>
+                    <td><input class="table" type="radio" name="q32" value="4"></td>
+                    <td><input class="table" type="radio" name="q32" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Ваш населенный пункт</td>
+                    <td><input class="table" type="radio" name="q33" value="1"></td>
+                    <td><input class="table" type="radio" name="q33" value="2"></td>
+                    <td><input class="table" type="radio" name="q33" value="3"></td>
+                    <td><input class="table" type="radio" name="q33" value="4"></td>
+                    <td><input class="table" type="radio" name="q33" value="5"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="question q4">
+        <p>
+            4. Приходилось ли Вам сталкиваться с проявлениями экстремизма?
+        </p>
+        <ul>
+            <li><input type="radio" name="q2" value="1">Сталкиваюсь достаточно часто</li>
+            <li><input type="radio" name="q2" value="2">Сталкивался(ась) несколько раз</li>
+            <li><input type="radio" name="q2" value="3">Сталкивался(ась) однажды</li>
+            <li><input type="radio" name="q2" value="4">Не приходилось сталкиваться</li>
+            <li><input type="radio" name="q2" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q5">
+        <p>
+            5. С какими именно проявлениями экстремизма Вам приходилось сталкиваться?
+        </p>
+        <textarea name="text1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q6">
+        <p>
+            6. Приходилось ли Вам сталкиваться с экстремистскими материалами в каких-либо из нижеперечисленных источников?
+            Вы можете выбрать один или несколько вариантов, но не более 3.
 
-    })
-</script>
+        </p>
+        <ul>
+            <li><input type="checkbox" name="q6" value="1">В интернете</li>
+            <li><input type="checkbox" name="q6" value="2">В телевизионных передачах</li>
+            <li><input type="checkbox" name="q6" value="3">В фильмах</li>
+            <li><input type="checkbox" name="q6" value="4">В листовках</li>
+            <li><input type="checkbox" name="q6" value="5">В книгах</li>
+            <li><input type="checkbox" name="q6" value="6">Другие источники (напишите) </li>
+            <li><input type="checkbox" name="q6" value="7">Не сталкивался</li>
+        </ul>
+    </div>
+    <div class="question q7">
+        <p>
+            7. Сталкивались ли Вы с дискриминацией по национальному, религиозному или иному признаку в отношении Вашей личности?
+        </p>
+        <ul>
+            <li><input type="radio" name="q7" value="1">Сталкиваюсь достаточно часто</li>
+            <li><input type="radio" name="q7" value="2">Сталкивался(ась) несколько раз</li>
+            <li><input type="radio" name="q7" value="3">Сталкивался(ась) однажды</li>
+            <li><input type="radio" name="q7" value="4">Не приходилось сталкиваться</li>
+            <li><input type="radio" name="q7" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q8">
+        <p>
+            8. Вы испытываете раздражение или неприязнь к представителям другой национальности и (или) вероисповедания?
+        </p>
+        <ul>
+            <li><input type="radio" name="q8" value="1">Испытываю </li>
+            <li><input type="radio" name="q8" value="2">Скорее испытываю </li>
+            <li><input type="radio" name="q8" value="3">Скорее не испытываю </li>
+            <li><input type="radio" name="q8" value="4">Не испытываю </li>
+            <li><input type="radio" name="q8" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+</div>
+<style>
+    li {
+        
+        list-style-type: none; /* Убираем маркеры */
+    }
+    p {
+        font-weight: 600;
+    }
+    .question {
+        width:100%;
+        margin:15px;
+        padding:10px;
+        border:1px solid #ccc;
+    }
+    input {
+        margin-right: 20px !important;
+    }
+    .table {
+        margin-right: 0px !important;
+    }
+</style>

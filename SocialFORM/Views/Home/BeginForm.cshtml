@@ -44,7 +44,6 @@
     $(function () {
 
         $('button.begin_form').click(function () {
-            $.post("/Account/getTimeOutBeginEnd", { time: d("result3").innerText, userId: $('div[name=operatorID]').attr('id') })
                 $('body').append('<div class="loading"></div>');
                 $('.loading').show();
                 $('.loading').append('<div class="loader"></div>')

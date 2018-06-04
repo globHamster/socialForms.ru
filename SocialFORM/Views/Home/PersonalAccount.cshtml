@@ -1,0 +1,69 @@
+﻿@model IEnumerable<SocialFORM.Models.UserViewModel>
+
+<h2>Личный кабинет</h2>
+
+<div>
+
+    @foreach (var item in Model)
+    {
+        <p>Имя : @item.NameView</p>
+        <p>Фамилия : @item.FamilyView</p>
+        <p>Роль : @item.RoleView</p>
+    }
+
+</div>
+<div>
+    Выбрать проект для получение информации : 
+    <select class="select_project" name="select_project" id="select_project">
+        <option disabled>Выберите проект</option>
+        <option selected value="Все">Все</option>
+    </select>
+    <button class="found">Получить</button>
+</div>
+<div class="res">
+  
+</div>
+<script type="text/javascript">
+    //
+    //Запрос на список проекта
+    //
+    $.get("/Home/listproject")
+        .success(function (server_data) {
+            $.each(server_data, function (i, data) {
+                var code = '<option value="' + data.Id + '">' + data.NameProject + '</option>';
+                $('select.select_project').append(code);
+            })
+            console.info("Успешная выгрузка листа проектов ---- ", server_data);
+        })
+        .error(function (err) { console.error("Ошибка выгрузка данных ... /Home/Statistics_project", err) })
+
+    $('.found').click(function () {
+        $('div.res').empty();
+        var id_project = document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value;
+        var id_operator = $('div[name=operatorID]').attr('id');
+        $.ajax({
+            type: "GET",
+            url: "/Home/getResultListProject",
+            async: false,
+            data: {
+                id_project: id_project,
+                id_operator: id_operator
+            },
+            success: function (str) {
+                if (str != "null") {
+                    var tmp_str = str.split("_");
+                    $('div.res').empty();
+                    code = '<p><b>' + tmp_str[0] + '</b>' + tmp_str[1] + '</p>';
+                    code += '<p><b>' + tmp_str[2] + '</b>' + tmp_str[3] + '</p>';
+                    $('div.res').append(code);
+                }
+                else {
+                    $('div.res').empty();
+                    code = '<p>Список пуст</p>';
+                    $('div.res').append(code);
+                }
+            }
+        });
+    });
+
+</script>
