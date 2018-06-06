@@ -80,45 +80,35 @@
 
     <table border="1">
         <tr>
-        <th>Дата</th>
-        <th>Количество анкет за проект</th>
-        <th>Количество анкет в час</th>
-        <th>Среднее время анкет</th>
-        <th>Минимальная длительность</th>
-        <th>Максимальная длительность</th>
-        <th>Стандартное отклонение</th>
-        <th>Время входа</th>
-        <th>Время выхода</th>
-        <th>Время в системе</th>
-        <th>Время бездействия</th>
+            <th>Дата</th>
+            <th>Количество анкет за проект</th>
+            <th>Количество анкет в час</th>
+            <th>Среднее время анкет</th>
+            <th>Минимальная длительность</th>
+            <th>Максимальная длительность</th>
+            <th>Стандартное отклонение</th>
+            <th>Время входа</th>
+            <th>Время выхода</th>
+            <th>Время в системе</th>
+            <th>Время бездействия</th>
         </tr>
         @foreach (string i in ViewBag.list)
         {
             <tr>
-            @foreach (var item in i.Split('/'))
-            {
-                <td>@item</td>
-            }
+                @foreach (var item in i.Split('/'))
+                {
+                    <td>@item</td>
+                }
             </tr>
         }
+        <tr style="border: 2px solid #000000">
+            @foreach (string i in ViewBag.list_all)
+            {
+                foreach (var item in i.Split('/'))
+                {
+                    <td><b>@item</b></td>
+                }
+            }
+        </tr>
     </table>
 </div>
-@*<script type="text/javascript">
-
-    var code = '<table border="1">';
-    code += '<tr> <th></th> <th>Дата</th></tr>';
-    code += '<tr><td>Количество анкет за проект : </td><td>@ViewBag.countBlanks</td></tr>';
-    if (@ViewBag.countBlanks > 1) {
-        code += '<tr><td>Среднее время анкет : </td><td>@ViewBag.SrTime</td></tr>';
-        code += '<tr><td>Минимальная длительность : </td><td>@ViewBag.min</td></tr>';
-        code += '<tr><td>Максимальная длительность : </td><td>@ViewBag.max</td></tr>';
-        code += '<tr><td>Стандартное отклонение : </td><td>@ViewBag.SrTimeOT</td></tr>';
-    }
-    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
-    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
-    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
-    code += '<tr><td> : </td><td>@ViewBag.SrTimeOT</td></tr>';
-    code += '</table >';
-    $('div.resDiv').append(code);
-
-</script>*@

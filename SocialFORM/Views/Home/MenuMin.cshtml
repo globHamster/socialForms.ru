@@ -11,7 +11,7 @@
                 {
                     foreach (var it in items.Where(a => a.RoleId == 1))
                     {
-                        <li>
+                        <li id="@it.Url">
                             @Html.Raw(Ajax.ActionLink(@it.Header, @it.Url, "Home", new AjaxOptions { UpdateTargetId = "Tables" }).ToHtmlString().Replace(it.Header, "<img class=\"iconMenu\" src=\"" + it.UrlIcon + "\" title=\"" + it.Header + "\" />"))
                             @BuildMenu(data, it.Id)
                         </li>

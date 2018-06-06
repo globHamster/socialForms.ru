@@ -15,7 +15,7 @@ namespace SocialFORM.Hubs
         Models.ApplicationContext context = new Models.ApplicationContext();
 
         // Подключение нового пользователя
-        public void Connect(string userid ,string userName)
+        public void Connect(string userid ,string userName, string NamePC, string IPPC)
         {
             var id = Context.ConnectionId;
             var time = TimeSpan.Parse(DateTime.Now.ToLongTimeString());
@@ -31,15 +31,27 @@ namespace SocialFORM.Hubs
                 UserName = userName,
                 Date = DateTime.Now.ToShortDateString(),
                 StartTime = DateTime.Now.ToLongTimeString(),
-                IsAction = true
+                IsAction = true,
+                NamePC = NamePC,
+                IPPC = IPPC
             });
             context.SaveChanges();
-                        // Посылаем сообщение текущему пользователю
-            Clients.Caller.onConnected(id, userName, time, sessionHubs);
+
+            // Посылаем сообщение текущему пользователю
+            Clients.Caller.onConnected(id, userName, time, NamePC ,IPPC);
 
             // Посылаем сообщение всем пользователям, кроме текущего
-            Clients.AllExcept(id).onNewUserConnected(id, userName, time);
+            Clients.AllExcept(id).onNewUserConnected(context.SetSessionHubModel);
 
+        }
+
+        public void Monitoring()
+        {
+            string DateNow = DateTime.Now.ToShortDateString();
+            List<SessionHubModel> sessionHubModels_tmp = context.SetSessionHubModel.Where(u => u.Date == DateNow).ToList();
+            List<SessionHubModel> result = sessionHubModels_tmp.Where(u => u.IsAction == true || (u.IsAction == false && u.EndTime == null)).ToList();
+            System.Diagnostics.Debug.WriteLine("Monitoring COUNT================>>>>>" + result.Count);
+            Clients.Caller.onMonitoring(result);
         }
 
         public void Startafk()
@@ -56,7 +68,10 @@ namespace SocialFORM.Hubs
                 context.Entry(UPSetTimeUp).State = EntityState.Modified;
                 context.SaveChanges();
             }
-            Clients.Caller.fsAFK(sAFK);
+            string DateNow = DateTime.Now.ToShortDateString();
+            List<SessionHubModel> sessionHubModels_tmp = context.SetSessionHubModel.Where(u => u.Date == DateNow).ToList();
+            List<SessionHubModel> result = sessionHubModels_tmp.Where(u => u.IsAction == true || (u.IsAction == false && u.EndTime == null)).ToList();
+            Clients.All.fsAFK(result);
         }
         public void Endafk(string sAFK_tmp)
         {
@@ -80,6 +95,10 @@ namespace SocialFORM.Hubs
                 context.Entry(UPSetTimeUp).State = EntityState.Modified;
                 context.SaveChanges();
             }
+            string DateNow = DateTime.Now.ToShortDateString();
+            List<SessionHubModel> sessionHubModels_tmp = context.SetSessionHubModel.Where(u => u.Date == DateNow).ToList();
+            List<SessionHubModel> result = sessionHubModels_tmp.Where(u => u.IsAction == true || (u.IsAction == false && u.EndTime == null)).ToList();
+            Clients.All.feAFK(result);
         }
 
 
