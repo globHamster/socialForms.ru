@@ -97,7 +97,7 @@
 
 <script type="text/javascript">
 
-    var type_q;
+var type_q;
     var id_q, id_a;
     var id_project = $('div[name=projectID]').attr('id');
     var id_operator = $('div[name=operatorID]').attr('id');
@@ -120,19 +120,14 @@
     var list_id_question_group = {};
     var list_group = {};
     var list_question_bind_group = {};
-    var begin_time; //Время начала анкетирования
+    var begin_time, end_time; //Время начала анкетирования
+    var status = 0;
     var is_load_id = false;
     var active_group = {};
     var q1, q2, q3, q4, q5, q6, q7;
     var count_ajax = 0;
     //Блок выгрузки данных
     {
-        $.get("/Group/GetTimeBegin")
-            .success(function (server_date_time) {
-                console.info("Time of begining ---- ", server_date_time);
-                begin_time = server_date_time;
-            })
-
 
         //подгрузка листа сс базовыми ответами
         q1 = $.get("/Question/getListAnswerBase")
@@ -286,10 +281,35 @@
     }, 50);
 
     //Блок отрисовки анкеты
-    function getStart() {
+            function getStart() {
+                alert();
         if (index >= massiv_question_id.length) {
             $(".show_result").load("/Form/showResult");
         } else {
+            alert(req)
+            if (index == 1 && status == 0) {
+                $.get("/Form/GetServerTime")
+                    .success(function (server_time) {
+                        if (begin_time == undefined)
+                            begin_time = server_time;
+                        status = 1;
+                        console.log("Test time   ", begin_time);
+                    })
+                    .error(function () { alert("Error"); })
+            }
+            if (index == massiv_question_id.length - 1) {
+                $.get("/Form/GetServerTime")
+                    .success(function (server_time) {
+                        if (end_time == undefined)
+                            end_time = server_time;
+                        console.log("Test time   ", end_time);
+                    })
+            }
+            if (index == 1) {
+                $('button.previous').hide();
+            } else if (index > 1) {
+                $('button.previous').show();
+            }
             console.log("Result list ---->", result[index - 1]);
             console.info("is done");
             id_q = massiv_question_id[index];
@@ -429,7 +449,7 @@
                     break;
                 default:
                     break;
-                    
+
             }
         }
     }
@@ -517,10 +537,10 @@
                 }
                 break;
             case 4:
-                
+
                 var count_row = $('tr.table_answer').length - 1;
                 if ($('input[name^=group]:checked').length == count_row) {
-                    
+
                     $('div.wrong_choise').fadeOut('fast');
                     SaveResult();
                     console.log("IN HERE !!!!");
@@ -696,10 +716,10 @@
             }
                 break;
             case 4: {
-                
+
                 var mas_tmp = result[index];
                 var mas_tmp_2 = list_question_bind_group[id_q];
-               
+
                 if (mas_tmp_2 != undefined) {
                     $.each(mas_tmp_2, function (i, item) {
 
@@ -1053,7 +1073,7 @@
         }
         return -1;
     }
-        // END
+// END
 
 
 

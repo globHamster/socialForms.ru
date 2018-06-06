@@ -113,6 +113,15 @@
         cursor: pointer;
         display: none; /* в oбычнoм сoстoянии её нет) */
     }
+
+    .emptySpace {
+        border: 2px dotted blue;
+        width: 100px;
+        height: 20px;
+    }
+    .group_element{
+        /*border: 1px solid red;*/
+    }
 </style>
 
 <div class="title">@ViewBag.ProjectName</div>
@@ -126,7 +135,6 @@
                     <button class="menu_panel" id="add_question">Добавить вопрос</button>
                     <button onclick="AddNewGroup()">Добавить группу</button>
                     <button onclick="DeleteGroup()">Удалить группу</button>
-                    <button onclick="TestAnswerAll()">Test</button>
                     @*<button class="menu_panel">Удалить группу</button>*@
                 </div>
             </td>
@@ -238,7 +246,7 @@
                         code += '<li class="question_view quest" id=' + item.QuestionID + '><span>' + item.GroupName + '</span></li>';
                     } else {
                         var index = item.Group;
-                        code += '<li class="group" id=' + item.Group + '><span>' + item.GroupName + '</span><ul>';
+                        code += '<li class="group" id=' + item.Group + '><span>' + item.GroupName + '</span><ul class="group_element" id=' + item.Group + '>';
                         if (list_group_block[index] != null) {
                             $.each(list_group_block[index], function (i, item) {
                                 code += '<li class="question_view quest" id=' + item.QuestionID + '><span>' + item.GroupName + '</span></li>';
@@ -275,36 +283,57 @@
                 });
               //  $(".ul-dropfree").find("ul").slideUp(400).parents("li").children("div.drop").css({ 'background-position': "0 0" });
                 $('ul.tree_view').sortable({
+                    start: function (event, ui) {
+                        $('ul.tree_view').find('ul.group_element').each(function () {
+
+                            if ($(this).text().length == 0) {
+                                $(this).append('<li class="tmp_item" style="background-color: grey; width: 100px; height: 20px;"></li>');
+                            }
+                        })
+                    },
                     stop: function (event, ui) {
                         var count = 1;
                         var count_group = 1;
                         var list_id_question = [];
+                        $('.tree_view').find('.tmp_item').each(function () { $(this).remove(); })
                         $('ul.tree_view li').each(function () {
                             if ($(this).hasClass('group')) {
                                 $(this).find('span').text("Группа " + count_group);
                                 count_group++;
+                                list_id_question.push(-1*Number($(this).attr('id')))
                             }
                             else {
-                                $(this).text("Вопрос " + count);
+                                $(this).find('span').text("Вопрос " + count);
                                 count++;
+                                list_id_question.push(Number($(this).attr('id')));
                             }
-                           
-                            list_id_question.push(Number($(this).attr('id')))
-                           
                         })
-                        $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
-                    }
+                        var change_item = ui.item;
+                        if (ui.item.parent().hasClass('group_element')) {
+                            if (ui.item.hasClass('group')) {
+                                $('ul.tree_view').sortable("cancel");
+                            } else {
+                                $.post("/Group/ChangeGroup", { id_q: ui.item.attr('id'), id_g: ui.item.parent().attr('id') });
+                            }
+                        }
+                        console.log("Mass ==== ", list_id_question);
+                        $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question, id_p: $('input[name=project_id]').val() });
+                    },
+                    placeholder: 'emptySpace',
+                    delay: 400,
+                    connectWith: '.group_element'
                 });
 
                 $('li.group ul').sortable({
                     stop: function (event, ui) {
                         var list_id_question = [];
-                        $('ul.tree_view li').each(function () {
-                            list_id_question.push(Number($(this).attr('id')))
-                        })
                         changeIndexGroup();
-                        $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
-                    }
+                        if (ui.item.parent().hasClass('tree_view')) {
+                            $.post("/Group/ChangeGroup", { id_q: ui.item.attr('id'), id_g: 0 });
+                        }
+                    },
+                    placeholder: 'emptySpace',
+                    connectWith: '.tree_view'
                 });
                 $('ul.tree_view').disableSelection();
                 console.info("ListGroup ---->", list_group_block);
@@ -417,15 +446,19 @@
             if ($(this).hasClass('group')) {
                 $(this).find('span').text("Группа " + count_group);
                 count_group++;
+                list_id_question.push(-1*Number($(this).attr('id')))
             }
             else {
                 $(this).find('span').text("Вопрос " + count);
                 count++;
+                list_id_question.push(Number($(this).attr('id')))
             }
 
-            list_id_question.push(Number($(this).attr('id')))
+            
 
         })
-        $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
+        if ($('ul.tree_view').text().length != 0) {
+            $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
+        }
     }
 </script>

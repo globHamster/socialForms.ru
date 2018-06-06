@@ -85,7 +85,8 @@
         console.info("Выгрузка данных ... ", result);
         console.info("Выгрузка данных ... ", text_other);
         console.info("Выгрузка данных ... ", massiv_question_id);
-
+        console.log("Время начала ==== ", begin_time);
+        console.log("Время окончания ==== ", end_time);
         /*  $.each(massiv_question_id, function (i, data) {
               var code = '<div class="quest" id="' + data + '"></div>';
               $('.changes').append(code);
@@ -282,7 +283,8 @@
             operator_id: id_operator,
             phone_number: str_number,
             list: query_q,
-            time_begin: begin_time
+            time_begin: begin_time,
+            time_end: end_time
         }
         sendData(query);
     });

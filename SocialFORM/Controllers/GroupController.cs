@@ -220,23 +220,24 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public void ChangeIndexQuestion(List<int> new_set)
+        public void ChangeIndexQuestion(List<int> new_set, int id_p)
         {
             int count = 1;
             int count_group = 1;
             int count_answer = 1;
             foreach (var item in new_set)
             {
-                GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.QuestionID == item);
-                if (group_item == null)
+                
+                if (item < 0)
                 {
-                    group_item = db.SetGroupModels.FirstOrDefault(u => u.Group == item);
+                    GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.Group == (-1)*item && u.ProjectID == id_p);
                     group_item.IndexQuestion = count;
                     group_item.GroupName = "Группа " + count_group;
                     count_group++;
                 }
                 else
                 {
+                    GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.QuestionID == item);
                     group_item.IndexQuestion = count;
                     group_item.GroupName = "Вопрос " + count_answer;
                     count_answer++;
@@ -244,6 +245,14 @@ namespace SocialFORM.Controllers
                 db.SaveChanges();
                 count++;
             }
+        }
+
+        [HttpPost]
+        public void ChangeGroup(int id_q, int id_g)
+        {
+            GroupModel tmp = db.SetGroupModels.FirstOrDefault(u => u.QuestionID == id_q);
+            tmp.GroupID = id_g;
+            db.SaveChanges();
         }
 
         [HttpPost]

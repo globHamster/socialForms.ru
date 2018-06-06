@@ -805,7 +805,7 @@
                     }
                 })
                 $('button.delete_blocks').click(function () {
-                    $.post("/Question/deleteBlocks", { id_transition: $(this).attr('id') });
+                    $.post("/Question/deleteBlocks", { id_block: $(this).attr('id') });
                     $(this).parent().remove();
                 });
             },
@@ -1137,6 +1137,7 @@
                 })
         })
 
+        $('.manager_panel').off('click', '.chain_group_delete');
         $('.manager_panel').on('click', '.chain_group_delete', function () {
             var id_answer = $(this).parent();
             $.post("/Group/DeleteBindGroup", { id_q: $('input.Id').val(), id_a: id_answer.attr('id') })
@@ -1145,6 +1146,7 @@
                     id_answer.remove();
                 })
         })
+
 
         $('div.panel_group').on('click', 'button.save_group', function () {
             /**

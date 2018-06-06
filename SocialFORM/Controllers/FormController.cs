@@ -123,7 +123,7 @@ namespace SocialFORM.Controllers
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<int> SaveData(string name, int project_id, int operator_id, string phone_number, List<SaveDataModel> list, string time_begin)
+        public async Task<int> SaveData(string name, int project_id, int operator_id, string phone_number, List<SaveDataModel> list, string time_begin, string time_end)
         {
 
             ResultModel result = new ResultModel();
@@ -136,7 +136,7 @@ namespace SocialFORM.Controllers
 
             result.PhoneNumber = phone_number;
             result.Data = DateTime.Parse(time_begin);
-            result.Time = DateTime.Now.ToString();
+            result.Time = DateTime.Parse(time_end).ToString();
             result.CoordWidth = "0";
             result.CoordHeight = "0";
             db2.SetResultModels.Add(result);
@@ -222,6 +222,12 @@ namespace SocialFORM.Controllers
         public JsonResult getBlanks(int id_project)
         {
             return Json(db2.SetResultModels.Where(u => u.ProjectID == id_project).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetServerTime()
+        {
+            return Json(DateTime.Now.ToString(), JsonRequestBehavior.AllowGet);
         }
     }
 }
