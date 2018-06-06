@@ -31,24 +31,19 @@
         $('#hdId').val(id);
         $('#username').val(userName);
 
-        // Добавление всех пользователей
-        for (i = 0; i < allUsers.length; i++) {
-
-            AddUser(allUsers[i].ConnectionId, allUsers[i].Name);
-        }
     }
 
-    // Добавляем нового пользователя
-    chat.client.onNewUserConnected = function (id, name) {
+    //// Добавляем нового пользователя
+    //chat.client.onNewUserConnected = function (id, name) {
 
-        AddUser(id, name);
-    }
+    //    AddUser(id, name);
+    //}
 
-    // Удаляем пользователя
-    chat.client.onUserDisconnected = function (id, userName) {
+    //// Удаляем пользователя
+    //chat.client.onUserDisconnected = function (id, userName) {
 
-        $('#' + id).remove();
-    }
+    //    $('#' + id).remove();
+    //}
 
     // Открываем соединение
     $.connection.hub.start().done(function () {

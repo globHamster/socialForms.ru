@@ -5,9 +5,6 @@
     // Функция, вызываемая при подключении нового пользователя
     session.client.onConnected = function (id, userName, time, namepc, ippc) {
         $('#session').html('<font color="#808080" size="1"><p name="StetLine" style="white-space: nowrap" id="' + id + '"> Status bar ConnectionId: ' + id + ' - Name: ' + userName + ' - TimeUp: ' + time + ' NamePC/IP - ' + namepc + '/' + ippc + '<p></font>');
-        //for (i = 0; i < allUsers.length; i++) {
-        //    AddUser(allUsers[i].ConnectionId, allUsers[i].UserName, allUsers[i].StartTime);
-        //}
     }
 
     // Добавляем нового пользователя
@@ -82,13 +79,6 @@
 //}
 
 
-
-//Добавление нового пользователя
-function AddUser(id, name, time) {
-    setTimeout(function () {
-        $("#list_monitorig").append('<p id="' + id + '">' + id + ' : <b>' + name + '</b> - ' + time + '</p>');
-    }, 1000);
-}
 //Обработка мониторинга
 function OnMonitor(allUsers_l) {
     setTimeout(function () {
