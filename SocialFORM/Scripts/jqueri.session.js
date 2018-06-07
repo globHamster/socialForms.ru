@@ -4,7 +4,7 @@
     var connectionId;
     // Функция, вызываемая при подключении нового пользователя
     session.client.onConnected = function (id, userName, time) {
-        $('#session').html('<font color="#808080" size="1"><p name="StetLine" style="white-space: nowrap" id="' + id + '"> Status bar ConnectionId: ' + id + ' - Name: ' + userName + ' - TimeUp: ' + time + '<p></font>');
+        $('#session').html('<font color="#808080" size="1"><p align="right" name="StetLine" style="white-space: nowrap" id="' + id + '"> Status bar ConnectionId: ' + id + ' - Name: ' + userName + ' - TimeUp: ' + time + '<p></font>');
     }
 
     // Добавляем нового пользователя
@@ -84,9 +84,9 @@ function OnMonitor(allUsers_l) {
         var codeTable = '';
         codeTable += '<table><tr>';
         wid_w = $(window).width();
-        var countROW = 6; // Отсчет ведеться от 0 т.е. [0..2]
-        if (wid_w < 992) countROW = 4;
-        if (wid_w < 452) countROW = 2;
+        var countROW = 4; // Отсчет ведеться от 0 т.е. [0..2]
+        if (wid_w < 992) countROW = 2;
+        if (wid_w < 452) countROW = 1;
 
         var countROW_tmp = countROW;
         for (i = 0; i < allUsers_l.length; i++) {
@@ -96,22 +96,14 @@ function OnMonitor(allUsers_l) {
                     + allUsers_l[i].ConnectionId
                     + '"> <img id = "status_monitoring" class= "online" src = "../images/icon/status.png" /> <b>'
                     + allUsers_l[i].UserName
-                    + '</b><br/>'
-                    + '<font color="#808080" size="1">' + allUsers_l[i].NamePC
-                    + '/'
-                    + allUsers_l[i].IPPC
-                    + '</font></p></td>';
+                    + '</b></p></td>';
             }
             if (allUsers_l[i].IsAction == false && allUsers_l[i].EndTime == null) {
                 codeTable += '<td style="padding:4px"><p style="text-align: center;" id="'
                     + allUsers_l[i].ConnectionId
                     + '"> <img id = "status_monitoring" class= "online" src = "../images/icon/status_offline.png" /> <b>'
                     + allUsers_l[i].UserName
-                    + '</b><br/>'
-                    + '<font color="#808080" size="1">' + allUsers_l[i].NamePC
-                    + '/'
-                    + allUsers_l[i].IPPC
-                    + '</font></p></td>';
+                    + '</b></p></td>';
             }
         }
         codeTable += '</tr></table>';

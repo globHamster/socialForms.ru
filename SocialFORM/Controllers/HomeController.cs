@@ -167,7 +167,7 @@ namespace SocialFORM.Controllers
                 EmailView = DataUsers.Email,
             }
             );
-            listUsers = result.ToList();
+            listUsers = result.ToList().OrderBy(u => u.FamilyView).ToList();
             int pageSize = 14;
             int pageNumber = (page ?? 1);
             return PartialView("_Users", listUsers.ToPagedList(pageNumber, pageSize));

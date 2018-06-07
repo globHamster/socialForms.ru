@@ -303,6 +303,7 @@
     <Content Include="images\icon\exit.png" />
     <Content Include="images\icon\listProject.png" />
     <Content Include="images\icon\listUser.png" />
+    <Content Include="images\icon\mess.png" />
     <Content Include="images\icon\monitor.png" />
     <Content Include="images\icon\next.png" />
     <Content Include="images\icon\previous.png" />
@@ -318,6 +319,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\chosen.jquery.js" />
     <Content Include="Scripts\daterangepicker.js" />

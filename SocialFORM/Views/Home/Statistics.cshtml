@@ -1,33 +1,44 @@
 ﻿@model IList<SocialFORM.Models.Form.ResultModel>
 @using PagedList.Mvc;
 <link rel="stylesheet" type="text/css" href="~/Content/daterangepicker.css" />
+<div class="col-md-12">
+    <div class="row" id="filterDiv">
 
-<div id="filterDiv">
-    <div>
-        <select class="select_project" name="select_project" id="select_project">
-            <option disabled>Выберите проект</option>
-            <option selected value="Все">Все</option>
-        </select>
+        <div class="col-md-6">
+            Выберите проект : 
+            <select class="select_project" name="select_project" id="select_project">
+                <option disabled>Выберите проект</option>
+                <option selected value="Все">Все</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            Выберите оператора :
+            <select class="select_operator" name="select_operator" id="select_operator">
+                <option disabled>Выберите оператора</option>
+                <option selected value="0">Все</option>
+            </select>
+        </div>
     </div>
-    <div>
-        <select class="select_operator" name="select_operator" id="select_operator">
-            <option disabled>Выберите оператора</option>
-            <option selected value="0">Все</option>
-        </select>
+    <br/>
+    <div class="row">
+        <div class="col-md-12">
+            Выберите дату и время : 
+            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%">
+                <i class="fa fa-calendar"></i>&nbsp;
+                <span></span> <i class="fa fa-caret-down"></i>
+            </div>
+        </div>
+        <div class="row">
+        </div>
+        <div class="col-md-12">
+            <button class="filter_button" id="">Фильтровать</button>
+        </div>
     </div>
-    <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%">
-        <i class="fa fa-calendar"></i>&nbsp;
-        <span></span> <i class="fa fa-caret-down"></i>
+    <div id="resultDiv" class="resultDiv">
+
     </div>
-    <div>
-        <button class="filter_button" id="">Фильтровать</button>
-    </div>
+
 </div>
-<div id="resultDiv" class="resultDiv">
-
-</div>
-
-
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 @Scripts.Render("~/Scripts/moment.min.js")
 @Scripts.Render("~/Scripts/daterangepicker.js")
@@ -131,7 +142,7 @@
         var startTime = string[0];
         var endTime = string[1];
         console.info("Start Time", startTime);
-        console.info("End Time",endTime);
+        console.info("End Time", endTime);
         $.ajax({
             type: "GET",
             url: "/Home/getResultListFilter",
@@ -149,7 +160,7 @@
                     alert("Список пуст");
                 }
 
-               }
+            }
         });
     })
 

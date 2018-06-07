@@ -23,6 +23,7 @@
             </td>
             <td>
                 <button class="infoP" id="@item.Id">?</button>
+                <button class="kvot" id="@item.Id">Квоты</button>
                 <button class="show_blanks" id="@item.Id">База данных</button>|
                 <button class="export_result" id="@item.Id">Экспорт Excel</button>|
                 @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
@@ -42,11 +43,12 @@
 </table>
 <div id="contentPager">
     @Html.PagedListPager(
-                                         Model,
-                                         page => Url.Action("_Project", "Home", new { page = page }),
-                                         PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
-                                                                 )
+                Model,
+                page => Url.Action("_Project", "Home", new { page = page }),
+                PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
+                             )
 </div>
+
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
 
@@ -68,8 +70,7 @@
                     code += '<p><b>' + tmp_str[2] + '</b>' + tmp_str[3] + '</p>';
                     $('td.str_infoP[id =' + id_project + ']').append(code);
                 }
-                else
-                {
+                else {
                     $('td.str_infoP[id =' + id_project + ']').empty();
                     code = '<p>Список пуст</p>';
                     $('td.str_infoP[id =' + id_project + ']').append(code);
