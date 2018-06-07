@@ -3,8 +3,8 @@
     var session = $.connection.sessionHub;
     var connectionId;
     // Функция, вызываемая при подключении нового пользователя
-    session.client.onConnected = function (id, userName, time, namepc, ippc) {
-        $('#session').html('<font color="#808080" size="1"><p name="StetLine" style="white-space: nowrap" id="' + id + '"> Status bar ConnectionId: ' + id + ' - Name: ' + userName + ' - TimeUp: ' + time + ' NamePC/IP - ' + namepc + '/' + ippc + '<p></font>');
+    session.client.onConnected = function (id, userName, time) {
+        $('#session').html('<font color="#808080" size="1"><p name="StetLine" style="white-space: nowrap" id="' + id + '"> Status bar ConnectionId: ' + id + ' - Name: ' + userName + ' - TimeUp: ' + time + '<p></font>');
     }
 
     // Добавляем нового пользователя
@@ -21,9 +21,7 @@
     $.connection.hub.start().done(function () {
         var name = $('div.operatorID').text();
         var id = $('div.operatorID').attr('id');
-        var namepc = $('div.namePC').attr('id');
-        var ippc = $('div.namePC').text();
-        session.server.connect(id, name, namepc, ippc);
+        session.server.connect(id, name);
     });
 
     idleTimer = null;

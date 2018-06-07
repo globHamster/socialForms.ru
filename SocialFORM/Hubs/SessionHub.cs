@@ -15,7 +15,7 @@ namespace SocialFORM.Hubs
         Models.ApplicationContext context = new Models.ApplicationContext();
 
         // Подключение нового пользователя
-        public void Connect(string userid ,string userName, string NamePC, string IPPC)
+        public void Connect(string userid ,string userName)
         {
             var id = Context.ConnectionId;
             var time = TimeSpan.Parse(DateTime.Now.ToLongTimeString());
@@ -32,13 +32,11 @@ namespace SocialFORM.Hubs
                 Date = DateTime.Now.ToShortDateString(),
                 StartTime = DateTime.Now.ToLongTimeString(),
                 IsAction = true,
-                NamePC = NamePC,
-                IPPC = IPPC
             });
             context.SaveChanges();
 
             // Посылаем сообщение текущему пользователю
-            Clients.Caller.onConnected(id, userName, time, NamePC ,IPPC);
+            Clients.Caller.onConnected(id, userName, time);
 
             // Посылаем сообщение всем пользователям, кроме текущего
             Clients.AllExcept(id).onNewUserConnected(context.SetSessionHubModel);

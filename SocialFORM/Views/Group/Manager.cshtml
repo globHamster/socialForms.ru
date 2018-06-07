@@ -327,6 +327,12 @@
                 $('li.group ul').sortable({
                     stop: function (event, ui) {
                         var list_id_question = [];
+                        if (ui.item.parent().hasClass('group_element')) {
+                            $.post("/Group/ChangeGroup", { id_q: ui.item.attr('id'), id_g: ui.item.parent().attr('id') });
+                        }
+                        if (ui.item.parent().hasClass('tree_view')) {
+                            $.post("/Group/ChangeGroup", { id_q: ui.item.attr('id'), id_g: 0 });
+                        }
                         changeIndexGroup();
                         if (ui.item.parent().hasClass('tree_view')) {
                             $.post("/Group/ChangeGroup", { id_q: ui.item.attr('id'), id_g: 0 });
@@ -457,8 +463,10 @@
             
 
         })
+       
+        console.log("Mass ==== ", list_id_question);
         if ($('ul.tree_view').text().length != 0) {
-            $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question });
+            $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question, id_p: $('input[name=project_id]').val() });
         }
     }
 </script>

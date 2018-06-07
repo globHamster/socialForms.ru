@@ -127,7 +127,7 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public JsonResult Answer(AnswerModel tmp)
+        public void Answer(AnswerModel tmp)
         {
             if (ModelState.IsValid)
             {
@@ -157,8 +157,6 @@ namespace SocialFORM.Controllers
                     setAnswerAll(answerAll);
                 }
             }
-
-            return Json(db.SetAnswers.ToList().Last());
         }
 
         [HttpPost]

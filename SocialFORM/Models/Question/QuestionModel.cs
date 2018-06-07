@@ -18,6 +18,7 @@ namespace SocialFORM.Models.Question
         public int ProjectID { get; set; }
         public int? Bind { get; set; }
         public int? Bind_Blocks { get; set; }
+        public int? LimitCount { get; set; }
         public ProjectModel Project { get; set; }
 
         public ICollection<GroupModel> Groups { get; set; }
