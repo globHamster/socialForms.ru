@@ -470,6 +470,7 @@
     <Content Include="Views\Home\_Project.cshtml" />
     <Content Include="Views\Home\PersonalAccount.cshtml" />
     <Content Include="Views\Home\MenuMin.cshtml" />
+    <Content Include="Views\Home\Options.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
