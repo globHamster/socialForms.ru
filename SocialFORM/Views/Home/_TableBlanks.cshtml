@@ -16,7 +16,7 @@
             @foreach (var item in Model)
             {
                 <tr id="@item.Id" name="@item.Id" class="answer_row">
-                    <td><input type="hidden" name="UserID" value="@item.UserID" /> @item.Id</td>
+                    <td><input type="hidden" name="UserID" value="@item.UserID" /> @item.BlankID</td>
                     <td>@item.UserName</td>
                     <td>@item.PhoneNumber</td>
                     <td class="startDATE">@item.Data</td>

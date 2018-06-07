@@ -31,7 +31,7 @@ namespace SocialFORM.Hubs
                 UserName = userName,
                 Date = DateTime.Now.ToShortDateString(),
                 StartTime = DateTime.Now.ToLongTimeString(),
-                IsAction = true,
+                IsAction = true
             });
             context.SaveChanges();
 
@@ -39,7 +39,10 @@ namespace SocialFORM.Hubs
             Clients.Caller.onConnected(id, userName, time);
 
             // Посылаем сообщение всем пользователям, кроме текущего
-            Clients.AllExcept(id).onNewUserConnected(context.SetSessionHubModel);
+            string DateNow = DateTime.Now.ToShortDateString();
+            List<SessionHubModel> sessionHubModels_tmp = context.SetSessionHubModel.Where(u => u.Date == DateNow).ToList();
+            List<SessionHubModel> result = sessionHubModels_tmp.Where(u => u.IsAction == true || (u.IsAction == false && u.EndTime == null)).ToList();
+            Clients.AllExcept(id).onNewUserConnected(result);
 
         }
 
