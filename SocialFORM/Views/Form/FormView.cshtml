@@ -751,6 +751,7 @@
                 case 2:
                     var mas_ans = {};
                     var tmp_str = String(text_other[index]).split(',');
+                    var is_check_base_answer = false;
                     $.each(tmp_str, function (i, item) {
                         var str = item.split('#');
                         mas_ans[str[0]] = str[1];
@@ -759,13 +760,14 @@
                         var tmp = $('.answer_table').find('input[id=' + item + ']');
                         tmp.prop('checked', true);
                         if (tmp.parent().parent().hasClass('base_answer')) {
+                            is_check_base_answer = true;
                             checkedAnswerBase(tmp.parent().parent());
                         } else if (tmp.parent().find('input.is_free_area').is(':checked')) {
                             tmp.parent().find('input.is_free_area').after('<textarea class="text_free_area"  style="margin-left: 10px; width: 600px; height: 50px; resize: none; display: none"></textarea>');
                             tmp.parent().find('.text_free_area').slideDown(200).text(mas_ans[item]);
                         }
                     })
-                    CheckLimitAnswer();
+                    if (!is_check_base_answer) CheckLimitAnswer();
                     break;
                 case 3:
                     var mas_ans = [];
@@ -1063,7 +1065,7 @@
 
     function CheckLimitAnswer() {
         var limit_count = list_question[id_q].LimitCount;
-        if (limit_count > 0 || limit_count != null) {
+        if (limit_count > 0 && limit_count != null) {
             if ($('.answer_panel').find('input:checked').length == limit_count) {
                 $('div.limit_checked_div').remove();
                 $('.answer_panel').find('input').each(function () {
