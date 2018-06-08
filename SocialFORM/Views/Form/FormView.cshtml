@@ -1065,18 +1065,19 @@
 
     function CheckLimitAnswer() {
         var limit_count = list_question[id_q].LimitCount;
+        console.log("limit count ", $('.answer_panel').find('input[name=group]:checked').length);
         if (limit_count > 0 && limit_count != null) {
-            if ($('.answer_panel').find('input:checked').length == limit_count) {
+            if ($('.answer_panel').find('input[name=group]:checked').length == limit_count) {
                 $('div.limit_checked_div').remove();
-                $('.answer_panel').find('input').each(function () {
+                $('.answer_panel').find('input[name=group]').each(function () {
                     if (!$(this).is(":checked")) {
                         $(this).prop('disabled', true);
                     }
                 })
                 $('div.wrong_choise').after('<div class="limit_checked_div wrong_choise">Выбрано максимальное количество ответов. Для выбора другого ответа отмените любой из уже выбранных.</div>');
                 $('div.limit_checked_div').fadeIn(500);
-            } else if ($('.answer_panel').find('input:checked').length < limit_count) {
-                $('.answer_panel').find('input').each(function () {
+            } else if ($('.answer_panel').find('input[name=group]:checked').length < limit_count) {
+                $('.answer_panel').find('input[name=group]').each(function () {
                     if (!$(this).is(":checked")) {
                         $(this).prop('disabled', false);
                     }
