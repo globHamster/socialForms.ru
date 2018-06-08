@@ -1381,5 +1381,11 @@ namespace SocialFORM.Controllers
             return Json(info, JsonRequestBehavior.AllowGet);
         }
         //
+
+
+        public ActionResult Options()
+        {
+            return PartialView();
+        }
     }
 }
