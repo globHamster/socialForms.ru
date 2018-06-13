@@ -148,9 +148,12 @@
         $.get("/Question/getListBlocks", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (data) {
                 $.each(data, function (i, item) {
-                    list_blocks[item.fromQuestion] = item;
+                    if (list_blocks[item.fromQuestion] == null || list_blocks[item.fromQuestion] == undefined)
+                        list_blocks[item.fromQuestion] = [item];
+                    else
+                        list_blocks[item.fromQuestion].push(item);
                 });
-                //console.info('Загрузка таблицы блокировок успешна ---', list_blocks);
+                console.info('Загрузка таблицы блокировок успешна ---', list_blocks);
                 count_ajax++;
             })
             .error(function (err) { console.error('Ошибка загрузки таблицы блокировок .../Question/getListBlocks ', err); });
@@ -426,7 +429,7 @@
                         availableTags.push(tmp_str[0]);
                         tmp_massive[tmp_str[0]] = tmp_str[1];
                     })
-                    
+
                     var code = '';
                     code += '<select data-placeholder="Choose a Country..." class="chosen-select-new">';
                     code += '<option value="">Выберите вариант ответа.</option>';
@@ -496,10 +499,19 @@
             case 1:
                 if ($("input[name=group]:radio:checked").length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
-               //     $('div.limit_checked_div').remove();
+                    //     $('div.limit_checked_div').remove();
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
+                    if ($('textarea.text_free_area').length > 0 && $('textarea.text_free_area').is(":visible")) {
+                        if ($('textarea.text_free_area').val() == "") {
+                            $('textarea.text_free_area').animate({
+                                backgroundColor: 'red'
+                            }, 500).animate({ backgroundColor: 'white' }, 500);
+                            break;
+                        }
+
+                    }
                     SaveResult();
                     CheckGroupGo();
                     checkTransitionGo();
@@ -515,6 +527,15 @@
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
+                    if ($('textarea.text_free_area').length > 0 && $('textarea.text_free_area').is(":visible")) {
+                        if ($('textarea.text_free_area').val() == "") {
+                            $('textarea.text_free_area').animate({
+                                backgroundColor: 'red'
+                            }, 500).animate({ backgroundColor: 'white' }, 500);
+                            break;
+                        }
+
+                    }
                     SaveResult();
                     CheckGroupGo();
                     index++;
@@ -526,7 +547,7 @@
             case 3:
                 if ($("input:text").val().length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
-       //             $('div.limit_checked_div').remove();
+                    //             $('div.limit_checked_div').remove();
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
@@ -550,7 +571,7 @@
                     //   goNext();
                 } else {
                     $('div.wrong_choise').fadeIn('slow');
-       //             $('div.limit_checked_div').remove();
+                    //             $('div.limit_checked_div').remove();
                 }
                 break;
             case 5:
@@ -909,7 +930,7 @@
         if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
             checkedAnswerBase($(this));
         }
-      
+
     });
 
     $('.answer_table').on('mouseenter', 'textarea.text_free_area', function () {
@@ -932,6 +953,31 @@
     //Дополнительные функции
     function Check_blocks(item) {
         var skip = false;
+
+        if (list_blocks[id_q] != null) {
+            if (list_blocks[id_q].length > 1) {
+
+                console.log("List block length ===== ", list_blocks[id_q].length);
+                $.each(list_blocks[id_q], function (i, item_block) {
+                    //--------
+                    console.log("List block length ===== ", item_block);
+                    if (item_block.fromQuestion == id_q && item_block.typeBlock == 1) {
+                        $.each(result[massiv_question_id.indexOf(Number(item_block.toQuestion))], function (i, item_tmp) {
+                            if (Number(item_tmp) <= 1) {
+                                skip = false; return;
+                            }
+                            if (item.AnswerType != 2) {
+                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
+                                    skip = true; return;
+                            }
+                        });
+                    }
+                    //------
+                })
+            }
+        }
+
+        /*
         if (list_question[id_q].Bind_Blocks != null) {
             if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
                 $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
@@ -960,7 +1006,7 @@
                     }
                 });
             }
-        }
+        }*/
         return skip;
     }
     function Check_blocks_Row(item) {
