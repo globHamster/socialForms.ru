@@ -974,39 +974,43 @@
                     }
                     //------
                 })
+            } else if (list_blocks[id_q].length == 1) {
+                // --------
+                if (list_question[id_q].Bind_Blocks != null) {
+                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
+                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                            if (Number(item_tmp) <= 1) {
+                                skip = false; return;
+                            }
+                            if (item.AnswerType != 2) {
+                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
+                                    skip = true; return;
+                            }
+                        });
+                    }
+                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
+                        skip = true;
+                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                            if (Number(item_tmp) <= 1) {
+                                skip = false; return;
+                            }
+                            if (item.AnswerType != 2) {
+                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index) {
+                                    skip = false; return;
+                                }
+                            }
+                            else {
+                                skip = false;
+                            }
+                        });
+                    }
+                }
+                // --------
             }
         }
 
         /*
-        if (list_question[id_q].Bind_Blocks != null) {
-            if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
-                $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
-                    if (Number(item_tmp) <= 1) {
-                        skip = false; return;
-                    }
-                    if (item.AnswerType != 2) {
-                        if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
-                            skip = true; return;
-                    }
-                });
-            }
-            if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
-                skip = true;
-                $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
-                    if (Number(item_tmp) <= 1) {
-                        skip = false; return;
-                    }
-                    if (item.AnswerType != 2) {
-                        if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index) {
-                            skip = false; return;
-                        }
-                    }
-                    else {
-                        skip = false;
-                    }
-                });
-            }
-        }*/
+        */
         return skip;
     }
     function Check_blocks_Row(item) {
