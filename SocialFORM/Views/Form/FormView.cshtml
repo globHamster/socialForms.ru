@@ -87,7 +87,7 @@
             </tr>
         </table>
     </div>
-    <button class="all_again" style="margin-top: 20px;">Начать заново</button>
+    <button class="all_again" style="margin-top: 20px; display: none;">Начать заново</button>
     <br />
 
 </div>
@@ -961,10 +961,10 @@
         ConnectClick();
     });
 
-    $('button.all_again').click(function () {
+    $('button.all_again').one("click", function () {
+        $(this).remove();
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), '', function () { $('div.waiting_screen').remove(); });
     })
-
 
     //Дополнительные функции
     function Check_blocks(item) {

@@ -43,7 +43,7 @@
 <script type="text/javascript">
     $(function () {
 
-        $('button.begin_form').click(function () {
+        $('button.begin_form').one("click", function () {
                 $('body').append('<div class="loading"></div>');
                 $('.loading').show();
                 $('.loading').append('<div class="loader"></div>')
