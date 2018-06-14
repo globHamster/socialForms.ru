@@ -277,6 +277,10 @@
         console.info("query_q ---- ", query_q);
         var str_number = $("#phone_number").val().replace(/[^0-9]/ig, '');
         str_number = "8" + str_number.substr(1, str_number.length);
+        if (begin_time == undefined) {
+            var now_time = new Date();
+            begin_time = now_time.
+        }
         query = {
             name: $('p.name_operator').text(),
             project_id: id_project,

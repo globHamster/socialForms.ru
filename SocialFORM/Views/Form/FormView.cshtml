@@ -276,6 +276,7 @@
     var interval = setInterval(function () {
         if (count_ajax > 8) {
             clearInterval(interval);
+            $('button.all_again').fadeIn("slow");
             getStart();
         }
     }, 50);
@@ -1121,15 +1122,16 @@
                         var is_find = false;
                         var item_find;
 
-                        $.each(list_base_answer, function (index, item) {
-                            
+                        $.each(list_base_answer, function (index_, item) {
+
                             if (Number(item.BaseIndex) == Number(list_result[j])) {
+                                item_find = item;
                                 console.log("go here");
-                                is_find = true; item_find = item; return;
+                                is_find = true; return;
                             }
                         })
 
-                        if (is_find) return i;
+                        if (list_transition[i].TriggerAnswer == item_find.Id) return i;
                     } else if (list_transition[i].TriggerAnswer == list_result[j]) return i;
                 }
             }
