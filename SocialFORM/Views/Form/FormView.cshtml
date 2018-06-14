@@ -132,7 +132,7 @@
                 $.each(server_data, function (i, item) {
                     list_base_answer[item.Id] = item;
                 })
-                //console.log('Загргузка базовых вопросов успешна ', list_base_answer);
+                console.log('Загргузка базовых вопросов успешна ', list_base_answer);
                 count_ajax++;
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListAnswerBase ", err) });
@@ -140,7 +140,7 @@
         q2 = $.get("/Question/getListTransition", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (data) {
                 list_transition = data;
-                //console.info('Загрузка таблицы переходов успешна ---', list_transition);
+                console.info('Загрузка таблицы переходов успешна ---', list_transition);
                 count_ajax++;
             })
             .error(function (err) { console.error('Ошибка загрузки таблицы переходов .../Question/getListTransition ', err); });
@@ -335,6 +335,7 @@
                                     $('.answer_table').append('<tr class="tool_layer base_answer"><td><input type="radio" name="group" id="' + list_base_answer[item.AnswerKey].BaseIndex + '"> ' + list_base_answer[item.AnswerKey].AnswerText + '</td></tr>')
                             }
                         })
+
                     }
                     FindAnswer();
                     break;
@@ -449,6 +450,7 @@
                     break;
 
             }
+            ConnectClick();
         }
     }
 
@@ -668,19 +670,36 @@
     function checkTransitionGo() {
         var code_transition = find_transition_move(id_q, result[index]);
         console.log("Code transition ==== ", code_transition);
+        console.log("result list ====== ", result[index]);
         if (code_transition >= 0) {
-            if (result[index] == list_transition[code_transition].TriggerAnswer) {
-                var jump_index;
-                list_transition[code_transition].ActiveTransition = true;
-                jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
-                for (var i = index + 1; i < jump_index; i++) {
-                    result[i] = [-404];
-                    text_other[i] = ['null'];
-                }
-                index = jump_index;
-            } else {
+            if (Number(result[index]) > 0) {
+                if (result[index] == list_transition[code_transition].TriggerAnswer) {
+                    var jump_index;
+                    list_transition[code_transition].ActiveTransition = true;
+                    jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                    for (var i = index + 1; i < jump_index; i++) {
+                        result[i] = [-404];
+                        text_other[i] = ['null'];
+                    }
+                    index = jump_index;
+                } else {
 
-                index++;
+                    index++;
+                }
+            } else {
+                if (result[index] == list_base_answer[list_transition[code_transition].TriggerAnswer].BaseIndex) {
+                    var jump_index;
+                    list_transition[code_transition].ActiveTransition = true;
+                    jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                    for (var i = index + 1; i < jump_index; i++) {
+                        result[i] = [-404];
+                        text_other[i] = ['null'];
+                    }
+                    index = jump_index;
+                } else {
+
+                    index++;
+                }
             }
         } else {
 
@@ -880,6 +899,7 @@
                 });
                 code += '</table></div>';
                 $('.answer_table').append(code);
+                ConnectClick();
             }
         })
 
@@ -916,34 +936,29 @@
             .css('cursor', 'default');
     });
 
-    $('.answer_table').off('click', '.tool_layer');
-    $('.answer_table').on('click', '.tool_layer', function () {
-        checkedAnswer($(this));
-        if (type_q == 2) {
-            var is_check_base_answer = true;
-            $('.answer_panel').find('tr.base_answer').each(function () {
-                if ($(this).find('input').is(":checked")) {
-                    is_check_base_answer = false;
-                }
-            });
-            if (is_check_base_answer) CheckLimitAnswer();
-        }
-        if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
-            checkedAnswerBase($(this));
-        }
+    //$('.answer_table').off('click', '.tool_layer');
+    //$('.answer_table').on('click', '.tool_layer', function () {
+    //    checkedAnswer($(this));
+    //    if (type_q == 2) {
+    //        var is_check_base_answer = true;
+    //        $('.answer_panel').find('tr.base_answer').each(function () {
+    //            if ($(this).find('input').is(":checked")) {
+    //                is_check_base_answer = false;
+    //            }
+    //        });
+    //        if (is_check_base_answer) CheckLimitAnswer();
+    //    }
+    //    if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
+    //        checkedAnswerBase($(this));
+    //    }
 
-    });
+    //});
 
     $('.answer_table').on('mouseenter', 'textarea.text_free_area', function () {
         $('.answer_table').off('click', '.tool_layer');
     });
     $('.answer_table').on('mouseleave', 'textarea.text_free_area', function () {
-        $('.answer_table').on('click', '.tool_layer', function () {
-            checkedAnswer($(this));
-            if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
-                checkedAnswerBase($(this));
-            }
-        });
+        ConnectClick();
     });
 
     $('button.all_again').click(function () {
@@ -958,10 +973,10 @@
         if (list_blocks[id_q] != null) {
             if (list_blocks[id_q].length >= 1) {
 
-                console.log("List block length ===== ", list_blocks[id_q].length);
+                //console.log("List block length ===== ", list_blocks[id_q].length);
                 $.each(list_blocks[id_q], function (i, item_block) {
                     //--------
-                    console.log("List block length ===== ", item_block);
+                    //console.log("List block length ===== ", item_block);
                     if (item_block.fromQuestion == id_q && item_block.typeBlock == 1) {
                         $.each(result[massiv_question_id.indexOf(Number(item_block.toQuestion))], function (i, item_tmp) {
                             if (Number(item_tmp) <= 1) {
@@ -1099,8 +1114,23 @@
     function find_transition_move(id_question, list_result) {
         for (var i = 0; i < list_transition.length; i++) {
             if (list_transition[i].fromQuestion == id_question) {
+                console.log("ID question ==== ", id_question);
                 for (var j = 0; j < list_result.length; j++) {
-                    if (list_transition[i].TriggerAnswer == list_result[j]) return i;
+                    if (Number(list_result[j]) < 0) {
+                        console.log("Find minus id ===== ", Number(list_result[j]));
+                        var is_find = false;
+                        var item_find;
+
+                        $.each(list_base_answer, function (index, item) {
+                            
+                            if (Number(item.BaseIndex) == Number(list_result[j])) {
+                                console.log("go here");
+                                is_find = true; item_find = item; return;
+                            }
+                        })
+
+                        if (is_find) return i;
+                    } else if (list_transition[i].TriggerAnswer == list_result[j]) return i;
                 }
             }
         }
@@ -1137,5 +1167,27 @@
             }
         }
     }
+
+
+    function ConnectClick() {
+        $('.answer_table').find('.tool_layer').each(function () {
+            $(this).click(function () {
+                checkedAnswer($(this));
+                if (type_q == 2) {
+                    var is_check_base_answer = true;
+                    $('.answer_panel').find('tr.base_answer').each(function () {
+                        if ($(this).find('input').is(":checked")) {
+                            is_check_base_answer = false;
+                        }
+                    });
+                    if (is_check_base_answer) CheckLimitAnswer();
+                }
+                if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
+                    checkedAnswerBase($(this));
+                }
+            })
+        })
+    }
+
 // END
 </script>
