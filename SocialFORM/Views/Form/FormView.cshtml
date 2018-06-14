@@ -667,6 +667,7 @@
     //Проверка перехода при проходе вперед
     function checkTransitionGo() {
         var code_transition = find_transition_move(id_q, result[index]);
+        console.log("Code transition ==== ", code_transition);
         if (code_transition >= 0) {
             if (result[index] == list_transition[code_transition].TriggerAnswer) {
                 var jump_index;
@@ -955,7 +956,7 @@
         var skip = false;
 
         if (list_blocks[id_q] != null) {
-            if (list_blocks[id_q].length > 1) {
+            if (list_blocks[id_q].length >= 1) {
 
                 console.log("List block length ===== ", list_blocks[id_q].length);
                 $.each(list_blocks[id_q], function (i, item_block) {
@@ -974,7 +975,7 @@
                     }
                     //------
                 })
-            } else if (list_blocks[id_q].length == 1) {
+            } /*else if (list_blocks[id_q].length == 1) {
                 // --------
                 if (list_question[id_q].Bind_Blocks != null) {
                     if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
@@ -1006,7 +1007,7 @@
                     }
                 }
                 // --------
-            }
+            }*/
         }
 
         /*
