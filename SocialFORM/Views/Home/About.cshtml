@@ -10,12 +10,24 @@
 
         })
     </script>*@
+@Scripts.Render("~/scripts/jquery-1.10.2.js")
+
 <div class="form">
-    <div class="question q1">
+    <div class="hello">
+        <p>
+            Министерством по молодежной политике Иркутской области проводит опрос молодежи, целью которого является изучение экстремизма в Иркутской области. Просим Вас принять участие в данном исследовании.
+            Опрос займет у Вас не более 5 минут. Анонимность Ваших ответов гарантируется: все полученные данные будут использованы только в обобщенном виде.
+        </p>
+    </div>
+    <div class="question q1" id="1">
+        <p class="p1" hidden id="er">
+            Не выбран вариант ответа
+        </p>
         <p>
             1. Как Вы думаете, что такое экстремизм?
-            Вы можете выбрать один или несколько вариантов, но не более 3.
         </p>
+        <i>(Вы можете выбрать один или несколько вариантов, но не более 3.)</i>
+
         <ul>
             <li><input type="checkbox" name="q1" value="1">Насилие на основе неприязни к другой национальности</li>
             <li><input type="checkbox" name="q1" value="2">Нетерпимость во всех её проявлениях</li>
@@ -23,15 +35,33 @@
             <li><input type="checkbox" name="q1" value="4">Пропаганда насилия</li>
             <li><input type="checkbox" name="q1" value="5">Готовность применять насилие для достижения целей</li>
             <li><input type="checkbox" name="q1" value="6">Допустимость использования крайних мер</li>
-            <li><input type="checkbox" name="q1" value="7">Другое (напишите)</li>
+            <li><input type="checkbox" name="q1" value="7">Другое (напишите)<input type="text" class="q1" hidden /></li>
             <li><input type="checkbox" name="q1" value="8">Затрудняюсь ответить</li>
         </ul>
+        <script>
+            $('input[name="q1"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 7) {
+                    $('input[class$="q1"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 7)
+                        $('input[class$="q1"]').hide();
+                }
+            });
+        </script>
     </div>
-    <div class="question q2">
-        <p>
-            2. Экстремизмом принято называть приверженность в идеологии и политике к крайним позициям во взглядах и выбор таких же средств для достижения определенных целей. Среди таких мер можно отметить провокацию беспорядков, террористические акции, методы партизанской войны. В чем, по Вашему мнению, заключаются основные причины такого явления?
-            Вы можете выбрать один или несколько вариантов, но не более 3.
+    <div class="question q2" id="1">
+        <p class="p2" hidden id="er">
+            Не выбран вариант ответа
         </p>
+        <p>
+            ЭКСТРЕМИЗМОМ принято называть приверженность в идеологии и политике к крайним позициям во взглядах и выбор таких же средств для достижения определенных целей. Среди таких мер можно отметить провокацию беспорядков, террористические акции, методы партизанской войны.
+        </p><p>
+            2. В чем, по Вашему мнению, заключаются основные причины такого явления?
+        </p>
+        <i>
+            (Вы можете выбрать один или несколько вариантов, но не более 3.)
+        </i>
         <ul>
             <li><input type="checkbox" name="q2" value="1">В многонациональности населения, проживающего на территории России</li>
             <li><input type="checkbox" name="q2" value="2">В низкой правовой культуре населения и недостаточной терпимости людей</li>
@@ -40,121 +70,655 @@
             <li><input type="checkbox" name="q2" value="5">В недостаточном количестве центров досуга и специальных досуговых программ для детей подросткового возраста и взрослого населения</li>
             <li><input type="checkbox" name="q2" value="6">В кризисе школьного и семейного воспитания</li>
             <li><input type="checkbox" name="q2" value="7">В деформации системы ценностей в современном обществе</li>
-            <li><input type="checkbox" name="q2" value="8">Другое (напишите)</li>
+            <li><input type="checkbox" name="q2" value="8">Другое (напишите)<input type="text" class="q2" hidden /></li>
             <li><input type="checkbox" name="q2" value="9">Затрудняюсь ответить</li>
         </ul>
+        <script>
+            $('input[name="q2"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 8) {
+                    $('input[class$="q2"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 8)
+                        $('input[class$="q2"]').hide();
+                }
+            });
+        </script>
     </div>
-    <div class="question q3">
-        <p>
-            3. Насколько актуальной, по Вашему мнению, является проблема экстремизма для России в целом, для Иркутской области и Вашего населенного пункта, в частности?
+    <div class="question q3" id="2">
+        <p class="p3" hidden id="er">
+            Не выбран вариант ответа
         </p>
+        <p>
+            3. С какими именно проявлениями экстремизма Вам приходилось сталкиваться?
+        </p>
+        <textarea name="text3" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+
+    <div class="question q4" id="3">
+        <p class="p4" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            4. Насколько актуальной, по Вашему мнению, является проблема экстремизма для России в целом, для Иркутской области и Вашего населенного пункта, в частности?
+        </p>
+        <i>(ответ дайте, пожалуйста, по каждой строке)</i>
         <div style="padding-left:15%; width:100%;">
             <table border="1" style="text-align:center">
-                <tr><th></th><th>Актуальна</th><th>Скорее актуальна</th><th>Скорее не актуальна</th><th>Не актуальна</th><th>Затрудняюсь ответить</th></tr>
+                <tr><th></th><th>Крайне актуальна</th><th>Скорее актуальна</th><th>Скорее не актуальна</th><th>Не актуальна совсем</th><th>Затрудняюсь ответить</th></tr>
                 <tr>
                     <td>Россия</td>
-                    <td><input class="table" type="radio" name="q31" value="1"></td>
-                    <td><input class="table" type="radio" name="q31" value="2"></td>
-                    <td><input class="table" type="radio" name="q31" value="3"></td>
-                    <td><input class="table" type="radio" name="q31" value="4"></td>
-                    <td><input class="table" type="radio" name="q31" value="5"></td>
+                    <td><input class="table" type="radio" name="q41" value="1"></td>
+                    <td><input class="table" type="radio" name="q41" value="2"></td>
+                    <td><input class="table" type="radio" name="q41" value="3"></td>
+                    <td><input class="table" type="radio" name="q41" value="4"></td>
+                    <td><input class="table" type="radio" name="q41" value="5"></td>
                 </tr>
                 <tr>
                     <td>Иркутская область</td>
-                    <td><input class="table" type="radio" name="q32" value="1"></td>
-                    <td><input class="table" type="radio" name="q32" value="2"></td>
-                    <td><input class="table" type="radio" name="q32" value="3"></td>
-                    <td><input class="table" type="radio" name="q32" value="4"></td>
-                    <td><input class="table" type="radio" name="q32" value="5"></td>
+                    <td><input class="table" type="radio" name="q42" value="1"></td>
+                    <td><input class="table" type="radio" name="q42" value="2"></td>
+                    <td><input class="table" type="radio" name="q42" value="3"></td>
+                    <td><input class="table" type="radio" name="q42" value="4"></td>
+                    <td><input class="table" type="radio" name="q42" value="5"></td>
                 </tr>
                 <tr>
                     <td>Ваш населенный пункт</td>
-                    <td><input class="table" type="radio" name="q33" value="1"></td>
-                    <td><input class="table" type="radio" name="q33" value="2"></td>
-                    <td><input class="table" type="radio" name="q33" value="3"></td>
-                    <td><input class="table" type="radio" name="q33" value="4"></td>
-                    <td><input class="table" type="radio" name="q33" value="5"></td>
+                    <td><input class="table" type="radio" name="q43" value="1"></td>
+                    <td><input class="table" type="radio" name="q43" value="2"></td>
+                    <td><input class="table" type="radio" name="q43" value="3"></td>
+                    <td><input class="table" type="radio" name="q43" value="4"></td>
+                    <td><input class="table" type="radio" name="q43" value="5"></td>
                 </tr>
             </table>
         </div>
     </div>
-    <div class="question q4">
+    <div class="question q5" id="1">
+        <p class="p5" hidden id="er">
+            Не выбран вариант ответа
+        </p>
         <p>
-            4. Приходилось ли Вам сталкиваться с проявлениями экстремизма?
+            5. Приходилось ли Вам сталкиваться с проявлениями экстремизма?
         </p>
         <ul>
-            <li><input type="radio" name="q2" value="1">Сталкиваюсь достаточно часто</li>
-            <li><input type="radio" name="q2" value="2">Сталкивался(ась) несколько раз</li>
-            <li><input type="radio" name="q2" value="3">Сталкивался(ась) однажды</li>
-            <li><input type="radio" name="q2" value="4">Не приходилось сталкиваться</li>
-            <li><input type="radio" name="q2" value="5">Затрудняюсь ответить</li>
+            <li><input type="radio" name="q5" value="1">Сталкиваюсь достаточно часто</li>
+            <li><input type="radio" name="q5" value="2">Сталкивался(ась) несколько раз</li>
+            <li><input type="radio" name="q5" value="3">Сталкивался(ась) однажды</li>
+            <li><input type="radio" name="q5" value="4">Не приходилось сталкиваться</li>
+            <li><input type="radio" name="q5" value="5">Затрудняюсь ответить</li>
         </ul>
     </div>
-    <div class="question q5">
-        <p>
-            5. С какими именно проявлениями экстремизма Вам приходилось сталкиваться?
+    <div class="question q6" id="2">
+        <p class="p6" hidden id="er">
+            Не выбран вариант ответа
         </p>
-        <textarea name="text1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+        <p>
+            6. С какими именно проявлениями экстремизма Вам приходилось сталкиваться?
+        </p>
+        <textarea name="text6" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
     </div>
-    <div class="question q6">
-        <p>
-            6. Приходилось ли Вам сталкиваться с экстремистскими материалами в каких-либо из нижеперечисленных источников?
-            Вы можете выбрать один или несколько вариантов, но не более 3.
-
+    <div class="question q7" id="1">
+        <p class="p7" hidden id="er">
+            Не выбран вариант ответа
         </p>
+        <p>
+            ЭКСТРЕМИСТСКИЕ МАТЕРИАЛЫ – документы, либо информация на иных носителях, призывающие к осуществлению экстремистской деятельности (призывы к беспорядкам, террористическим акциям и проч.), либо обосновывающие или оправдывающие необходимость осуществления такой деятельности.
+        </p>
+        <p>
+            7. Приходилось ли Вам сталкиваться с экстремистскими материалами в каких-либо из нижеперечисленных источников?
+        </p>
+        <i>
+            (Вы можете выбрать один или несколько вариантов, но не более 3.)
+        </i>
         <ul>
-            <li><input type="checkbox" name="q6" value="1">В интернете</li>
-            <li><input type="checkbox" name="q6" value="2">В телевизионных передачах</li>
-            <li><input type="checkbox" name="q6" value="3">В фильмах</li>
-            <li><input type="checkbox" name="q6" value="4">В листовках</li>
-            <li><input type="checkbox" name="q6" value="5">В книгах</li>
-            <li><input type="checkbox" name="q6" value="6">Другие источники (напишите) </li>
-            <li><input type="checkbox" name="q6" value="7">Не сталкивался</li>
+            <li><input type="checkbox" name="q7" value="1">В интернете</li>
+            <li><input type="checkbox" name="q7" value="2">В телевизионных передачах</li>
+            <li><input type="checkbox" name="q7" value="3">В фильмах</li>
+            <li><input type="checkbox" name="q7" value="4">В листовках</li>
+            <li><input type="checkbox" name="q7" value="5">В книгах</li>
+            <li><input type="checkbox" name="q7" value="6">Другие источники (напишите) <input type="text" class="q7" hidden /></li>
+            <li><input type="checkbox" name="q7" value="7">Не сталкивался</li>
         </ul>
+        <script>
+            $('input[name="q7"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 6) {
+                    $('input[class$="q7"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 6)
+                        $('input[class$="q7"]').hide();
+                }
+            });
+        </script>
     </div>
-    <div class="question q7">
+    <div class="question q8" id="1">
+        <p class="p8" hidden id="er">
+            Не выбран вариант ответа
+        </p>
         <p>
-            7. Сталкивались ли Вы с дискриминацией по национальному, религиозному или иному признаку в отношении Вашей личности?
+            8. Сталкивались ли Вы с дискриминацией по национальному, религиозному или иному признаку в отношении Вашей личности?
         </p>
         <ul>
-            <li><input type="radio" name="q7" value="1">Сталкиваюсь достаточно часто</li>
-            <li><input type="radio" name="q7" value="2">Сталкивался(ась) несколько раз</li>
-            <li><input type="radio" name="q7" value="3">Сталкивался(ась) однажды</li>
-            <li><input type="radio" name="q7" value="4">Не приходилось сталкиваться</li>
-            <li><input type="radio" name="q7" value="5">Затрудняюсь ответить</li>
-        </ul>
-    </div>
-    <div class="question q8">
-        <p>
-            8. Вы испытываете раздражение или неприязнь к представителям другой национальности и (или) вероисповедания?
-        </p>
-        <ul>
-            <li><input type="radio" name="q8" value="1">Испытываю </li>
-            <li><input type="radio" name="q8" value="2">Скорее испытываю </li>
-            <li><input type="radio" name="q8" value="3">Скорее не испытываю </li>
-            <li><input type="radio" name="q8" value="4">Не испытываю </li>
+            <li><input type="radio" name="q8" value="1">Сталкиваюсь достаточно часто</li>
+            <li><input type="radio" name="q8" value="2">Сталкивался(ась) несколько раз</li>
+            <li><input type="radio" name="q8" value="3">Сталкивался(ась) однажды</li>
+            <li><input type="radio" name="q8" value="4">Не приходилось сталкиваться</li>
             <li><input type="radio" name="q8" value="5">Затрудняюсь ответить</li>
         </ul>
     </div>
+    <div class="question q9" id="1">
+        <p class="p9" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            9. Если сталкивались, то что стало основанием для дискриминации?
+        </p>
+        <ul>
+            <li><input type="radio" name="q9" value="1">Пол</li>
+            <li><input type="radio" name="q9" value="2">Возраст</li>
+            <li><input type="radio" name="q9" value="3">Национальность</li>
+            <li><input type="radio" name="q9" value="4">Религия</li>
+            <li><input type="radio" name="q9" value="5">Сексуальная ориентация</li>
+            <li><input type="radio" name="q9" value="5">Другое (напишите) <input type="text" class="q9" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q9"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 5) {
+                    $('input[class$="q9"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 5)
+                        $('input[class$="q9"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q10" id="1">
+        <p class="p10" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            10. Вы испытываете раздражение или неприязнь к представителям другой национальности и (или) вероисповедания?
+        </p>
+        <ul>
+            <li><input type="radio" name="q10" value="1">Испытываю </li>
+            <li><input type="radio" name="q10" value="2">Скорее испытываю </li>
+            <li><input type="radio" name="q10" value="3">Скорее не испытываю </li>
+            <li><input type="radio" name="q10" value="4">Не испытываю </li>
+            <li><input type="radio" name="q10" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q11" id="1">
+        <p class="p11" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            11.	Вы испытываете раздражение или нетерпимость к сексуальных меньшинств?
+        </p>
+        <ul>
+            <li><input type="radio" name="q11" value="1">Испытываю </li>
+            <li><input type="radio" name="q11" value="2">Скорее испытываю </li>
+            <li><input type="radio" name="q11" value="3">Скорее не испытываю </li>
+            <li><input type="radio" name="q11" value="4">Не испытываю </li>
+            <li><input type="radio" name="q11" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q12" id="1">
+        <p class="p12" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            12.	В настоящее время в мире сложилась такая ситуация, что количество конфликтов на национальной  и религиозной почве с каждым годом увеличивается. Вспомните на минуту своих друзей. О ком из них Вам доподлинно известно, что им приходилось участвовать в конфликтах на национальной почве (быть зачинщиками или жертвами данных конфликтов)?
+        </p>
+        <ul>
+            <li><input type="radio" name="q12" value="1">Об одном</li>
+            <li><input type="radio" name="q12" value="2">О двоих</li>
+            <li><input type="radio" name="q12" value="3">О троих</li>
+            <li><input type="radio" name="q12" value="4">Ни о ком</li>
+        </ul>
+    </div>
+    <div class="question q13" id="1">
+        <p class="p13" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            13.	А приходилось ли Вам лично участвовать в такого рода конфликтах?
+        </p>
+        <ul>
+            <li><input type="radio" name="q13" value="1">Да, приходилось</li>
+            <li><input type="radio" name="q13" value="2">Нет, не приходилось</li>
+        </ul>
+    </div>
+    <div class="question q14" id="1">
+        <p class="p14" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            14.	Смогли бы Вы лично принять участие в акции протеста, митинге против действующей власти?
+        </p>
+        <ul>
+            <li><input type="radio" name="q14" value="1">Определенно да</li>
+            <li><input type="radio" name="q14" value="2">Возможно, при исключительных обстоятельствах</li>
+            <li><input type="radio" name="q14" value="3">Скорее всего, нет</li>
+            <li><input type="radio" name="q14" value="4">Нет, ни при каких обстоятельствах</li>
+            <li><input type="radio" name="q14" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q15" id="1">
+        <p class="p15" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            15.	В чем, по Вашему мнению, заключаются основные причины, побуждающие молодежь к экстремистскому поведению?
+        </p>
+        <i>
+            (Вы можете выбрать один или несколько вариантов, но не более 3.)
+        </i>
+        <ul>
+            <li><input type="checkbox" name="q15" value="1">Подверженность чужому влиянию, мнению</li>
+            <li><input type="checkbox" name="q15" value="2">Стремление защитить себя </li>
+            <li><input type="checkbox" name="q15" value="3">Отсутствие возможности иначе проводить досуг</li>
+            <li><input type="checkbox" name="q15" value="4">Потребность в полной свободе</li>
+            <li><input type="checkbox" name="q15" value="5">Низкий уровень образования и культуры</li>
+            <li><input type="checkbox" name="q15" value="6">Отсутствие идеалов, государственной идеологии</li>
+            <li><input type="checkbox" name="q15" value="7">Стремление изменить мир</li>
+            <li><input type="checkbox" name="q15" value="8">Влияние средств массовой информации (СМИ)</li>
+            <li><input type="checkbox" name="q15" value="9">Личные убеждения</li>
+            <li><input type="checkbox" name="q15" value="10">Другое (напишите) <input type="text" class="q15" hidden /></li>
+            <li><input type="checkbox" name="q15" value="11">Затрудняюсь ответить</li>
+        </ul>
+        <script>
+            $('input[name="q15"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 10) {
+                    $('input[class$="q15"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 10)
+                        $('input[class$="q15"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q16" id="2">
+        <p class="p16" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            ЭКСТРЕМИСТСКАЯ ОРГАНИЗАЦИЯ – общественное или религиозное объединение либо иная организация, в отношении которых по основаниям, предусмотренным законом, судом принято вступившее в законную силу решение о ликвидации или запрете деятельности в связи с осуществлением экстремистской деятельности.
+        </p>
+        <p>
+            16.	Какие экстремистские организации Вы знаете?
+        </p>
+        <textarea name="text16_1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+        <p>
+            В том числе, осуществляющих свою деятельность в Вашем городе (районе)
+        </p>
+        <textarea name="text16_2" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q17" id="1">
+        <p class="p17" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            17.	Как Вы относитесь к действиям представителей экстремистских организаций?
+        </p>
+        <ul>
+            <li><input type="radio" name="q17" value="1">Одобряю подобные действия</li>
+            <li><input type="radio" name="q17" value="2">Скорее одобряю</li>
+            <li><input type="radio" name="q17" value="3">Скорее осуждаю</li>
+            <li><input type="radio" name="q17" value="4">Осуждаю подобные действия</li>
+            <li><input type="radio" name="q17" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q18" id="1">
+        <p class="p18" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            18.	Знаете ли Вы, куда следует обратиться в случае обнаружения фактов проявления экстремизма?
+        </p>
+        <ul>
+            <li><input type="radio" name="q18" value="1">Да</li>
+            <li><input type="radio" name="q18" value="2">Нет</li>
+            <li><input type="radio" name="q18" value="3">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q19" id="1">
+        <p class="p19" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            19.	Готовы ли Вы оказывать помощь сотрудникам правоохранительных органов по противодействию экстремизму?
+        </p>
+        <ul>
+            <li><input type="radio" name="q19" value="1">Готов(а)</li>
+            <li><input type="radio" name="q19" value="2">Скорее готов(а)</li>
+            <li><input type="radio" name="q19" value="3">Скорее не готов(а)</li>
+            <li><input type="radio" name="q19" value="4">Не готов(а)</li>
+            <li><input type="radio" name="q19" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q20" id="1">
+        <p class="p20" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            20.	Кто, по Вашему мнению, в наибольшей степени может повлиять на профилактику экстремизма?
+        </p>
+        <ul>
+            <li><input type="radio" name="q20" value="1">Каждый человек</li>
+            <li><input type="radio" name="q20" value="2">Семья</li>
+            <li><input type="radio" name="q20" value="3">Учебные заведения</li>
+            <li><input type="radio" name="q20" value="4">Средства массовой информации (СМИ)</li>
+            <li><input type="radio" name="q20" value="5">Правоохранительные органы</li>
+            <li><input type="radio" name="q20" value="6">Местные власти</li>
+            <li><input type="radio" name="q20" value="7">Региональные власти</li>
+            <li><input type="radio" name="q20" value="8">Федеральные власти</li>
+        </ul>
+    </div>
+    <div class="question q21" id="1">
+        <p class="p21" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            21.	По Вашему мнению, какой способ профилактики молодежного экстремизма самый эффективный?
+        </p>
+        <ul>
+            <li><input type="radio" name="q21" value="1">Развитие спортивных, культурных и иных учреждений для молодежи</li>
+            <li><input type="radio" name="q21" value="2">Привлечение молодого поколения к деятельности молодежных общественных организаций</li>
+            <li><input type="radio" name="q21" value="3">Правовое и духовно-нравственное воспитание</li>
+            <li><input type="radio" name="q21" value="4">Пропаганда здорового образа жизни, физической культуры и спорта</li>
+            <li><input type="radio" name="q21" value="5">Работа правоохранительных органов</li>
+            <li><input type="radio" name="q21" value="6">Активная работа государства по трудоустройству молодежи</li>
+            <li><input type="radio" name="q21" value="7">Контроль спецслужб за сетью «Интернет»</li>
+            <li><input type="radio" name="q21" value="8">Ужесточение законодательства</li>
+            <li><input type="radio" name="q21" value="9">Проведение органами власти постоянного мониторинга ситуации в области межнациональных отношений</li>
+            <li><input type="radio" name="q21" value="10">Другое (напишите) <input type="text" class="q21" hidden /></li>
+            <li><input type="radio" name="q21" value="11">Нет эффективных форм борьбы с экстремизмом</li>
+            <li><input type="radio" name="q21" value="12">Затрудняюсь ответить</li>
+        </ul>
+        <script>
+            $('input[name="q21"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 10) {
+                    $('input[class$="q21"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 10)
+                        $('input[class$="q21"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q22" id="3">
+        <p class="p22" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            22.	Насколько велика опасность распространения экстремизма в России в целом, в Иркутской области и в Вашем населенном пункте?
+        </p>
+        <i>(ответ дайте, пожалуйста, по каждой строке)</i>
+        <div style="padding-left:15%; width:100%;">
+            <table border="1" style="text-align:center">
+                <tr><th></th><th>Довольно велика</th><th>Скорее велика</th><th>Скорее невелика</th><th>Невелика</th><th>Затрудняюсь ответить</th></tr>
+                <tr>
+                    <td>Россия</td>
+                    <td><input class="table" type="radio" name="q221" value="1"></td>
+                    <td><input class="table" type="radio" name="q221" value="2"></td>
+                    <td><input class="table" type="radio" name="q221" value="3"></td>
+                    <td><input class="table" type="radio" name="q221" value="4"></td>
+                    <td><input class="table" type="radio" name="q221" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Иркутская область</td>
+                    <td><input class="table" type="radio" name="q222" value="1"></td>
+                    <td><input class="table" type="radio" name="q222" value="2"></td>
+                    <td><input class="table" type="radio" name="q222" value="3"></td>
+                    <td><input class="table" type="radio" name="q222" value="4"></td>
+                    <td><input class="table" type="radio" name="q222" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Ваш населенный пункт</td>
+                    <td><input class="table" type="radio" name="q223" value="1"></td>
+                    <td><input class="table" type="radio" name="q223" value="2"></td>
+                    <td><input class="table" type="radio" name="q223" value="3"></td>
+                    <td><input class="table" type="radio" name="q223" value="4"></td>
+                    <td><input class="table" type="radio" name="q223" value="5"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="question q23" id="2">
+        <p class="p23" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            23.	Ваши предложения по улучшению деятельности органов государственной власти в сфере противодействия и профилактики экстремизма?
+        </p>
+        <textarea name="text22_1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q24" id="1">
+        <p class="p24" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            24.	По Вашему мнению, какой способ профилактики молодежного экстремизма самый эффективный?
+        </p>
+        <ul>
+            <li><input type="radio" name="q24" value="1">Мужской </li>
+            <li><input type="radio" name="q24" value="2">Женский</li>
+        </ul>
+    </div>
+    <div class="question q25" id="1">
+        <p class="p25" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            25.	По Вашему мнению, какой способ профилактики молодежного экстремизма самый эффективный?
+        </p>
+        <ul>
+            <li><input type="radio" name="q25" value="1">14-17 лет</li>
+            <li><input type="radio" name="q25" value="2">18-24 лет</li>
+            <li><input type="radio" name="q25" value="3">25-30 лет</li>
+        </ul>
+    </div>
+    <div class="question q26" id="1">
+        <p class="p26" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            26.	Ваш город (район) постоянного проживания?
+        </p>
+        <ul>
+            <li><input type="radio" name="q26" value="1">Город Иркутск</li>
+            <li><input type="radio" name="q26" value="2">Муниципальное образование «Ангарский городской округ»</li>
+            <li><input type="radio" name="q26" value="3">Зиминское городское муниципальное образование</li>
+            <li><input type="radio" name="q26" value="4">Муниципальное образование «Заларинский район»</li>
+            <li><input type="radio" name="q26" value="5">Муниципальное образование «Куйтунский район»</li>
+            <li><input type="radio" name="q26" value="6">Муниципальное образование «Нижнеудинский район»</li>
+            <li><input type="radio" name="q26" value="7">Муниципальное образование «Тайшетский район»</li>
+            <li><input type="radio" name="q26" value="8">Усть-Кутское муниципальное образование</li>
+            <li><input type="radio" name="q26" value="9">Муниципальное образование «Усть-Удинский район»</li>
+            <li><input type="radio" name="q26" value="10">Черемховское районное муниципальное образование</li>
+            <li><input type="radio" name="q26" value="11">Муниципальное образование «Усолье-Сибирское»</li>
+            <li><input type="radio" name="q26" value="12">Муниципальное образование «Эхирит-Булагатский район»</li>
+        </ul>
+    </div>
+    <div class="question q27" id="2">
+        <p class="p27" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            27.	Оставьте, пожалуйста, любую контактную информацию (номер телефона, адрес электронной почты, ссылку на профиль в соцсетях и др.). Это нужно для проверки факта проведения опроса и Ваши данные никому не будут сообщены
+        </p>
+        <textarea name="text27_1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <p>СПАСИБО ЗА УЧАСТИЕ В ИССЛЕДОВАНИИ !</p>
+    <button id="SaveData">СОХРАНИТЬ</button>
 </div>
 <style>
     li {
-        
         list-style-type: none; /* Убираем маркеры */
     }
+
     p {
         font-weight: 600;
     }
+
     .question {
-        width:100%;
-        margin:15px;
-        padding:10px;
-        border:1px solid #ccc;
+        width: 100%;
+        margin: 15px;
+        padding: 10px;
+        border: 1px solid #ccc;
     }
+
     input {
         margin-right: 20px !important;
     }
+
     .table {
         margin-right: 0px !important;
     }
+
+    #er {
+        color: red;
+    }
 </style>
+<script type="text/javascript">
+    $(function () {
+        $('input[type="checkbox"]').bind('click', function () {
+            $('.form').find('p#er').each(function () {
+                $(this).hide();
+            });
+            var parent_div = $('div[class$="' + $(this).attr('name') + '"]');
+            if (LimitAnswer(parent_div) == 3) {
+                parent_div.children('ul').find('input[name="' + $(this).attr('name') + '"]').each(function () {
+                    if (!$(this).is(':checked')) $(this).prop('disabled', true);
+                });
+            }
+            else {
+                if (LimitAnswer(parent_div) < 3) {
+                    parent_div.children('ul').find('input[name="' + $(this).attr('name') + '"]').each(function () {
+                        if (!$(this).is(':checked')) $(this).prop('disabled', false);
+                    });
+                }
+            }
+        });
+    });
+
+    $('textarea').click(function () {
+        $('.form').find('p#er').each(function () {
+            $(this).hide();
+        });
+    });
+
+    $('input[type="radio"]').click(function () {
+        $('.form').find('p#er').each(function () {
+            $(this).hide();
+        });
+
+    });
+
+
+    $('input[name="q8"]').change(function () {
+        if ($(this).is(':checked') && ($(this).val() == 4 || $(this).val() == 5)) {
+            $('div[class$="q9"]').hide();
+        }
+        else {
+            $('div[class$="q9"]').show();
+        }
+    });
+
+
+    function LimitAnswer(block) {
+        var count_checked_answer = 0;
+        block.children('ul').find('input').each(function () {
+            if ($(this).is(':checked')) count_checked_answer++;
+        });
+        return count_checked_answer;
+    };
+
+    $('button[id="SaveData"]').click(function () {
+        alert('SAVE');
+        var conteiner = [];
+        for (var i = 1; i <= 27; i++) {
+            if (!$('div[class$="q' + i + '"]').is(":visible")) {
+                conteiner.push('');
+                i++;
+            }
+            switch ($('div[class$="q' + i + '"]').attr('id')) {
+                case '1':
+                    if ($('div[class$="q' + i + '"]').find('input:checked').length > 0) {
+                        switch ($('div[class$="q' + i + '"]').find('input:first').attr('type')) {
+                            case 'checkbox':
+                                var count = 0;
+                                $('div[class$="q' + i + '"]').find('input').each(function () {
+                                    if ($(this).is(':checked')) {
+                                        conteiner.push($(this).attr('value'));
+                                        count++;
+                                    }
+                                });
+                                while (count < 3) {
+                                    conteiner.push('');
+                                    count++;
+                                }
+                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
+                                    conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
+                                } else {
+                                    conteiner.push('');
+                                };
+
+
+                                break;
+                            case 'radio':
+                                $('div[class$="q' + i + '"]').find('input').each(function () {
+                                    if ($(this).is(':checked')) conteiner.push($(this).attr('value'));
+                                });
+                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').length > 0)
+                                    if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
+                                        conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
+                                    } else {
+                                        conteiner.push('');
+                                    };
+                                break;
+                        }
+                    }
+                    else {
+                        $('.p' + i).show();
+                        $('html,body').animate({ scrollTop: $('div[class$="q' + i + '"]').offset().top }, 500);
+                        return;
+                    }
+                    break;
+                case '2':
+                    if ($('div[class$="q' + i + '"]').find('textarea').val() != "") {
+                        $('div[class$="q' + i + '"]').find('textarea').each(function () {
+                            conteiner.push($(this).val());
+                        });
+                    }
+                    else {
+                        $('.p' + i).show();
+                        $('html,body').animate({ scrollTop: $('div[class$="q' + i + '"]').offset().top }, 500);
+                        return;
+                    }
+                    break;
+                case '3':
+                    if ($('div[class$="q' + i + '"]').find('input:checked').length == 3) {
+                        $('div[class$="q' + i + '"]').find('input').each(function () {
+                            if ($(this).is(':checked')) conteiner.push($(this).attr('value'));
+                        });
+                    }
+                    else {
+                        $('.p' + i).show();
+                        $('html,body').animate({ scrollTop: $('div[class$="q' + i + '"]').offset().top }, 500);
+                        return;
+                    }
+                    break;
+            }
+        }
+        //
+        //ЗАПРОС НА СОХРАНЕНИЕ
+        $.post('/Home/postSaveOp', { mass: conteiner }).success(function () {
+            //window.location.reload();
+        });
+        console.log('save =>>>>>>', conteiner);
+    });
+</script>

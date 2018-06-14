@@ -1387,5 +1387,60 @@ namespace SocialFORM.Controllers
         {
             return PartialView();
         }
+
+        [HttpPost]
+        public void postSaveOp(List<string> mass )
+        {
+            ApplicationContext context = new ApplicationContext();
+            Opros list = new Opros();
+            list.q1 = mass[0];
+            list.q2 = mass[1];
+            list.q3 = mass[2];
+            list.q4 = mass[3];
+            list.q5 = mass[4];
+            list.q6 = mass[5];
+            list.q7 = mass[6];
+            list.q8 = mass[7];
+            list.q9 = mass[8];
+            list.q10 = mass[9];
+            list.q11 = mass[10];
+            list.q12 = mass[11];
+            list.q13 = mass[12];
+            list.q14 = mass[13];
+            list.q15 = mass[14];
+            list.q16 = mass[15];
+            list.q17 = mass[16];
+            list.q18 = mass[17];
+            list.q19 = mass[18];
+            list.q20 = mass[19];
+            list.q21 = mass[20];
+            list.q22 = mass[21];
+            list.q23 = mass[22];
+            list.q24 = mass[23];
+            list.q25 = mass[24];
+            list.q26 = mass[25];
+            list.q27 = mass[26];
+            list.q28 = mass[27];
+            list.q29 = mass[28];
+            list.q30 = mass[29];
+            list.q31 = mass[30];
+            list.q32 = mass[31];
+            list.q33 = mass[32];
+            list.q34 = mass[33];
+            list.q35 = mass[34];
+            list.q36 = mass[35];
+            list.q37 = mass[36];
+            list.q38 = mass[37];
+            list.q39 = mass[38];
+            list.q40 = mass[39];
+            list.q41 = mass[40];
+            list.q42 = mass[41];
+            list.q43 = mass[42];
+            list.q44 = mass[43];
+            list.q45 = mass[44];
+            list.q46 = mass[45];
+            context.SetOpros.Add(list);
+            context.SaveChanges();
+        }
     }
 }

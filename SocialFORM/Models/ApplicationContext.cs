@@ -22,5 +22,6 @@ namespace SocialFORM.Models
         public DbSet<BlankModel> SetBlankModels { get; set; }
         public DbSet<SchoolDay> SetSchoolDay { get; set; }
         public DbSet<SessionHubModel> SetSessionHubModel { get; set; }
+        public DbSet<Opros> SetOpros { get; set; }
     }
 }
