@@ -23,15 +23,12 @@
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
-    $(document).on({
-        ajaxStart: function () { }
-    });
+
     $(document).ready(function () {
    
 
         $(".table").on("click", "td", function () {
             
-
             $("#Tables").load("/Home/BeginForm?id_p=" + $(this).attr('id'), '', function () { $('.loading').hide(); });
            
            

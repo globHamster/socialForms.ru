@@ -47,8 +47,7 @@
                 $('body').append('<div class="loading"></div>');
                 $('.loading').show();
                 $('.loading').append('<div class="loader"></div>')
-               
-                $("#Tables").load("/Form/FormView?id_p=" + @ViewBag.ProjectID, '', function () { $('.loading').hide(); });
+            $("#Tables").load("/Form/FormView?id_p=" + @ViewBag.ProjectID, '', function () { $('.loading').hide(); });
             
         })
     })

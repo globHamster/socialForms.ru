@@ -19,12 +19,6 @@ namespace SocialFORM.Controllers
         QuestionContext db = new QuestionContext();
         ApplicationContext db2 = new ApplicationContext();
 
-
-        public List<QuestionModel> listQ;
-        public List<AnswerModel> listA;
-        public List<Result> listResult;
-        public ResultRepository repo;
-
         public static int _index = 0;
         public static int max_index;
         public bool isReload = false;
@@ -32,17 +26,11 @@ namespace SocialFORM.Controllers
         // GET: Form
         public ActionResult FormView(int id_p)
         {
-            ViewBag.QuestionID = db.SetQuestions.Where(u => u.ProjectID == id_p).ToList().First().Id;
-            System.Diagnostics.Debug.WriteLine("Starting view is run ...");
-            _index = 0;
-            listResult = new List<Result>();
             using (ProjectContext db3 = new ProjectContext())
             {
-                ViewBag.Title = db3.SetProjectModels.First(u => u.Id == id_p).NameProject;
+                ViewBag.Title = db3.SetProjectModels.First(u=>u.Id == id_p).NameProject;
             }
-
             ViewBag.ProjectID = id_p;
-            System.Diagnostics.Debug.WriteLine("Uploading the view on client ... ");
 
             return PartialView();
         }
@@ -99,29 +87,6 @@ namespace SocialFORM.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult showResult()
-        {
-            return PartialView(listResult);
-        }
-
-        [HttpGet]
-        public JsonResult getAnswerResult(int id_q)
-        {
-
-            List<AnswerModel> tmp = new List<AnswerModel>();
-
-            foreach (var item in listResult)
-            {
-
-                if (item.answerResult.QuestionID == id_q)
-                {
-
-                    tmp.Add(item.answerResult);
-                }
-            }
-
-            return Json(tmp, JsonRequestBehavior.AllowGet);
-        }
 
         public async Task<int> SaveData(string name, int project_id, int operator_id, string phone_number, List<SaveDataModel> list, string time_begin, string time_end)
         {
@@ -192,30 +157,6 @@ namespace SocialFORM.Controllers
             await db2.SaveChangesAsync();
 
             return blank_id;
-        }
-
-        [HttpGet]
-        public JsonResult getReadyAnswer(int id_q)
-        {
-            List<int> tmp = new List<int>();
-            System.Diagnostics.Debug.WriteLine("Get from client -> " + id_q);
-
-            foreach (var item in listResult.Where(u => u.questionResult.Id == id_q))
-            {
-                tmp.Add(item.answerResult.Id);
-            }
-
-            foreach (var item in listResult)
-            {
-                System.Diagnostics.Debug.WriteLine("Sending -> " + item.answerResult.AnswerText + " " + item.questionResult.Id);
-            }
-            foreach (var item in tmp)
-            {
-                System.Diagnostics.Debug.WriteLine("Sending all ready ansswer to client ... " + item);
-                listResult.Remove(listResult.First(u => u.answerResult.Id == item));
-            }
-
-            return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

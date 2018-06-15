@@ -60,7 +60,7 @@
 <div class="title">@ViewBag.Title</div>
 <div name="projectID" id="@ViewBag.ProjectID" style="display: none;" />
 <div name="operatorID" id="@ViewBag.ProjectID" style="display: none;" />
-<div name="questionID" id="@ViewBag.QuestionID" style="display: none;" />
+
 <div>
     <br />
     <div class="show_result">
@@ -163,7 +163,7 @@
                 $.each(server_data, function (i, item) {
                     list_question[item.Id] = item;
                 })
-                console.info("Успешная выгрузка данных ---", list_question);
+                console.info("Успешная выгрузка данных листа вопросов ---", list_question);
                 count_ajax++;
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListQuestion", err) });
@@ -171,7 +171,7 @@
         q4 = $.get("/Group/getIdQuestionGroup", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
                 massiv_question_id = server_data;
-                //console.info("Успешная выгрузка данных --- ", massiv_question_id);
+                console.info("Успешная выгрузка данных сорт id вопросов  --- ", massiv_question_id);
                 count_ajax++;
                 is_load_id = true;
             })
@@ -195,6 +195,7 @@
                     $.each(server_data, function (i, item) {
                         list_answer[item.Id] = item;
                     })
+
                     //console.info("Успешная выгрузка данных листа ответов --- ", list_answer);
                     count_ajax++;
                 })
@@ -276,6 +277,7 @@
     var interval = setInterval(function () {
         if (count_ajax > 8) {
             clearInterval(interval);
+            $('button.all_again').fadeIn("slow");
             getStart();
         }
     }, 50);
@@ -540,7 +542,7 @@
                     }
                     SaveResult();
                     CheckGroupGo();
-                    index++;
+                    checkTransitionGo();
                     CheckGroup();
                     getStart();
                     //    goNext();
@@ -672,39 +674,60 @@
         console.log("Code transition ==== ", code_transition);
         console.log("result list ====== ", result[index]);
         if (code_transition >= 0) {
-            if (Number(result[index]) > 0) {
-                if (result[index] == list_transition[code_transition].TriggerAnswer) {
-                    var jump_index;
-                    list_transition[code_transition].ActiveTransition = true;
-                    jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
-                    for (var i = index + 1; i < jump_index; i++) {
-                        result[i] = [-404];
-                        text_other[i] = ['null'];
-                    }
-                    index = jump_index;
-                } else {
 
-                    index++;
-                }
+            if (result[index].length >= 2) {
+                $.each(result[index], function (u, item) {
+                    console.log("item ==== ", item);
+                    console.log("trigger ==== ", list_transition[code_transition].TriggerAnswer);
+                    if (Number(item) == list_transition[code_transition].TriggerAnswer) {
+                        console.log("check transition");
+                        var jump_index;
+                        list_transition[code_transition].ActiveTransition = true;
+                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                        for (var i = index + 1; i < jump_index; i++) {
+                            result[i] = [-404];
+                            text_other[i] = ['null'];
+                        }
+                        index = jump_index;
+                        return;
+                    } 
+                })
+
             } else {
-                if (result[index] == list_base_answer[list_transition[code_transition].TriggerAnswer].BaseIndex) {
-                    var jump_index;
-                    list_transition[code_transition].ActiveTransition = true;
-                    jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
-                    for (var i = index + 1; i < jump_index; i++) {
-                        result[i] = [-404];
-                        text_other[i] = ['null'];
+                if (Number(result[index]) > 0) {
+                    if (result[index] == list_transition[code_transition].TriggerAnswer) {
+                        var jump_index;
+                        list_transition[code_transition].ActiveTransition = true;
+                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                        for (var i = index + 1; i < jump_index; i++) {
+                            result[i] = [-404];
+                            text_other[i] = ['null'];
+                        }
+                        index = jump_index;
+                    } else {
+
+                        index++;
                     }
-                    index = jump_index;
                 } else {
+                    if (result[index] == list_base_answer[list_transition[code_transition].TriggerAnswer].BaseIndex) {
+                        var jump_index;
+                        list_transition[code_transition].ActiveTransition = true;
+                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                        for (var i = index + 1; i < jump_index; i++) {
+                            result[i] = [-404];
+                            text_other[i] = ['null'];
+                        }
+                        index = jump_index;
+                    } else {
 
-                    index++;
+                        index++;
+                    }
                 }
-            }
+            } 
         } else {
-
             index++;
         }
+
     }
 
     //Проверка перехода при возращении назад
@@ -882,7 +905,6 @@
                     change_list['length'] = count;
                 }
             });
-            console.info("cchange list -0---- ", change_list);
             if (change_list.length > 0) {
                 delete change_list['length'];
                 code = '<div class="change_answer_table"><table>';
@@ -890,7 +912,6 @@
                     if (result[massiv_question_id[index]] == undefined)
                         code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><span>' + item.AnswerText + '</span></td></tr>';
                     else {
-                        console.info("op[wpeoropwre ------- ", result[massiv_question_id[index]]);
                         if (result[massiv_question_id[index]] == item.Id)
                             code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '" checked/><span>' + item.AnswerText + '</span></td></tr>';
                         else
@@ -962,6 +983,8 @@
     });
 
     $('button.all_again').one("click", function () {
+        begin_time = undefined;
+        end_time = undefined;
         $(this).remove();
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), '', function () { $('div.waiting_screen').remove(); });
     })
@@ -1122,7 +1145,7 @@
                         var item_find;
 
                         $.each(list_base_answer, function (index, item) {
-                            
+
                             if (Number(item.BaseIndex) == Number(list_result[j])) {
                                 console.log("go here");
                                 is_find = true; item_find = item; return;

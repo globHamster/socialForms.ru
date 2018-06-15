@@ -145,6 +145,10 @@ namespace SocialFORM.Controllers
         public ActionResult BeginForm(int id_p)
         {
             ViewBag.ProjectID = id_p;
+            using (ProjectContext p_context = new ProjectContext())
+            {
+                ViewBag.NameProject = p_context.SetProjectModels.First(u=>u.Id == id_p).NameProject;
+            }
             return PartialView();
         }
 

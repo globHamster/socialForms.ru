@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using SocialFORM.Models.Utilite;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace SocialFORM.Controllers
 {
@@ -362,39 +363,40 @@ namespace SocialFORM.Controllers
 
         //Функция выгузки листа вопросов
         [HttpGet]
-        public JsonResult getAllAnswerGrow(string massiv)
+        public async Task<JsonResult> getAllAnswerGrow(string massiv) // Асинхроный метод выгрузки всех ответов по вопросам
         {
             var myArrayInt = massiv.Split(',').Select(x => Int32.Parse(x)).ToArray();
             List<AnswerModel> list_answer = new List<AnswerModel>();
             foreach (var item in myArrayInt)
             {
-                list_answer.AddRange(db.SetAnswers.Where(u => u.QuestionID == item).ToList());
+                list_answer.AddRange(await db.SetAnswers.Where(u => u.QuestionID == item).ToListAsync());
             }
             return Json(list_answer, JsonRequestBehavior.AllowGet);
         }
 
+        // Нужна ли эта функция?????
         //Функция выгрузки листа id всех ответов
         [HttpGet]
-        public JsonResult getIdAnswerAllGrow(string massiv)
+        public async Task<JsonResult> getIdAnswerAllGrow(string massiv) // Асинхронный метод выгрузки всех id ответов по вопросам
         {
             var myArrayInt = massiv.Split(',').Select(x => Int32.Parse(x)).ToArray();
             List<AnswerAll> list_answer_all = new List<AnswerAll>();
             foreach(var item in myArrayInt)
             {
-                list_answer_all.AddRange(db.SetAnswerAll.Where(u => u.QuestionID == item).ToList());
+                list_answer_all.AddRange(await db.SetAnswerAll.Where(u => u.QuestionID == item).ToListAsync());
             }
             return Json(list_answer_all, JsonRequestBehavior.AllowGet);
         }
 
         //Функция выгрузки строк табличного вопроса
         [HttpGet]
-        public JsonResult getAllTableRow(string massiv)
+        public async Task<JsonResult> getAllTableRow(string massiv) // Асинхронный метод выгрузки всех строк для табличных вопросов
         {
             var myArrayInt = massiv.Split(',').Select(x => Int32.Parse(x)).ToArray();
             List<TableRow> list_table_row = new List<TableRow>();
             foreach (var item in myArrayInt)
             {
-                list_table_row.AddRange(db.SetTableRows.Where(u => u.TableID == item).ToList());
+                list_table_row.AddRange(await db.SetTableRows.Where(u => u.TableID == item).ToListAsync());
             }
             return Json(list_table_row, JsonRequestBehavior.AllowGet);
         }
@@ -407,31 +409,31 @@ namespace SocialFORM.Controllers
 
 
         [HttpGet]
-        public JsonResult getListQuestion(int id_p)
+        public async Task<JsonResult> getListQuestion(int id_p) // Асинхронный метод вывода листа с вопросами
         {
-            List<GroupModel> tmp_list_group = new List<GroupModel>();
-            using (GroupContext group_context = new GroupContext())
-            {
-                tmp_list_group.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u=>u.IndexQuestion).ToList());
-            }
-            List<QuestionModel> tmp_list_question = new List<QuestionModel>();
-            foreach(var item in tmp_list_group)
-            {
-                tmp_list_question.Add(db.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID));
-            }
-            return Json(tmp_list_question, JsonRequestBehavior.AllowGet);
+            //List<GroupModel> tmp_list_group = new List<GroupModel>();
+            //using (GroupContext group_context = new GroupContext())
+            //{
+            //    tmp_list_group.AddRange(await group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u=>u.IndexQuestion).ToListAsync());
+            //}
+            //List<QuestionModel> tmp_list_question = new List<QuestionModel>();
+            //foreach(var item in tmp_list_group)
+            //{
+                //tmp_list_question.Add(await db.SetQuestions.FirstOrDefaultAsync(u => u.Id == item.QuestionID));
+            //}
+            return Json(await db.SetQuestions.Where(u=>u.ProjectID == id_p).ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
-        public JsonResult getListAnswerBase()
+        public async Task<JsonResult> getListAnswerBase() // Асинхроный метод вывода базовых ответов
         {
-            return Json(db.SetAnswerBaseModels.ToList(), JsonRequestBehavior.AllowGet);
+            return Json(await db.SetAnswerBaseModels.ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
-        public JsonResult getListTransition(int id_p)
+        public async Task<JsonResult> getListTransition(int id_p) //Асинхроный метод вывода таблицы переходов
         {
-            return Json(db.SetTransition.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+            return Json(await db.SetTransition.Where(u => u.ProjectID == id_p).ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -476,9 +478,9 @@ namespace SocialFORM.Controllers
         }
 
         [HttpGet]
-        public JsonResult getListMassk()
+        public async Task<JsonResult> getListMassk() // Асинхронный метод выгрузки таблицы регулярных выражений
         {
-            return Json(db.GetMassk.ToList(), JsonRequestBehavior.AllowGet);
+            return Json(await db.GetMassk.ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
         /*
@@ -487,9 +489,9 @@ namespace SocialFORM.Controllers
          */
 
         [HttpGet]
-        public JsonResult getListBlocks(int id_p)
+        public async Task<JsonResult> getListBlocks(int id_p)
         {
-            return Json(db.SetBlock.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+            return Json(await db.SetBlock.Where(u => u.ProjectID == id_p).ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
