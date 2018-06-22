@@ -550,6 +550,55 @@ namespace SocialFORM.Controllers
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
-        
+        [HttpPost]
+        public void SetKvot(List<Kvot> _kvot)
+        {
+            db.SetKvots.AddRange(_kvot);
+            db.SaveChanges();
+        }
+
+        [HttpGet]
+        public JsonResult GetListQuestionKvot(int id_p)
+        {
+            List<QuestionModel> tmp_list = db.SetQuestions.Where(u => u.ProjectID == id_p && u.IsKvot == true).ToList();
+            return Json(tmp_list, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetListKvot(int id_p)
+        {
+            List<Kvot> tmp = db.SetKvots.Where(u => u.ProjectID == id_p).ToList();
+            return Json(tmp, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public async Task MinusCountKvot(int id_kvot)
+        {
+            Kvot tmp_kvot = await db.SetKvots.FirstOrDefaultAsync(u => u.Id == id_kvot);
+            tmp_kvot.CountKvot = tmp_kvot.CountKvot - 1;
+            await db.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        public void DeleteKvot(int id_question)
+        {
+            List<Kvot> tmp_kvot = db.SetKvots.Where(u => u.QuestionID == id_question).ToList();
+            db.SetKvots.RemoveRange(tmp_kvot);
+            db.SaveChanges();
+        }
+
+        [HttpPost]
+        public void ChangeKvot(List<string> new_changes)
+        {
+            foreach(var item in new_changes)
+            {
+                System.Diagnostics.Debug.WriteLine(item);
+                string[] tmp = item.Split('#');
+                int id_kvot = Int32.Parse(tmp[0]);
+                Kvot tmp_kvot = db.SetKvots.FirstOrDefault(u => u.Id == id_kvot);
+                tmp_kvot.CountKvot = Int32.Parse(tmp[1]);
+                db.SaveChanges();
+            }
+        }
     }
 }

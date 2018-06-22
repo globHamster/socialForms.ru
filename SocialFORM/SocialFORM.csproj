@@ -20,8 +20,8 @@
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort>44343</IISExpressSSLPort>
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>enabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
@@ -235,6 +235,7 @@
     <Compile Include="Hubs\SessionHub.cs" />
     <Compile Include="Models\ChatUser.cs" />
     <Compile Include="Models\Opros.cs" />
+    <Compile Include="Models\Question\Kvot.cs" />
     <Compile Include="Models\Session\SessionHubModel.cs" />
     <Compile Include="Startup.cs" />
     <Content Include="Content\ajax-loader.gif" />
@@ -242,6 +243,12 @@
     <Content Include="Content\chosen.css" />
     <Content Include="Content\contextmenu.css" />
     <Content Include="Content\daterangepicker.css" />
+    <Content Include="Content\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\images\ui-icons_777620_256x240.png" />
+    <Content Include="Content\images\ui-icons_777777_256x240.png" />
+    <Content Include="Content\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\jquery.contextmenu.css" />
     <Content Include="Content\loading.css" />
@@ -472,6 +479,7 @@
     <Content Include="Views\Home\PersonalAccount.cshtml" />
     <Content Include="Views\Home\MenuMin.cshtml" />
     <Content Include="Views\Home\Options.cshtml" />
+    <Content Include="Views\Home\Kvot.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -43,7 +43,9 @@
     td.table_answer {
         border: 1px solid black;
         text-align: center;
-        min-width: 20px;
+        width: 80px;
+        font-weight: 600;
+        font-size: 16px;
     }
 
     #map {
@@ -51,6 +53,14 @@
         height: 400px;
         padding: 0;
         margin: 0;
+    }
+    .limit_over {
+        padding: 15px;
+        text-align: center;
+        border: 5px inset red;
+        box-shadow: 5px 5px 5px black;
+        font-size: 24px;
+        font-family: 'Century Gothic';
     }
 </style>
 <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
@@ -117,6 +127,8 @@
     var list_id_question_group = {};
     var list_group = {};
     var list_question_bind_group = {};
+    let list_kvot = {}
+    let minus_kvot_list = {};
     var begin_time, end_time; //Время начала анкетирования
     var status = 0;
     var is_load_id = false;
@@ -196,7 +208,7 @@
                         list_answer[item.Id] = item;
                     })
 
-                    //console.info("Успешная выгрузка данных листа ответов --- ", list_answer);
+                    console.info("Успешная выгрузка данных листа ответов --- ", list_answer);
                     count_ajax++;
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
@@ -271,6 +283,20 @@
                 //console.log("Лист группы по вопросам : ", list_group);
                 //console.info("list group --->", list_id_question_group);
             })
+
+        $.get("/Question/GetListKvot", { id_p: $('div[name=projectID]').attr('id') })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    if (list_kvot[item.QuestionID] == undefined) {
+                        list_kvot[item.QuestionID] = [item];
+                    } else {
+                        list_kvot[item.QuestionID].push(item);
+                    }
+                })
+
+                console.log("Успешно выгружен лист квот ====== ", list_kvot);
+            });
+
     }
 
     //Ожидание выгрузки данных с сервера
@@ -285,6 +311,9 @@
     //Блок отрисовки анкеты
     function getStart() {
         if (index >= massiv_question_id.length) {
+            $.each(minus_kvot_list, function (i, item) {
+                $.post("/Question/MinusCountKvot", { id_kvot: item });
+            })
             $(".show_result").load("/Form/showResult");
         } else {
             $('body,html').animate({ scrollTop: 0 }, 500);
@@ -452,7 +481,7 @@
                     break;
 
             }
-            ConnectClick();
+            //ConnectClick();
         }
     }
 
@@ -503,7 +532,7 @@
             case 1:
                 if ($("input[name=group]:radio:checked").length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
-                    //     $('div.limit_checked_div').remove();
+                    $('div.limit_checked_div').remove();
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
@@ -517,6 +546,7 @@
 
                     }
                     SaveResult();
+                    CheckKvot();
                     CheckGroupGo();
                     checkTransitionGo();
                     CheckGroup();
@@ -531,6 +561,7 @@
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
+                    $('div.limit_checked_div').remove();
                     if ($('textarea.text_free_area').length > 0 && $('textarea.text_free_area').is(":visible")) {
                         if ($('textarea.text_free_area').val() == "") {
                             $('textarea.text_free_area').animate({
@@ -551,7 +582,7 @@
             case 3:
                 if ($("input:text").val().length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
-                    //             $('div.limit_checked_div').remove();
+                    //$('div.limit_checked_div').remove();
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
@@ -920,7 +951,7 @@
                 });
                 code += '</table></div>';
                 $('.answer_table').append(code);
-                ConnectClick();
+                //ConnectClick();
             }
         })
 
@@ -957,29 +988,44 @@
             .css('cursor', 'default');
     });
 
-    //$('.answer_table').off('click', '.tool_layer');
-    //$('.answer_table').on('click', '.tool_layer', function () {
-    //    checkedAnswer($(this));
-    //    if (type_q == 2) {
-    //        var is_check_base_answer = true;
-    //        $('.answer_panel').find('tr.base_answer').each(function () {
-    //            if ($(this).find('input').is(":checked")) {
-    //                is_check_base_answer = false;
-    //            }
-    //        });
-    //        if (is_check_base_answer) CheckLimitAnswer();
-    //    }
-    //    if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
-    //        checkedAnswerBase($(this));
-    //    }
+    $('.answer_table').off('click', '.tool_layer');
+    $('.answer_table').on('click', '.tool_layer', function () {
+        checkedAnswer($(this));
+        if (type_q == 2) {
+            var is_check_base_answer = true;
+            $('.answer_panel').find('tr.base_answer').each(function () {
+                if ($(this).find('input').is(":checked")) {
+                    is_check_base_answer = false;
+                }
+            });
+            if (is_check_base_answer) CheckLimitAnswer();
+        }
+        if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
+            checkedAnswerBase($(this));
+        }
 
-    //});
+    });
 
     $('.answer_table').on('mouseenter', 'textarea.text_free_area', function () {
         $('.answer_table').off('click', '.tool_layer');
     });
     $('.answer_table').on('mouseleave', 'textarea.text_free_area', function () {
-        ConnectClick();
+        $('.answer_table').on('click', '.tool_layer', function () {
+            checkedAnswer($(this));
+            if (type_q == 2) {
+                var is_check_base_answer = true;
+                $('.answer_panel').find('tr.base_answer').each(function () {
+                    if ($(this).find('input').is(":checked")) {
+                        is_check_base_answer = false;
+                    }
+                });
+                if (is_check_base_answer) CheckLimitAnswer();
+            }
+            if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
+                checkedAnswerBase($(this));
+            }
+
+        });
     });
 
     $('button.all_again').one("click", function () {
@@ -1211,6 +1257,26 @@
                 }
             })
         })
+    }
+
+    function CheckKvot() {
+        if (list_kvot[id_q] != undefined) {
+            var sublist_kvot = list_kvot[id_q];
+            var checked_answer = list_answer[result[index]].AnswerText;
+            $.each(sublist_kvot, function (i, item) {
+                if (item.Target == checked_answer) {
+                    if (item.CountKvot <= 0) {
+                        alert("Kvot ");
+                        $('.show_result').empty();
+                        $('.show_result').append('<div class="limit_over">Квотный лимит исчерпан</div>')
+                        index = massiv_question_id.length - 2;
+                    } else {
+                        alert("Find");
+                        minus_kvot_list[id_q] = item.Id;
+                    }
+                }
+            })
+        }
     }
 
 // END

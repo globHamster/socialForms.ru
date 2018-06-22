@@ -170,5 +170,10 @@ namespace SocialFORM.Controllers
         {
             return Json(DateTime.Now.ToString(), JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult showResult()
+        {
+            return PartialView();
+        }
     }
 }

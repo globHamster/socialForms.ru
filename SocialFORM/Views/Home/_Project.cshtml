@@ -167,4 +167,10 @@
         })
 
     });
+
+    $('button.kvot').click(function () {
+        var id_project = $(this).attr('id');
+        $('.Tables').load('/Home/Kvot?id_p=' + id_project);
+
+    });
 </script>

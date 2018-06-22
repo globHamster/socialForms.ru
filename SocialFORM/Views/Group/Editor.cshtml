@@ -60,7 +60,8 @@
     .massk {
         display: none;
     }
-    span.chain_group{
+
+    span.chain_group {
         border: 1px solid black;
         border-radius: 5%;
         background-color: #72afff;
@@ -70,10 +71,28 @@
         box-shadow: 5px 5px 5px;
     }
 
-    button.chain_group_delete{
+    button.chain_group_delete {
         border-radius: 50%;
         margin-left: 5px;
     }
+
+    .QButton {
+        border: 2px solid #72afff;
+        width: 50px;
+        margin: 5px;
+        text-align: center;
+        padding: 5px;
+        display: inline-block;
+        font-family: 'Century Gothic';
+    }
+
+        .QButton:hover {
+            background-color: rgba(114, 175, 255, 0.6);
+        }
+
+        .Qon{
+            background-color: #72afff;
+        }
 </style>
 
 @Html.Hidden("id", Model.Id)
@@ -98,8 +117,16 @@
                 @Html.EnumDropDownListFor(model => model.TypeMassk, "Выберите тип маски", new { id = "typemassk", value = Model.TypeMassk })
             </div>
         </td>
+
     </tr>
 </table>
+<div class="panel_set_kvot">
+    <div style="display: inline-block">
+        Квотируемый вопрос
+    </div>
+    <div class="QButton Yes_Kvot Qoff">Да</div>
+    <div class="QButton Not_Kvot Qoff">Нет</div>
+</div>
 <hr style="margin-top: 10px; margin-bottom: 10px; color: red; background-color: red; height: 2px;">
 <div id="change_panel" class="table_answe">
     <table class="manager_panel"></table>
@@ -150,8 +177,8 @@
     })
 
     $(function () {
-       
-        
+
+
         var id_q = $(".Id").attr('value');
         var type_q;
         if (!is_loaded) {
@@ -163,7 +190,11 @@
                 data: { id: id_q },
                 success: function (data) {
 
-
+                    if (data.IsKvot) {
+                        $('.Yes_Kvot').removeClass('Qoff').addClass('Qon');
+                    } else {
+                        $('.Not_Kvot').removeClass('Qoff').addClass('Qon');
+                    }
 
                     $(".jqte_editor").html(data.TextQuestion);
                     sceditor.instance(textarea).val(data.TextQuestion);
@@ -338,6 +369,10 @@
         var text_question = sceditor.instance(textarea).val();
         var type_question = $("#typequestion").val();
         var query;
+        var is_kvot = false;
+        if ($('.Yes_Kvot').hasClass('Qon')) {
+            is_kvot = true;
+        }
         if (type_question != 3) {
             if ($('input.binding_question').is(':checked')) {
                 query = {
@@ -346,7 +381,8 @@
                     TextQuestion: text_question,
                     ProjectID: $('input[name=project_id]').val(),
                     Bind: $('select.id_bind_question option:checked').val(),
-                    LimitCount: $('input.limit_count').length > 0 ? Number($('input.limit_count').val()) : null
+                    LimitCount: $('input.limit_count').length > 0 ? Number($('input.limit_count').val()) : null,
+                    IsKvot: is_kvot
                 };
             } else {
                 query = {
@@ -354,7 +390,8 @@
                     TypeQuestion: type_question,
                     TextQuestion: text_question,
                     ProjectID: $('input[name=project_id]').val(),
-                    LimitCount: $('input.limit_count').length > 0 ? Number($('input.limit_count').val()) : null
+                    LimitCount: $('input.limit_count').length > 0 ? Number($('input.limit_count').val()) : null,
+                    IsKvot: is_kvot
                 };
             }
         } else {
@@ -531,10 +568,10 @@
         $('#modal_close, #overlay, .add_group').click(function () { // лoвим клик пo крестику или пoдлoжке
             $('#modal_form')
                 .animate({ opacity: 0, top: '45%' }, 200,  // плaвнo меняем прoзрaчнoсть нa 0 и oднoвременнo двигaем oкнo вверх
-                function () { // пoсле aнимaции
-                    $(this).css('display', 'none'); // делaем ему display: none;
-                    $('#overlay').fadeOut(400); // скрывaем пoдлoжку
-                }
+                    function () { // пoсле aнимaции
+                        $(this).css('display', 'none'); // делaем ему display: none;
+                        $('#overlay').fadeOut(400); // скрывaем пoдлoжку
+                    }
                 );
         });
     });
@@ -978,7 +1015,8 @@
         if (!$(this).is(":checked")) {
             $('div.panel_group').remove();
             $.post("/Group/RemoveAllBindGroup", { id_q: $('input.Id').val() });
-;        } else {
+            ;
+        } else {
             DrawPanelGroup($(this));
         }
     });
@@ -1007,13 +1045,13 @@
                                             $('span.edittext[id=' + item.AnswerKey + ']')
                                                 .parent()
                                                 .append('<span class="chain_group" id=' + item.AnswerKey + '>'
-                                                + 'Связь: ' + tmp_list_group[item.BindGroup] + '<button class="chain_group_delete">X</button></span>');
+                                                    + 'Связь: ' + tmp_list_group[item.BindGroup] + '<button class="chain_group_delete">X</button></span>');
                                         }
                                     })
                                     clearInterval(wait_interval);
                                 }
                             }, 100);
-                            
+
                         });
                         return false;
                     }
@@ -1112,11 +1150,11 @@
                     code += '</select></span>';
                     $('div.panel_group').append(code);
                     $('div.panel_group').append('<button class="save_group" style="margin-left: 15px;">Сохранить</button>');
-                    
+
                     $('div.panel_group').append('<div class="list_bind_group"></div>');
                 }
             });
-           
+
         })
 
         $('div.panel_group').on("click", ".deleteBindGroup", function () {
@@ -1148,7 +1186,7 @@
             var id_answer = $('select.checkAnswer option:checked').val() - 0;
             var is_not_busy = false;
             if ($('div.list_bind_group p').length > 0) {
-               
+
                 $('div.list_bind_group p').each(function () {
                     if ($(this).attr('id') == id_answer) {
                         alert("Busy");
@@ -1167,7 +1205,7 @@
                         $('span.edittext[id=' + id_answer + ']')
                             .parent()
                             .append('<span class="chain_group" id=' + id_answer + '>'
-                            + 'Связь: ' + $('select.toGroup option:checked').text() + '<button class="chain_group_delete">X</button></span>');
+                                + 'Связь: ' + $('select.toGroup option:checked').text() + '<button class="chain_group_delete">X</button></span>');
                     })
             }
             //}
@@ -1187,8 +1225,15 @@
             if (Number(this.value) > count_answer) {
                 this.value = count_answer;
                 alert("Большое число");
-            } 
+            }
         });
     }
+
+    $('.panel_set_kvot').on("click", ".QButton", function () {
+
+        $('.panel_set_kvot').find('.Qon').removeClass('Qon');
+        $(this).addClass('Qon').removeClass('Qoff');
+
+    })
 
 </script>

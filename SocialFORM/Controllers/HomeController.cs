@@ -1392,6 +1392,12 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
+        public ActionResult Kvot(int id_p)
+        {
+            ViewBag.ProjectID = id_p;
+            return PartialView();
+        }
+
         [HttpPost]
         public void postSaveOp(List<string> mass )
         {
