@@ -600,5 +600,96 @@ namespace SocialFORM.Controllers
                 db.SaveChanges();
             }
         }
+
+        [HttpPost]
+        public void SaveQuota(int id_p, List<string> list_quota)
+        {
+            foreach(var item in list_quota)
+            {
+                var tmp_string = item.Split('=');
+                string chain_string = tmp_string[0];
+                QuotaModel tmp_quota = db.SetQuotaModels.FirstOrDefault(u => u.ChainString == chain_string);
+                if (tmp_quota == null)
+                {
+                    tmp_quota = new QuotaModel();
+                    tmp_quota.ProjectID = id_p;
+                    tmp_quota.ChainString = tmp_string[0];
+                    tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
+                    db.SetQuotaModels.Add(tmp_quota);
+                } else
+                {
+                    tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
+                }
+            }
+            db.SaveChanges();
+        }
+
+        [HttpGet]
+        public JsonResult GetQuota(int id_p)
+        {
+            return Json(db.SetQuotaModels.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public void SaveRange(int id_p, int bind_q, List<string> list_range)
+        {
+            foreach(var item in list_range)
+            {
+                var str_tmp = item.Split('#');
+                string range_pos = str_tmp[0];
+                int index_range = Int32.Parse(str_tmp[1]);
+                RangeModel rangeModel = db.SetRangeModels.FirstOrDefault(u => u.ProjectID == id_p && u.BindQuestion == bind_q && u.RangeString == range_pos);
+                if (rangeModel == null)
+                {
+                    rangeModel = new RangeModel();
+                    rangeModel.ProjectID = id_p;
+                    rangeModel.BindQuestion = bind_q;
+                    rangeModel.RangeString = range_pos;
+                    rangeModel.IndexRange = index_range;
+                    db.SetRangeModels.Add(rangeModel);
+                }
+            }
+            db.SaveChanges();
+        }
+
+        [HttpGet]
+        public JsonResult GetRange(int id_p, int bind_q)
+        {
+            return Json(db.SetRangeModels.Where(u => u.ProjectID == id_p && u.BindQuestion == bind_q).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetAllRange(int id_p)
+        {
+            return Json(db.SetRangeModels.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult CheckQuotaCount(int id_quota)
+        {
+            return Json(db.SetQuotaModels.FirstOrDefault(u => u.Id == id_quota), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public async Task SubtractionQuota(int id_quota)
+        {
+            QuotaModel quotaModel = await db.SetQuotaModels.FirstOrDefaultAsync(u => u.Id == id_quota);
+            if (quotaModel != null)
+            {
+                quotaModel.QuotaCount -= 1;
+                await db.SaveChangesAsync();
+            }
+        }
+
+        [HttpPost]
+        public void DeleteQuota(int id_p)
+        {
+            List<QuotaModel> tmp_quota = db.SetQuotaModels.Where(u => u.ProjectID == id_p).ToList();
+            if (tmp_quota != null)
+            {
+                db.SetQuotaModels.RemoveRange(tmp_quota);
+                db.SaveChanges();
+            }
+        }
     }
 }

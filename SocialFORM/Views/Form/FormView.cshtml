@@ -54,6 +54,7 @@
         padding: 0;
         margin: 0;
     }
+
     .limit_over {
         padding: 15px;
         text-align: center;
@@ -61,6 +62,48 @@
         box-shadow: 5px 5px 5px black;
         font-size: 24px;
         font-family: 'Century Gothic';
+    }
+
+    .TextLimitQuota {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        box-shadow: 0 0 3px 1px black;
+        font-family: 'Century Gothic';
+        background-color: #72afff;
+    }
+
+    .ButtonAGAIN {
+        position: absolute;
+        width: 100px;
+        left: calc(100% - 100px);
+        top: calc(100% - 50px);
+        background-color: white;
+        font-family: 'Century Gothic';
+        text-align: center;
+        padding: 5px;
+    }
+
+        .ButtonAGAIN:hover {
+            background-color: #72afff;
+            box-shadow: 3px 3px 3px 3px black;
+        }
+
+    .TextForSpeech {
+        position: relative;
+        width: 350px;
+        height: 350px;
+        top: calc(50% - 175px);
+        left: calc(50% - 175px);
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        font-family: 'Century Gothic';
+        background-color: white;
+        box-shadow: 5px 5px 5px 3px black;
     }
 </style>
 <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
@@ -101,7 +144,15 @@
     <br />
 
 </div>
+<div class="TextLimitQuota">
+    <div class="TextForSpeech">
+       Квотный лимит превышен!
+    </div>
 
+    <div class="ButtonAGAIN">
+        Начать анкету
+    </div>
+</div>
 <script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
     var type_q;
@@ -127,8 +178,10 @@
     var list_id_question_group = {};
     var list_group = {};
     var list_question_bind_group = {};
-    let list_kvot = {}
-    let minus_kvot_list = {};
+    let list_range = {};
+    let list_quota = {};
+    let string_chain = new String();
+    var finded_quota = new Number();
     var begin_time, end_time; //Время начала анкетирования
     var status = 0;
     var is_load_id = false;
@@ -284,18 +337,25 @@
                 //console.info("list group --->", list_id_question_group);
             })
 
-        $.get("/Question/GetListKvot", { id_p: $('div[name=projectID]').attr('id') })
+        $.get("/Question/GetAllRange", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
+                console.log("Успешна выгрузка диапозонов ===== ", server_data);
                 $.each(server_data, function (i, item) {
-                    if (list_kvot[item.QuestionID] == undefined) {
-                        list_kvot[item.QuestionID] = [item];
+                    if (list_range[item.BindQuestion] == undefined) {
+                        list_range[item.BindQuestion] = [item];
                     } else {
-                        list_kvot[item.QuestionID].push(item);
+                        list_range[item.BindQuestion].push(item);
                     }
-                })
 
-                console.log("Успешно выгружен лист квот ====== ", list_kvot);
-            });
+                })
+                console.log("Range massive === ", list_range);
+            })
+
+        $.get("/Question/GetQuota", { id_p: $('div[name=projectID]').attr('id') })
+            .success(function (server_data) {
+                console.log("Успешна выгрузка квот ==== ", server_data);
+                list_quota = server_data;
+            })
 
     }
 
@@ -304,6 +364,7 @@
         if (count_ajax > 8) {
             clearInterval(interval);
             $('button.all_again').fadeIn("slow");
+            $('.PreLoader').hide();
             getStart();
         }
     }, 50);
@@ -311,9 +372,6 @@
     //Блок отрисовки анкеты
     function getStart() {
         if (index >= massiv_question_id.length) {
-            $.each(minus_kvot_list, function (i, item) {
-                $.post("/Question/MinusCountKvot", { id_kvot: item });
-            })
             $(".show_result").load("/Form/showResult");
         } else {
             $('body,html').animate({ scrollTop: 0 }, 500);
@@ -546,7 +604,11 @@
 
                     }
                     SaveResult();
-                    CheckKvot();
+                    if (list_question[id_q].IsKvot == true) {
+                        string_chain += id_q + "/" + result[index];
+                        CheckQuota();
+                        console.log("Chain string ==== ", string_chain);
+                    }
                     CheckGroupGo();
                     checkTransitionGo();
                     CheckGroup();
@@ -587,6 +649,20 @@
                 else {
                     $('div.wrong_choise').fadeOut('fast');
                     SaveResult();
+                    if (list_question[id_q].IsKvot == true) {
+                        var age = Number(String(result[index]).split('#')[1]);
+                        $.each(list_range[id_q], function (i, item) {
+                            var lower_limit = !isNaN(Number(String(item.RangeString).split('-')[0])) ? Number(String(item.RangeString).split('-')[0]) : -Infinity;
+                            var upper_limit = !isNaN(Number(String(item.RangeString).split('-')[1])) ? Number(String(item.RangeString).split('-')[1]) : Infinity;
+                            if ((lower_limit <= age) && (age <= upper_limit)) {
+                                alert("Here");
+                                string_chain += id_q + "/" + item.Id;
+                                CheckQuota();
+                                return false;
+                            }
+                        })
+                        console.log("Age ==== ", age);
+                    }
                     index++;
                     getStart();
                     //goNext();
@@ -721,7 +797,7 @@
                         }
                         index = jump_index;
                         return;
-                    } 
+                    }
                 })
 
             } else {
@@ -754,7 +830,7 @@
                         index++;
                     }
                 }
-            } 
+            }
         } else {
             index++;
         }
@@ -966,9 +1042,15 @@
             SaveResult();
             checkTransitionBack();
             CheckGroup_Back();
+            if (list_question[massiv_question_id[index]].IsKvot == true) {
+                var tmp_id_question = massiv_question_id[index];
+                string_chain = string_chain.substring(0, string_chain.indexOf(String(tmp_id_question)));
+                console.log("New string chain >>>>> ", string_chain);
+            }
             getStart();
         }
     });
+
     $(document).off("mouseenter", ".tool_layer");
     $(document).on("mouseenter", ".tool_layer", function () {
         if ($(this).find('input[name=group]').is(':disabled')) {
@@ -1259,25 +1341,36 @@
         })
     }
 
-    function CheckKvot() {
-        if (list_kvot[id_q] != undefined) {
-            var sublist_kvot = list_kvot[id_q];
-            var checked_answer = list_answer[result[index]].AnswerText;
-            $.each(sublist_kvot, function (i, item) {
-                if (item.Target == checked_answer) {
-                    if (item.CountKvot <= 0) {
-                        alert("Kvot ");
-                        $('.show_result').empty();
-                        $('.show_result').append('<div class="limit_over">Квотный лимит исчерпан</div>')
-                        index = massiv_question_id.length - 2;
+    function CheckQuota() {
+        var is_out = false;
+        var item_quota;
+        $.each(list_quota, function (i, item) {
+
+            if (item.ChainString == string_chain) {
+                is_out = true;
+                item_quota = item;
+                return false;
+            }
+        })
+        if (is_out) {
+            $.get("/Question/CheckQuotaCount", { id_quota: item_quota.Id })
+                .success(function (server_data) {
+                    if (server_data.QuotaCount <= 0) {
+                        $('.TextLimitQuota').show();
                     } else {
-                        alert("Find");
-                        minus_kvot_list[id_q] = item.Id;
+                        finded_quota = item_quota.Id;
                     }
-                }
-            })
+                })
+        } else {
+            string_chain += "#";
         }
     }
 
+    $('.ButtonAGAIN').one("click", function () {
+        begin_time = undefined;
+        end_time = undefined;
+        $('.PreLoader').show();
+        $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'));
+    })
 // END
 </script>

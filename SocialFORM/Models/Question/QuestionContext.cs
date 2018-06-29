@@ -21,5 +21,7 @@ namespace SocialFORM.Models.Question
         public DbSet<Massk> GetMassk { get; set; }
         public DbSet<File> GetFiles { get; set; }
         public DbSet<Kvot> SetKvots { get; set; }
+        public DbSet<QuotaModel> SetQuotaModels { get; set; }
+        public DbSet<RangeModel> SetRangeModels { get; set; }
     }
 }

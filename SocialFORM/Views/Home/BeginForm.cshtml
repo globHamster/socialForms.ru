@@ -44,10 +44,8 @@
     $(function () {
 
         $('button.begin_form').one("click", function () {
-                $('body').append('<div class="loading"></div>');
-                $('.loading').show();
-                $('.loading').append('<div class="loader"></div>')
-            $("#Tables").load("/Form/FormView?id_p=" + @ViewBag.ProjectID, '', function () { $('.loading').hide(); });
+            $('.PreLoader').show();
+            $("#Tables").load("/Form/FormView?id_p=" + @ViewBag.ProjectID);
             
         })
     })

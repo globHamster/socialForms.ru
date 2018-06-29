@@ -90,9 +90,78 @@
             background-color: rgba(114, 175, 255, 0.6);
         }
 
-        .Qon{
-            background-color: #72afff;
+    .Qon {
+        background-color: #72afff;
+    }
+
+    .TextRangeAge {
+        box-shadow: 0 0 3px 1px black;
+    }
+
+    .RangeOFF {
+        display: none;
+    }
+
+    .RangeON {
+        display: block;
+    }
+
+    .ButtonADD {
+        position: relative;
+        width: 100px;
+        left: calc(100% - 100px);
+        top: calc(100% - 50px);
+        background-color: #72afff;
+        font-family: 'Century Gothic';
+        text-align: center;
+        padding: 5px;
+    }
+
+    .PanelOfRange {
+        margin: 5px;
+    }
+
+    .SaveRange {
+        position: relative;
+        width: 100px;
+        left: calc(100% - 100px);
+        background-color: #72afff;
+        font-family: 'Century Gothic';
+        text-align: center;
+        padding: 5px;
+    }
+
+    .InputRange {
+        width: 60px;
+    }
+
+    .RemoveRangePos {
+        width: 20px;
+        height: 20px;
+        background-color: #F08080;
+        color: white;
+        text-align: center;
+        margin-left: 10px;
+        cursor: pointer;
+    }
+
+        .RemoveRangePos:hover {
+            color: red;
         }
+
+    .StringRange {
+        padding: 3px;
+        width: 150px;
+        box-shadow: 0 0 3px 1px black;
+        display: inline-block;
+    }
+
+    .IndexRange {
+        margin-right: 5px;
+        font-family: 'Century Gothic';
+        display: inline-block;
+        font-weight: 600;
+    }
 </style>
 
 @Html.Hidden("id", Model.Id)
@@ -127,6 +196,18 @@
     <div class="QButton Yes_Kvot Qoff">Да</div>
     <div class="QButton Not_Kvot Qoff">Нет</div>
 </div>
+<div class="TextRangeAge RangeOFF">
+    <div class="SaveRange">Сохранить</div>
+    <div style="padding-left: 5px;">Установить диапозон</div>
+    <div class="PanelOfRange"></div>
+    <div style="position: absolute;">
+        <span style="margin: 5px 0px;">Диапозон</span>
+        <input type="text" class="InputRange LowerLimit" />
+        <span style="margin: 5px 0px;">-</span>
+        <input type="text" class="InputRange UpperLimit" />
+    </div>
+    <div class="ButtonADD">Добавить</div>
+</div>
 <hr style="margin-top: 10px; margin-bottom: 10px; color: red; background-color: red; height: 2px;">
 <div id="change_panel" class="table_answe">
     <table class="manager_panel"></table>
@@ -149,7 +230,7 @@
 
 @*Исполняймый скрип*@
 <script type="text/javascript">
-    var list_answer_base;
+var list_answer_base;
     var id_list_answer_base = [];
     var list_answer_base_1 = [];
     let type_question;
@@ -200,6 +281,9 @@
                     sceditor.instance(textarea).val(data.TextQuestion);
                     if (data.TypeQuestion == '3') {
                         $('.massk').show();
+                        if (data.TypeMassk == 1) {
+                            $('.TextRangeAge').removeClass("RangeOFF").addClass("RangeON");
+                        }
                         $("#typemassk").val(data.TypeMassk);
                     } else if (data.TypeQuestion == '2') {
                         AddLimitAnswerPanel();
@@ -400,7 +484,8 @@
                 TypeQuestion: type_question,
                 TextQuestion: text_question,
                 ProjectID: $('input[name=project_id]').val(),
-                TypeMassk: $('#typemassk').val()
+                TypeMassk: $('#typemassk').val(),
+                IsKvot: $('#typemassk').val() == 1 ? is_kvot : false
             }
         }
         var question_id;
@@ -1236,4 +1321,74 @@
 
     })
 
+    $('.LowerLimit').bind("change keyup input", function () {
+        if (this.value.match(RegExp(/[^0-9]/g))) {
+            this.value = this.value.substr(0, this.value.length - 1);
+        }
+    })
+    $('.UpperLimit').bind("change keyup input", function () {
+        if (this.value.match(RegExp(/[^0-9]/g))) {
+            this.value = this.value.substr(0, this.value.length - 1);
+        }
+    })
+
+    $('.ButtonADD').click(function () {
+        var container_range = $('.PanelOfRange');
+        var LowerContainer = $(this).prev().find('input.LowerLimit');
+        var UpperContainer = $(this).prev().find('input.UpperLimit');
+        var lower_limit = $(this).prev().find('input.LowerLimit').val() != "" ? Number($(this).prev().find('input.LowerLimit').val()) : -Infinity;
+        var upper_limit = $(this).prev().find('input.UpperLimit').val() != "" ? Number($(this).prev().find('input.UpperLimit').val()) : Infinity;
+        if (upper_limit <= lower_limit) {
+            alert("Нижний предел не может быть больше верхнего");
+            return;
+        }
+        var is_out = false
+        $('.PanelOfRange').find('div.StringRange').each(function () {
+            var e_lower_limit = !isNaN(Number($(this).text().split('-')[0])) ? Number($(this).text().split('-')[0]) : -Infinity;
+            var e_upper_limit = !isNaN(Number($(this).text().split('-')[1])) ? Number($(this).text().split('-')[1]) : Infinity;
+            if (((e_lower_limit <= lower_limit) && (lower_limit <= e_upper_limit)) || ((e_lower_limit <= upper_limit) && (upper_limit <= e_upper_limit))) {
+                alert("Диапозоны пересекаются");
+                is_out = true;
+                return false;
+            }
+        })
+        if (is_out) { return; }
+        var index_range = 1;
+        if ($('.PanelOfRange').find('.IndexRange').length >= 1) {
+            index_range = Number($('.PanelOfRange').find(".IndexRange:last").attr('id')) + 1;
+        }
+        var code = '<div><div class="IndexRange" id="' + index_range + '">' + index_range + ')</div><div class="StringRange">' + (lower_limit != -Infinity ? lower_limit : ("меньше " + upper_limit)) + ' - ' + (upper_limit != Infinity ? upper_limit : "больше " + lower_limit) + '</div><div style="display: inline-block;" class="RemoveRangePos">&#10006;</div></div>';
+        container_range.append(code);
+        LowerContainer.val(upper_limit + 1);
+        UpperContainer.val("");
+    });
+
+    $('#typemassk').change(function () {
+        var checked_type = $(this).find('option:checked').val();
+        if (checked_type == 1) {
+            $('.TextRangeAge').removeClass('RangeOFF').addClass('RangeON');
+        } else {
+            $('.TextRangeAge').removeClass('RangeON').addClass('RangeOFF');
+        }
+    })
+
+    $('.SaveRange').click(function () {
+        var list_range = [];
+        $('.PanelOfRange').find('div.StringRange').each(function () {
+            list_range.push($(this).text()+"#"+$(this).parent().find('.IndexRange').attr('id'));
+        })
+        console.log("Range List ==== : ", list_range);
+        var query = {
+            id_p: Number($('input[name=project_id]').val()),
+            bind_q: Number($('input.Id').val()),
+            list_range: list_range
+        }
+        $.post("/Question/SaveRange", query);
+        console.log("Query obj ==== ", query);
+    })
+
+    //Удаление позиции диапозона
+    $('.TextRangeAge').on("click", '.RemoveRangePos', function () {
+        $(this).parent().remove();
+    })
 </script>

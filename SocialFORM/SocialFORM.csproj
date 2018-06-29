@@ -236,6 +236,8 @@
     <Compile Include="Models\ChatUser.cs" />
     <Compile Include="Models\Opros.cs" />
     <Compile Include="Models\Question\Kvot.cs" />
+    <Compile Include="Models\Question\QuotaModel.cs" />
+    <Compile Include="Models\Question\RangeModel.cs" />
     <Compile Include="Models\Session\SessionHubModel.cs" />
     <Compile Include="Startup.cs" />
     <Content Include="Content\ajax-loader.gif" />

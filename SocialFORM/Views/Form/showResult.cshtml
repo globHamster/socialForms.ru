@@ -80,91 +80,10 @@
     $(function () {
 
         $('button.all_again').remove();
-
-        console.info("Выгрузка данных ... ", result);
-        console.info("Выгрузка данных ... ", text_other);
-        console.info("Выгрузка данных ... ", massiv_question_id);
-        console.log("Время начала ==== ", begin_time);
-        console.log("Время окончания ==== ", end_time);
-        /*  $.each(massiv_question_id, function (i, data) {
-              var code = '<div class="quest" id="' + data + '"></div>';
-              $('.changes').append(code);
-          });
-
-          $('div.quest').each(function () {
-              // $(this).append($(this).attr('id'))
-
-              var div_text = $(this);
-              $.get("/Question/getQuestion", { id: div_text.attr('id') })
-                  .success(function (data) {
-                      id_project = data.ProjectID;
-                      var type_q = data.TypeQuestion;
-                      div_text.html('<h3>Вопрос</h3><div class="question" id="' + div_text.attr('id') + '">' + data.TextQuestion + '</div>');
-                      div_text.append('<h3>Выбраны ответы</h3>');
-                      $.get("/Form/getAnswer", { id_q: div_text.attr('id') })
-                          .success(function (data) {
-                              var i_result = 0;
-                              for (var k = 0, iter = massiv_question_id[k]; k < massiv_question_id.length; k++ , iter = massiv_question_id[k]) {
-
-                                  if (iter == div_text.attr('id')) {
-                                      i_result = k;
-                                  }
-                              }
-
-
-                              var massiv = result[i_result];
-                              if (type_q == 4) {
-                                  var row_text;
-                                  $.ajax({
-                                      type: "GET",
-                                      url: "/Question/getTableRow",
-                                      async: false,
-                                      data: { id_q: div_text.attr('id') },
-                                      success: function (data) {
-                                          row_text = data;
-                                      }
-                                  });
-                                  var answer_id = [];
-                                  for (var i = 0; i < data.length; i++) {
-                                      answer_id.push(data[i].Id);
-                                  }
-                                  for (var i = 0; i < massiv.length; i++) {
-                                      var index_answer = answer_id.indexOf(Number(massiv[i]));
-                                      var code = '<p class="answer" id="' + div_text.attr('id') + '"><span>' + row_text[i].TableRowText + '</span> ' + data[index_answer].AnswerText + '</p>';
-                                      div_text.append(code);
-                                  }
-                              } else if (type_q != 3) {
-                                  $.each(data, function (i, data) {
-                                      for (var k = 0; k < massiv.length; k++) {
-                                          if (massiv[k] == data.Id) {
-                                              var code = '<p class="answer" id="' + div_text.attr('id') + '">' + data.AnswerText + '</p>';
-                                              div_text.append(code);
-                                          }
-                                      }
-                                  });
-                              } else {
-                                  $.each(data, function (i, data) {
-                                      if (massiv.length == 1 && massiv[0] == 0) {
-                                          var code = '<p class="answer" id="' + div_text.attr('id') + '">Jump</p>';
-                                          div_text.append(code);
-
-                                      } else {
-
-                                          for (var k = 0; k < massiv.length; k++) {
-                                              if (Number(massiv[k].substr(0, massiv[k].indexOf('#'))) == data.Id) {
-                                                  var code = '<p class="answer" id="' + div_text.attr('id') + '">' + massiv[k].substr(massiv[k].indexOf('#') + 1) + '</p>';
-                                                  div_text.append(code);
-                                              }
-                                          }
-                                      }
-                                  });
-                              }
-                          });
-                  })
-                  .error(function () {
-                      alert("Error");
-                  });
-          });*/
+        if (finded_quota != null || finded_quota != undefined) {
+            $.post("/Question/SubtractionQuota", { id_quota: finded_quota });
+        }
+  
     });
 
     $('input[name=phone_number]').focus(function () {
@@ -276,10 +195,6 @@
         console.info("query_q ---- ", query_q);
         var str_number = $("#phone_number").val().replace(/[^0-9]/ig, '');
         str_number = "8" + str_number.substr(1, str_number.length);
-        if (begin_time == undefined) {
-            var now_time = new Date();
-            begin_time = now_time.
-        }
         query = {
             name: $('p.name_operator').text(),
             project_id: id_project,

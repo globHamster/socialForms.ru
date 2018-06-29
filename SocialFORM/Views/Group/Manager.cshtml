@@ -221,6 +221,7 @@
 
 
     $(document).ready(function () { // вся мaгия пoсле зaгрузки стрaницы
+        $('.PreLoader').hide();
         var list_group_block = {};
         var list_div_group = [];
         $.get("/Group/GetListGroup", { id_p: $('input[name=project_id]').val() })

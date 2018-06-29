@@ -9,6 +9,65 @@
     @Scripts.Render("~/scripts/jquery-1.10.2.js")
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <style>
+        .PreLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(105,151,219, 0.7);
+            align-items: center;
+            text-align: center;
+            display: none;
+        }
+
+
+        .BoxLoad {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            position: absolute;
+            animation: animate .5s linear infinite;
+            left: 50%;
+            top: 50%;
+            border-radius: 3px;
+        }
+
+      
+@@keyframes loader {
+  0% { left: -100px }
+  100% { left: 110%; }
+}
+
+@@keyframes animate {
+  17% { border-bottom-right-radius: 3px; }
+  25% { transform: translateY(9px) rotate(22.5deg); }
+  50% {
+    transform: translateY(18px) scale(1,.9) rotate(45deg) ;
+    border-bottom-right-radius: 40px;
+  }
+  75% { transform: translateY(9px) rotate(67.5deg); }
+  100% { transform: translateY(0) rotate(90deg); }
+}
+.ShadowLoad {
+  width: 50px;
+  height: 5px;
+  background: #000;
+  opacity: 0.1;
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 59px);
+  border-radius: 50%;
+  animation: shadow .5s linear infinite;
+}
+@@keyframes shadow {
+  50% {
+    transform: scale(1.2,1);
+  }
+}
+
+    </style>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -37,6 +96,10 @@
 
     </div>
     <hr />
+    <div class="PreLoader">
+        <div class="BoxLoad"></div>
+        <div class="ShadowLoad"></div>
+    </div>
     <footer>
         <p style="text-align:center">&copy; @DateTime.Now.Year – приложение ASP.NET</p>
     </footer>

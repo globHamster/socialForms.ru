@@ -99,6 +99,7 @@
 
         $(".table").on("click", "td", function () {
             var id = $(this).attr('id');
+            $('.PreLoader').show();
             $("#Tables").load("/Group/Manager?id_project=" + id);
             //location.href = "/Group/Manager?id_project=" + id;
         });
@@ -170,6 +171,7 @@
 
     $('button.kvot').click(function () {
         var id_project = $(this).attr('id');
+        $('.PreLoader').show();
         $('.Tables').load('/Home/Kvot?id_p=' + id_project);
 
     });
