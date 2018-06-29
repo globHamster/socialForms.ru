@@ -20,3 +20,8 @@
     left: -20px;
     top: 20px;
 }
+
+#Tables {
+    display: inline-block !important;
+    width:100%;
+}

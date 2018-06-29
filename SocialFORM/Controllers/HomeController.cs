@@ -808,13 +808,15 @@ namespace SocialFORM.Controllers
                     string sessionEndTime = "";
                     string sessionTimeInSystem = "00:00:00";
                     string sessionAfkTime = "00:00:00";
+                    string tmp_time = "";
                     if (session.Count != 0)
                     {
                         sessionStartTime = session.First().StartTime;
                         sessionEndTime = session.Reverse<SessionHubModel>().First().EndTime;
                         foreach (var q in session)
                         {
-                            sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
+                            if (q.TimeInSystem == null) { tmp_time = DateTime.Now.ToLongTimeString(); } else { tmp_time = q.TimeInSystem; }
+                            sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(tmp_time)).ToString();
                             if (q.AfkTime != null)
                             {
                                 sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
