@@ -34,7 +34,7 @@
             <li><input type="checkbox" name="q1" value="3">Способ восстановить справедливость</li>
             <li><input type="checkbox" name="q1" value="4">Пропаганда насилия</li>
             <li><input type="checkbox" name="q1" value="5">Готовность применять насилие для достижения целей</li>
-            <li><input type="checkbox" name="q1" value="6">Допустимость использования крайних мер</li>
+            <li><input type="checkbox" name="q1" value="6">Приверженность к крайним взглядам и мерам(например, провокация беспорядков, террористические акции)</li>
             <li><input type="checkbox" name="q1" value="7">Другое (напишите)<input type="text" class="q1" hidden /></li>
             <li><input type="checkbox" name="q1" value="8">Затрудняюсь ответить</li>
         </ul>
@@ -90,7 +90,7 @@
             Не выбран вариант ответа
         </p>
         <p>
-            3. С какими именно проявлениями экстремизма Вам приходилось сталкиваться?
+            3. Какие виды экстремизма Вы знаете?
         </p>
         <textarea name="text3" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
     </div>
@@ -105,7 +105,7 @@
         <i>(ответ дайте, пожалуйста, по каждой строке)</i>
         <div style="padding-left:15%; width:100%;">
             <table border="1" style="text-align:center">
-                <tr><th></th><th>Крайне актуальна</th><th>Скорее актуальна</th><th>Скорее не актуальна</th><th>Не актуальна совсем</th><th>Затрудняюсь ответить</th></tr>
+                <tr class="tableheader"><th></th><th>Крайне актуальна</th><th>Скорее актуальна</th><th>Скорее не актуальна</th><th>Не актуальна совсем</th><th>Затрудняюсь ответить</th></tr>
                 <tr>
                     <td>Россия</td>
                     <td><input class="table" type="radio" name="q41" value="1"></td>
@@ -175,17 +175,18 @@
             <li><input type="checkbox" name="q7" value="2">В телевизионных передачах</li>
             <li><input type="checkbox" name="q7" value="3">В фильмах</li>
             <li><input type="checkbox" name="q7" value="4">В листовках</li>
-            <li><input type="checkbox" name="q7" value="5">В книгах</li>
-            <li><input type="checkbox" name="q7" value="6">Другие источники (напишите) <input type="text" class="q7" hidden /></li>
-            <li><input type="checkbox" name="q7" value="7">Не сталкивался</li>
+            <li><input type="checkbox" name="q7" value="5">В социальных сетях</li>
+            <li><input type="checkbox" name="q7" value="6">В книгах</li>
+            <li><input type="checkbox" name="q7" value="7">Другие источники (напишите) <input type="text" class="q7" hidden /></li>
+            <li><input type="checkbox" name="q7" value="8">Не сталкивался</li>
         </ul>
         <script>
             $('input[name="q7"]').change(function () {
-                if ($(this).is(':checked') && $(this).val() == 6) {
+                if ($(this).is(':checked') && $(this).val() == 7) {
                     $('input[class$="q7"]').show();
                 }
                 else {
-                    if (!$(this).is(':checked') && $(this).val() == 6)
+                    if (!$(this).is(':checked') && $(this).val() == 7)
                         $('input[class$="q7"]').hide();
                 }
             });
@@ -459,7 +460,7 @@
         <i>(ответ дайте, пожалуйста, по каждой строке)</i>
         <div style="padding-left:15%; width:100%;">
             <table border="1" style="text-align:center">
-                <tr><th></th><th>Довольно велика</th><th>Скорее велика</th><th>Скорее невелика</th><th>Невелика</th><th>Затрудняюсь ответить</th></tr>
+                <tr class="tableheader"><th></th><th>Довольно велика</th><th>Скорее велика</th><th>Скорее невелика</th><th>Невелика</th><th>Затрудняюсь ответить</th></tr>
                 <tr>
                     <td>Россия</td>
                     <td><input class="table" type="radio" name="q221" value="1"></td>
@@ -501,7 +502,7 @@
             Не выбран вариант ответа
         </p>
         <p>
-            24.	По Вашему мнению, какой способ профилактики молодежного экстремизма самый эффективный?
+            24.	Ваш пол?
         </p>
         <ul>
             <li><input type="radio" name="q24" value="1">Мужской </li>
@@ -513,7 +514,7 @@
             Не выбран вариант ответа
         </p>
         <p>
-            25.	По Вашему мнению, какой способ профилактики молодежного экстремизма самый эффективный?
+            25.	Ваш возраст?
         </p>
         <ul>
             <li><input type="radio" name="q25" value="1">14-17 лет</li>
@@ -553,7 +554,8 @@
         <textarea name="text27_1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
     </div>
     <p>СПАСИБО ЗА УЧАСТИЕ В ИССЛЕДОВАНИИ !</p>
-    <button id="SaveData">СОХРАНИТЬ</button>
+    <p><input type="checkbox" name="if" id="if" />Нажимая на кнопку "ОТПРАВИТЬ", Вы даете <a href="~/Content/Политика конфиденциальности и согласие на обработку персональных данных.docx">согласие на обработку персональных данных и соглашаетесь c политикой конфиденциальности.</a></p>
+    <button id="SaveData" disabled>ОТПРАВИТЬ</button>
 </div>
 <style>
     li {
@@ -618,6 +620,11 @@
 
     });
 
+    $('#if').click(function () {
+        if ($(this).is(':checked')) $('#SaveData').prop('disabled', false);
+        else $('#SaveData').prop('disabled', true);
+    });
+
 
     $('input[name="q8"]').change(function () {
         if ($(this).is(':checked') && ($(this).val() == 4 || $(this).val() == 5)) {
@@ -647,29 +654,31 @@
             }
             switch ($('div[class$="q' + i + '"]').attr('id')) {
                 case '1':
-                    if ($('div[class$="q' + i + '"]').find('input:checked').length > 0) {
-                        switch ($('div[class$="q' + i + '"]').find('input:first').attr('type')) {
-                            case 'checkbox':
-                                var count = 0;
-                                $('div[class$="q' + i + '"]').find('input').each(function () {
-                                    if ($(this).is(':checked')) {
-                                        conteiner.push($(this).attr('value'));
-                                        count++;
-                                    }
-                                });
-                                while (count < 3) {
-                                    conteiner.push('');
+                    switch ($('div[class$="q' + i + '"]').find('input:first').attr('type')) {
+                        case 'checkbox':
+                            var count = 0;
+                            $('div[class$="q' + i + '"]').find('input').each(function () {
+                                if ($(this).is(':checked')) {
+                                    conteiner.push($(this).attr('value'));
                                     count++;
                                 }
-                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
-                                    conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
-                                } else {
-                                    conteiner.push('');
-                                };
-
-
-                                break;
-                            case 'radio':
+                            });
+                            while (count < 3) {
+                                conteiner.push('');
+                                count++;
+                            }
+                            if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
+                                conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
+                            } else {
+                                conteiner.push('');
+                            };
+                            break;
+                        case 'radio':
+                            if ($('div[class$="q' + i + '"]').find('input:checked').length == 0) {
+                                conteiner.push('');
+                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').length > 0) conteiner.push('');
+                            }
+                            else {
                                 $('div[class$="q' + i + '"]').find('input').each(function () {
                                     if ($(this).is(':checked')) conteiner.push($(this).attr('value'));
                                 });
@@ -679,45 +688,29 @@
                                     } else {
                                         conteiner.push('');
                                     };
-                                break;
-                        }
-                    }
-                    else {
-                        $('.p' + i).show();
-                        $('html,body').animate({ scrollTop: $('div[class$="q' + i + '"]').offset().top }, 500);
-                        return;
+                            }
+                            break;
                     }
                     break;
                 case '2':
-                    if ($('div[class$="q' + i + '"]').find('textarea').val() != "") {
-                        $('div[class$="q' + i + '"]').find('textarea').each(function () {
-                            conteiner.push($(this).val());
-                        });
-                    }
-                    else {
-                        $('.p' + i).show();
-                        $('html,body').animate({ scrollTop: $('div[class$="q' + i + '"]').offset().top }, 500);
-                        return;
-                    }
+                    $('div[class$="q' + i + '"]').find('textarea').each(function () {
+                        conteiner.push($(this).val());
+                    });
                     break;
                 case '3':
-                    if ($('div[class$="q' + i + '"]').find('input:checked').length == 3) {
-                        $('div[class$="q' + i + '"]').find('input').each(function () {
-                            if ($(this).is(':checked')) conteiner.push($(this).attr('value'));
-                        });
-                    }
-                    else {
-                        $('.p' + i).show();
-                        $('html,body').animate({ scrollTop: $('div[class$="q' + i + '"]').offset().top }, 500);
-                        return;
-                    }
+                    $('div[class$="q' + i + '"]').find('tr:not(.tableheader)').each(function () {
+                        if ($(this).find('input:checked').length >= 1)
+                            conteiner.push($(this).find('input:checked').attr('value'));
+                        else
+                            conteiner.push('');
+                    });
                     break;
             }
         }
         //
         //ЗАПРОС НА СОХРАНЕНИЕ
         $.post('/Home/postSaveOp', { mass: conteiner }).success(function () {
-            //window.location.reload();
+            window.location.reload();
         });
         console.log('save =>>>>>>', conteiner);
     });

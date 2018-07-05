@@ -1,10 +1,16 @@
-﻿$(function () {
+﻿//import { Stats } from "fs";
+
+$(function () {
     // Ссылка на автоматически-сгенерированный прокси хаба
     var session = $.connection.sessionHub;
     var connectionId;
     // Функция, вызываемая при подключении нового пользователя
     session.client.onConnected = function (id, userName, time) {
-        $('#session').html('<font color="#808080" size="1"><p align="right" name="StetLine" style="white-space: nowrap" id="' + id + '"> Status bar ConnectionId: ' + id + ' - Name: ' + userName + ' - TimeUp: ' + time + '<p></font>');
+        $('#session').html('<font color="#808080" size="1"><p align="right" name="StetLine" style="white-space: nowrap" id="' + id + '"> Status bar ConnectionId: ' + id + ' - Name: ' + userName
+            + ' - TimeUp: ' + time
+            + '<p></font>');
+        console.log(session);
+        console.log();
     }
 
     // Добавляем нового пользователя
@@ -33,7 +39,7 @@
     $(document).ready(function () {
         $(document).bind('mousemove keydown scroll', function () {
             clearTimeout(idleTimer); // отменяем прежний временной отрезок
-            if (idleState == true) {
+            if (idleState === true) {
                 // Действия на возвращение пользователя
                 session.server.endafk(safkll);
                 $('img[id=status]').attr('src', '../images/icon/status.png');
@@ -90,15 +96,15 @@ function OnMonitor(allUsers_l) {
 
         var countROW_tmp = countROW;
         for (i = 0; i < allUsers_l.length; i++) {
-            if (i == countROW_tmp) { codeTable += '</tr><tr>'; countROW_tmp = countROW + i + 1; }
-            if (allUsers_l[i].IsAction == true && allUsers_l[i].EndTime == null) {
+            if (i === countROW_tmp) { codeTable += '</tr><tr>'; countROW_tmp = countROW + i + 1; }
+            if (allUsers_l[i].IsAction === true && allUsers_l[i].EndTime === null) {
                 codeTable += '<td style="padding:4px"><p style="text-align: center;" id="'
                     + allUsers_l[i].ConnectionId
                     + '"> <img id = "status_monitoring" class= "online" src = "../images/icon/status.png" /> <b>'
                     + allUsers_l[i].UserName
                     + '</b></p></td>';
             }
-            if (allUsers_l[i].IsAction == false && allUsers_l[i].EndTime == null) {
+            if (allUsers_l[i].IsAction === false && allUsers_l[i].EndTime === null) {
                 codeTable += '<td style="padding:4px"><p style="text-align: center;" id="'
                     + allUsers_l[i].ConnectionId
                     + '"> <img id = "status_monitoring" class= "online" src = "../images/icon/status_offline.png" /> <b>'

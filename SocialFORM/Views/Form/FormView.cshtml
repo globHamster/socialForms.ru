@@ -1,5 +1,7 @@
-﻿<style>
+﻿﻿
+<style>
     .tool_layer {
+        background-color: #FFF;
         border-bottom: 1px solid black;
         height: 35px;
     }
@@ -182,7 +184,7 @@
     var list_quota = {};
     let string_chain = new String();
     var finded_quota = new Number();
-    var begin_time, end_time; //Время начала анкетирования
+    var begin_time = undefined, end_time = undefined; //Время начала анкетирования
     var status = 0;
     var is_load_id = false;
     var active_group = {};
@@ -381,13 +383,13 @@
             $(".show_result").load("/Form/showResult");
         } else {
             $('body,html').animate({ scrollTop: 0 }, 500);
-            if (index == 1 && status == 0) {
+            if (index == 1) {
                 $.get("/Form/GetServerTime")
                     .success(function (server_time) {
                         if (begin_time == undefined)
                             begin_time = server_time;
                         status = 1;
-                        console.log("Test time   ", begin_time);
+                        console.log("Test time begin   ", begin_time);
                     })
                     .error(function () { alert("Error"); })
             }
@@ -396,7 +398,7 @@
                     .success(function (server_time) {
                         if (end_time == undefined)
                             end_time = server_time;
-                        console.log("Test time   ", end_time);
+                        console.log("Test time end  ", end_time);
                     })
             }
             if (index == 1) {
@@ -421,16 +423,15 @@
                                 if (skip) { skip = false; return; }
                                 if (item.AnswerType == 1) {
                                     if (list_answer[item.AnswerKey].isFreeArea) {
-                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="radio" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden checked/></td></tr>')
+                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="radio" name="group" id="' + item.AnswerKey + '"> <label for="' + item.AnswerKey + '"><span></span></label>' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden checked/></td></tr>')
                                     } else {
-                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="radio" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden/></td></tr>')
+                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="radio" name="group" id="' + item.AnswerKey + '"> <label for="' + item.AnswerKey + '"><span></span></label>' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden/></td></tr>')
                                     }
                                 }
                                 else
-                                    $('.answer_table').append('<tr class="tool_layer base_answer"><td><input type="radio" name="group" id="' + list_base_answer[item.AnswerKey].BaseIndex + '"> ' + list_base_answer[item.AnswerKey].AnswerText + '</td></tr>')
+                                    $('.answer_table').append('<tr class="tool_layer base_answer"><td><input type="radio" name="group" id="' + list_base_answer[item.AnswerKey].BaseIndex + '"> <label for="' + list_base_answer[item.AnswerKey].BaseIndex + '"><span></span></label>' + list_base_answer[item.AnswerKey].AnswerText + '</td></tr>')
                             }
                         })
-
                     }
                     FindAnswer();
                     break;
@@ -503,7 +504,7 @@
                             if (skip) { skip = false; return; }
                             code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
                             for (var c = 1; c < count_table_colum; c++) {
-                                code += '<td class="table_answer tool_layer"><input type="radio" name="group' + count_table_row + '" id="' + c + '"></td>';
+                                code += '<td class="table_answer tool_layer" style="background-color:#FFF;"><input type="radio" name="group' + count_table_row + '" id="' + c + '"><label for="' + c + '"><span></span></label></td>';
                             }
                             code += '</tr>';
                             count_table_row++;
@@ -814,6 +815,7 @@
                 }
             }
         } else {
+
             index++;
         }
 
@@ -999,12 +1001,12 @@
                 code = '<div class="change_answer_table"><table>';
                 $.each(change_list, function (i, item) {
                     if (result[massiv_question_id[index]] == undefined)
-                        code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><span>' + item.AnswerText + '</span></td></tr>';
+                        code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><label for="' + item.Id + '"><span></span></label><span>' + item.AnswerText + '</span></td></tr>';
                     else {
                         if (result[massiv_question_id[index]] == item.Id)
-                            code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '" checked/><span>' + item.AnswerText + '</span></td></tr>';
+                            code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '" checked/><label for="' + item.Id + '"><span></span></label><span>' + item.AnswerText + '</span></td></tr>';
                         else
-                            code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><span>' + item.AnswerText + '</span></td></tr>';
+                            code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><label for="' + item.Id + '"><span></span></label><span>' + item.AnswerText + '</span></td></tr>';
                     }
                 });
                 code += '</table></div>';
@@ -1044,7 +1046,7 @@
     $(document).off("mouseleave", ".tool_layer");
     $(document).on("mouseleave", ".tool_layer", function () {
 
-        $(this).css('background-color', '#fff')
+        $(this).css('background-color', '#FFF')
             .css('cursor', 'default');
     });
 
@@ -1102,10 +1104,10 @@
         if (list_blocks[id_q] != null) {
             if (list_blocks[id_q].length >= 1) {
 
-                //console.log("List block length ===== ", list_blocks[id_q].length);
+                console.log("List block length ===== ", list_blocks[id_q].length);
                 $.each(list_blocks[id_q], function (i, item_block) {
                     //--------
-                    //console.log("List block length ===== ", item_block);
+                    console.log("List block length ===== ", item_block);
                     if (item_block.fromQuestion == id_q && item_block.typeBlock == 1) {
                         $.each(result[massiv_question_id.indexOf(Number(item_block.toQuestion))], function (i, item_tmp) {
                             if (Number(item_tmp) <= 1) {

@@ -2,7 +2,7 @@
     ViewBag.Title = "Личный кабинет";
 }
 
-<link rel="stylesheet" type="text/css" href="~/Content/media/style.css">
+<link rel="stylesheet" type="text/css" href="../Content/media/style.css">
 
 <div class="col-md-3 menu">
     <button class="MinMax" id="max"><img src="~/images/icon/previous.png" style="width:20px; height:20px; margin-left: -13px;" /></button>
@@ -78,7 +78,7 @@
 <div class="col-md-9 cont">
     <div class="row" id="session"></div>
     <div class="Chat row">
-        <button class="openChat btnLogin" style="border:none;outline:none;background-color:white"><img src="~/images/icon/mess.png" height="20"/></button><span class="blink" name="@ViewData["Role"]"><b>НОВОЕ СООБЩЕНИЕ</b></span>
+        <button class="openChat btnLogin" style="border:none;outline:none;background-color:white"><img src="~/images/icon/mess.png" height="20" /></button><span class="blink" name="@ViewData["Role"]"><b>НОВОЕ СООБЩЕНИЕ</b></span>
         <div class="modelChat" style="display:none;position: fixed;z-index:1000;">
             <button class="close" data-dismiss="modal" area-hidden="true" style="margin-top:1%;margin-right:1%;">X</button>
             <div class="main">
@@ -104,6 +104,7 @@
     <div id="Tables" class="Tables">
 
     </div>
+
 </div>
 
 

@@ -74,6 +74,7 @@ namespace SocialFORM.Controllers
                     ModelState.AddModelError("", "Пользователя с таким логином и паролем нет");
                 }
             }
+            
             return View(model);
         }
 
