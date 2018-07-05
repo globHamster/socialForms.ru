@@ -146,7 +146,7 @@
 </div>
 <div class="TextLimitQuota">
     <div class="TextForSpeech">
-       Квотный лимит превышен!
+        Квотный лимит превышен!
     </div>
 
     <div class="ButtonAGAIN">
@@ -179,7 +179,7 @@
     var list_group = {};
     var list_question_bind_group = {};
     let list_range = {};
-    let list_quota = {};
+    var list_quota = {};
     let string_chain = new String();
     var finded_quota = new Number();
     var begin_time, end_time; //Время начала анкетирования
@@ -188,6 +188,8 @@
     var active_group = {};
     var q1, q2, q3, q4, q5, q6, q7;
     var count_ajax = 0;
+    var massive_quota_id = [];
+    let massive_string_chain = [];
     //Блок выгрузки данных
     {
 
@@ -353,8 +355,12 @@
 
         $.get("/Question/GetQuota", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
-                console.log("Успешна выгрузка квот ==== ", server_data);
-                list_quota = server_data;
+
+                $.each(server_data, function (i, item) {
+                    item.IsActive = false;
+                    list_quota[i] = item;
+                });
+                console.log("Успешна выгрузка квот ==== ", list_quota);
             })
 
     }
@@ -604,11 +610,7 @@
 
                     }
                     SaveResult();
-                    if (list_question[id_q].IsKvot == true) {
-                        string_chain += id_q + "/" + result[index];
-                        CheckQuota();
-                        console.log("Chain string ==== ", string_chain);
-                    }
+                    CheckQuota();
                     CheckGroupGo();
                     checkTransitionGo();
                     CheckGroup();
@@ -649,20 +651,7 @@
                 else {
                     $('div.wrong_choise').fadeOut('fast');
                     SaveResult();
-                    if (list_question[id_q].IsKvot == true) {
-                        var age = Number(String(result[index]).split('#')[1]);
-                        $.each(list_range[id_q], function (i, item) {
-                            var lower_limit = !isNaN(Number(String(item.RangeString).split('-')[0])) ? Number(String(item.RangeString).split('-')[0]) : -Infinity;
-                            var upper_limit = !isNaN(Number(String(item.RangeString).split('-')[1])) ? Number(String(item.RangeString).split('-')[1]) : Infinity;
-                            if ((lower_limit <= age) && (age <= upper_limit)) {
-                                alert("Here");
-                                string_chain += id_q + "/" + item.Id;
-                                CheckQuota();
-                                return false;
-                            }
-                        })
-                        console.log("Age ==== ", age);
-                    }
+                    CheckQuota();
                     index++;
                     getStart();
                     //goNext();
@@ -741,7 +730,6 @@
                 $('input.free_text').each(function () {
                     mas.push($(this).attr('id') + "#" + $(this).val().replace(',', ';'));
                 });
-                console.info("mas result ---- ", mas);
                 result[index] = mas;
                 text_other[index] = ['null'];
                 break;
@@ -753,7 +741,6 @@
                         mas.push($('tr.beginer').find('td[id=' + id + ']').attr('name'));
                     }
                 });
-                console.info("data table ---- ", mas);
                 result[index] = mas;
                 text_other[index] = ['null'];
                 break;
@@ -778,16 +765,11 @@
     //Проверка перехода при проходе вперед
     function checkTransitionGo() {
         var code_transition = find_transition_move(id_q, result[index]);
-        console.log("Code transition ==== ", code_transition);
-        console.log("result list ====== ", result[index]);
         if (code_transition >= 0) {
 
             if (result[index].length >= 2) {
                 $.each(result[index], function (u, item) {
-                    console.log("item ==== ", item);
-                    console.log("trigger ==== ", list_transition[code_transition].TriggerAnswer);
                     if (Number(item) == list_transition[code_transition].TriggerAnswer) {
-                        console.log("check transition");
                         var jump_index;
                         list_transition[code_transition].ActiveTransition = true;
                         jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
@@ -1042,11 +1024,7 @@
             SaveResult();
             checkTransitionBack();
             CheckGroup_Back();
-            if (list_question[massiv_question_id[index]].IsKvot == true) {
-                var tmp_id_question = massiv_question_id[index];
-                string_chain = string_chain.substring(0, string_chain.indexOf(String(tmp_id_question)));
-                console.log("New string chain >>>>> ", string_chain);
-            }
+            CheckQuotaBack();
             getStart();
         }
     });
@@ -1208,7 +1186,6 @@
                 });
             }
         }
-        console.info(skip);
         return skip;
     }
 
@@ -1265,10 +1242,8 @@
     function find_transition_move(id_question, list_result) {
         for (var i = 0; i < list_transition.length; i++) {
             if (list_transition[i].fromQuestion == id_question) {
-                console.log("ID question ==== ", id_question);
                 for (var j = 0; j < list_result.length; j++) {
                     if (Number(list_result[j]) < 0) {
-                        console.log("Find minus id ===== ", Number(list_result[j]));
                         var is_find = false;
                         var item_find;
 
@@ -1298,7 +1273,6 @@
 
     function CheckLimitAnswer() {
         var limit_count = list_question[id_q].LimitCount;
-        console.log("limit count ", $('.answer_panel').find('input[name=group]:checked').length);
         if (limit_count > 0 && limit_count != null) {
             if ($('.answer_panel').find('input[name=group]:checked').length == limit_count) {
                 $('div.limit_checked_div').remove();
@@ -1320,7 +1294,7 @@
         }
     }
 
-
+    //DELETE???
     function ConnectClick() {
         $('.answer_table').find('.tool_layer').each(function () {
             $(this).click(function () {
@@ -1341,29 +1315,127 @@
         })
     }
 
+    /*Поиск и проверка квот (Осуществляется только при движении вперед по анкете)
+     *Запись цепочек осуществляется в массив massive_string_chain 
+     */
     function CheckQuota() {
         var is_out = false;
         var item_quota;
-        $.each(list_quota, function (i, item) {
-
-            if (item.ChainString == string_chain) {
-                is_out = true;
-                item_quota = item;
-                return false;
+        var res;
+        if (list_question[id_q].IsKvot == true) {
+            massive_quota_id.push(id_q);
+            if (list_question[id_q].TypeQuestion == 3) {
+                var age = Number(String(result[index]).split('#')[1]);
+                $.each(list_range[id_q], function (i, item) {
+                    var lower_limit = !isNaN(Number(String(item.RangeString).split('-')[0])) ? Number(String(item.RangeString).split('-')[0]) : -Infinity;
+                    var upper_limit = !isNaN(Number(String(item.RangeString).split('-')[1])) ? Number(String(item.RangeString).split('-')[1]) : Infinity;
+                    if ((lower_limit <= age) && (age <= upper_limit)) {
+                        res = item.Id;
+                        return false;
+                    }
+                })
+            } else {
+                res = result[index];
             }
-        })
-        if (is_out) {
-            $.get("/Question/CheckQuotaCount", { id_quota: item_quota.Id })
+            var break_loop = false;
+            $.each(list_quota, function (i, item) {
+
+                if (item.ChainString.indexOf(id_q + '/') == 0) {
+                    var str_chain = id_q + '/' + res;
+                    $.each(list_quota, function (i, item) {
+                        if (item.ChainString == str_chain) {
+                            item.IsActive = true;
+                            break_loop = true;
+                            CheckCountQuota(item.Id);
+                            return false;
+                        }
+                    });
+                    if (break_loop) {
+                        break_loop = false;
+                        massive_string_chain.push(str_chain);
+                        return false;
+                    } else {
+                        massive_string_chain.push(str_chain);
+                    }
+                    return false;
+                } else {
+                    $.each(massive_string_chain, function (index_chain, item_chain) {
+                        var str_chain = item_chain + '#' + id_q + '/' + res;
+
+                        $.each(list_quota, function (i, item) {
+                            if (item.ChainString == str_chain) {
+                                item.IsActive = true;
+                                break_loop = true;
+                                CheckCountQuota(item.Id);
+                            }
+                            if (item.ChainString.indexOf(str_chain) == 0) {
+                                massive_string_chain[index_chain] = str_chain;
+                                break_loop = true;
+                                return false;
+                            }
+                        });
+                        if (break_loop) {
+                            break_loop = false;
+                            return false;
+                        }
+                    })
+                }
+
+            });
+        }
+        console.log("Massive string chain ==== ", list_quota);
+    }
+
+    function CheckQuotaBack() {
+        var question_id = massiv_question_id[index];
+
+        var res;
+        if (list_question[question_id].IsKvot == true) {
+            if (list_question[question_id].TypeQuestion == 3) {
+                var age = Number(String(result[index]).split('#')[1]);
+                $.each(list_range[question_id], function (i, item) {
+                    var lower_limit = !isNaN(Number(String(item.RangeString).split('-')[0])) ? Number(String(item.RangeString).split('-')[0]) : -Infinity;
+                    var upper_limit = !isNaN(Number(String(item.RangeString).split('-')[1])) ? Number(String(item.RangeString).split('-')[1]) : Infinity;
+                    if ((lower_limit <= age) && (age <= upper_limit)) {
+                        res = item.Id;
+                        return false;
+                    }
+                })
+            } else {
+                res = result[index];
+            }
+            var str_chain = question_id + "/" + res;
+            $.each(massive_string_chain, function (i, item) {
+                if (item.indexOf(str_chain) >= 0) {
+                    var item_string_chain = item;
+                    $.each(list_quota, function (i, item) {
+                        if (item.ChainString == item_string_chain) {
+                            list_quota[i].IsActive = false;
+                        }
+                    });
+                    if (item.indexOf(str_chain) == 0) {
+                        if (i == 0) {
+                            massive_string_chain = [];
+                        } else {
+                            massive_string_chain.splice(i, i);
+                        }
+                    } else {
+                        massive_string_chain[i] = item.substring(0, item.indexOf(str_chain) - 1);
+                    }
+                }
+            })
+        }
+        console.log("Check Quota back >>>>> ", list_quota);
+    }
+
+    //Функция проверки счетчика квот
+    function CheckCountQuota(id_quota) {
+        $.get("/Question/CheckQuotaCount", { id_quota: id_quota })
                 .success(function (server_data) {
                     if (server_data.QuotaCount <= 0) {
                         $('.TextLimitQuota').show();
-                    } else {
-                        finded_quota = item_quota.Id;
-                    }
+                    } 
                 })
-        } else {
-            string_chain += "#";
-        }
     }
 
     $('.ButtonAGAIN').one("click", function () {

@@ -80,9 +80,11 @@
     $(function () {
 
         $('button.all_again').remove();
-        if (finded_quota != null || finded_quota != undefined) {
-            $.post("/Question/SubtractionQuota", { id_quota: finded_quota });
-        }
+        $.each(list_quota, function (i, item) {
+            if (item.IsActive == true) {
+                $.post("/Question/SubtractionQuota", { id_quota: item.Id });
+            }
+        })
   
     });
 

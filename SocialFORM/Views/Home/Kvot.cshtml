@@ -108,6 +108,14 @@
         .SaveQuota:hover {
             color: #585858;
         }
+
+        .Total_Count {
+            position: relative;
+            width: 100px;
+            height: 50px;
+            background-color: red;
+            left: calc(100% - 100px);
+        }
 </style>
 <input name="project_id" value="@ViewBag.ProjectID" hidden />
 
@@ -281,7 +289,7 @@
             BildQuotaTree();
         } else {
             $('.QuotaPanel').append('<div name="quota_question_manager" id="' + $(this).attr('id') + '" class="QuotaManager Root"><div class="name_quota_question">' + list_group_question[$(this).attr('id')].GroupName + '</div><div class="RemoveLevelQuota Root" id="' + $(this).attr('id') + '">&#10006;</div><div class="UnionWith Root"> &#10010; Уровень</div></div>');
-            $('div[id=' + $(this).attr('id') + '][name=quota_question_manager]').append('<div class="TargetAnswerPanel"></div>');
+            $('div[id=' + $(this).attr('id') + '][name=quota_question_manager]').append('<div class="Total_Count">1</div><div class="TargetAnswerPanel"></div>');
             var id_question = $(this).attr('id');
             $.get("/Question/getAnswer", { id_question: $(this).attr('id') })
                 .success(function (server_data) {
@@ -470,7 +478,7 @@
                         count_index++;
                     }
                 })
-                console.log("Item massiv == ", massiv_tmp2);
+                
                 $.each(massiv_tmp2, function (ind, item) {
 
                     var massiv_tmp = item;
@@ -496,28 +504,25 @@
                         if (i == massiv_tmp.length - 1) {
 
                             var list_answer = question_item.AnswerList;
-                            console.log('List answer === ', list_answer);
                             if (massiv_tmp.length == 1) {
                                 $.each(list_answer, function (k, item) {
-                                    container_rebild.find('.TargetAnswerPanel').append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input type="text" style=" width: 80px;" /></div></div>');
+                                    container_rebild.find('.TargetAnswerPanel').append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input class="Count_Quota" type="text" style=" width: 80px;" /></div></div>');
                                 })
                             }
                             else {
                                 $.each(list_answer, function (k, item) {
                                     container_rebild.find('.TargetAnswerPanel').find('div[id=' + (i - 1) + ']').each(function () {
-                                        $(this).append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input type="text" style=" width: 80px;" /></div></div>');
+                                        $(this).append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input class="Count_Quota" type="text" style=" width: 80px;" /></div></div>');
                                     })
                                 })
                             }
                         } else if (i == 0) {
                             var list_answer = question_item.AnswerList;
-                            console.log('List answer === ', list_answer);
                             $.each(list_answer, function (k, item) {
                                 container_rebild.find('.TargetAnswerPanel').append('<div class="QuotaHeadName QuotaDiv" id=' + i + '><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div>');
                             })
                         } else {
                             var list_answer = question_item.AnswerList;
-                            console.log('List answer === ', list_answer);
                             $.each(list_answer, function (k, item) {
                                 container_rebild.find('.TargetAnswerPanel').find('div[id=' + (i - 1) + ']').each(function () {
                                     $(this).append('<div class="QuotaHeadName QuotaDiv" id=' + i + ' style="margin-left: ' + (10 * i) + 'px"><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div>');
@@ -527,7 +532,6 @@
                     }
                 })
 
-                console.log('MAssivr == ', full_chain_answer);
                 $.each(full_chain_answer, function (i, item) {
                     FindInputCountQuota(item[0], item[1]);
                 })
