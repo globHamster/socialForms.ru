@@ -17,6 +17,7 @@
         min-width: 150px;
         display: none;
         align-items: center;
+        z-index: 999;
     }
 
     p.hover_question {
@@ -49,7 +50,7 @@
     .TargetAnswerPanel {
         border: 1px solid black;
         padding: 5px;
-        margin: 5px;
+        margin-bottom: 5px;
     }
 
     .UnionWith {
@@ -109,13 +110,35 @@
             color: #585858;
         }
 
-        .Total_Count {
-            position: relative;
-            width: 100px;
-            height: 50px;
-            background-color: red;
-            left: calc(100% - 100px);
-        }
+    .Total_Count {
+        position: relative;
+        display: inline-block;
+        width: 100px;
+        height: 30px;
+        border: 1px solid black;
+        border-bottom: 0px;
+        left: calc(100% - 100px);
+        font-size: 16px;
+        font-family: 'Century Gothic';
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .PanelTotalCount {
+        align-items: flex-end;
+        height: 30px;
+    }
+
+    .TextTotalCount {
+        font-family: 'Century Gothic';
+        font-weight: 900;
+        font-size: 16px;
+        display: inline-block;
+        position: absolute;
+        left: calc(100% - 200px);
+        width: 120px;
+        height: 30px;
+    }
 </style>
 <input name="project_id" value="@ViewBag.ProjectID" hidden />
 
@@ -173,7 +196,6 @@
                                     }
 
                                 })
-                                console.log("Range list === ", list_range);
                             })
                     } else {
                         $.get("/Question/getAnswer", { id_question: id_question })
@@ -190,8 +212,6 @@
                             })
                     }
                 })
-                console.log("Full list question === ", list_kvot_question);
-
             })
 
         //$('select[name=question_name]').change(function () {
@@ -289,7 +309,7 @@
             BildQuotaTree();
         } else {
             $('.QuotaPanel').append('<div name="quota_question_manager" id="' + $(this).attr('id') + '" class="QuotaManager Root"><div class="name_quota_question">' + list_group_question[$(this).attr('id')].GroupName + '</div><div class="RemoveLevelQuota Root" id="' + $(this).attr('id') + '">&#10006;</div><div class="UnionWith Root"> &#10010; Уровень</div></div>');
-            $('div[id=' + $(this).attr('id') + '][name=quota_question_manager]').append('<div class="Total_Count">1</div><div class="TargetAnswerPanel"></div>');
+            $('div[id=' + $(this).attr('id') + '][name=quota_question_manager]').append('<div class="PanelTotalCount"><div class="TextTotalCount">Всего : </div><div class="Total_Count">1</div></div><div class="TargetAnswerPanel"></div>');
             var id_question = $(this).attr('id');
             $.get("/Question/getAnswer", { id_question: $(this).attr('id') })
                 .success(function (server_data) {
@@ -349,6 +369,10 @@
     $('.QuotaPanel').on("click", ".RemoveLevelQuota", function () {
         var id_question = $(this).attr('id');
         if ($(this).hasClass('Root')) {
+            var parent_div = $(this).parents('.QuotaManager');
+            parent_div.find(".QuotaManager").each(function () {
+                $('.PanelQuestion').find('p[id=' + $(this).attr('id') + ']').show();
+            })
             $(this).parent().addClass('Rebild');
             $('.PanelQuestion').find('p[id=' + id_question + ']').show();
             $(this).parent().remove();
@@ -358,8 +382,10 @@
             $('.PanelQuestion').find('p[id=' + id_question + ']').show();
             $(this).parent().remove();
             BildQuotaTree();
+
         }
-        $.post('/Question/DeleteQuota', { id_p: $('input[name=project_id]').val() });
+
+        $.post('/Question/DeleteQuota', { id_p: $('input[name=project_id]').val(), id_q: id_question });
     })
 
     function BildQuotaTree() {
@@ -371,35 +397,30 @@
         container_rebild.find('div.QuotaManager').each(function () {
             massiv_tmp.push($(this).attr('id'));
         })
-
-        console.log("Massive tmp : ", massiv_tmp);
         for (var i = 0; i < massiv_tmp.length; i++) {
             var question_item = list_kvot_question[massiv_tmp[i]];
             console.log("Question list === ", question_item);
             if (i == massiv_tmp.length - 1) {
                 var list_answer = question_item.AnswerList;
-                console.log('List answer === ', list_answer);
                 if (massiv_tmp.length == 1) {
                     $.each(list_answer, function (k, item) {
-                        container_rebild.find('.TargetAnswerPanel').append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input type="text" style=" width: 80px;" /></div></div>');
+                        container_rebild.find('.TargetAnswerPanel').append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input class="Count_Quota" type="text" style=" width: 80px;" /></div></div>');
                     })
                 }
                 else {
                     $.each(list_answer, function (k, item) {
                         container_rebild.find('.TargetAnswerPanel').find('div[id=' + (i - 1) + ']').each(function () {
-                            $(this).append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input type="text" style=" width: 80px;" /></div></div>');
+                            $(this).append('<div style="margin-left: ' + (10 * i) + 'px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=' + i + ' ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input class="Count_Quota" type="text" style=" width: 80px;" /></div></div>');
                         })
                     })
                 }
             } else if (i == 0) {
                 var list_answer = question_item.AnswerList;
-                console.log('List answer === ', list_answer);
                 $.each(list_answer, function (k, item) {
                     container_rebild.find('.TargetAnswerPanel').append('<div class="QuotaHeadName QuotaDiv" id=' + i + '><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div>');
                 })
             } else {
                 var list_answer = question_item.AnswerList;
-                console.log('List answer === ', list_answer);
                 $.each(list_answer, function (k, item) {
                     container_rebild.find('.TargetAnswerPanel').find('div[id=' + (i - 1) + ']').each(function () {
                         $(this).append('<div class="QuotaHeadName QuotaDiv" id=' + i + ' style="margin-left: ' + (10 * i) + 'px"><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + question_item.Id + '"/>' + item.AnswerText + '</div>');
@@ -407,10 +428,35 @@
                 })
             }
         }
+
+        var panel_answer = container_rebild.find('.TargetAnswerPanel').first();
+        var total_count = 0;
+        panel_answer.find('.Count_Quota').each(function () {
+            if (isNaN(Number($(this).val())) || $(this).val() == "") $(this).val("0");
+            total_count += Number($(this).val());
+        })
+        panel_answer.prev().find('.Total_Count').first().text(total_count);
+
+        CheckTotalCount();
         $('.Rebild').removeClass('Rebild');
     }
 
     $('.SaveQuota').click(function () {
+        var prev_count;
+        var out_function = false;
+        $('.Total_Count').each(function (i) {
+            if (i == 0) prev_count = Number($(this).text());
+            else {
+                if (prev_count != Number($(this).text())) {
+                    out_function = true;
+                    return false;
+                }
+            }
+        })
+        if (out_function) {
+            alert("Не совподают количество квот");
+            return;
+        }
         var list_quota = [];
         $('.TargetAnswerPanel').find('input').each(function () {
             if ($(this).val() == '') {
@@ -418,8 +464,9 @@
             }
         })
         CreateChainQuota($('.TargetAnswerPanel'), -1, "", list_quota);
-        console.log("List Quota ==>> ", list_quota);
         $.post("/Question/SaveQuota", { id_p: $('input[name=project_id]').val(), list_quota: list_quota })
+            .success(function () { alert("Квоты сохранены") })
+            .error(function () { alert("Ошибка сохранения квот") });
     })
 
     function CreateChainQuota(container, id_num, str_tmp, list_quota) {
@@ -432,7 +479,6 @@
                 var id_answer = $(this).find('input.InfoAnswer:first').attr('id');
                 chain_str += id_question + "/" + id_answer + '=' + $(this).next().find('input:first').val();
                 list_quota.push(chain_str);
-                //console.log("chain === > ", chain_str);
             } else {
                 chain_str = str_tmp.substr(0);
                 var id_question = $(this).find('input.InfoQuestion:first').attr('id');
@@ -471,21 +517,18 @@
                         $.each(devide_massiv, function (i, item) {
                             tmp_devide_massive.push(item.split('/')[0]);
                         })
-                        console.log("Template massive : ", tmp_devide_massive);
-                        console.log("Count index : ", count_index);
                         massiv_tmp2[count_index] = tmp_devide_massive;
-                        console.log("Full massive : ", massiv_tmp2);
                         count_index++;
                     }
                 })
-                
+
                 $.each(massiv_tmp2, function (ind, item) {
 
                     var massiv_tmp = item;
                     for (var i = 0; i < massiv_tmp.length; i++) {
                         if (i == 0) {
-                            $('.QuotaPanel').append('<div name="quota_question_manager" id="' + massiv_tmp[0] + '" class="QuotaManager Root"><div class="name_quota_question">' + list_group_question[massiv_tmp[0]].GroupName + '</div><div class="RemoveLevelQuota Root" id="' + massiv_tmp[0] + '">&#10006;</div><div class="UnionWith Root AddNewLevel"> &#10010; Уровень</div></div>');
-                            $('div[id=' + massiv_tmp[0] + '][name=quota_question_manager]').append('<div class="TargetAnswerPanel"></div>');
+                            $('.QuotaPanel').append('<div name="quota_question_manager" id="' + massiv_tmp[0] + '" class="QuotaManager Root"><div class="name_quota_question">' + list_group_question[massiv_tmp[0]].GroupName + '</div><div class="RemoveLevelQuota Root" id="' + massiv_tmp[0] + '">&#10006;</div><div class="UnionWith Root"> &#10010; Уровень</div></div>');
+                            $('div[id=' + massiv_tmp[0] + '][name=quota_question_manager]').append('<div class="PanelTotalCount"><div class="TextTotalCount">Всего : </div><div class="Total_Count">1</div></div><div class="TargetAnswerPanel"></div>');
                             $('.PanelQuestion').find('p[id=' + massiv_tmp[i] + ']').hide();
                         } else {
                             $('.AddNewLevel').after('<div name="quota_question_manager" class="QuotaManager Child" id="' + massiv_tmp[i] + '"><div class="SpaceArrow">&#10148;</div><div class="name_quota_question">' + list_group_question[massiv_tmp[i]].GroupName + '</div><div class="RemoveLevelQuota Child" id="' + massiv_tmp[i] + '">&#10006;</div><div class="UnionWith Child"> &#10010; Уровень</div></div>');
@@ -500,7 +543,6 @@
 
                     for (var i = 0; i < massiv_tmp.length; i++) {
                         var question_item = list_kvot_question[massiv_tmp[i]];
-                        console.log("Question list === ", question_item);
                         if (i == massiv_tmp.length - 1) {
 
                             var list_answer = question_item.AnswerList;
@@ -532,10 +574,20 @@
                     }
                 })
 
+
                 $.each(full_chain_answer, function (i, item) {
                     FindInputCountQuota(item[0], item[1]);
                 })
+                $('.TargetAnswerPanel').each(function () {
+                    var panel_answer = $(this);
+                    var total_count = 0;
+                    panel_answer.find('.Count_Quota').each(function () {
+                        total_count += isNaN(Number($(this).val())) ? 0 : Number($(this).val());
+                    })
+                    panel_answer.prev().find('.Total_Count').first().text(total_count);
+                })
 
+                CheckTotalCount();
             })
     }
 
@@ -556,6 +608,40 @@
                 container.next().find('input').val(count);
             }
         })
+    }
+
+    $('.QuotaPanel').on("keyup", '.Count_Quota', function () {
+        var parent_panel = $(this).parents('.TargetAnswerPanel');
+        var total_count = 0;
+        parent_panel.find('.Count_Quota').each(function () {
+            total_count += isNaN(Number($(this).val())) ? 0 : Number($(this).val());
+        })
+        parent_panel.prev().find('.Total_Count').first().text(total_count);
+        CheckTotalCount();
+    })
+
+
+    function CheckTotalCount() {
+        var prev_count;
+        if ($('.Total_Count').length > 1) {
+            $('.Total_Count').each(function (i) {
+                if (i == 0) prev_count = Number($(this).text());
+                else {
+
+                    if (prev_count != Number($(this).text())) {
+                        $('.Total_Count').each(function () {
+                            $(this).css("color", "red")
+                        });
+                        return false;
+                    }
+                    if (i == $('.Total_Count').length - 1) {
+                        $('.Total_Count').css("color", "green");
+                    }
+                }
+            })
+        } else if ($('.Total_Count').length == 1) {
+            $('.Total_Count').css("color", "green");
+        }
     }
 </script>
 

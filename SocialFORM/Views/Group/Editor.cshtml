@@ -273,6 +273,19 @@ var list_answer_base;
 
                     if (data.IsKvot) {
                         $('.Yes_Kvot').removeClass('Qoff').addClass('Qon');
+                        if (data.TypeQuestion == '3') {
+                            $.get("/Question/GetRange", { id_p: data.ProjectID, bind_q: data.Id })
+                                .success(function (server_data) {
+                                    if (server_data.length > 0) {
+                                        var container_range = $('.PanelOfRange');
+                                        $.each(server_data, function (i, item) {
+                                            var code = '<div><div class="IndexRange" id="' + item.IndexRange + '">' + item.IndexRange + ')</div><div class="StringRange">' + item.RangeString + '</div><div style="display: inline-block;" class="RemoveRangePos">&#10006;</div></div>';
+                                            container_range.append(code);
+                                        })
+                                        
+                                    }
+                                })
+                        }
                     } else {
                         $('.Not_Kvot').removeClass('Qoff').addClass('Qon');
                     }

@@ -682,14 +682,19 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public void DeleteQuota(int id_p)
+        public void DeleteQuota(int id_p, int id_q)
         {
             List<QuotaModel> tmp_quota = db.SetQuotaModels.Where(u => u.ProjectID == id_p).ToList();
-            if (tmp_quota != null)
+            List<QuotaModel> quota_list_to_remove = new List<QuotaModel>();
+            foreach(var item in tmp_quota)
             {
-                db.SetQuotaModels.RemoveRange(tmp_quota);
-                db.SaveChanges();
+                if (item.ChainString.Contains(id_q.ToString()))
+                {
+                    quota_list_to_remove.Add(item);
+                }
             }
+            db.SetQuotaModels.RemoveRange(quota_list_to_remove);
+            db.SaveChanges();
         }
     }
 }
