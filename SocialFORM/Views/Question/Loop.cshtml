@@ -1,0 +1,221 @@
+﻿<style>
+    .LoopPanel{
+        padding: 15px;
+    }
+    .RangeOfLoop{
+        align-content:center;
+        border: 2px solid black;
+        padding: 10px;
+        padding-top: 20px;
+    }
+    .ListOfLoop {
+        align-content: center;
+        border: 2px solid black;
+        padding: 10px;
+        padding-top: 20px;
+        overflow: auto;
+        height: 450px;
+    }
+    .IDQuestion {
+        display: inline-block;
+        width: 150px;
+        height: 30px;
+        background-color: #72afff;
+    }
+    .CountQuestion {
+        display: inline-block;
+    }
+    .Text{
+        display: inline-block;
+        height: 30px;
+        font-family: 'Century Gothic';
+        font-size: 16px;
+        font-weight: 600;
+    }
+    input[name=count_loop] {
+        width: 150px;
+    }
+    .PanelOfLoopQuestion {
+        box-shadow: 0 0 5px black;
+        padding: 10px;
+        position: absolute;
+        min-width: 150px;
+        display: none;
+        align-items: center;
+        z-index: 999;
+    }
+    .QuestionLoop {
+        margin: 3px 0px;
+        font-family: 'Century Gothic';
+        text-align: center;
+    }
+  .TextDiv{
+      position:relative;
+      z-index: 10;
+      width: 150px;
+      height: 25px;
+      background-color: white;
+      border: 1px solid black;
+      left: 0px;
+      top: 15px;
+      text-align: center;
+      font-family: 'Century Gothic';
+      font-weight: 600;
+  }
+  .ButtonSave{
+      padding: 5px;
+      width: 100px;
+      height: 30px;
+      background-color: #72afff;
+      text-align: center;
+      font-family: 'Century Gothic';
+      font-weight: 600;
+  }
+  .Space{
+      height: 50px;
+  }
+  .LoopRange{
+      width: 100%;
+      height: 30px;
+      box-shadow: 3px 3px 5px black;
+      border: 1px solid black;
+      font-family: 'Century Gothic';
+      font-size: 16px;
+  }
+    .DeleteRangeLoop {
+        background: radial-gradient(#ffa2a2, #ff3434);
+        width: 25px;
+        height: 25px;
+        display: inline-block;
+        text-align: center;
+        position: relative;
+        margin: 2px 10px;
+        padding: 1px 0px;
+        /*left: calc(100% - 25px);
+      top: -20px;*/
+    }
+</style>
+<div class="LoopPanel">
+    <input type="hidden" name="ProjectID" value="@ViewBag.ProjectID" />
+    <div class="TextDiv">Настройка цикла</div>
+    <div class="RangeOfLoop">
+        <div class="Text">Начать с :</div>
+        <div class="fromQuestion IDQuestion">Выберите вопрос</div>
+        <div class="Text"> до</div>
+        <div class="toQuestion IDQuestion">Выберите вопрос</div>
+        <div class="Text">Количество циклов: </div>
+        <div class="CountLoop CountQuestion"><input type="text" name="count_loop" /></div>
+    </div>
+    <div class="ButtonSave">Сохранить</div>
+    <div class="Space"></div>
+    <div class="TextDiv">Список циклов</div>
+    <div class="ListOfLoop">
+        
+    </div>
+</div>
+<div class="PanelOfLoopQuestion" id="PanelOfLoopQuestion">
+
+</div>
+<script>
+    let list_question = {};
+    let list_group_question = {};
+    $(function () {
+
+        $.get("/Question/getListQuestion", { id_p: $('input[name=ProjectID]').val() })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    if (item.TypeQuestion != 5) {
+                        $('.PanelOfLoopQuestion').append('<div class="QuestionLoop" id="' + item.Id + '"> Вопрос' + item.Id + '</div>')
+                        list_question[item.Id] = item;
+                    }
+                })
+                console.log("Massive of question >>>> ", list_question);
+                $('.PreLoader').hide();
+            })
+
+    })
+
+    $.get("/Group/getGroup", { id_p: $('input[name=ProjectID]').val() })
+        .success(function (server_data) {
+            $.each(server_data, function (i, item) {
+                list_group_question[item.QuestionID] = item;
+            })
+        })
+
+    $.get("/Question/GetLoopRange", { id_p: $('input[name=ProjectID]').val() })
+        .success(function (server_data) {
+            $.each(server_data, function (i, item) {
+                $('.ListOfLoop').append('<div class="LoopRange"><div style="display: inline-block;">Цикл начинается с ' + item.fromQuestion + ' до ' + item.toQuestion + ' в количестве ' + item.CountLoop + '</div><div class="DeleteRangeLoop" id="'+item.Id+'">&#10006;</div></div > ');
+            })
+        })
+
+    $('.IDQuestion').click(function (event) {
+        var position_x = this.offsetLeft + Math.floor(this.offsetWidth / 2);
+        var position_y = this.offsetTop + Math.floor(this.offsetHeight / 2);
+        this.style.backgroundColor = "grey";
+        $(this).addClass('AddQuestionText');
+        $(this).animate({ backgroundColor: '#72afff' }, 200);
+        var panel_question_div = document.getElementById('PanelOfLoopQuestion');
+        panel_question_div.style.display = 'block';
+        //panel_question_div.style.position = 'fixed';
+        panel_question_div.style.left = position_x + "px";
+        panel_question_div.style.top = position_y + "px";
+        panel_question_div.style.backgroundColor = "#72afff";
+        $(document).mouseup(function (event) {
+            var container = $('.PanelOfLoopQuestion');
+            if (container.has(event.target).length === 0) {
+                $('.AddQuestionText').removeClass('AddQuestionText');
+                container.hide();
+            }
+        });
+    })
+
+    $('.PanelOfLoopQuestion').on('mouseenter', '.QuestionLoop', function () {
+        $(this).css({ 'background-color': "#58e863", "box-shadow": "0 0 5px black"});
+    })
+
+    $('.PanelOfLoopQuestion').on('mouseleave', '.QuestionLoop', function () {
+        $(this).css({ 'background-color': '#72afff', 'box-shadow': '0 0 0 0 black'});
+    })
+
+    $('.PanelOfLoopQuestion').on('click', '.QuestionLoop', function () {
+        $('.PanelOfLoopQuestion').hide();
+        $('.AddQuestionText').empty().text($(this).text());
+        $('.AddQuestionText').removeAttr('id').attr('id', $(this).attr('id'));
+        $('.AddQuestionText').removeClass('AddQuestionText');
+    });
+
+    $('.ButtonSave').click(function () {
+        var fromQ = $('div.fromQuestion').attr('id');
+        var toQ = $('div.toQuestion').attr('id');
+        var indexFromQ = list_group_question[fromQ].IndexQuestion;
+        var indexToQ = list_group_question[toQ].IndexQuestion;
+        if (Number(indexFromQ) >= Number(indexToQ)) {
+            alert("Не корректно составлен цикл");
+            return;
+        } 
+        var count_loop = isNaN(Number($('div.CountLoop').find('input').val())) ? 0 : Number($('div.CountLoop').find('input').val());
+        var query = {
+            fromQuestion: fromQ,
+            toQuestion: toQ,
+            CountLoop: count_loop,
+            ProjectID: $('input[name=ProjectID]').val()
+        }
+
+        $.post("/Question/SetLoopRange", query)
+            .success(function (server_data) {
+                $('.ListOfLoop').append('<div class="LoopRange"><div style="display: inline-block;">Цикл начинается с ' + list_group_question[fromQ].GroupName + ' до ' + list_group_question[toQ].GroupName + ' в количестве ' + count_loop + '</div><div class="DeleteRangeLoop" id="' + server_data + '">&#10006;</div></div> ');
+            })
+        //alert("From " + fromQ + " To " + toQ + " for " + count_loop);
+       
+
+    })
+
+    $('.ListOfLoop').on('click', '.DeleteRangeLoop', function () {
+        var div_range_remove = $(this);
+        $.post("/Question/DeleteLoopRange", { id_loop: $(this).attr('id') })
+            .success(function () {
+                div_range_remove.parent().remove();
+            })
+    })
+</script>

@@ -333,6 +333,11 @@ namespace SocialFORM.Controllers
                 }
             }
 
+            List<RangeModel> listRangeExport = new List<RangeModel>();
+            using (QuestionContext q_context = new QuestionContext())
+            {
+                listRangeExport = q_context.SetRangeModels.Where(u => u.ProjectID == id_p).ToList();
+            }
 
             var products = new System.Data.DataTable();
 
@@ -363,6 +368,11 @@ namespace SocialFORM.Controllers
                     case Models.Question.Type.Multiple:
                         {
                             int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
+                            if (listQuestionExport[(int)item.QuestionID].LimitCount > 1)
+                            {
+                                tmp_count = (int)listQuestionExport[(int)item.QuestionID].LimitCount;
+                            }
+                            //System.Diagnostics.Debug.WriteLine("Limit count  >>>>> " + (int)listQuestionExport[(int)item.QuestionID].LimitCount);
                             for (int i = 1; i <= tmp_count; i++)
                             {
                                 if (item.GroupID > 0)
@@ -411,11 +421,33 @@ namespace SocialFORM.Controllers
                                         products.Columns.Add(item.GroupName + "_" + i);
                                 }
                             }
+                            if(listQuestionExport[(int)item.QuestionID].IsKvot == true)
+                            {
+                                products.Columns.Add("Диапозон");
+                            }
                         }
                         break;
                     case Models.Question.Type.Table:
                         {
                             int count_row = listTableRow[(int)item.QuestionID].Count();
+                            int null_count_row = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == null).Count();
+                            int max_cont_row = 0;
+                            foreach(var item_row in listTableRow[(int)item.QuestionID])
+                            {
+                                if (item_row.IndexRow != null)
+                                {
+                                    int tmp_max = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == item_row.IndexRow).Count();
+                                    if (max_cont_row < tmp_max)
+                                    {
+                                        max_cont_row = tmp_max;
+                                    }
+                                }
+                            }
+                            if (listQuestionExport[(int)item.QuestionID].Bind != null)
+                            {
+                                count_row = (null_count_row + max_cont_row);
+                                System.Diagnostics.Debug.WriteLine("ALL count Rows >>>> " + (null_count_row + max_cont_row));
+                            }
                             for (int i = 1; i <= count_row; i++)
                             {
                                 if (item.GroupID > 0)
@@ -474,7 +506,15 @@ namespace SocialFORM.Controllers
                                 if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID) != null)
                                 {
                                     if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex != -404)
-                                        tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex.ToString());
+                                    {
+                                        if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex < 0)
+                                        {
+                                            tmp_str.Add((-1*tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex).ToString());
+                                        } else
+                                        {
+                                            tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex.ToString());
+                                        }
+                                    }
                                     else
                                         tmp_str.Add(" ");
                                     if (listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
@@ -503,12 +543,25 @@ namespace SocialFORM.Controllers
                                 {
                                     List<BlankModel> tmp_list_blank = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
                                     int count_all_answer = listAnswerAllExport[(int)group_item.QuestionID].Count();
+                                    if (listQuestionExport[(int)group_item.QuestionID].LimitCount > 1)
+                                    {
+                                        count_all_answer = (int)listQuestionExport[(int)group_item.QuestionID].LimitCount;
+                                    }
                                     int count_other_column = listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count();
                                     List<string> other_column = new List<string>();
                                     foreach (var blank_item in tmp_list_blank)
                                     {
                                         if (blank_item.AnswerIndex != -404)
-                                            tmp_str.Add(blank_item.AnswerIndex.ToString());
+                                        {
+                                            if (blank_item.AnswerIndex < 0)
+                                            {
+                                                tmp_str.Add((-1 * blank_item.AnswerIndex).ToString());
+                                            }
+                                            else
+                                            {
+                                                tmp_str.Add(blank_item.AnswerIndex.ToString());
+                                            }
+                                        }
                                         else
                                             tmp_str.Add(" ");
                                         if (blank_item.Text != null)
@@ -548,12 +601,56 @@ namespace SocialFORM.Controllers
                                         tmp_str.Add(" ");
 
                                 }
+                                if (listQuestionExport[(int)group_item.QuestionID].IsKvot == true)
+                                {
+                                    List<RangeModel>tmp_listRange = listRangeExport.Where(u => u.BindQuestion == (int)group_item.QuestionID).ToList();
+                                    int age = Int32.Parse(_blank_list[0].Text);
+                                    foreach(var item_range in tmp_listRange)
+                                    {
+                                        int lower_limit; 
+                                        if (!Int32.TryParse(item_range.RangeString.Split('-')[0], out lower_limit))
+                                        {
+                                            lower_limit = Int32.MinValue;
+                                        }
+                                        int upper_limit;
+                                        if(!Int32.TryParse(item_range.RangeString.Split('-')[1], out upper_limit))
+                                        {
+                                            upper_limit = Int32.MaxValue;
+                                        }
+                                       
+                                        if ((lower_limit <= age) && (age <= upper_limit))
+                                        {
+                                            tmp_str.Add(item_range.RangeString);
+
+                                            break;
+                                        }
+                                    }
+                                }
+
                             }
                             break;
                         case Models.Question.Type.Table:
                             {
                                 int count_row = listTableRow[(int)group_item.QuestionID].Count();
                                 int count_row_result = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).Count();
+                                int null_count_row = listTableRow[(int)group_item.QuestionID].Where(u => u.IndexRow == null).Count();
+                                int max_cont_row = 0;
+                                foreach (var item_row in listTableRow[(int)group_item.QuestionID])
+                                {
+                                    if (item_row.IndexRow != null)
+                                    {
+                                        int tmp_max = listTableRow[(int)group_item.QuestionID].Where(u => u.IndexRow == item_row.IndexRow).Count();
+                                        if (max_cont_row < tmp_max)
+                                        {
+                                            max_cont_row = tmp_max;
+                                        }
+                                    }
+                                }
+                                if (listQuestionExport[(int)group_item.QuestionID].Bind != null)
+                                {
+                                    count_row = (null_count_row + max_cont_row);
+                                    System.Diagnostics.Debug.WriteLine("ALL count Rows >>>> " + (null_count_row + max_cont_row));
+                                }
                                 List<BlankModel> _blank_list = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
                                 for (int i = 0; i < count_row; i++)
                                 {
@@ -1454,5 +1551,12 @@ namespace SocialFORM.Controllers
             context.SetOpros.Add(list);
             context.SaveChanges();
         }
+
+        [HttpGet]
+        public JsonResult GetListProject()
+        {
+            return Json(db2.SetProjectModels.ToList(), JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

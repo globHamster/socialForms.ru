@@ -165,6 +165,17 @@ namespace SocialFORM.Controllers
         {
             AnswerModel answer = db.SetAnswers.Where(u => u.Id == Id).First();
             AnswerAll tmpAnswerAll = db.SetAnswerAll.Where(u => u.AnswerKey == Id).FirstOrDefault();
+            List<AnswerModel> list_tmp_answer = db.SetAnswers.Where(u => u.QuestionID == answer.QuestionID && u.Index > answer.Index).ToList();
+            if (list_tmp_answer != null)
+            {
+                int count = answer.Index;
+                foreach(var item in list_tmp_answer)
+                {
+                    item.Index = count;
+                    count++;
+                }
+            }
+            DeleteQuota(db.SetQuestions.First(u => u.Id == answer.QuestionID).ProjectID, answer.QuestionID);
             db.SetAnswerAll.Remove(tmpAnswerAll);
             db.Entry(answer).State = EntityState.Deleted;
             db.SaveChanges();
@@ -187,6 +198,7 @@ namespace SocialFORM.Controllers
             using (GroupContext db2 = new GroupContext())
             {
                 GroupModel item_tmp = db2.SetGroupModels.FirstOrDefault(u => u.QuestionID == tmp.Id);
+                DeleteQuota((int)item_tmp.ProjectID, (int)item_tmp.QuestionID);
                 if (tmp.TypeQuestion == Models.Question.Type.Table)
                 {
                     List<TableRow> table_row_list = db.SetTableRows.Where(u => u.TableID == tmp.Id).ToList();
@@ -664,6 +676,18 @@ namespace SocialFORM.Controllers
             return Json(db.SetRangeModels.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public void DeleteRangePos(int id_range, int id_q)
+        {
+            RangeModel tmp = db.SetRangeModels.FirstOrDefault(u => u.Id == id_range);
+            if (tmp != null)
+            {
+                DeleteQuota(tmp.ProjectID, id_q);
+                db.SetRangeModels.Remove(tmp);
+                db.SaveChanges();
+            }
+        }
+
         [HttpGet]
         public JsonResult CheckQuotaCount(int id_quota)
         {
@@ -695,6 +719,39 @@ namespace SocialFORM.Controllers
             }
             db.SetQuotaModels.RemoveRange(quota_list_to_remove);
             db.SaveChanges();
+        }
+
+        public ActionResult Loop(int id_p)
+        {
+            ViewBag.ProjectID = id_p;
+            return PartialView();
+        }
+
+        [HttpPost]
+        public int SetLoopRange(LoopModel tmp)
+        {
+            int id_loop;
+            db.SetLoopModels.Add(tmp);
+            db.SaveChanges();
+            id_loop = tmp.Id;
+            return id_loop;
+        }
+
+        [HttpGet]
+        public JsonResult GetLoopRange(int id_p)
+        {
+            return Json(db.SetLoopModels.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public void DeleteLoopRange(int id_loop)
+        {
+            LoopModel tmp = db.SetLoopModels.FirstOrDefault(u => u.Id == id_loop);
+            if (tmp != null)
+            {
+                db.SetLoopModels.Remove(tmp);
+                db.SaveChanges();
+            }
         }
     }
 }

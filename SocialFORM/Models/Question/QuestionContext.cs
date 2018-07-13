@@ -23,5 +23,6 @@ namespace SocialFORM.Models.Question
         public DbSet<Kvot> SetKvots { get; set; }
         public DbSet<QuotaModel> SetQuotaModels { get; set; }
         public DbSet<RangeModel> SetRangeModels { get; set; }
+        public DbSet<LoopModel> SetLoopModels { get; set; }
     }
 }

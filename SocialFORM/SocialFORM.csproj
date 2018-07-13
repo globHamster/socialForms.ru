@@ -236,6 +236,7 @@
     <Compile Include="Models\ChatUser.cs" />
     <Compile Include="Models\Opros.cs" />
     <Compile Include="Models\Question\Kvot.cs" />
+    <Compile Include="Models\Question\LoopModel.cs" />
     <Compile Include="Models\Question\QuotaModel.cs" />
     <Compile Include="Models\Question\RangeModel.cs" />
     <Compile Include="Models\Session\SessionHubModel.cs" />
@@ -322,6 +323,7 @@
     <Content Include="images\icon\status_busy.png" />
     <Content Include="images\icon\status_offline.png" />
     <Content Include="images\icon\zapret.png" />
+    <Content Include="Scripts\anime.min.js" />
     <Content Include="Scripts\BLOCKS.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -483,6 +485,7 @@
     <Content Include="Views\Home\MenuMin.cshtml" />
     <Content Include="Views\Home\Options.cshtml" />
     <Content Include="Views\Home\Kvot.cshtml" />
+    <Content Include="Views\Question\Loop.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

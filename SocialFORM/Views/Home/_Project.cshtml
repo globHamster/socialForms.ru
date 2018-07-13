@@ -1,5 +1,42 @@
 ﻿@model PagedList.IPagedList<SocialFORM.Models.Project.ProjectModel>
 @using PagedList.Mvc;
+<style>
+    .Button{
+        width: 150px;
+        height: 30px;
+        background-color: #72afff;
+        font-family: 'Century Gothic';
+        align-items: center;
+        display: inline-flex;
+        position:relative;
+        top: -1px;
+    }
+    .Text{
+        width: 100%;
+        text-align: center;
+    }
+    .ProjectName {
+        width: 350px;
+        font-family: 'Century Gothic';
+        padding: 5px;
+        display: inline-flex;
+    }
+    .PanelOfProject{
+        width: 100%;
+        padding: 10px;
+        box-shadow: 0 0 5px 1px black;
+    }
+    .ProjectLayer{
+        display: flex;
+        height: 30px;
+        border: 1px solid black;
+        border-left: 15px solid black;
+        border-bottom-left-radius: 15px;
+        border-top-left-radius: 15px;
+        margin-bottom: 5px;
+    }
+</style>
+
 
 <h2>Список проектов</h2>
 
@@ -41,6 +78,7 @@
     }
 
 </table>
+
 <div id="contentPager">
     @Html.PagedListPager(
                 Model,
@@ -48,7 +86,8 @@
                 PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
                              )
 </div>
-
+<div class="PanelOfProject">
+</div>
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
 
@@ -175,4 +214,74 @@
         $('.Tables').load('/Home/Kvot?id_p=' + id_project);
 
     });
+
+    $.get("/Home/GetListProject")
+        .success(function (server_data) {
+            $.each(server_data, function (i, item) {
+                CreateDivProject(item.Id, item.NameProject);
+            })
+        })
+
+    function CreateDivProject(id_p, name_p) {
+        var code = "<div class='ProjectLayer'><input type='hidden' value='" + id_p + "' name='project_info'/><div class='ProjectName'><div class='Text'>" + name_p + "</div></div><div class='ExportToEXCEL Button'><div class='Text'>Экспорт в EXCEL</div></div><div class='Button'><div class='Text'>Удалить</div></div></div>";
+        $('.PanelOfProject').append(code);
+    }
+
+    $('.PanelOfProject').on("mouseenter", ".Button", function () {
+        $(this).addClass('Anime');
+        $(this).animate({ border: "0 0 5px black" }, 300);
+        var cssButton = anime({
+            targets: '.Anime',
+            scale: 1.1,
+            translateX: 2,
+            duration: 100,
+            easing: 'linear',
+        });
+    })
+
+    $('.PanelOfProject').on("mouseleave", ".Button", function () {
+        var cssButton = anime({
+            targets: '.Anime',
+            scale: 1.0,
+            translateX: -2,
+            duration: 100,
+            easing: 'linear',
+        })
+        $(this).removeClass('Anime');
+    })
+
+    $('.PanelOfProject').on("click", ".Button", function () {
+        var cssButton = anime({
+            targets: '.Anime',
+            scale: 0.9,
+            duration: 100,
+            backgroundColor: '#999999',
+            easing: 'linear',   
+            direction: 'alternate',
+        })
+    })
+
+    $('.PanelOfProject').on("mouseenter", ".ProjectName", function () {
+        $(this).parent().addClass('Anime');
+        var cssButton = anime({
+            targets: '.Anime',
+            background: '#58e86377',
+            scale: 1.2,
+            translateX: 2,
+            duration: 100,
+            easing: 'linear',
+        });
+    })
+
+    $('.PanelOfProject').on("mouseleave", ".ProjectName", function () {
+        var cssButton = anime({
+            targets: '.Anime',
+            scale: 1.0,
+            translateX: -2,
+            backgroundColor: '#ffffff',
+            duration: 100,
+            easing: 'linear',
+        })
+        $(this).parent().removeClass('Anime');
+    })
 </script>

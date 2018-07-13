@@ -122,6 +122,42 @@
     .group_element{
         /*border: 1px solid red;*/
     }
+    .HiddenPanelQuota {
+        display: none;
+        position: fixed;
+        width: 80%;
+        height: 80%;
+        left: 10%;
+        top: 10%;
+        background-color: white;
+        border: 10px inset #72afff;
+        z-index: 999;
+        overflow:auto;
+    }
+    .ButtonClose{
+        display: none;
+        position: fixed;
+        width: 30px;
+        height: 30px;
+        left: calc(90% - 15px);
+        top: calc(10% - 15px);
+        background-color: red;
+        border: 5px outset red;
+        border-radius: 15px;
+        text-align: center;
+        z-index: 1000;
+        cursor: pointer;
+    }
+    .BlockWall{
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: grey;
+        opacity: 0.5;
+    }
 </style>
 
 <div class="title">@ViewBag.ProjectName</div>
@@ -135,6 +171,8 @@
                     <button class="menu_panel" id="add_question">Добавить вопрос</button>
                     <button onclick="AddNewGroup()">Добавить группу</button>
                     <button onclick="DeleteGroup()">Удалить группу</button>
+                    <button onclick="ShowQuotaPanel()">Квоты</button>
+                    <button onclick="ShowLoopPanel()">Циклы</button>
                     @*<button class="menu_panel">Удалить группу</button>*@
                 </div>
             </td>
@@ -185,7 +223,9 @@
     </div>
 </div>
 <div id="overlay"></div><!-- Пoдлoжкa -->
-
+<div class="ButtonClose" onclick="CloseClick()">&#10006;</div>
+<div class="HiddenPanelQuota"></div>
+<div class="BlockWall"></div>
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -469,5 +509,36 @@
         if ($('ul.tree_view').text().length != 0) {
             $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question, id_p: $('input[name=project_id]').val() });
         }
+    }
+
+    function ShowQuotaPanel() {
+        $('.PreLoader').show();
+        var id_project = Number($('input[name=project_id]').val());
+        $('.BlockWall').show();
+        $('.HiddenPanelQuota').fadeIn(500);
+        $('.ButtonClose').fadeIn(500);
+        $('.HiddenPanelQuota').append('<div class="ForDelete" style="padding: 15px;"></div>')
+        setTimeout(function () {
+            $('.ForDelete').load("/Home/Kvot?id_p=" + id_project);
+        }, 500);
+    }
+
+    function CloseClick() {
+        $('.HiddenPanelQuota').find('div.ForDelete').remove();
+        $('.HiddenPanelQuota').fadeOut(200);
+        $('.ButtonClose').fadeOut(200);
+        $('.BlockWall').hide();
+    }
+
+    function ShowLoopPanel() {
+        $('.PreLoader').show();
+        var id_project = Number($('input[name=project_id]').val());
+        $('.BlockWall').show();
+        $('.HiddenPanelQuota').fadeIn(500);
+        $('.ButtonClose').fadeIn(500);
+        $('.HiddenPanelQuota').append('<div class="ForDelete" style="padding: 15px;"></div>')
+        setTimeout(function () {
+            $('.ForDelete').load("/Question/Loop?id_p=" + id_project);
+        }, 500);
     }
 </script>

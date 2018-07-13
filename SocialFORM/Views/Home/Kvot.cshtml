@@ -308,20 +308,30 @@
             $('.AddNewLevel').removeClass('AddNewLevel');
             BildQuotaTree();
         } else {
-            $('.QuotaPanel').append('<div name="quota_question_manager" id="' + $(this).attr('id') + '" class="QuotaManager Root"><div class="name_quota_question">' + list_group_question[$(this).attr('id')].GroupName + '</div><div class="RemoveLevelQuota Root" id="' + $(this).attr('id') + '">&#10006;</div><div class="UnionWith Root"> &#10010; Уровень</div></div>');
+            $('.QuotaPanel').append('<div name="quota_question_manager" id="' + $(this).attr('id') + '" class="QuotaManager Root Rebild"><div class="name_quota_question">' + list_group_question[$(this).attr('id')].GroupName + '</div><div class="RemoveLevelQuota Root" id="' + $(this).attr('id') + '">&#10006;</div><div class="UnionWith Root"> &#10010; Уровень</div></div>');
             $('div[id=' + $(this).attr('id') + '][name=quota_question_manager]').append('<div class="PanelTotalCount"><div class="TextTotalCount">Всего : </div><div class="Total_Count">1</div></div><div class="TargetAnswerPanel"></div>');
             var id_question = $(this).attr('id');
-            $.get("/Question/getAnswer", { id_question: $(this).attr('id') })
-                .success(function (server_data) {
-                    var sublist_kvot = {};
-                    //$.each(list_kvot[id_question], function (i, item) {
-                    //    sublist_kvot[item.Target] = item;
-                    //});
-                    $.each(server_data, function (i, item) {
-                        $('div[id=' + id_question + '][name=quota_question_manager]').find('.TargetAnswerPanel').append('<p id="' + item.Id + '"><span style="margin-right: 10px;">' + item.AnswerText + '</span><input type="text" /></p>');
+            BildQuotaTree();
+            //$.get("/Question/getAnswer", { id_question: $(this).attr('id') })
+            //    .success(function (server_data) {
+            //        var sublist_kvot = {};
+            //        //$.each(list_kvot[id_question], function (i, item) {
+            //        //    sublist_kvot[item.Target] = item;
+            //        //});
+            //        $.each(server_data, function (i, item) {
+            //            $('div[id=' + id_question + '][name=quota_question_manager]').find('.TargetAnswerPanel').append('<div style="margin-left: 0px; border-bottom: 1px solid grey;"><div class="QuotaLastName QuotaDiv" id=0 ><input type="hidden" class="InfoAnswer" id="' + item.Id + '" value="' + item.AnswerText + '" /><input type="hidden" class="InfoQuestion" id="' + id_question + '"/>' + item.AnswerText + '</div><div style="display:inline-block; margin-bottom: 3px;"><input class="Count_Quota" type="text" style=" width: 80px;" /></div></div>');
 
-                    })
-                })
+            //        })
+            //        var panel_answer = $('div[id=' + id_question + '][name=quota_question_manager]').find('.TargetAnswerPanel').first();
+            //        var total_count = 0;
+            //        panel_answer.find('.Count_Quota').each(function () {
+            //            if (isNaN(Number($(this).val())) || $(this).val() == "") $(this).val("0");
+            //            total_count += Number($(this).val());
+            //        })
+            //        panel_answer.prev().find('.Total_Count').first().text(total_count);
+                    
+            //        CheckTotalCount();
+            //    })
         }
     })
 
@@ -643,6 +653,26 @@
             $('.Total_Count').css("color", "green");
         }
     }
+
+    $('.check_question').hover(
+        function () {
+            console.log("hover >>>> ");
+            var cssProp = anime({
+                targets: '.check_question',
+                scale: 1.1,
+                easing: 'linear',
+                borderRadius: ['0em', '2em'],
+            });
+        },
+        function () {
+            var cssProp = anime({
+                targets: '.check_question',
+                scale: 1,
+                easing: 'linear',
+                borderRadius: ['0em', '0em'],
+            });
+        }
+    )
 </script>
 
 

@@ -279,7 +279,7 @@ var list_answer_base;
                                     if (server_data.length > 0) {
                                         var container_range = $('.PanelOfRange');
                                         $.each(server_data, function (i, item) {
-                                            var code = '<div><div class="IndexRange" id="' + item.IndexRange + '">' + item.IndexRange + ')</div><div class="StringRange">' + item.RangeString + '</div><div style="display: inline-block;" class="RemoveRangePos">&#10006;</div></div>';
+                                            var code = '<div><div class="IndexRange" id="' + item.IndexRange + '">' + item.IndexRange + ')</div><div class="StringRange">' + item.RangeString + '</div><div style="display: inline-block;" class="RemoveRangePos"><input type="hidden" value="'+item.Id+'">&#10006;</div></div>';
                                             container_range.append(code);
                                         })
                                         
@@ -1402,6 +1402,9 @@ var list_answer_base;
 
     //Удаление позиции диапозона
     $('.TextRangeAge').on("click", '.RemoveRangePos', function () {
+        if ($(this).find('input').length > 0) {
+            $.post("/Question/DeleteRangePos", { id_range: $(this).find('input').val(), id_q: $('input.Id').val() });
+        }
         $(this).parent().remove();
     })
 </script>
