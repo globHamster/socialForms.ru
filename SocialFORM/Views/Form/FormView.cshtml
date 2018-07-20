@@ -1,5 +1,4 @@
-﻿﻿
-<style>
+﻿<style>
     .tool_layer {
         background-color: #FFF;
         border-bottom: 1px solid black;
@@ -45,9 +44,7 @@
     td.table_answer {
         border: 1px solid black;
         text-align: center;
-        width: 80px;
-        font-weight: 600;
-        font-size: 16px;
+        min-width: 20px;
     }
 
     #map {
@@ -57,56 +54,37 @@
         margin: 0;
     }
 
-    .limit_over {
-        padding: 15px;
-        text-align: center;
-        border: 5px inset red;
-        box-shadow: 5px 5px 5px black;
-        font-size: 24px;
-        font-family: 'Century Gothic';
-    }
-
-    .TextLimitQuota {
+    input[type="radio"] {
         display: none;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        box-shadow: 0 0 3px 1px black;
-        font-family: 'Century Gothic';
-        background-color: #72afff;
     }
 
-    .ButtonAGAIN {
-        position: absolute;
-        width: 100px;
-        left: calc(100% - 100px);
-        top: calc(100% - 50px);
-        background-color: white;
-        font-family: 'Century Gothic';
-        text-align: center;
-        padding: 5px;
-    }
-
-        .ButtonAGAIN:hover {
-            background-color: #72afff;
-            box-shadow: 3px 3px 3px 3px black;
+        input[type="radio"] + label span {
+            display: inline-block;
+            width: 13px;
+            height: 13px;
+            margin: -1px 4px 0 0;
+            vertical-align: middle;
+            cursor: pointer;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
         }
 
-    .TextForSpeech {
-        position: relative;
-        width: 350px;
-        height: 350px;
-        top: calc(50% - 175px);
-        left: calc(50% - 175px);
-        text-align: center;
-        font-size: 24px;
-        font-weight: 600;
-        font-family: 'Century Gothic';
-        background-color: white;
-        box-shadow: 5px 5px 5px 3px black;
-    }
+        input[type="radio"] + label span {
+            border: 2px solid black;
+            background-color: #fff;
+        }
+
+        input[type="radio"]:checked + label span {
+            background-color: #72aFFF;
+        }
+
+        input[type="radio"] + label span,
+        input[type="radio"]:checked + label span {
+            -webkit-transition: background-color 0.2s linear;
+            -o-transition: background-color 0.2s linear;
+            -moz-transition: background-color 0.3s linear;
+            transition: background-color 0.2s linear;
+        }
 </style>
 <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
 <link href="~/Content/chosen.css" rel="stylesheet" />
@@ -115,7 +93,7 @@
 <div class="title">@ViewBag.Title</div>
 <div name="projectID" id="@ViewBag.ProjectID" style="display: none;" />
 <div name="operatorID" id="@ViewBag.ProjectID" style="display: none;" />
-
+<div name="questionID" id="@ViewBag.QuestionID" style="display: none;" />
 <div>
     <br />
     <div class="show_result">
@@ -146,15 +124,7 @@
     <br />
 
 </div>
-<div class="TextLimitQuota">
-    <div class="TextForSpeech">
-        Квотный лимит превышен!
-    </div>
 
-    <div class="ButtonAGAIN">
-        Начать анкету
-    </div>
-</div>
 <script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
     var type_q;
@@ -180,10 +150,6 @@
     var list_id_question_group = {};
     var list_group = {};
     var list_question_bind_group = {};
-    let list_range = {};
-    var list_quota = {};
-    let string_chain = new String();
-    var finded_quota = new Number();
     var begin_time = undefined, end_time = undefined; //Время начала анкетирования
     var status = 0;
     var is_load_id = false;
@@ -202,7 +168,7 @@
                 $.each(server_data, function (i, item) {
                     list_base_answer[item.Id] = item;
                 })
-                console.log('Загргузка базовых вопросов успешна ', list_base_answer);
+                //console.log('Загргузка базовых вопросов успешна ', list_base_answer);
                 count_ajax++;
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListAnswerBase ", err) });
@@ -233,7 +199,7 @@
                 $.each(server_data, function (i, item) {
                     list_question[item.Id] = item;
                 })
-                console.info("Успешная выгрузка данных листа вопросов ---", list_question);
+                console.info("Успешная выгрузка данных ---", list_question);
                 count_ajax++;
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListQuestion", err) });
@@ -241,7 +207,7 @@
         q4 = $.get("/Group/getIdQuestionGroup", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
                 massiv_question_id = server_data;
-                console.info("Успешная выгрузка данных сорт id вопросов  --- ", massiv_question_id);
+                //console.info("Успешная выгрузка данных --- ", massiv_question_id);
                 count_ajax++;
                 is_load_id = true;
             })
@@ -265,8 +231,7 @@
                     $.each(server_data, function (i, item) {
                         list_answer[item.Id] = item;
                     })
-
-                    console.info("Успешная выгрузка данных листа ответов --- ", list_answer);
+                    //console.info("Успешная выгрузка данных листа ответов --- ", list_answer);
                     count_ajax++;
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
@@ -381,7 +346,6 @@
         if (count_ajax > 8) {
             clearInterval(interval);
             $('button.all_again').fadeIn("slow");
-            $('.PreLoader').hide();
             getStart();
         }
     }, 50);
@@ -596,7 +560,6 @@
                     break;
 
             }
-            //ConnectClick();
         }
     }
 
@@ -647,7 +610,7 @@
             case 1:
                 if ($("input[name=group]:radio:checked").length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
-                    $('div.limit_checked_div').remove();
+                    //     $('div.limit_checked_div').remove();
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
@@ -690,7 +653,7 @@
                     SaveResult();
                    // CheckLoop();
                     CheckGroupGo();
-                    checkTransitionGo();
+                    index++;
                     CheckGroup();
                     getStart();
                     //    goNext();
@@ -699,7 +662,7 @@
             case 3:
                 if ($("input:text").val().length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
-                    //$('div.limit_checked_div').remove();
+                    //             $('div.limit_checked_div').remove();
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
@@ -785,6 +748,7 @@
                 $('input.free_text').each(function () {
                     mas.push($(this).attr('id') + "#" + $(this).val().replace(',', ';'));
                 });
+                console.info("mas result ---- ", mas);
                 result[index] = mas;
                 text_other[index] = ['null'];
                 break;
@@ -796,6 +760,7 @@
                         mas.push($('tr.beginer').find('td[id=' + id + ']').attr('name'));
                     }
                 });
+                console.info("data table ---- ", mas);
                 result[index] = mas;
                 text_other[index] = ['null'];
                 break;
@@ -820,59 +785,42 @@
     //Проверка перехода при проходе вперед
     function checkTransitionGo() {
         var code_transition = find_transition_move(id_q, result[index]);
+        console.log("Code transition ==== ", code_transition);
+        console.log("result list ====== ", result[index]);
         if (code_transition >= 0) {
-
-            if (result[index].length >= 2) {
-                $.each(result[index], function (u, item) {
-                    if (Number(item) == list_transition[code_transition].TriggerAnswer) {
-                        var jump_index;
-                        list_transition[code_transition].ActiveTransition = true;
-                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
-                        for (var i = index + 1; i < jump_index; i++) {
-                            result[i] = [-404];
-                            text_other[i] = ['null'];
-                        }
-                        index = jump_index;
-                        return;
+            if (Number(result[index]) > 0) {
+                if (result[index] == list_transition[code_transition].TriggerAnswer) {
+                    var jump_index;
+                    list_transition[code_transition].ActiveTransition = true;
+                    jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                    for (var i = index + 1; i < jump_index; i++) {
+                        result[i] = [-404];
+                        text_other[i] = ['null'];
                     }
-                })
-
-            } else {
-                if (Number(result[index]) > 0) {
-                    if (result[index] == list_transition[code_transition].TriggerAnswer) {
-                        var jump_index;
-                        list_transition[code_transition].ActiveTransition = true;
-                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
-                        for (var i = index + 1; i < jump_index; i++) {
-                            result[i] = [-404];
-                            text_other[i] = ['null'];
-                        }
-                        index = jump_index;
-                    } else {
-
-                        index++;
-                    }
+                    index = jump_index;
                 } else {
-                    if (result[index] == list_base_answer[list_transition[code_transition].TriggerAnswer].BaseIndex) {
-                        var jump_index;
-                        list_transition[code_transition].ActiveTransition = true;
-                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
-                        for (var i = index + 1; i < jump_index; i++) {
-                            result[i] = [-404];
-                            text_other[i] = ['null'];
-                        }
-                        index = jump_index;
-                    } else {
 
-                        index++;
+                    index++;
+                }
+            } else {
+                if (result[index] == list_base_answer[list_transition[code_transition].TriggerAnswer].BaseIndex) {
+                    var jump_index;
+                    list_transition[code_transition].ActiveTransition = true;
+                    jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                    for (var i = index + 1; i < jump_index; i++) {
+                        result[i] = [-404];
+                        text_other[i] = ['null'];
                     }
+                    index = jump_index;
+                } else {
+
+                    index++;
                 }
             }
         } else {
 
             index++;
         }
-
     }
 
     //Проверка перехода при возращении назад
@@ -1050,6 +998,7 @@
                     change_list['length'] = count;
                 }
             });
+            console.info("cchange list -0---- ", change_list);
             if (change_list.length > 0) {
                 delete change_list['length'];
                 code = '<div class="change_answer_table"><table>';
@@ -1057,6 +1006,7 @@
                     if (result[massiv_question_id[index]] == undefined)
                         code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><label for="' + item.Id + '"><span></span></label><span>' + item.AnswerText + '</span></td></tr>';
                     else {
+                        console.info("op[wpeoropwre ------- ", result[massiv_question_id[index]]);
                         if (result[massiv_question_id[index]] == item.Id)
                             code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '" checked/><label for="' + item.Id + '"><span></span></label><span>' + item.AnswerText + '</span></td></tr>';
                         else
@@ -1065,7 +1015,6 @@
                 });
                 code += '</table></div>';
                 $('.answer_table').append(code);
-                //ConnectClick();
             }
         })
 
@@ -1080,11 +1029,9 @@
             SaveResult();
             checkTransitionBack();
             CheckGroup_Back();
-            CheckQuotaBack();
             getStart();
         }
     });
-
     $(document).off("mouseenter", ".tool_layer");
     $(document).on("mouseenter", ".tool_layer", function () {
         if ($(this).find('input[name=group]').is(':disabled')) {
@@ -1150,6 +1097,7 @@
         $(this).remove();
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), '', function () { $('div.waiting_screen').remove(); });
     })
+
 
     //Дополнительные функции
     function Check_blocks(item) {
@@ -1242,6 +1190,7 @@
                 });
             }
         }
+        console.info(skip);
         return skip;
     }
 
@@ -1298,8 +1247,10 @@
     function find_transition_move(id_question, list_result) {
         for (var i = 0; i < list_transition.length; i++) {
             if (list_transition[i].fromQuestion == id_question) {
+                console.log("ID question ==== ", id_question);
                 for (var j = 0; j < list_result.length; j++) {
                     if (Number(list_result[j]) < 0) {
+                        console.log("Find minus id ===== ", Number(list_result[j]));
                         var is_find = false;
                         var item_find;
 
@@ -1329,6 +1280,7 @@
 
     function CheckLimitAnswer() {
         var limit_count = list_question[id_q].LimitCount;
+        console.log("limit count ", $('.answer_panel').find('input[name=group]:checked').length);
         if (limit_count > 0 && limit_count != null) {
             if ($('.answer_panel').find('input[name=group]:checked').length == limit_count) {
                 $('div.limit_checked_div').remove();

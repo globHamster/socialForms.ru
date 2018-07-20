@@ -40,7 +40,7 @@
     #tab_2:checked ~ #txt_2,
     #tab_3:checked ~ #txt_3,
     #tab_4:checked ~ #txt_4 {
-        display: flex;
+        display: block;
     }
 </style>
 
@@ -71,10 +71,13 @@
             <p>могут отличаться по высоте!</p>
         </div>
         <div id="txt_4">
-            <label for="time_timer_afk"> Время бездействия в минутах</label>
-            <input type="text" value="" id="time_timer_afk" />
-            <br>
-            <button id="save_tab4">Сохранить</button>
+            <div>
+                <label for="time_timer_afk"> Время бездействия в минутах</label>&nbsp;&nbsp;&nbsp;
+                <input type="text" value="" id="time_timer_afk" />
+            </div>
+            <div>
+                <button id="save_tab4">Сохранить</button>
+            </div>
         </div>
     </div>
 </div>
