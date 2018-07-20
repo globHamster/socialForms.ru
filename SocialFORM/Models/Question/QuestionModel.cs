@@ -20,6 +20,7 @@ namespace SocialFORM.Models.Question
         public int? Bind_Blocks { get; set; }
         public int? LimitCount { get; set; }
         public bool? IsKvot { get; set; }
+        public bool IsRotate { get; set; }
         public ProjectModel Project { get; set; }
 
         public ICollection<GroupModel> Groups { get; set; }

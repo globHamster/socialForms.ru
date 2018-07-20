@@ -6,12 +6,13 @@
 <style>
     div.title {
         padding: 20px;
-        border: 2px solid black;
-        background-color: #72afff;
+        border: 5px inset #008dd2;
+        background-color: #ffffff;
         text-align: center;
         font-size: 30px;
-        font-family: 'Courier New';
+        font-family: 'Century Gothic';
         font-weight: 900;
+        color: #008dd2;
     }
 
     .tablenav td {
@@ -130,9 +131,10 @@
         left: 10%;
         top: 10%;
         background-color: white;
-        border: 10px inset #72afff;
+        border: 10px inset #008dd2;
         z-index: 999;
         overflow:auto;
+        box-shadow: 10px 10px 20px black;
     }
     .ButtonClose{
         display: none;
@@ -141,8 +143,8 @@
         height: 30px;
         left: calc(90% - 15px);
         top: calc(10% - 15px);
-        background-color: red;
-        border: 5px outset red;
+        background-color: #e57373;
+        border: 5px outset #f44336;
         border-radius: 15px;
         text-align: center;
         z-index: 1000;
@@ -173,6 +175,7 @@
                     <button onclick="DeleteGroup()">Удалить группу</button>
                     <button onclick="ShowQuotaPanel()">Квоты</button>
                     <button onclick="ShowLoopPanel()">Циклы</button>
+                    <button onclick="ShowBaseAnswerPanel()">Базовые вопросы</button>
                     @*<button class="menu_panel">Удалить группу</button>*@
                 </div>
             </td>
@@ -271,7 +274,6 @@
 
                     if (item.Group == null || item.Group>0) {
                         mas_tmp.push(item);
-                        console.info("tmp-mass --->", item);
                         if (list_group_block[item.GroupID] != null) {
                             list_group_block[item.GroupID].push(item);
                         } else {
@@ -357,7 +359,6 @@
                                 $.post("/Group/ChangeGroup", { id_q: ui.item.attr('id'), id_g: ui.item.parent().attr('id') });
                             }
                         }
-                        console.log("Mass ==== ", list_id_question);
                         $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question, id_p: $('input[name=project_id]').val() });
                     },
                     placeholder: 'emptySpace',
@@ -383,7 +384,6 @@
                     connectWith: '.tree_view'
                 });
                 $('ul.tree_view').disableSelection();
-                console.info("ListGroup ---->", list_group_block);
             });
 
         $('#add_question, .save_question').click(function (event) { // лoвим клик пo ссылки с id="go"
@@ -504,8 +504,6 @@
             
 
         })
-       
-        console.log("Mass ==== ", list_id_question);
         if ($('ul.tree_view').text().length != 0) {
             $.post("/Group/ChangeIndexQuestion", { new_set: list_id_question, id_p: $('input[name=project_id]').val() });
         }
@@ -539,6 +537,18 @@
         $('.HiddenPanelQuota').append('<div class="ForDelete" style="padding: 15px;"></div>')
         setTimeout(function () {
             $('.ForDelete').load("/Question/Loop?id_p=" + id_project);
+        }, 500);
+    }
+
+    function ShowBaseAnswerPanel() {
+        $('.PreLoader').show();
+        $('.BlockWall').show();
+        $('.HiddenPanelQuota').fadeIn(500);
+        $('.ButtonClose').fadeIn(500);
+        if ($('.HiddenPanelQuota').find('.ForDelete').length > 0) $('.HiddenPanelQuota').find('.ForDelete').remove();
+        $('.HiddenPanelQuota').append('<div class="ForDelete" style="padding: 15px;"></div>');
+        setTimeout(function () {
+            $('.ForDelete').load("/Question/BaseAnswer");
         }, 500);
     }
 </script>

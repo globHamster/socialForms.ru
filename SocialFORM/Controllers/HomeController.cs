@@ -583,6 +583,22 @@ namespace SocialFORM.Controllers
                                             tmp_str.Add(" ");
                                         }
                                     }
+                                } else
+                                {
+                                    int count_all_answer = listAnswerAllExport[(int)group_item.QuestionID].Count();
+                                    if (listQuestionExport[(int)group_item.QuestionID].LimitCount > 1)
+                                    {
+                                        count_all_answer = (int)listQuestionExport[(int)group_item.QuestionID].LimitCount;
+                                    }
+                                    int count_other_column = listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count();
+                                    for (int i = 0; i < count_all_answer; i++)
+                                    {
+                                        tmp_str.Add(" ");
+                                    }
+                                    for (int i =0; i<count_other_column; i++)
+                                    {
+                                        tmp_str.Add(" ");
+                                    }
                                 }
                             }
                             break;
@@ -620,7 +636,7 @@ namespace SocialFORM.Controllers
                                        
                                         if ((lower_limit <= age) && (age <= upper_limit))
                                         {
-                                            tmp_str.Add(item_range.RangeString);
+                                            tmp_str.Add(item_range.IndexRange.ToString());
 
                                             break;
                                         }

@@ -1,0 +1,223 @@
+﻿<style>
+    .LayerBaseAnswer {
+        display: flex;
+        box-shadow: 3px 3px 3px black;
+        margin-bottom: 5px;
+       
+        min-height: 30px;
+    }
+    .TextAnswerBase {
+        display: flex;
+        align-items: center;
+        font-family: 'Century Gothic';
+        font-weight: 600;
+        color: #455a64;
+        width: 450px;
+        border-right: 3px solid #455a64;
+    }
+    .IndexAnswerBase {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 200px
+    }
+    .DeleteButton {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 100px;
+        background-color: #f44336;
+    }
+    .ChangeButton {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 100px;
+        background-color: #90a4ae;
+    }
+    .AddButton {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 100px;
+        height: 30px;
+        background-color: #81c784;
+    }
+    .HeaderPanel{
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid black;
+        box-shadow: 0px 5px 5px #008dd2;
+        margin-bottom: 10px;
+    }
+    .ColumnBase {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        font-family: 'Century Gothic';
+        align-content: center;
+        font-size: 16px;
+        padding: 0px 5px;
+        border-right: 3px solid #455a64;
+    }
+    .ColumnAnswerText{
+        width: 450px;        
+    }
+    .ColumnBaseIndex{
+        width: 200px;
+    }
+    .Scaled{
+        transform: scale(1.1,1.1);
+        box-shadow: 5px 5px black;
+        transition: 0.1s linear;
+    }
+    .NotScaled {
+        transform: scale(1,1);
+        box-shadow: 0px 0px black;
+        transition: 0.1s linear;
+    }
+    .InfoBaseAnswer{
+        position: fixed;
+        display: none;
+        z-index: 1001;
+        width: 400px;
+        height: 400px;
+        background-color: #fff;
+        border: 3px solid black;
+        top: calc(50% - 200px);
+        left: calc(50% - 200px);
+    }
+    .SaveInfoBaseAnswer {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 100px;
+        height: 30px;
+        background-color: #81c784;
+        top: calc(100% - 35px);
+        left: calc(100% - 105px);
+    }
+</style>
+<div class="AddButton">Добавить</div>
+<div class="BaseAnswerPanel">
+    <div class="HeaderPanel">
+        <div class="ColumnAnswerText ColumnBase">Текст ответа</div>
+        <div class="ColumnBaseIndex ColumnBase">Индекс ответа</div>
+        </div>
+</div>
+<div class="InfoBaseAnswer">
+    <div class="SaveInfoBaseAnswer">Сохранить</div>
+    <div>weurweioiewpoirpoewipwe</div>
+</div>
+
+<script>
+    $(function () {
+        $('.PreLoader').hide();
+        $.get("/Question/GetListBaseAnswer")
+            .success(function (server_data) {
+                
+                $.each(server_data, function (i, item) {
+                    var code = "";
+                    code += `<div class="LayerBaseAnswer">
+                        <div class="TextAnswerBase">`+ item.AnswerText + `</div>
+                        <div class="IndexAnswerBase">`+ (-1*Number(item.BaseIndex)) +`</div>
+                        <div class="DeleteButton">Удалить</div>
+                        <div class="ChangeButton">Изменить</div>
+                     </div>
+                    `;
+                    $('.BaseAnswerPanel').append(code);
+                })
+            })
+
+        $('.AddButton').hover(
+            function () {
+                $(this).addClass('Scaled');
+                //  $(this).animate({ 'scale': '1.25' }, 1000);
+            },
+            function () {
+                $(this).removeClass('Scaled');
+            }
+        )
+
+        $('.AddButton').mousedown(
+            function (event) {
+                $(this).addClass('NotScaled').removeClass('Scaled');
+                AddBaseAnswer();
+                //  $(this).animate({ 'scale': '1.25' }, 1000);
+            }
+        )
+        $('.AddButton').mouseup(
+            function (event) {
+                $(this).addClass('Scaled').removeClass('NotScaled');
+                //  $(this).animate({ 'scale': '1.25' }, 1000);
+            }
+        )
+    })
+
+    function DeleteBaseAnswer(tmp_elem) {
+        tmp_elem.remove();
+    }
+
+    function AddBaseAnswer() {
+        $('.InfoBaseAnswer').show();
+        //var code = "";
+        //code += `<div class="LayerBaseAnswer">
+        //                <div class="TextAnswerBase">Text</div>
+        //                <div class="IndexAnswerBase">100</div>
+        //                <div class="DeleteButton">Удалить</div>
+        //                <div class="ChangeButton">Изменить</div>
+        //             </div>
+        //            `;
+        //$('.BaseAnswerPanel').append(code);
+    }
+
+    $('.BaseAnswerPanel').on("mouseenter", ".LayerBaseAnswer", function () {
+        $(this).animate({ 'backgroundColor': '#b3e5fc' }, 100);
+    })
+
+    $('.BaseAnswerPanel').on("mouseleave", ".LayerBaseAnswer", function () {
+        $(this).animate({ 'backgroundColor': '#fff' }, 100);
+    })
+
+    $('.BaseAnswerPanel').on("mouseenter", ".DeleteButton", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('.BaseAnswerPanel').on("mouseleave", ".DeleteButton", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('.BaseAnswerPanel').on("mousedown", ".DeleteButton", function () {
+        $(this).addClass('NotScaled').removeClass('Scaled');
+        DeleteBaseAnswer($(this).parents('.LayerBaseAnswer'));
+    })
+
+    $('.BaseAnswerPanel').on("mouseenter", ".ChangeButton", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('.BaseAnswerPanel').on("mouseleave", ".ChangeButton", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('.BaseAnswerPanel').on("mousedown", ".ChangeButton", function () {
+        $(this).addClass('NotScaled').removeClass('Scaled');
+    })
+
+    $('.BaseAnswerPanel').on("mouseup", ".ChangeButton", function () {
+        $(this).addClass('Scaled').removeClass('NotScaled');
+    })
+</script>

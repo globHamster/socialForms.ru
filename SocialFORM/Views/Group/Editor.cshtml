@@ -162,6 +162,15 @@
         display: inline-block;
         font-weight: 600;
     }
+    .PanelSetting{
+        border-bottom: 3px solid;
+        border-left: 10px solid;
+        border-bottom-color:Highlight;
+        border-left-color: Highlight;
+        width: 400px;
+        margin-bottom: 3px;
+        padding-left: 10px;
+    }
 </style>
 
 @Html.Hidden("id", Model.Id)
@@ -169,13 +178,11 @@
 <input type="text" value="@Model.TypeQuestion" class="Type_Question" hidden />
 @Html.Label("Текст вопроса")
 <textarea id="example" style="width: 80%; height: 300px; display: none;"></textarea>
-
 <table>
     <tr>
         <td> @Html.Label("Тип вопроса")</td>
         <td>
             @Html.EnumDropDownListFor(model => model.TypeQuestion, "Выберите тип вопроса", new { id = "typequestion", value = Model.TypeQuestion })
-
             <span style="margin-left: 10px">Использовать переход <input type="checkbox" class="set_transition" /></span>
             <span style="margin-left: 10px">Использовать блокировку <input type="checkbox" class="set_blocks" /></span>
             <span style="margin-left: 10px">Связать с группой <input type="checkbox" class="set_group" /></span>
@@ -186,15 +193,21 @@
                 @Html.EnumDropDownListFor(model => model.TypeMassk, "Выберите тип маски", new { id = "typemassk", value = Model.TypeMassk })
             </div>
         </td>
-
     </tr>
 </table>
-<div class="panel_set_kvot">
-    <div style="display: inline-block">
+<div class="panel_set_kvot PanelSetting">
+    <div style="display: inline-block; width: 250px;">
         Квотируемый вопрос
     </div>
     <div class="QButton Yes_Kvot Qoff">Да</div>
     <div class="QButton Not_Kvot Qoff">Нет</div>
+</div>
+<div class="panel_set_rotation PanelSetting">
+    <div style="display: inline-block; width: 250px;">
+        Ротирование
+    </div>
+    <div class="QButton Yes_Rot Qoff">Да</div>
+    <div class="QButton Not_Rot Qoff">Нет</div>
 </div>
 <div class="TextRangeAge RangeOFF">
     <div class="SaveRange">Сохранить</div>
@@ -220,7 +233,6 @@
 <button class="save_question">Сохраниеть вопрос</button>
 <button class="delete_question" style="margin-left: 20px;">Удалить вопрос</button>
 
-
 @*Подключение скриптов*@
 <script src="~/Scripts/minified/sceditor.min.js"></script>
 <script src="~/Scripts/minified/formats/xhtml.js"></script>
@@ -230,7 +242,7 @@
 
 @*Исполняймый скрип*@
 <script type="text/javascript">
-var list_answer_base;
+    var list_answer_base;
     var id_list_answer_base = [];
     var list_answer_base_1 = [];
     let type_question;
@@ -258,8 +270,6 @@ var list_answer_base;
     })
 
     $(function () {
-
-
         var id_q = $(".Id").attr('value');
         var type_q;
         if (!is_loaded) {
@@ -270,7 +280,6 @@ var list_answer_base;
                 async: false,
                 data: { id: id_q },
                 success: function (data) {
-
                     if (data.IsKvot) {
                         $('.Yes_Kvot').removeClass('Qoff').addClass('Qon');
                         if (data.TypeQuestion == '3') {
@@ -279,17 +288,24 @@ var list_answer_base;
                                     if (server_data.length > 0) {
                                         var container_range = $('.PanelOfRange');
                                         $.each(server_data, function (i, item) {
-                                            var code = '<div><div class="IndexRange" id="' + item.IndexRange + '">' + item.IndexRange + ')</div><div class="StringRange">' + item.RangeString + '</div><div style="display: inline-block;" class="RemoveRangePos"><input type="hidden" value="'+item.Id+'">&#10006;</div></div>';
+                                            var code = '<div><div class="IndexRange" id="' + item.IndexRange + '">' + item.IndexRange + ')</div><div class="StringRange">' + item.RangeString + '</div><div style="display: inline-block;" class="RemoveRangePos"><input type="hidden" value="' + item.Id + '">&#10006;</div></div>';
                                             container_range.append(code);
                                         })
-                                        
                                     }
                                 })
                         }
                     } else {
                         $('.Not_Kvot').removeClass('Qoff').addClass('Qon');
                     }
-
+                    if (data.TypeQuestion == 1 || data.TypeQuestion == 2 || data.TypeQuestion == 4) {
+                        if (data.IsRotate) {
+                            $('.Yes_Rot').removeClass('Qoff').addClass('Qon');
+                        } else {
+                            $('.Not_Rot').removeClass('Qoff').addClass('Qon');
+                        }
+                    } else {
+                        $('.panel_set_rotation').remove();
+                    }
                     $(".jqte_editor").html(data.TextQuestion);
                     sceditor.instance(textarea).val(data.TextQuestion);
                     if (data.TypeQuestion == '3') {
@@ -321,7 +337,6 @@ var list_answer_base;
                                             else
                                                 var code = '<tr><td><input type="radio" value="' + data.Index + '" class="edittext" disabled/><span id="' + data.Id + '" class="edittext">' + data.AnswerText + '</span><span style="border: 1px solid black; padding: 5px; margin-left: 5px;"> Добавить сободный ответ <input class="is_free_area" type="checkbox"/></span><button id="' + data.Id + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
                                             $(".manager_panel").append(code);
-
                                         });
                                         $.ajax({
                                             type: "GET",
@@ -332,7 +347,6 @@ var list_answer_base;
                                                 $.each(data, function (i, item) {
                                                     //  alert(list_answer_base.length);
                                                     if (item.AnswerType == 2) {
-
                                                         code = '<tr class="base_answer" id="' + list_answer_base[item.AnswerKey - 2].BaseIndex + '"><td><input type="radio" class="base_answer" name="group" id ="' + list_answer_base[item.AnswerKey - 2].Id + '"/><span class="base_answer ' + list_answer_base[item.AnswerKey - 2].Transcription + '">' + list_answer_base[item.AnswerKey - 2].AnswerText + '</span><input type="checkbox" class="is_free_area" hidden/><button id="' + item.Id + '" class="delete_answer_base" style="margin-left: 10px">X</button></td></tr>';
                                                         $(".manager_panel").append(code);
                                                     }
@@ -371,13 +385,10 @@ var list_answer_base;
                                     }, 100);
                                     break;
                                 case '3':
-
                                     $('.question_form').load("/Group/FreeForm");
-
                                     $.each(data, function (i, data) {
                                         var code = '<tr><td><span id="' + data.Id + '" class="edittext">' + data.AnswerText + '</span> <input type="text" value="1" class="edittext" disabled/><button id="' + data.Id + '" class="delete_answer" style="margin-left: 10px">X</button></td></tr>';
                                         $(".manager_panel").append(code);
-
                                     });
                                     break;
                                 case '4':
@@ -415,7 +426,6 @@ var list_answer_base;
                                             $('.question_form').load("/Group/TableForm");
                                         })
                                         .error(function () { console.error("Ошибка выгрузки данных ... /Question/getTableRow") });
-
                                     break;
                                 case '5':
                                     break;
@@ -429,21 +439,15 @@ var list_answer_base;
                                                     alert("er")
                                                     $.post("/Group/DeleteFile", { path: $('p.path_file').text() })
                                                 })
-                                                $.get("/Group/Load", { path: $('p.path_file').text() })
-                                                    .success(function (server_file) {
-
-                                                    })
                                             } else {
                                                 $('.question_form').load("/Group/FilterForm");
                                             }
-
                                         })
                                         .error(function (err) { console.error("Ошибка выгрузки файла ---- /Group/CheckFile", err); })
                                     break;
                                 default:
                                     break;
                             }
-
                             CheckGroup();
                         },
                         error: function () { console.error("Ошибка выгрузки данных ... /Question/getAnswer") }
@@ -451,8 +455,6 @@ var list_answer_base;
                 }
             });
             is_loaded = false;
-
-
         }
     });
 
@@ -470,6 +472,14 @@ var list_answer_base;
         if ($('.Yes_Kvot').hasClass('Qon')) {
             is_kvot = true;
         }
+        var is_rotate = false;
+        if ($('.panel_set_rotation').length > 0) {
+            if ($('.Yes_Rot').hasClass('Qon')) {
+                is_rotate = true;
+            } else {
+                is_rotate = false;
+            }
+        }
         if (type_question != 3) {
             if ($('input.binding_question').is(':checked')) {
                 query = {
@@ -479,7 +489,8 @@ var list_answer_base;
                     ProjectID: $('input[name=project_id]').val(),
                     Bind: $('select.id_bind_question option:checked').val(),
                     LimitCount: $('input.limit_count').length > 0 ? Number($('input.limit_count').val()) : null,
-                    IsKvot: is_kvot
+                    IsKvot: is_kvot,
+                    IsRotate: is_rotate
                 };
             } else {
                 query = {
@@ -488,7 +499,8 @@ var list_answer_base;
                     TextQuestion: text_question,
                     ProjectID: $('input[name=project_id]').val(),
                     LimitCount: $('input.limit_count').length > 0 ? Number($('input.limit_count').val()) : null,
-                    IsKvot: is_kvot
+                    IsKvot: is_kvot,
+                    IsRotate: is_rotate
                 };
             }
         } else {
@@ -501,6 +513,7 @@ var list_answer_base;
                 IsKvot: $('#typemassk').val() == 1 ? is_kvot : false
             }
         }
+        console.log("Question DATA >>>> ", query);
         var question_id;
         $.ajax({
             type: "POST",
@@ -522,7 +535,6 @@ var list_answer_base;
                     var iter = 1;
                     $('span.row_text').each(function () {
                         var row_id;
-
                         if ($(this).attr('id') != null) {
                             row_id = $(this).attr('id');
                         } else {
@@ -617,7 +629,6 @@ var list_answer_base;
                                 }
                             });
                         } else {
-                            //   alert($(this).parent().find('input.is_free_area').prop('checked'));
                             query_answer = {
                                 Id: answer_id,
                                 AnswerText: $(this).next().text(),
@@ -633,23 +644,13 @@ var list_answer_base;
                                 success: function () { }
                             });
                         }
-
                     }
-
                 });
                 alert("Вопрос сохранен");
                 $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
             },
-            error: function () {
-
-            }
+            error: function () { }
         });
-
-
-        setTimeout(function () {
-
-        }, 500);
-
     });
 
     $(document).ready(function () { // вся мaгия пoсле зaгрузки стрaницы
@@ -684,14 +685,10 @@ var list_answer_base;
             data: { id: id_question },
             success: function () {
                 $("#" + id_question).remove();
-                //$(".editor").empty();
                 $("#Tables").load("/Group/Manager?id_project=" + $('input[name=project_id]').val());
             }
         })
-
     });
-
-
 
     $("#typequestion").change(function () {
         var type = $(this).val();
@@ -749,16 +746,13 @@ var list_answer_base;
                 $("#edit").blur();
             }
         });
-
     });
 
     /*
         Данный блок будет перемещен в функцию при загруске вопроса типа Single и Multiple
         BEGIN CODE
     */
-
     if ($('.Type_Question').attr('value') == 'Single' || $('.Type_Question').attr('value') == 'Multiple') {
-
         $.get('/Question/getListAnswerBase')
             .success(function (data) {
                 $('div.panel_base_answer').fadeIn(1000);
@@ -793,7 +787,6 @@ var list_answer_base;
         }
     });
 
-
     $.ajax({
         type: "GET",
         url: "/Question/getListBlocksQuestion",
@@ -813,7 +806,6 @@ var list_answer_base;
     $('input.set_blocks').click(function (event) {
         if ($(this).is(':checked')) {
             DrawPanelBlocks($(this));
-
         } else {
             $('div.panel_blocks').remove();
             $('div.slide_line_blocks').remove();
@@ -891,15 +883,6 @@ var list_answer_base;
             /**
              * Проверка на повторение
              */
-            //var is_exist = false;
-            //$('span[name=blocks_answer_id]').each(function () {
-            //    if (Number($(this).text()) == Number($('select.typeBlock option:checked').attr('value'))) {
-            //        alert('Переход для данного ответа уже существует');
-            //        is_exist = true;
-            //    }
-
-            //})
-            //if (!is_exist) {
             var query = {
                 fromQuestion: $('input.Id').val(),
                 toQuestion: $('select.toQuestion option:checked').attr('value'),
@@ -908,9 +891,9 @@ var list_answer_base;
             }
             $.post("/Question/setBlock", query)
                 .success(function () { alert('Блок добавлен'); LoadListBlocks(); });
-            //}
         })
     }
+
     /*
     * Загрузка листа блокировок
     */
@@ -939,14 +922,12 @@ var list_answer_base;
         });
     }
 
-
     /*
      *Создание панети управления переходами о вопроса к вопросу
      */
     $('input.set_transition').click(function (event) {
         if ($(this).is(':checked')) {
             DrawPanelTransition($(this));
-
         } else {
             $('div.panel_transition').remove();
             $('div.slide_line').remove();
@@ -954,8 +935,6 @@ var list_answer_base;
                 .success(function () { alert('Таблица переходов удалена'); })
         }
     })
-
-
 
     /*
     * Функция отрисовки панели переходов
@@ -1016,6 +995,7 @@ var list_answer_base;
                 $('div.panel_transition').append(code);
             }
         });
+
         $.ajax({
             type: "GET",
             url: "/Question/getAnswerAll",
@@ -1058,7 +1038,6 @@ var list_answer_base;
                     alert('Переход для данного ответа уже существует');
                     is_exist = true;
                 }
-
             })
             if (!is_exist) {
                 var query = {
@@ -1149,7 +1128,6 @@ var list_answer_base;
                                     clearInterval(wait_interval);
                                 }
                             }, 100);
-
                         });
                         return false;
                     }
@@ -1248,7 +1226,6 @@ var list_answer_base;
                     code += '</select></span>';
                     $('div.panel_group').append(code);
                     $('div.panel_group').append('<button class="save_group" style="margin-left: 15px;">Сохранить</button>');
-
                     $('div.panel_group').append('<div class="list_bind_group"></div>');
                 }
             });
@@ -1274,7 +1251,6 @@ var list_answer_base;
                 })
         })
 
-
         $('div.panel_group').on('click', 'button.save_group', function () {
             /**
              * Проверка на повторение
@@ -1284,7 +1260,6 @@ var list_answer_base;
             var id_answer = $('select.checkAnswer option:checked').val() - 0;
             var is_not_busy = false;
             if ($('div.list_bind_group p').length > 0) {
-
                 $('div.list_bind_group p').each(function () {
                     if ($(this).attr('id') == id_answer) {
                         alert("Busy");
@@ -1319,7 +1294,6 @@ var list_answer_base;
             if (this.value.match(RegExp(/[^0-9]/g)) || this.value.length > 2) {
                 this.value = this.value.substr(0, this.value.length - 1);
             }
-
             if (Number(this.value) > count_answer) {
                 this.value = count_answer;
                 alert("Большое число");
@@ -1334,11 +1308,19 @@ var list_answer_base;
 
     })
 
+    $('.panel_set_rotation').on("click", ".QButton", function () {
+
+        $('.panel_set_rotation').find('.Qon').removeClass('Qon');
+        $(this).addClass('Qon').removeClass('Qoff');
+
+    })
+
     $('.LowerLimit').bind("change keyup input", function () {
         if (this.value.match(RegExp(/[^0-9]/g))) {
             this.value = this.value.substr(0, this.value.length - 1);
         }
     })
+
     $('.UpperLimit').bind("change keyup input", function () {
         if (this.value.match(RegExp(/[^0-9]/g))) {
             this.value = this.value.substr(0, this.value.length - 1);
@@ -1388,7 +1370,7 @@ var list_answer_base;
     $('.SaveRange').click(function () {
         var list_range = [];
         $('.PanelOfRange').find('div.StringRange').each(function () {
-            list_range.push($(this).text()+"#"+$(this).parent().find('.IndexRange').attr('id'));
+            list_range.push($(this).text() + "#" + $(this).parent().find('.IndexRange').attr('id'));
         })
         console.log("Range List ==== : ", list_range);
         var query = {

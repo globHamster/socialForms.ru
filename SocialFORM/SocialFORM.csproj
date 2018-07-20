@@ -486,6 +486,7 @@
     <Content Include="Views\Home\Options.cshtml" />
     <Content Include="Views\Home\Kvot.cshtml" />
     <Content Include="Views\Question\Loop.cshtml" />
+    <Content Include="Views\Question\BaseAnswer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

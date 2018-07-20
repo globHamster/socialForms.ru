@@ -2,7 +2,7 @@
 <style>
     .check_question {
         padding: 5px;
-        background-color: #58e863;
+        background-color: #81c784;
         width: 150px;
         font-weight: 600;
         font-family: 'Century Gothic';
@@ -57,7 +57,7 @@
         display: inline-block;
         margin-left: 5px;
         padding: 5px 15px;
-        background-color: #58e863;
+        background-color: #81c784;
     }
 
         .UnionWith:hover {
@@ -101,9 +101,10 @@
         height: 30px;
         padding: 5px;
         text-align: center;
-        background-color: #72afff;
+        background-color: #008dd2;
         color: black;
         font-weight: 600;
+        box-shadow: 0 0 5px black;
     }
 
         .SaveQuota:hover {
@@ -282,7 +283,7 @@
         var position_y = this.offsetTop + Math.floor(this.offsetHeight / 2);
         this.style.backgroundColor = "grey";
 
-        $('.check_question').animate({ backgroundColor: '#58e863' }, 200);
+        $('.check_question').animate({ backgroundColor: '#81c784' }, 200);
         var panel_question_div = document.getElementById('PanelQuestion');
         panel_question_div.style.display = 'block';
         //panel_question_div.style.position = 'fixed';
@@ -653,26 +654,6 @@
             $('.Total_Count').css("color", "green");
         }
     }
-
-    $('.check_question').hover(
-        function () {
-            console.log("hover >>>> ");
-            var cssProp = anime({
-                targets: '.check_question',
-                scale: 1.1,
-                easing: 'linear',
-                borderRadius: ['0em', '2em'],
-            });
-        },
-        function () {
-            var cssProp = anime({
-                targets: '.check_question',
-                scale: 1,
-                easing: 'linear',
-                borderRadius: ['0em', '0em'],
-            });
-        }
-    )
 </script>
 
 

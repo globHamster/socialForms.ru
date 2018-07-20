@@ -135,7 +135,7 @@ namespace SocialFORM.Controllers
                 
                 if (tmp.Id > 0)
                 {
-                    QuestionModel question = db.SetQuestions.Where(u => u.Id == tmp.QuestionID).FirstOrDefault();
+                    QuestionModel question = db.SetQuestions.FirstOrDefault(u => u.Id == tmp.QuestionID);
                     AnswerModel answer = db.SetAnswers.Where(u => u.Id == tmp.Id).FirstOrDefault();
                     answer.QuestionID = question.Id;
                     answer.AnswerText = tmp.AnswerText;
@@ -752,6 +752,17 @@ namespace SocialFORM.Controllers
                 db.SetLoopModels.Remove(tmp);
                 db.SaveChanges();
             }
+        }
+
+        public ActionResult BaseAnswer()
+        {
+            return PartialView();
+        }
+
+        [HttpGet]
+        public JsonResult GetListBaseAnswer()
+        {
+            return Json(db.SetAnswerBaseModels.ToList(), JsonRequestBehavior.AllowGet);
         }
     }
 }
