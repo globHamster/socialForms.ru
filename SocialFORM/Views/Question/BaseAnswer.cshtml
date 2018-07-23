@@ -15,12 +15,25 @@
         width: 450px;
         border-right: 3px solid #455a64;
     }
+    .TranscriptionAnswerBase {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        font-family: 'Century Gothic';
+        font-weight: 600;
+        color: #455a64;
+        width: 300px;
+        border-right: 3px solid #455a64;
+    }
     .IndexAnswerBase {
         display: flex;
         justify-content: center;
         align-content: space-between;
         align-items: center;
         flex-direction: column;
+        border-right: 3px solid #455a64;
         width: 200px
     }
     .DeleteButton {
@@ -51,11 +64,21 @@
         height: 30px;
         background-color: #81c784;
     }
+    .SaveButton {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 100px;
+        height: 30px;
+        background-color: #81c784;
+    }
     .HeaderPanel{
         display: flex;
         align-items: center;
         border-bottom: 1px solid black;
-        box-shadow: 0px 5px 5px #008dd2;
+        box-shadow: 0px 0px 0px 1px black;
         margin-bottom: 10px;
     }
     .ColumnBase {
@@ -76,6 +99,9 @@
     .ColumnBaseIndex{
         width: 200px;
     }
+    .ColumnTranscriptionText{
+        width: 300px;
+    }
     .Scaled{
         transform: scale(1.1,1.1);
         box-shadow: 5px 5px black;
@@ -89,7 +115,7 @@
     .InfoBaseAnswer{
         position: fixed;
         display: none;
-        z-index: 1001;
+        z-index: 1002;
         width: 400px;
         height: 400px;
         background-color: #fff;
@@ -110,19 +136,98 @@
         top: calc(100% - 35px);
         left: calc(100% - 105px);
     }
+    .DivInfoBaseAnswer{
+        width: 90%;
+        height: 90%;
+        margin: 5px;
+    }
+    .InputTextAnswerBase{
+        width: 300px;
+        height: 80px;
+        resize: none;
+    }
+    .TextInfoAnswerBase{
+        width: 100%;
+    }
+    .IndexInfoAnswerBase{
+        width: 100%;
+    }
+    .TranscriptionText{
+        width: 100%;
+    }
+    .ButtonCloseBase {
+        display: none;
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        left: calc(100% - 15px);
+        top: -15px;
+        background-color: #e57373;
+        border: 5px outset #f44336;
+        border-radius: 15px;
+        text-align: center;
+        z-index: 1005;
+        cursor: pointer;
+    }
+    .ShowDown{
+        transform: translateY(-60px);
+        opacity: 1;
+        transition: .5s linear;
+    }
+    .BugReport {
+        position: fixed;
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        opacity: 0;
+        width: 100%;
+        height: 60px;
+        left: 0px;
+        top: 100vh;
+        background-color: #f44336;
+        font-family: 'Century Gothic';
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .BlockWallTwo{
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        opacity: 0.4;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: gray;
+    }
 </style>
 <div class="AddButton">Добавить</div>
 <div class="BaseAnswerPanel">
     <div class="HeaderPanel">
         <div class="ColumnAnswerText ColumnBase">Текст ответа</div>
         <div class="ColumnBaseIndex ColumnBase">Индекс ответа</div>
+        <div class="ColumnTranscriptionText ColumnBase">Транскрипция</div>
         </div>
 </div>
-<div class="InfoBaseAnswer">
-    <div class="SaveInfoBaseAnswer">Сохранить</div>
-    <div>weurweioiewpoirpoewipwe</div>
-</div>
 
+<div class="InfoBaseAnswer">
+    <div class="SaveInfoBaseAnswer SaveButton">Сохранить</div>
+    <div class="DivInfoBaseAnswer">
+        <div style="font-family:'Century Gothic';">Текст базового ответа</div>
+        <div class="TextInfoAnswerBase"><textarea type="text" class="InputTextAnswerBase" /></div>
+        <div style="height: 1em;"></div>
+        <div style="font-family:'Century Gothic';">Индекс базового ответа</div>
+        <div class="TextInfoAnswerBase"><input type="text" class="IndexInfoAnswerBase" /></div>
+        <div style="height: 1em;"></div>
+        <div>Транскрипция</div>
+        <div class="TranscriptionBaseAnswer"><input type="text" class="TranscriptionText" /></div>
+        <div class="ButtonCloseBase" onclick="CloseInfoClick()">&#10006;</div>
+    </div>
+</div>
+<div class="BlockWallTwo"></div>
+<div class="BugReport">Ошибка! Не соответствие данных</div>
 <script>
     $(function () {
         $('.PreLoader').hide();
@@ -132,8 +237,10 @@
                 $.each(server_data, function (i, item) {
                     var code = "";
                     code += `<div class="LayerBaseAnswer">
+                        <input type="hidden" value="`+ item.Id + `" />
                         <div class="TextAnswerBase">`+ item.AnswerText + `</div>
-                        <div class="IndexAnswerBase">`+ (-1*Number(item.BaseIndex)) +`</div>
+                        <div class="IndexAnswerBase">`+ (-1 * Number(item.BaseIndex)) + `</div>
+                        <div class="TranscriptionAnswerBase">`+ item.Transcription +`</div>
                         <div class="DeleteButton">Удалить</div>
                         <div class="ChangeButton">Изменить</div>
                      </div>
@@ -168,11 +275,19 @@
     })
 
     function DeleteBaseAnswer(tmp_elem) {
-        tmp_elem.remove();
+        var id_base_answer = tmp_elem.find('input:first').val();
+        console.warn(id_base_answer);
+        $.post("/Question/DeleteBaseAnswer", { id_base: id_base_answer })
+            .success(function () {
+                tmp_elem.remove();
+            })
     }
 
     function AddBaseAnswer() {
+        $('.BlockWallTwo').show();
+        $('.ButtonClose').hide();
         $('.InfoBaseAnswer').show();
+        $('.ButtonCloseBase').show();
         //var code = "";
         //code += `<div class="LayerBaseAnswer">
         //                <div class="TextAnswerBase">Text</div>
@@ -215,9 +330,162 @@
 
     $('.BaseAnswerPanel').on("mousedown", ".ChangeButton", function () {
         $(this).addClass('NotScaled').removeClass('Scaled');
+        ChangeBaseAnswer($(this));
     })
 
     $('.BaseAnswerPanel').on("mouseup", ".ChangeButton", function () {
         $(this).addClass('Scaled').removeClass('NotScaled');
     })
+
+    $('.InfoBaseAnswer').on("mouseenter", ".SaveButton", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('.InfoBaseAnswer').on("mouseleave", ".SaveButton", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('.InfoBaseAnswer').on("mousedown", ".SaveButton", function () {
+        $(this).addClass('NotScaled').removeClass('Scaled');
+        SaveBaseAnswer();
+    })
+
+    $('.InfoBaseAnswer').on("mouseup", ".SaveButton", function () {
+        $(this).addClass('Scaled').removeClass('NotScaled');
+    })
+
+    $('.BaseAnswerPanel').on("mouseenter", ".SaveButton", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('.BaseAnswerPanel').on("mouseleave", ".SaveButton", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('.BaseAnswerPanel').on("mousedown", ".SaveButton", function () {
+        $(this).addClass('NotScaled').removeClass('Scaled');
+        SaveChangeBaseAnswer($(this));
+    })
+
+    $('.BaseAnswerPanel').on("mouseup", ".SaveButton", function () {
+        $(this).addClass('Scaled').removeClass('NotScaled');
+    })
+
+    $('.InfoBaseAnswer').on('change keydown input', '.IndexInfoAnswerBase', function () {
+        if (this.value.match(RegExp(/[^0-9]/g))) {
+            this.value = this.value.substr(0, this.value.length - 1);
+        }
+    })
+
+    function SaveBaseAnswer() {
+        var text_base_answer = $('.InputTextAnswerBase').val();
+        var index_base_answer = $('.IndexInfoAnswerBase').val();
+        var transcription_base_asnwer = $('.TranscriptionText').val();
+        var is_allright = true;
+        $('.BaseAnswerPanel').find('.IndexAnswerBase').each(function () {
+            if ($(this).text() == index_base_answer) {
+                is_allright = false;
+                console.warn("I find index");
+                $('.BugReport').addClass('ShowDown').animate({ opacity: "1"}, 500);
+                setTimeout(function () {
+                    $('.BugReport').removeClass('ShowDown');
+                }, 3000)
+                return false;
+            }
+        })
+        $('.BaseAnswerPanel').find('.TranscriptionAnswerBase').each(function () {
+            if ($(this).text() == transcription_base_asnwer) {
+                is_allright = false;
+                console.warn("I find transcription");
+                $('.BugReport').addClass('ShowDown').animate({ opacity: "1" }, 500);
+                setTimeout(function () {
+                    $('.BugReport').removeClass('ShowDown');
+                }, 3000)
+                return false;
+            }
+        })
+        if (is_allright) {
+            var query = {
+                AnswerText: text_base_answer,
+                withFreeArea: false,
+                Transcription: transcription_base_asnwer,
+                BaseIndex: (-1 * Number(index_base_answer))
+            }
+            $.post("/Question/AddBaseAnswer", query)
+                .success(function (server_code) {
+                    var code = "";
+                    code += `<div class="LayerBaseAnswer">
+                        <input type="hidden" value="`+ server_code + `" />
+                        <div class="TextAnswerBase">`+ text_base_answer + `</div>
+                        <div class="IndexAnswerBase">`+ index_base_answer + `</div>
+                        <div class="TranscriptionAnswerBase">`+ transcription_base_asnwer + `</div>
+                        <div class="DeleteButton">Удалить</div>
+                        <div class="ChangeButton">Изменить</div>
+                     </div>`;
+                    $('.BaseAnswerPanel').append(code);
+                    $('.InfoBaseAnswer').fadeOut(200);
+                    $('.BlockWallTwo').hide();
+                    $('.ButtonClose').show();
+                    $('.AddButton').removeClass('NotScaled');
+                });
+        }
+    }
+
+    function CloseInfoClick() {
+        $('.ButtonClose').show();
+        $('.BlockWallTwo').hide();
+        $('.InfoBaseAnswer').find('input').val("");
+        $('.InfoBaseAnswer').find('textarea').val("");
+        $('.InfoBaseAnswer').fadeOut(200);
+        $('.AddButton').removeClass('NotScaled');
+    }
+
+    function ChangeBaseAnswer(tmp) {
+       // console.warn("click");
+        var is_bug = false
+        $('.BaseAnswerPanel').find('.LayerBaseAnswer').each(function () {
+            if ($(this).find('.SaveButton').length > 0) {
+                is_bug = SaveChangeBaseAnswer($(this).find('.SaveButton'));
+                if (is_bug) return false;
+            }
+        })
+        // console.warn(tmp.parent().html());
+        if (is_bug == false) {
+            var parent = tmp.parent();
+            var text = parent.find('.TextAnswerBase').text();
+            var index = parent.find('.IndexAnswerBase').text();
+            var transcription = parent.find('.TranscriptionAnswerBase').text();
+            parent.find('.TextAnswerBase').empty().append('<input type="text" style="width: 100%; height: auto;" value="' + text + '"/>');
+            parent.find('.IndexAnswerBase').empty().append('<input type="text" style="width: 100%; height: auto;" value="' + index + '"/>');
+            parent.find('.TranscriptionAnswerBase').empty().append('<input type="text" style="width: 100%; height: auto;" value="' + transcription + '"/>');
+            parent.find('.ChangeButton').removeClass('ChangeButton').addClass('SaveButton').text('Сохранить');
+        }
+    }
+
+    function SaveChangeBaseAnswer(tmp) {
+        var parent = tmp.parent();
+        var text = parent.find('.TextAnswerBase').find('input').val();
+        var index = parent.find('.IndexAnswerBase').find('input').val();
+        var transcription = parent.find('.TranscriptionAnswerBase').find('input').val();
+        var is_bug = false;
+        $('.BaseAnswerPanel').find('.LayerBaseAnswer').each(function () {
+            if ($(this) == parent) return;
+            if ($(this).find('.IndexAnswerBase').text() == index) {
+                is_bug = true;
+                $('.BugReport').addClass('ShowDown').animate({ opacity: "1" }, 500);
+                setTimeout(function () {
+                    $('.BugReport').removeClass('ShowDown');
+                }, 3000)
+                //SaveChangeBaseAnswer($(this).find('.SaveButton'));
+                return false;
+            }
+        })
+        if (is_bug == false) {
+            parent.find('.TextAnswerBase').empty().text(text);
+            parent.find('.IndexAnswerBase').empty().text(index);
+            parent.find('.TranscriptionAnswerBase').empty().text(transcription);
+            parent.find('.SaveButton').removeClass('SaveButton').addClass('ChangeButton').text('Изменить');
+        }
+        return is_bug;
+    }
 </script>

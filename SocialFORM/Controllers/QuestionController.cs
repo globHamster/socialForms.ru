@@ -764,5 +764,25 @@ namespace SocialFORM.Controllers
         {
             return Json(db.SetAnswerBaseModels.ToList(), JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public int AddBaseAnswer(AnswerBaseModel tmp)
+        {
+            db.SetAnswerBaseModels.Add(tmp);
+            db.SaveChanges();
+            int id_base = tmp.Id;
+            return id_base;
+        }
+
+        [HttpPost]
+        public void DeleteBaseAnswer(int id_base)
+        {
+            AnswerBaseModel tmp = db.SetAnswerBaseModels.FirstOrDefault(u => u.Id == id_base);
+            if (tmp != null)
+            {
+                db.SetAnswerBaseModels.Remove(tmp);
+                db.SaveChanges();
+            }
+        }
     }
 }
