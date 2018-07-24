@@ -35,6 +35,73 @@
         border-top-left-radius: 15px;
         margin-bottom: 5px;
     }
+    .ExportButton {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 100px;
+        height: 30px;
+        background-color: #008dd2;
+        cursor: default;
+        color: #fff;
+    }
+    .ShowDB {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 100px;
+        height: 30px;
+        background-color: #008dd2;
+        cursor: default;
+        color: #fff;
+    }
+    .CheckEncode {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 30px;
+        height: 30px;
+        background-color: #008dd2;
+        border-left: 2px solid #b0bec5;
+        cursor: pointer;
+        color: #fff;
+    }
+    .SettingExport{
+        display:inline-flex;
+    }
+    .Scaled {
+        transform: scale(1.1,1.1);
+        box-shadow: 5px 5px black;
+        transition: 0.1s linear;
+    }
+
+    .NotScaled {
+        transform: scale(1,1);
+        box-shadow: 0px 0px black;
+        transition: 0.1s linear;
+    }
+    .EncodingString{
+        display: none;
+        position: fixed;
+        border: 5px inset #008dd2;
+        z-index: 999;
+        background: #fff;
+        padding: 5px;
+        font-family: 'Century Gothic';
+    }
+    .EncodingString > div {
+        background-color: #fff;
+        margin: 5px;
+    }
+    .EncodingString > div > input{
+        margin-right: 5px;
+    }
 </style>
 
 
@@ -58,11 +125,15 @@
             <td id="@item.Id">
                 @Html.DisplayFor(modelItem => item.NameProject)
             </td>
-            <td>
+            <td style="display: inline-flex;">
                 <button class="infoP" id="@item.Id">?</button>
-                <button class="kvot" id="@item.Id">Квоты</button>
-                <button class="show_blanks" id="@item.Id">База данных</button>|
-                <button class="export_result" id="@item.Id">Экспорт Excel</button>|
+                <div class="ShowDB" id="@item.Id">База данных</div>
+                <div style="width:2px;"/>
+                <div class="SettingExport">
+                    <input type="hidden" name="SettingEncodeProject" value="@item.SettingEncode" />
+                    <div class="ExportButton" id="@item.Id">&#11015; Экспорт</div>
+                    <div class="CheckEncode">&#9776;</div>
+                </div>
                 @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
                 @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
                 @if (item.ActionProject == true)
@@ -86,7 +157,10 @@
                 PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
                              )
 </div>
-<div class="PanelOfProject">
+
+<div class="EncodingString" id="EncodingString">
+    <div name="UTF-8"><input type="radio" name="setting"/>UTF-8</div>
+    <div name="Windows-1251"><input type="radio" name="setting">Windows-1251</div>
 </div>
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
@@ -208,80 +282,93 @@
 
     });
 
-    $('button.kvot').click(function () {
+    $('table.table').on("mouseenter", ".ExportButton", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('table.table').on("mouseleave", ".ExportButton", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('table.table').on("mousedown", ".ExportButton", function () {
+        $(this).addClass('NotScaled').removeClass('Scaled');
+        setTimeout(function () { $('.PreLoader').hide(); }, 1000);
+        
+    })
+
+    $('table.table').on("mouseup", ".ExportButton", function () {
+        $(this).addClass('Scaled').removeClass('NotScaled');
+        var setting = $(this).parent().find('input[name=SettingEncodeProject]').val();
+        console.warn(setting);
+        document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id') + "&name_file=" + $(this).parent().parent().parent().find('td').first().text() + "&encode=" + setting;
+        $('.PreLoader').hide();
+    })
+
+    $('table.table').on("mouseenter", ".CheckEncode", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('table.table').on("mouseleave", ".CheckEncode", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('table.table').on("mouseenter", ".ShowDB", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('table.table').on("mouseleave", ".ShowDB", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('table.table').on("mousedown", ".ShowDB", function () {
+        $(this).removeClass('Scaled').addClass('NotScaled');
         var id_project = $(this).attr('id');
-        $('.PreLoader').show();
-        $('.Tables').load('/Home/Kvot?id_p=' + id_project);
-
-    });
-
-    $.get("/Home/GetListProject")
-        .success(function (server_data) {
-            $.each(server_data, function (i, item) {
-                CreateDivProject(item.Id, item.NameProject);
-            })
+        $.ajax({
+            type: "GET",
+            url: "/Home/getResultList",
+            async: false,
+            data: { id_project: id_project },
+            success: function (data) {
+                if (data.length != 0) {
+                    $('.Tables').load('/Home/TableBlanks?id_project=' + id_project, null, function () { $('.PreLoader').hide(); });
+                } else {
+                    alert("Список пуст");
+                }
+            }
         })
+    })
+    
 
-    function CreateDivProject(id_p, name_p) {
-        var code = "<div class='ProjectLayer'><input type='hidden' value='" + id_p + "' name='project_info'/><div class='ProjectName'><div class='Text'>" + name_p + "</div></div><div class='ExportToEXCEL Button'><div class='Text'>Экспорт в EXCEL</div></div><div class='Button'><div class='Text'>Удалить</div></div></div>";
-        $('.PanelOfProject').append(code);
-    }
-
-    $('.PanelOfProject').on("mouseenter", ".Button", function () {
-        $(this).addClass('Anime');
-        $(this).animate({ border: "0 0 5px black" }, 300);
-        var cssButton = anime({
-            targets: '.Anime',
-            scale: 1.1,
-            translateX: 2,
-            duration: 100,
-            easing: 'linear',
+    $('table.table').on("mousedown", ".CheckEncode", function (event) {
+        $('.ChangeEncode').removeClass("ChangeEncode");
+        var encode = $(this).parent().find('input[name=SettingEncodeProject]').val();
+        $(this).addClass("ChangeEncode");
+        setTimeout(function () { $('.PreLoader').hide(); }, 1000);
+        var offset_x = event.clientX;
+        var offset_y = event.clientY;
+        console.warn(encode);
+        $('.EncodingString').find('div[name=' + encode + ']').find('input').prop('checked', true);
+        var setting = document.getElementById('EncodingString');
+        setting.style.display = "block";
+        setting.style.left = (offset_x-15) + "px";
+        setting.style.top = (offset_y-15) + "px";
+        $(document).mouseup(function (event) {
+            var container = $('.EncodingString');
+            if (container.has(event.target).length === 0) {
+                container.hide();
+                $('.ChangeEncode').removeClass('ChangeEncode');
+            }
         });
     })
 
-    $('.PanelOfProject').on("mouseleave", ".Button", function () {
-        var cssButton = anime({
-            targets: '.Anime',
-            scale: 1.0,
-            translateX: -2,
-            duration: 100,
-            easing: 'linear',
-        })
-        $(this).removeClass('Anime');
-    })
-
-    $('.PanelOfProject').on("click", ".Button", function () {
-        var cssButton = anime({
-            targets: '.Anime',
-            scale: 0.9,
-            duration: 100,
-            backgroundColor: '#999999',
-            easing: 'linear',   
-            direction: 'alternate',
-        })
-    })
-
-    $('.PanelOfProject').on("mouseenter", ".ProjectName", function () {
-        $(this).parent().addClass('Anime');
-        var cssButton = anime({
-            targets: '.Anime',
-            background: '#58e86377',
-            scale: 1.2,
-            translateX: 2,
-            duration: 100,
-            easing: 'linear',
-        });
-    })
-
-    $('.PanelOfProject').on("mouseleave", ".ProjectName", function () {
-        var cssButton = anime({
-            targets: '.Anime',
-            scale: 1.0,
-            translateX: -2,
-            backgroundColor: '#ffffff',
-            duration: 100,
-            easing: 'linear',
-        })
-        $(this).parent().removeClass('Anime');
+    $('.EncodingString input[name=setting]').change(function () {
+        if ($(this).is(":checked")) {
+            //alert($(this).parent().attr('name'));
+            $('.ChangeEncode').parent().find('input[name=SettingEncodeProject]').val($(this).parent().attr('name'));
+            var encode_str = $(this).parent().attr('name');
+            var id_project = $('.ChangeEncode').parent().find('.ExportButton').attr('id');
+            $.post("/Home/ChangeEncodeProject", { id: id_project, encode: encode_str })
+                .success(function () { $('.EncodingString').hide(); });
+        }
     })
 </script>

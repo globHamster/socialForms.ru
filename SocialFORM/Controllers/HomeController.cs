@@ -17,6 +17,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using PagedList.Mvc;
 using PagedList;
+using System.Text;
 
 namespace SocialFORM.Controllers
 {
@@ -298,7 +299,7 @@ namespace SocialFORM.Controllers
         }
 
 
-        public void ExportToEXCEL(int id_p, string name_file)
+        public void ExportToEXCEL(int id_p, string name_file, string encode)
         {
             List<ResultModel> listResultExport = db.SetResultModels.Where(u => u.ProjectID == id_p).ToList();
             Dictionary<int, List<BlankModel>> listBlankExport = new Dictionary<int, List<BlankModel>>();
@@ -697,17 +698,20 @@ namespace SocialFORM.Controllers
 
             grid.DataSource = products;
             grid.DataBind();
+            
+
             Response.ClearContent();
-            Response.AddHeader("content-disposition", "attachment; filename=" + name_file + ".xls");
-            Response.ContentType = "application/excel";
-            Response.ContentEncoding = System.Text.Encoding.GetEncoding("utf-8");
+            Response.Clear();
+            Response.ContentEncoding = Encoding.GetEncoding(encode);
+            Response.ContentType = "application/ms-excel";
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + name_file + ".xls");
+            Response.Charset = "";
             StringWriter sw = new StringWriter();
             HtmlTextWriter htmlTextWriter = new HtmlTextWriter(sw);
-
             grid.RenderControl(htmlTextWriter);
-
+            //Response.ContentEncoding = System.Text.Encoding.UTF8;
             Response.Write(sw.ToString());
-
+            Response.Flush();
             Response.End();
         }
 
@@ -1572,6 +1576,17 @@ namespace SocialFORM.Controllers
         public JsonResult GetListProject()
         {
             return Json(db2.SetProjectModels.ToList(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public void ChangeEncodeProject(int id, string encode)
+        {
+            ProjectModel tmp = db2.SetProjectModels.FirstOrDefault(u => u.Id == id);
+            if(tmp != null)
+            {
+                tmp.SettingEncode = encode;
+                db2.SaveChanges();
+            }
         }
 
     }
