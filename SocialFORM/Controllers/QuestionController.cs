@@ -780,7 +780,22 @@ namespace SocialFORM.Controllers
             AnswerBaseModel tmp = db.SetAnswerBaseModels.FirstOrDefault(u => u.Id == id_base);
             if (tmp != null)
             {
+                List<AnswerAll> tmp_remove_list = db.SetAnswerAll.Where(u => u.AnswerKey == id_base && u.AnswerType == 2).ToList();
+                db.SetAnswerAll.RemoveRange(tmp_remove_list);
                 db.SetAnswerBaseModels.Remove(tmp);
+                db.SaveChanges();
+            }
+        }
+
+        [HttpPost]
+        public void SaveChangeBaseAnswer(AnswerBaseModel tmp)
+        {
+            AnswerBaseModel change_item = db.SetAnswerBaseModels.FirstOrDefault(u => u.Id == tmp.Id);
+            if (change_item != null)
+            {
+                change_item.AnswerText = tmp.AnswerText;
+                change_item.BaseIndex = tmp.BaseIndex;
+                change_item.Transcription = tmp.Transcription;
                 db.SaveChanges();
             }
         }

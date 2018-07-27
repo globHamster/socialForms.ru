@@ -465,6 +465,7 @@
 
     function SaveChangeBaseAnswer(tmp) {
         var parent = tmp.parent();
+        var id_base_answer = parent.find('input:first').val();
         var text = parent.find('.TextAnswerBase').find('input').val();
         var index = parent.find('.IndexAnswerBase').find('input').val();
         var transcription = parent.find('.TranscriptionAnswerBase').find('input').val();
@@ -482,10 +483,20 @@
             }
         })
         if (is_bug == false) {
-            parent.find('.TextAnswerBase').empty().text(text);
-            parent.find('.IndexAnswerBase').empty().text(index);
-            parent.find('.TranscriptionAnswerBase').empty().text(transcription);
-            parent.find('.SaveButton').removeClass('SaveButton').addClass('ChangeButton').text('Изменить');
+            var query = {
+                Id: id_base_answer,
+                AnswerText: text,
+                WithFreeArea: false,
+                Transcription: transcription,
+                BaseIndex: (-1*Number(index))
+            };
+            $.post("/Question/SaveChangeBaseAnswer", query)
+                .success(function () {
+                    parent.find('.TextAnswerBase').empty().text(text);
+                    parent.find('.IndexAnswerBase').empty().text(index);
+                    parent.find('.TranscriptionAnswerBase').empty().text(transcription);
+                    parent.find('.SaveButton').removeClass('SaveButton').addClass('ChangeButton').text('Изменить');
+                })
         }
         return is_bug;
     }

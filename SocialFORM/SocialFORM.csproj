@@ -300,6 +300,7 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\map-marker-icon.png" />
     <Content Include="Content\media\style.css" />
     <Content Include="Content\PagedList.css" />
     <Content Include="Content\radio-button.css" />

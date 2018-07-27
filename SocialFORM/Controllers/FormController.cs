@@ -175,5 +175,29 @@ namespace SocialFORM.Controllers
         {
             return PartialView();
         }
+
+
+        [HttpPost]
+        public void DeleteBlankResult(int id_res)
+        {
+            ResultModel tmp_result = db2.SetResultModels.FirstOrDefault(u => u.Id == id_res);
+            if (tmp_result != null)
+            {
+                List<BlankModel> tmp_list_blank = db2.SetBlankModels.Where(u => u.BlankID == tmp_result.Id).ToList();
+                if (tmp_list_blank.Count() > 0)
+                {
+                    db2.SetBlankModels.RemoveRange(tmp_list_blank);
+                }
+                List<ResultModel> tmp_change_list = db2.SetResultModels.Where(u => u.ProjectID == tmp_result.ProjectID && u.BlankID > tmp_result.BlankID).ToList();
+                int countBlankID = tmp_result.BlankID;
+                foreach(var item in tmp_change_list)
+                {
+                    item.BlankID = countBlankID;
+                    countBlankID++;
+                }
+                db2.SetResultModels.Remove(tmp_result);
+                db2.SaveChanges();
+            }
+        }
     }
 }

@@ -209,6 +209,7 @@ namespace SocialFORM.Controllers
             System.Diagnostics.Debug.WriteLine("Adding new project in table ..." + name_project);
             ProjectModel tmp = new ProjectModel();
             tmp.NameProject = name_project;
+            tmp.SettingEncode = "UTF-8";
             db4.SetProjectModels.Add(tmp);
             db4.SaveChanges();
             tmp = db4.SetProjectModels.ToList().Last();
@@ -347,7 +348,7 @@ namespace SocialFORM.Controllers
             products.Columns.Add("Номер телефона");
             products.Columns.Add("Начало анкеты");
             products.Columns.Add("Конец анкеты");
-            products.Columns.Add("Учебный день");
+            //products.Columns.Add("Учебный день");
             foreach (var item in listGroupExport)
             {
                 QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
@@ -474,7 +475,7 @@ namespace SocialFORM.Controllers
                         break;
                 }
             }
-
+            System.Diagnostics.Debug.WriteLine("Количество колонок >>>> "+products.Columns.Count);
             List<string> tmp_str = new List<string>();
 
             foreach (var item in listResultExport)
@@ -484,17 +485,17 @@ namespace SocialFORM.Controllers
                 tmp_str.Add(item.PhoneNumber);
                 tmp_str.Add(item.Data.ToString());
                 tmp_str.Add(item.Time);
-                List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
-                string is_introduce_day = "0";
-                foreach (var item_schoolday in list_schoolday)
-                {
-                    if (item.UserID == item_schoolday.UserId && item.Data.Date == item_schoolday.Date.Date)
-                    {
-                        is_introduce_day = "1";
-                        break;
-                    }
-                }
-                tmp_str.Add(is_introduce_day);
+                //List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
+                //string is_introduce_day = "0";
+                //foreach (var item_schoolday in list_schoolday)
+                //{
+                //    if (item.UserID == item_schoolday.UserId && item.Data.Date == item_schoolday.Date.Date)
+                //    {
+                //        is_introduce_day = "1";
+                //        break;
+                //    }
+                //}
+                //tmp_str.Add(is_introduce_day);
                 List<BlankModel> tmp_blank = listBlankExport[item.Id];
 
                 foreach (var group_item in listGroupExport)
@@ -552,6 +553,7 @@ namespace SocialFORM.Controllers
                                     List<string> other_column = new List<string>();
                                     foreach (var blank_item in tmp_list_blank)
                                     {
+                                        if (count_all_answer == 0) break;
                                         if (blank_item.AnswerIndex != -404)
                                         {
                                             if (blank_item.AnswerIndex < 0)
@@ -567,7 +569,7 @@ namespace SocialFORM.Controllers
                                             tmp_str.Add(" ");
                                         if (blank_item.Text != null)
                                             other_column.Add(blank_item.Text);
-                                        count_all_answer--;
+                                        count_all_answer--; 
                                     }
                                     for (int i = 0; i < count_all_answer; i++)
                                     {
@@ -621,6 +623,8 @@ namespace SocialFORM.Controllers
                                 if (listQuestionExport[(int)group_item.QuestionID].IsKvot == true)
                                 {
                                     List<RangeModel>tmp_listRange = listRangeExport.Where(u => u.BindQuestion == (int)group_item.QuestionID).ToList();
+                                    if (_blank_list.Count() == 0) { System.Diagnostics.Debug.WriteLine("Count = 0"); tmp_str.Add(" "); break; }
+                                    if (_blank_list[0].Text == null) { System.Diagnostics.Debug.WriteLine("Text is null"); tmp_str.Add(" "); break; }
                                     int age = Int32.Parse(_blank_list[0].Text);
                                     foreach(var item_range in tmp_listRange)
                                     {
@@ -691,7 +695,17 @@ namespace SocialFORM.Controllers
                     }
 
                 }
-                products.Rows.Add(tmp_str.ToArray());
+                System.Diagnostics.Debug.WriteLine("Количество элементов в строке >>>> " + tmp_str.Count());
+                try
+                {
+                    products.Rows.Add(tmp_str.ToArray());
+                } catch (System.ArgumentException r)
+                {
+                    tmp_str.RemoveAt(0);
+                    products.Rows.Add(tmp_str.ToArray());
+                    System.Diagnostics.Debug.WriteLine(r);
+                    
+                }
                 tmp_str.Clear();
             }
             var grid = new GridView();

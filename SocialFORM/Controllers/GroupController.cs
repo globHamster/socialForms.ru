@@ -100,6 +100,8 @@ namespace SocialFORM.Controllers
             System.Diagnostics.Debug.WriteLine("GroupID : " + tmp.GroupID);
             QuestionModel tmp_q = new QuestionModel();
             tmp_q.TextQuestion = "New question";
+            tmp_q.IsKvot = false;
+            tmp_q.IsRotate = false;
             tmp_q.TypeQuestion = (SocialFORM.Models.Question.Type)1;
             tmp_q = db2.SetQuestions.Add(tmp_q);
             db2.SaveChanges();

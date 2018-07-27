@@ -72,6 +72,20 @@
         cursor: pointer;
         color: #fff;
     }
+    .NameProjectDiv {
+        display: flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: flex-start;
+        flex-direction: column;
+        width: 100%;
+        height: 30px;
+        background-color: #008dd2;
+        cursor: pointer;
+        color: #fff;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
     .SettingExport{
         display:inline-flex;
     }
@@ -123,7 +137,7 @@
     {
         <tr class="project_layer">
             <td id="@item.Id">
-                @Html.DisplayFor(modelItem => item.NameProject)
+               <div class="NameProjectDiv" id="@item.Id"> @Html.DisplayFor(modelItem => item.NameProject) </div>
             </td>
             <td style="display: inline-flex;">
                 <button class="infoP" id="@item.Id">?</button>
@@ -162,6 +176,7 @@
     <div name="UTF-8"><input type="radio" name="setting"/>UTF-8</div>
     <div name="Windows-1251"><input type="radio" name="setting">Windows-1251</div>
 </div>
+
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
 
@@ -209,14 +224,7 @@
         $('button.export_result').click(function () {
             document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id') + "&name_file=" + $(this).parent().parent().find('td').first().text();
         })
-
-        $(".table").on("click", "td", function () {
-            var id = $(this).attr('id');
-            $('.PreLoader').show();
-            $("#Tables").load("/Group/Manager?id_project=" + id);
-            //location.href = "/Group/Manager?id_project=" + id;
-        });
-
+        
         //$(".table").on("click", "button", function () {
         //    alert("ewrqweq");
         //    $("#Tables").load("/Form/SingleFormView?id_q=1");
@@ -224,12 +232,7 @@
 
 
     });
-    $(".table").on('mouseenter', '.project_layer', function () {
-        $(this).css('background-color', '#72afff');
-    });
-    $(".table").on('mouseleave', '.project_layer', function () {
-        $(this).css('background-color', '#fff');
-    });
+
     $('.create_project').click(function () {
         var code = '<input type="text" class="name_project" style="display: none;"/>'
         $(this).after(code);
@@ -312,6 +315,21 @@
         $(this).removeClass('Scaled');
     })
 
+    $('table.table').on("mouseenter", ".NameProjectDiv", function () {
+        $(this).addClass('Scaled');
+    })
+
+    $('table.table').on("mouseleave", ".NameProjectDiv", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('table.table').on("click", ".NameProjectDiv", function () {
+        $(this).removeClass('Scaled').addClass('NotScaled');
+        var id = $(this).attr('id');
+        $('.PreLoader').show();
+        $("#Tables").load("/Group/Manager?id_project=" + id);
+    })
+
     $('table.table').on("mouseenter", ".ShowDB", function () {
         $(this).addClass('Scaled');
     })
@@ -321,6 +339,7 @@
     })
 
     $('table.table').on("mousedown", ".ShowDB", function () {
+        $('.PreLoader').show();
         $(this).removeClass('Scaled').addClass('NotScaled');
         var id_project = $(this).attr('id');
         $.ajax({
@@ -330,7 +349,7 @@
             data: { id_project: id_project },
             success: function (data) {
                 if (data.length != 0) {
-                    $('.Tables').load('/Home/TableBlanks?id_project=' + id_project, null, function () { $('.PreLoader').hide(); });
+                    $('.Tables').load('/Home/TableBlanks?id_project=' + id_project);
                 } else {
                     alert("Список пуст");
                 }
@@ -339,7 +358,7 @@
     })
     
 
-    $('table.table').on("mousedown", ".CheckEncode", function (event) {
+    $('table.table').on("click", ".CheckEncode", function (event) {
         $('.ChangeEncode').removeClass("ChangeEncode");
         var encode = $(this).parent().find('input[name=SettingEncodeProject]').val();
         $(this).addClass("ChangeEncode");
@@ -350,8 +369,8 @@
         $('.EncodingString').find('div[name=' + encode + ']').find('input').prop('checked', true);
         var setting = document.getElementById('EncodingString');
         setting.style.display = "block";
-        setting.style.left = (offset_x-15) + "px";
-        setting.style.top = (offset_y-15) + "px";
+        setting.style.left = (offset_x) + "px";
+        setting.style.top = (offset_y) + "px";
         $(document).mouseup(function (event) {
             var container = $('.EncodingString');
             if (container.has(event.target).length === 0) {
@@ -371,4 +390,5 @@
                 .success(function () { $('.EncodingString').hide(); });
         }
     })
+
 </script>

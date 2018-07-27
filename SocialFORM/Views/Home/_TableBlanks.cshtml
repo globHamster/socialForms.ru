@@ -1,27 +1,75 @@
 ﻿@model PagedList.IPagedList<SocialFORM.Models.Form.ResultModel>
 @using PagedList.Mvc;
+<style>
+    .GEOButton {
+        display: inline-flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 30px;
+        height: 30px;
+        background-color: #008dd2;
+        padding: 5px;
+        border-radius: 25px;
+    }
+    .DeleteBlankButton {
+        display: inline-flex;
+        justify-content: center;
+        align-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        width: 29px;
+        height: 30px;
+        background-color: #f44336;
+        padding: 5px;
+        border-radius: 25px;
+    }
+    .Scaled {
+        transform: scale(1.1,1.1);
+        box-shadow: 5px 5px black;
+        transition: 0.1s linear;
+    }
+
+    .NotScaled {
+        transform: scale(1,1);
+        box-shadow: 0px 0px black;
+        transition: 0.1s linear;
+    }
+</style>
 <div class="table_blanks" style="overflow:auto" id="@Model.First().ProjectID">
     <table class="export_table">
         <thead>
             <tr class="name_colum">
+                <th style="width: 50em;">GEO</th>
                 <th>Номер бланка</th>
                 <th>ФИО</th>
                 <th>Номер телефона</th>
                 <th>Начало Анкеты</th>
                 <th>Завершение Анкеты</th>
-                <th>Коордитаны</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
                 <tr id="@item.Id" name="@item.Id" class="answer_row">
+                    <td style="border: 0px; align-self: center; width: 50em;">
+                        <div style="width: 100%; display:inline-flex; flex-direction: column; justify-content:center; align-content: space-between; align-items: center;">
+                            <div class="GEOButton">
+                                <div style="display: none" name="CootdWidth">@item.CoordWidth</div>
+                                <div style="display: none" name="CootdHeight">@item.CoordHeight</div>
+                                <img src="~/Content/map-marker-icon.png" width="20" height="20" />
+                            </div>
+                            <div class="DeleteBlankButton" id="@item.Id">
+                                &#10006;
+                            </div>
+                        </div>
+                    </td>
                     <td><input type="hidden" name="UserID" value="@item.UserID" /> @item.BlankID</td>
                     <td>@item.UserName</td>
                     <td>@item.PhoneNumber</td>
                     <td class="startDATE">@item.Data</td>
                     <td>@item.Time</td>
-                    <td class="item_coord">@item.CoordWidth,@item.CoordHeight</td>
                 </tr>
 
             }
@@ -186,7 +234,7 @@
                 }
 
             })
-
+            $('.PreLoader').hide();
         }
     })
 
@@ -194,9 +242,9 @@
     $('tr.answer_row').each(function () {
         var UserID = $(this).find('input[name=UserID]').val();
         var startDATE = $(this).find('.startDATE').text().split(' ');
-        var tmp_this = $(this); 
+        var tmp_this = $(this);
         $.each(list_schoolDay, function (i, item) {
-          //  var tmp = item.Date.toString();
+            //  var tmp = item.Date.toString();
             // var string = tmp.split(' ');
             console.info(item[0], UserID, item[1], startDATE[0])
             if (item[0] == UserID && item[1] == startDATE[0]) {
@@ -298,8 +346,36 @@
         alert("База очищена");
         $("#Tables").load("/Home/Project");
     });
-    $('tr.answer_row').click(function () {
 
+    $('div.table_blanks').on("mouseenter", ".DeleteBlankButton", function () {
+        $(this).addClass("Scaled");
+    })
+
+    $('div.table_blanks').on("mouseleave", ".DeleteBlankButton", function () {
+        $(this).removeClass("Scaled");
+    })
+
+    $('div.table_blanks').on("click", ".DeleteBlankButton", function () {
+        $(this).removeClass("Scaled").addClass('NotScaled');
+        var elem = $(this);
+        var id_result = $(this).attr('id');
+        $.post("/Form/DeleteBlankResult", { id_res: id_result })
+            .success(function () {
+                elem.parents('.answer_row').remove();
+            });
+    })
+
+    $('div.table_blanks').on("mouseenter", ".GEOButton", function () {
+        $(this).addClass("Scaled");
+    })
+
+    $('div.table_blanks').on("mouseleave", ".GEOButton", function () {
+        $(this).removeClass("Scaled");
+    })
+
+    $('div.table_blanks').on("click", ".GEOButton", function () {
+        var CoordWidth = $(this).find("div[name=CoordWidth]").text();
+        var CoordHeight = $(this).find("div[name=CoordHeight]").text();
         $('body div.body-content').append('<div class="back_end"><div class="map_yandex" id="map"></div></div>');
         $('div.map_yandex').css({
             'position': 'fixed',
@@ -329,10 +405,8 @@
             });
         });
 
-        var coord = $(this).find('td.item_coord').text().split(',');
-
-        var coordX = Number(coord[0]), coordY = Number(coord[1]);
-        alert(coordX + " " + coordY);
+        var coordX = Number(CoordWidth), coordY = Number(CoordHeight);
+        
         var myMap = new ymaps.Map('map', {
             center: [coordX, coordY],
             zoom: 15
@@ -347,7 +421,5 @@
             {
                 preset: 'islands#blueCircleDotIcon'
             }));
-
     })
-
 </script>
