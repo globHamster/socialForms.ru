@@ -645,13 +645,9 @@
     };
 
     $('button[id="SaveData"]').click(function () {
-        alert('SAVE');
+        
         var conteiner = [];
         for (var i = 1; i <= 27; i++) {
-            if (!$('div[class$="q' + i + '"]').is(":visible")) {
-                conteiner.push('');
-                i++;
-            }
             switch ($('div[class$="q' + i + '"]').attr('id')) {
                 case '1':
                     switch ($('div[class$="q' + i + '"]').find('input:first').attr('type')) {
@@ -709,9 +705,17 @@
         }
         //
         //ЗАПРОС НА СОХРАНЕНИЕ
-        $.post('/Home/postSaveOp', { mass: conteiner }).success(function () {
-            window.location.reload();
-        });
+        //фаил
+        //сервер
+        $.post("/Home/postSaveOp", { mass: conteiner })
+            .success(function (code) {
+                console.log(code);
+                $('div.form').empty().load('/Home/SuccessOpros?id_op=' + code);
+                //window.location.reload();
+            })
+            .error(function () {
+                console.error("Ошибка отправки данных на postSaveOp");
+            });
         console.log('save =>>>>>>', conteiner);
     });
 </script>
