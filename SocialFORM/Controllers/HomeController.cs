@@ -6,18 +6,19 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
 using SocialFORM.Models.Project;
-using SocialFORM.Models.Menu;
-using SocialFORM.Models.Authentication;
 using SocialFORM.Models.Question;
 using SocialFORM.Models.Group;
 using SocialFORM.Models.Form;
 using SocialFORM.Models.Session;
+using SocialFORM.Models.Statistick;
 using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using PagedList.Mvc;
 using PagedList;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SocialFORM.Controllers
 {
@@ -148,7 +149,7 @@ namespace SocialFORM.Controllers
             ViewBag.ProjectID = id_p;
             using (ProjectContext p_context = new ProjectContext())
             {
-                ViewBag.NameProject = p_context.SetProjectModels.First(u=>u.Id == id_p).NameProject;
+                ViewBag.NameProject = p_context.SetProjectModels.First(u => u.Id == id_p).NameProject;
             }
             return PartialView();
         }
@@ -197,11 +198,107 @@ namespace SocialFORM.Controllers
                 EmailView = DataUsers.Email,
             }
             );
-            listUsers = result.ToList();
+            listUsers = result.ToList().OrderBy(u => u.FamilyView).ToList();
             int pageSize = 14;
             int pageNumber = (page ?? 1);
             return PartialView("_Users", listUsers.ToPagedList(pageNumber, pageSize));
         }
+        //
+        //Таблица Пользователей
+        //
+        public string GetData()
+        {
+            IQueryable<UserViewModel> result = (
+            from User in db.SetUser
+            join DataUsers in db.SetDataUsers on User.Id equals DataUsers.UserId
+            join Role in db.SetRoles on User.RoleId equals Role.Id
+            select new UserViewModel
+            {
+                IdView = User.Id,
+                LoginView = User.Login,
+                PasswordView = User.Password,
+                NameView = DataUsers.Name,
+                FamilyView = DataUsers.Family,
+                AgeView = DataUsers.Age,
+                FoolView = DataUsers.Fool,
+                EmailView = DataUsers.Email,
+                SchoolDayView = User.SchoolDay,
+                RoleView = Role.Name
+            }
+            );
+            listUsers = result.ToList();
+            return JsonConvert.SerializeObject(listUsers);
+        }
+
+        [HttpPost]
+        public void Edit(UserViewModel model)
+        {
+            string password = CodePass(model.PasswordView);
+            // действия по редактированию
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                User UPuser = db.SetUser.Where(c => c.Id == model.IdView).First();
+                DataUser UPdataUser = db.SetDataUsers.Where(c => c.UserId == model.IdView).First();
+
+                UPuser.Login = model.LoginView;
+
+                UPuser.Password = model.PasswordView;
+                UPuser.RoleId = Convert.ToInt32(model.RoleView);
+                UPuser.SchoolDay = model.SchoolDayView;
+
+                UPdataUser.Name = model.NameView;
+                UPdataUser.Family = model.FamilyView;
+                UPdataUser.Age = model.AgeView;
+                UPdataUser.Fool = model.FoolView;
+
+                db.Entry(UPuser).State = EntityState.Modified;
+                db.Entry(UPdataUser).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
+        [HttpPost]
+        public void Create(UserViewModel model)
+        {
+            string password = CodePass(model.PasswordView);
+            // действия по созданию
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                db.SetUser.Add(new User { Login = model.LoginView, Password = model.PasswordView, RoleId = Convert.ToInt32(model.RoleView), SchoolDay = model.SchoolDayView });
+                db.SaveChanges();
+                db.SetDataUsers.Add(new DataUser { Name = model.NameView, Family = model.FamilyView, Age = model.AgeView, Fool = model.FoolView, Email = model.EmailView, UserId = db.SetUser.First(u => u.Login == model.LoginView).Id });
+                db.SaveChanges();
+            }
+        }
+
+        [HttpPost]
+        public void Delete(int Id)
+        {
+            // действия по удалению
+            User UPuser = db.SetUser.Where(c => c.Id == Id).First();
+            DataUser UPdataUser = db.SetDataUsers.Where(c => c.UserId == Id).First();
+            db.SetUser.Remove(UPuser);
+            db.SetDataUsers.Remove(UPdataUser);
+            db.SaveChanges();
+        }
+
+        public static string CodePass(string pass)
+        {
+            byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(pass);
+            string returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
+            byte[] hash = Encoding.ASCII.GetBytes(returnValue);
+            MD5 md5 = new MD5CryptoServiceProvider();
+            byte[] hashenc = md5.ComputeHash(hash);
+            string result = "";
+            foreach (var b in hashenc)
+            {
+                result += b.ToString("x2");
+            }
+            return result;
+        }
+        //
+        //Конец таблицы пользователей
+        //
 
         [HttpGet]
         public JsonResult AddProject(string name_project)
@@ -348,7 +445,7 @@ namespace SocialFORM.Controllers
             products.Columns.Add("Номер телефона");
             products.Columns.Add("Начало анкеты");
             products.Columns.Add("Конец анкеты");
-            //products.Columns.Add("Учебный день");
+            products.Columns.Add("Учебный день");
             foreach (var item in listGroupExport)
             {
                 QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
@@ -423,7 +520,7 @@ namespace SocialFORM.Controllers
                                         products.Columns.Add(item.GroupName + "_" + i);
                                 }
                             }
-                            if(listQuestionExport[(int)item.QuestionID].IsKvot == true)
+                            if (listQuestionExport[(int)item.QuestionID].IsKvot == true)
                             {
                                 products.Columns.Add("Диапозон");
                             }
@@ -434,7 +531,7 @@ namespace SocialFORM.Controllers
                             int count_row = listTableRow[(int)item.QuestionID].Count();
                             int null_count_row = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == null).Count();
                             int max_cont_row = 0;
-                            foreach(var item_row in listTableRow[(int)item.QuestionID])
+                            foreach (var item_row in listTableRow[(int)item.QuestionID])
                             {
                                 if (item_row.IndexRow != null)
                                 {
@@ -475,7 +572,7 @@ namespace SocialFORM.Controllers
                         break;
                 }
             }
-            System.Diagnostics.Debug.WriteLine("Количество колонок >>>> "+products.Columns.Count);
+
             List<string> tmp_str = new List<string>();
 
             foreach (var item in listResultExport)
@@ -485,17 +582,17 @@ namespace SocialFORM.Controllers
                 tmp_str.Add(item.PhoneNumber);
                 tmp_str.Add(item.Data.ToString());
                 tmp_str.Add(item.Time);
-                //List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
-                //string is_introduce_day = "0";
-                //foreach (var item_schoolday in list_schoolday)
-                //{
-                //    if (item.UserID == item_schoolday.UserId && item.Data.Date == item_schoolday.Date.Date)
-                //    {
-                //        is_introduce_day = "1";
-                //        break;
-                //    }
-                //}
-                //tmp_str.Add(is_introduce_day);
+                List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
+                string is_introduce_day = "0";
+                foreach (var item_schoolday in list_schoolday)
+                {
+                    if (item.UserID == item_schoolday.UserId && item.Data.Date == item_schoolday.Date.Date)
+                    {
+                        is_introduce_day = "1";
+                        break;
+                    }
+                }
+                tmp_str.Add(is_introduce_day);
                 List<BlankModel> tmp_blank = listBlankExport[item.Id];
 
                 foreach (var group_item in listGroupExport)
@@ -511,8 +608,9 @@ namespace SocialFORM.Controllers
                                     {
                                         if (tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex < 0)
                                         {
-                                            tmp_str.Add((-1*tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex).ToString());
-                                        } else
+                                            tmp_str.Add((-1 * tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex).ToString());
+                                        }
+                                        else
                                         {
                                             tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerIndex.ToString());
                                         }
@@ -626,19 +724,19 @@ namespace SocialFORM.Controllers
                                     if (_blank_list.Count() == 0) { System.Diagnostics.Debug.WriteLine("Count = 0"); tmp_str.Add(" "); break; }
                                     if (_blank_list[0].Text == null) { System.Diagnostics.Debug.WriteLine("Text is null"); tmp_str.Add(" "); break; }
                                     int age = Int32.Parse(_blank_list[0].Text);
-                                    foreach(var item_range in tmp_listRange)
+                                    foreach (var item_range in tmp_listRange)
                                     {
-                                        int lower_limit; 
+                                        int lower_limit;
                                         if (!Int32.TryParse(item_range.RangeString.Split('-')[0], out lower_limit))
                                         {
                                             lower_limit = Int32.MinValue;
                                         }
                                         int upper_limit;
-                                        if(!Int32.TryParse(item_range.RangeString.Split('-')[1], out upper_limit))
+                                        if (!Int32.TryParse(item_range.RangeString.Split('-')[1], out upper_limit))
                                         {
                                             upper_limit = Int32.MaxValue;
                                         }
-                                       
+
                                         if ((lower_limit <= age) && (age <= upper_limit))
                                         {
                                             tmp_str.Add(item_range.IndexRange.ToString());
@@ -1402,24 +1500,6 @@ namespace SocialFORM.Controllers
                 }
             }
 
-            if (count_all != 0)
-            {
-                list_all.Add("ИТОГО : /"
-                    + count_all + "/"
-                    + string.Format("{0:0.##}", count_ch_all) + "/"
-                    + tmp_all.ToLongTimeString() + "/"
-                    + min_all + "/"
-                    + max_all + "/"
-                    + tmp2_all.ToLongTimeString()
-                    );
-            }
-            ViewBag.list_all = list_all;
-            ViewBag.list = list;
-            int pageSize = 15;
-            int pageNumber = (page ?? 1);
-            return PartialView(tmp_tableBlanksFilter.ToPagedList(pageNumber, pageSize));
-        }
-
         public ActionResult Monitoring()
         {
             return PartialView();
@@ -1544,8 +1624,9 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public void postSaveOp(List<string> mass )
+        public async Task<int> postSaveOp(List<string> mass)
         {
+            System.Diagnostics.Debug.WriteLine(mass.Count());
             ApplicationContext context = new ApplicationContext();
             Opros list = new Opros();
             list.q1 = mass[0];
@@ -1595,7 +1676,14 @@ namespace SocialFORM.Controllers
             list.q45 = mass[44];
             list.q46 = mass[45];
             context.SetOpros.Add(list);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
+            return list.id;
+        }
+
+        public ActionResult SuccessOpros(int id_op)
+        {
+            ViewBag.IDopros = id_op;
+            return PartialView();
         }
 
         [HttpGet]
@@ -1604,15 +1692,234 @@ namespace SocialFORM.Controllers
             return Json(db2.SetProjectModels.ToList(), JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
-        public void ChangeEncodeProject(int id, string encode)
+
+
+
+        //
+        //Таблица Статистика PATH 1
+        //
+        public string GetDataStat(int id, int idop, string sd, string ed, string st, string et)
         {
-            ProjectModel tmp = db2.SetProjectModels.FirstOrDefault(u => u.Id == id);
-            if(tmp != null)
+            List<ProjectViewModel> res = new List<ProjectViewModel>();
+            List<ResultModel> tmp1 = db.SetResultModels.ToList();
+            if (id > 0)
             {
-                tmp.SettingEncode = encode;
-                db2.SaveChanges();
+                tmp1 = tmp1.Where(u => u.ProjectID == id).ToList();
             }
+            if (idop > 0)
+            {
+                tmp1 = tmp1.Where(u => u.UserID == idop).ToList();
+            }
+            if (sd != "-1" && ed != "-1")
+            {
+                System.Diagnostics.Debug.WriteLine("Nice");
+                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 1 && Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == -1 || Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 0 || Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 0).ToList();
+            }
+            if (st != "-1" && et != "-1")
+            {
+                System.Diagnostics.Debug.WriteLine("Nice");
+                tmp1 = tmp1.Where(u => TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
+            }
+            foreach (var item in tmp1)
+            {
+                ProjectViewModel tmp2 = new ProjectViewModel();
+                tmp2.IDView = item.BlankID;
+                tmp2.ProjectIDView = item.ProjectID;
+                tmp2.UserIDView = item.UserID;
+                tmp2.UserNameView = item.UserName.Trim();
+                tmp2.PhoneView = item.PhoneNumber;
+                tmp2.DateView = item.Data.ToShortDateString();
+                tmp2.StartTimeView = item.Data.ToLongTimeString();
+                tmp2.EndTimeView = DateTime.Parse(item.Time).ToLongTimeString();
+                tmp2.LenghtTimeView = (DateTime.Parse(item.Time) - item.Data).ToString();
+
+                res.Add(tmp2);
+
+            }
+
+            return JsonConvert.SerializeObject(res);
+        }
+        //
+        //Таблица Статистика PATH 2
+        //
+        public string GetDataStatResult(int id, int idop, string sd, string ed, string st, string et)
+        {
+            List<StatResViewModel> StatRes = new List<StatResViewModel>();
+            List<ResultModel> tmp1 = db.SetResultModels.ToList();
+            List<SessionHubModel> tmp2 = new List<SessionHubModel>();
+
+            //
+            //Обработка списка результатов по фильтрам
+            //
+            if (id > 0)
+            {
+                tmp1 = tmp1.Where(u => u.ProjectID == id).ToList();
+            }
+            if (idop > 0)
+            {
+                tmp1 = tmp1.Where(u => u.UserID == idop).ToList();
+            }
+            if (sd != "-1" && ed != "-1")
+            {
+                System.Diagnostics.Debug.WriteLine("Nice");
+                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 1 && Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == -1 || Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 0 || Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 0).ToList();
+            }
+            if (st != "-1" && et != "-1")
+            {
+                System.Diagnostics.Debug.WriteLine("Nice");
+                tmp1 = tmp1.Where(u => TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
+            }
+
+            //
+            //Определение выбрана ли дата или обработка всего списка 
+            //
+            if (tmp1.Count != 0)
+            {
+                Dictionary<DateTime, List<ResultModel>> keys = new Dictionary<DateTime, List<ResultModel>>();
+                string startData, endData, startTime, endTime = "";
+
+                if (sd != "-1" && ed != "-1")
+                {
+                    startData = sd;
+                    startTime = st;
+                    endData = ed;
+                    endTime = et;
+                }
+                else
+                {
+                    startData = tmp1.First().Data.ToShortDateString();
+                    startTime = tmp1.First().Data.ToLongTimeString();
+                    List<ResultModel> tmp1t = tmp1.Reverse<ResultModel>().ToList();
+                    endData = tmp1t.First().Data.ToShortDateString();
+                    endTime = tmp1t.First().Data.ToLongTimeString();
+                }
+
+                DateTime BeginData = Convert.ToDateTime(startData).Date;
+                DateTime EndData = Convert.ToDateTime(endData).Date;
+                DateTime ttmp = new DateTime();
+                DateTime ttmp2 = new DateTime();
+                TimeSpan min = new TimeSpan();
+                TimeSpan max = new TimeSpan();
+                int count;
+                int countID = 0;
+                double count_ch = 0;
+
+                while (BeginData <= EndData)
+                {
+                    keys.Add(BeginData, tmp1.Where(u => u.Data.Date == BeginData.Date).ToList());
+                    BeginData = BeginData.AddDays(1);
+                }
+                foreach (var i in keys)
+                {
+                    List<ResultModel> tmp_list = i.Value;
+                    if (tmp_list.Count != 0)
+                    {
+                        //Количество анкет
+                        count = tmp_list.Count();
+                        //Вычисляем Срею время, Мин. - Макс. время, Сре. отклонение
+                        min = new TimeSpan(23, 59, 59); max = new TimeSpan(0, 0, 0);
+                        foreach (ResultModel item in tmp_list)
+                        {
+                            if (min >= DateTime.Parse(item.Time).Subtract(item.Data)) { min = DateTime.Parse(item.Time).Subtract(item.Data); }
+                            if (max <= DateTime.Parse(item.Time).Subtract(item.Data)) { max = DateTime.Parse(item.Time).Subtract(item.Data); }
+                        }
+                        if (count > 1)
+                        {
+                            double seconds = 0; double secondsOT = 0;
+                            foreach (ResultModel item in tmp_list)
+                            {
+                                seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
+                            }
+                            seconds = seconds / tmp_list.Count;
+                            foreach (ResultModel item in tmp_list)
+                            {
+                                secondsOT += Math.Pow(DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds - seconds, 2);
+                            }
+                            secondsOT /= (tmp_list.Count - 1); secondsOT = Math.Sqrt(secondsOT);
+                            int minutesOt = (int)Math.Floor(secondsOT / 60);
+                            int minutes = (int)Math.Floor(seconds / 60);
+                            seconds -= minutes * 60;
+                            secondsOT -= minutesOt * 60;
+                            ttmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
+                            ttmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
+                        }
+
+                        //Количество анкет в час
+                        List<ResultModel> t_tmp = tmp_list.Reverse<ResultModel>().ToList();
+                        TimeSpan t1 = new TimeSpan();
+                        if (count != 0)
+                        {
+                            t1 = TimeSpan.Parse(DateTime.Parse(t_tmp.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
+                            Double t2 = t1.TotalHours;
+                            count_ch = count / t2;
+                        }
+
+                        //Время работы
+                        string tmp_new = i.Key.Date.ToShortDateString();
+                        tmp2 = db.SetSessionHubModel.Where(u => u.UserId == idop && u.Date == tmp_new).ToList();
+                        List<SessionHubModel> sessionHubs = db.SetSessionHubModel.Where(u => u.Date == tmp_new).OrderBy(s => s.UserId).ToList();
+                        int countUser = 0;
+                        for (var item = 0; item < sessionHubs.Count() - 1; item++)
+                        {
+                            if (sessionHubs[item].UserId != sessionHubs[item + 1].UserId) countUser++;
+                        }
+                        string sessionStartTime = "";
+                        string sessionEndTime = "";
+                        string sessionTimeInSystem = "00:00:00";
+                        string sessionAfkTime = "00:00:00";
+                        if (tmp2.Count != 0)
+                        {
+                            sessionStartTime = tmp2.First().StartTime;
+                            sessionEndTime = tmp2.Reverse<SessionHubModel>().First().EndTime;
+                            if (sessionEndTime == null) sessionEndTime = DateTime.Now.ToLongTimeString();
+                            foreach (var q in tmp2)
+                            {
+                                if (q.TimeInSystem == null)
+                                {
+                                    sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(DateTime.Now.ToLongTimeString()) - TimeSpan.Parse(q.StartTime)).ToString();
+                                }
+                                else { 
+                                    sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
+                                }
+                                if (q.AfkTime == null)
+                                {
+                                    sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse("00:00:00")).ToString();
+                                }
+                                else
+                                {
+                                    sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
+                                }
+                            }
+                        }
+
+                        StatResViewModel tmp_statResViewModel = new StatResViewModel();
+                        tmp_statResViewModel.IdView = countID;
+                        tmp_statResViewModel.DataView = i.Key.ToShortDateString();
+                        tmp_statResViewModel.CountUserView = idop == -1 ? countUser.ToString() : "0";
+                        tmp_statResViewModel.CountProjectView = tmp_list.Count().ToString();
+                        tmp_statResViewModel.CountHourView = string.Format("{0:0.##}", count_ch);
+                        tmp_statResViewModel.MediumTimeView = ttmp.ToLongTimeString();
+                        tmp_statResViewModel.MinLenghtView = min.ToString();
+                        tmp_statResViewModel.MaxLenghtView = max.ToString();
+                        tmp_statResViewModel.MediumView = ttmp2.ToLongTimeString();
+                        tmp_statResViewModel.TimeUpView = tmp2.Count != 0 ? sessionStartTime : "0";
+                        tmp_statResViewModel.TimeOutView = tmp2.Count != 0 ? sessionEndTime : "0";
+                        tmp_statResViewModel.TimeWorkView = tmp2.Count != 0 ? sessionTimeInSystem : "0";
+                        tmp_statResViewModel.OneNView = t1.ToString(); ;
+                        tmp_statResViewModel.TimeAfkView = tmp2.Count != 0 ? sessionAfkTime : "0";
+
+                        StatRes.Add(tmp_statResViewModel);
+                        countID++;
+                    }
+                }
+            }
+            else
+            {
+                //нет анкет
+                return "";
+            }
+
+            return JsonConvert.SerializeObject(StatRes);
         }
 
     }

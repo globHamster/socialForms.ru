@@ -26,7 +26,7 @@ namespace SocialFORM.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model)
         {
-            DateTime someDateTime = DateTime.Now;
+            string someDateTime = DateTime.Now.ToShortDateString();
             if (ModelState.IsValid)
             {
                 // поиск пользователя в бд
@@ -39,35 +39,29 @@ namespace SocialFORM.Controllers
                 }
                 if (user != null)
                 {
+                    SessionHubModel date = null;
                     using (ApplicationContext db = new ApplicationContext())
                     {
-                        SessionModel date = db.SetSession.FirstOrDefault(u => u.UserId == user.Id && u.Date == someDateTime.Date);
-                        if (date == null)
-                        {
-                            db.SetSession.Add(new Models.Session.SessionModel { UserId = user.Id, Date = someDateTime.Date, TimeUp = someDateTime.ToLongTimeString(), SetTimeUp = someDateTime.ToLongTimeString(), TimeOut = someDateTime.ToLongTimeString(), AllTime = "00:00:00", StatusTime = 1 });
-                            db.SaveChanges();
-                        }
-                        if (date != null)
-                        {
-                            SessionModel UPSetTimeUp = db.SetSession.Where(u => u.UserId == user.Id && u.Date == someDateTime.Date).First();
-                            UPSetTimeUp.SetTimeUp = someDateTime.ToLongTimeString();
-                            UPSetTimeUp.TimeOut = someDateTime.ToLongTimeString();
-                            UPSetTimeUp.StatusTime = 1;
-                            db.Entry(UPSetTimeUp).State = EntityState.Modified;
-                            db.SaveChanges();
-                        }
+                        date = db.SetSessionHubModel.FirstOrDefault(u => u.UserId == user.Id && u.Date == someDateTime && u.IsAction == true);
                     }
-                    FormsAuthentication.SetAuthCookie(model.Login, true);
-                    // Создать объект cookie-набора
-                    HttpCookie cookie = new HttpCookie("cookieAuth");
+                    if (date == null)
+                    {
+                        FormsAuthentication.SetAuthCookie(model.Login, true);
+                        // Создать объект cookie-набора
+                        HttpCookie cookie = new HttpCookie("cookieAuth");
 
-                    // Установить значения в нем
-                    cookie["Login"] = CryporEngine.Encrypt(model.Login, true);
-                    cookie.Expires = DateTime.Now.AddYears(1);
+                        // Установить значения в нем
+                        cookie["Login"] = CryporEngine.Encrypt(model.Login, true);
+                        cookie.Expires = DateTime.Now.AddYears(1);
 
-                    // Добавить куки в ответ
-                    Response.Cookies.Add(cookie);
-                    return RedirectToAction("_Index", "Home");
+                        // Добавить куки в ответ
+                        Response.Cookies.Add(cookie);
+                        return RedirectToAction("_Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Пользователь Авторизирован");
+                    }
                 }
                 else
                 {
@@ -122,15 +116,6 @@ namespace SocialFORM.Controllers
         public void UpdateUser(UserViewModel model)
         {
 
-            //if (ModelState.IsValid)
-            //{
-            //User user = null;
-            //using (ApplicationContext db = new ApplicationContext())
-            //{
-            //    user = db.SetUser.FirstOrDefault(u => u.Login == model.LoginView);
-            //}
-            //if (user != null)
-            //{
             // обновляем пользователя
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -152,10 +137,6 @@ namespace SocialFORM.Controllers
                 db.Entry(UPdataUser).State = EntityState.Modified;
                 db.SaveChanges();
             }
-
-            //    user = db.SetUser.Where(u => u.Login == model.LoginView && u.Password == model.PasswordView).FirstOrDefault();
-            //}
-            //}
         }
 
         public ActionResult Logoff()
