@@ -690,12 +690,24 @@ namespace SocialFORM.Controllers
                                 }
                             }
                             break;
+                        case Models.Question.Type.Filter:
+                            if (tmp_blank.FirstOrDefault(u=>u.QuestionID == group_item.QuestionID) != null)
+                            {
+                                tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).AnswerID.ToString());
+                                tmp_str.Add(tmp_blank.FirstOrDefault(u => u.QuestionID == group_item.QuestionID).Text);
+                            }
+                            else
+                            {
+                                tmp_str.Add(" ");
+                                tmp_str.Add(" ");
+                            }
+                            break;
                         default:
                             break;
                     }
 
                 }
-                System.Diagnostics.Debug.WriteLine("Количество элементов в строке >>>> " + tmp_str.Count());
+                
                 try
                 {
                     products.Rows.Add(tmp_str.ToArray());

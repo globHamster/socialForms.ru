@@ -67,16 +67,9 @@ namespace SocialFORM.Controllers
         {
             System.Diagnostics.Debug.WriteLine("Text : " + q.TextQuestion);
             QuestionModel tmp = q;
-            if (ModelState.IsValid)
-            {
-                db.Entry(tmp).State = EntityState.Modified;
-                db.SaveChanges();
-                return tmp.Id;
-
-            }
-
-            return 0;
-
+            db.Entry(tmp).State = EntityState.Modified;
+            db.SaveChanges();
+            return tmp.Id;
         }
 
         [HttpPost]
@@ -128,6 +121,19 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
+        public void SaveAnswerRange(List<AnswerModel> tmp)
+        {
+            if (tmp != null)
+            {
+                List<AnswerModel> list = tmp.OrderBy(u => u.Index).ToList();
+                foreach (var item in list)
+                {
+                    Answer(item);
+                }
+            }
+        }
+
+        [HttpPost]
         public void Answer(AnswerModel tmp)
         {
             if (ModelState.IsValid)
@@ -140,6 +146,7 @@ namespace SocialFORM.Controllers
                     answer.QuestionID = question.Id;
                     answer.AnswerText = tmp.AnswerText;
                     answer.isFreeArea = tmp.isFreeArea;
+                    answer.Index = tmp.Index;
                     db.SaveChanges();
                     //answerAll.AnswerKey = tmp.Id;
                     //answerAll.QuestionID = tmp.QuestionID;
@@ -161,25 +168,36 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
+        public void DeleteListAnswer(List<int> list)
+        {
+            foreach(var item in list)
+            {
+                deleteAnswer(item);
+            }
+        }
+
+        [HttpPost]
         public void deleteAnswer(int Id)
         {
-            AnswerModel answer = db.SetAnswers.Where(u => u.Id == Id).First();
-            AnswerAll tmpAnswerAll = db.SetAnswerAll.Where(u => u.AnswerKey == Id).FirstOrDefault();
-            List<AnswerModel> list_tmp_answer = db.SetAnswers.Where(u => u.QuestionID == answer.QuestionID && u.Index > answer.Index).ToList();
-            if (list_tmp_answer != null)
+            AnswerModel answer = db.SetAnswers.Where(u => u.Id == Id).FirstOrDefault();
+            if (answer != null)
             {
-                int count = answer.Index;
-                foreach(var item in list_tmp_answer)
+                AnswerAll tmpAnswerAll = db.SetAnswerAll.Where(u => u.AnswerKey == Id).FirstOrDefault();
+                List<AnswerModel> list_tmp_answer = db.SetAnswers.Where(u => u.QuestionID == answer.QuestionID && u.Index > answer.Index).ToList();
+                if (list_tmp_answer != null)
                 {
-                    item.Index = count;
-                    count++;
+                    int count = answer.Index;
+                    foreach (var item in list_tmp_answer)
+                    {
+                        item.Index = count;
+                        count++;
+                    }
                 }
+                DeleteQuota(db.SetQuestions.First(u => u.Id == answer.QuestionID).ProjectID, answer.QuestionID);
+                db.SetAnswerAll.Remove(tmpAnswerAll);
+                db.Entry(answer).State = EntityState.Deleted;
+                db.SaveChanges();
             }
-            DeleteQuota(db.SetQuestions.First(u => u.Id == answer.QuestionID).ProjectID, answer.QuestionID);
-            db.SetAnswerAll.Remove(tmpAnswerAll);
-            db.Entry(answer).State = EntityState.Deleted;
-            db.SaveChanges();
-
         }
 
         [HttpGet]
@@ -232,19 +250,20 @@ namespace SocialFORM.Controllers
         public JsonResult getAnswer(int id_question)
         {
             System.Diagnostics.Debug.WriteLine("Зашло " + id_question);
-            List<AnswerModel> answers = db.SetAnswers.Where(u => u.QuestionID == id_question).ToList();
-            return Json(answers.ToList(), JsonRequestBehavior.AllowGet);
+            List<AnswerModel> answers = db.SetAnswers.Where(u => u.QuestionID == id_question).OrderBy(u=>u.Index).ToList();
+            return Json(answers, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public int deleteAllAnswer(int id_question)
         {
             var result = db.SetAnswers.Where(u => u.QuestionID == id_question);
+            List<int> tmp_id_answer = new List<int>();
             foreach (var item in result)
             {
-                db.SetAnswers.Remove(item);
+                tmp_id_answer.Add(item.Id);
             }
-            db.SaveChanges();
+            DeleteListAnswer(tmp_id_answer);
             return 200;
         }
 
@@ -303,8 +322,22 @@ namespace SocialFORM.Controllers
         public void DeleteTableRow(int id_table_row)
         {
             TableRow tmpTableRow = db.SetTableRows.Where(u => u.Id == id_table_row).FirstOrDefault();
-            db.SetTableRows.Remove(tmpTableRow);
-            db.SaveChanges();
+            if (tmpTableRow != null)
+            {
+                db.SetTableRows.Remove(tmpTableRow);
+                db.SaveChanges();
+            }
+        }
+
+        [HttpPost]
+        public void DeleteAllTableRow(int id_q)
+        {
+            if (db.SetTableRows.Where(u=>u.TableID == id_q).Count() != 0)
+            {
+                List<TableRow> list_tmp = db.SetTableRows.Where(u => u.TableID == id_q).ToList();
+                db.SetTableRows.RemoveRange(list_tmp);
+                db.SaveChanges();
+            }
         }
 
         [HttpGet]
@@ -455,10 +488,11 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public void setTransition(Transition transition)
+        public int setTransition(Transition transition)
         {
             db.SetTransition.Add(transition);
             db.SaveChanges();
+            return transition.Id;
         }
 
         [HttpPost]
@@ -513,12 +547,13 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public void setBlock(Block block)
+        public int setBlock(Block block)
         {
             QuestionModel tmp = db.SetQuestions.FirstOrDefault(u => u.Id == block.fromQuestion);
             db.SetBlock.Add(block);
             tmp.Bind_Blocks = block.toQuestion;
             db.SaveChanges();
+            return block.Id;
         }
 
         [HttpPost]
@@ -532,8 +567,8 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void deleteAllBlocks(int id_question)
         {
-            List<Transition> list_transition = db.SetTransition.Where(u => u.fromQuestion == id_question).ToList();
-            db.SetTransition.RemoveRange(list_transition);
+            List<Block> list_block = db.SetBlock.Where(u => u.fromQuestion == id_question).ToList();
+            db.SetBlock.RemoveRange(list_block);
             db.SaveChanges();
         }
 
@@ -591,14 +626,29 @@ namespace SocialFORM.Controllers
             await db.SaveChangesAsync();
         }
 
+        //[HttpPost]
+        //public void DeleteKvot(int id_question)
+        //{
+        //    if (db.SetQuotaModels.Where(u => u.QuestionID == id_question).Count() > 0)
+        //    {
+        //        List<Kvot> tmp_kvot = db.SetKvots.Where(u => u.QuestionID == id_question).ToList();
+        //        db.SetKvots.RemoveRange(tmp_kvot);
+        //        db.SaveChanges();
+        //    }
+        //}
+
         [HttpPost]
-        public void DeleteKvot(int id_question)
+        public void DeleteQuota(List<int> list_quota)
         {
-            List<Kvot> tmp_kvot = db.SetKvots.Where(u => u.QuestionID == id_question).ToList();
-            db.SetKvots.RemoveRange(tmp_kvot);
+            List<QuotaModel> list_tmp = new List<QuotaModel>();
+            foreach(var item in list_quota)
+            {
+                list_tmp.Add(db.SetQuotaModels.First(u => u.Id == item));
+            }
+            db.SetQuotaModels.RemoveRange(list_tmp);
             db.SaveChanges();
         }
-
+        
         [HttpPost]
         public void ChangeKvot(List<string> new_changes)
         {
@@ -684,6 +734,17 @@ namespace SocialFORM.Controllers
             {
                 DeleteQuota(tmp.ProjectID, id_q);
                 db.SetRangeModels.Remove(tmp);
+                db.SaveChanges();
+            }
+        }
+
+        [HttpPost]
+        public void DeletaAllRangeQ(int id_question)
+        {
+            if (db.SetRangeModels.Where(u=>u.BindQuestion == id_question).Count() > 0)
+            {
+                List<RangeModel> list_tmp = db.SetRangeModels.Where(u => u.BindQuestion == id_question).ToList();
+                db.SetRangeModels.RemoveRange(list_tmp);
                 db.SaveChanges();
             }
         }

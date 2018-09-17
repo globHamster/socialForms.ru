@@ -4,6 +4,8 @@
 
 <link rel="stylesheet" type="text/css" href="../Content/media/style.css">
 
+
+
 <div class="col-md-3 menu">
     <button class="MinMax" id="max"><img src="~/images/icon/previous.png" style="width:20px; height:20px; margin-left: -13px;" /></button>
 
@@ -50,7 +52,7 @@
     <div class="min">
         @*малое меню START*@
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 tmp">
                 <div class="row">
                     @Html.Raw(Html.ActionLink("Выйти", "Logoff", "Account").ToHtmlString().Replace("Выйти", "<img class=\"iconMenu\" src=\"../images/icon/exit.png\" title=\"Выход\" />"))
                 </div>
@@ -108,6 +110,7 @@
 
 
 <script src="~/Scripts/ifvisible.js" type="text/javascript"></script>
+<script src="~/Scripts/slideout.min.js" type="text/javascript"></script>
 <script type="text/javascript">
     var root = window.addEventListener || window.attachEvent ? window : document.addEventListener ? document : null;
     if (root) {
@@ -199,6 +202,13 @@
     $(".close").click(function () {
         $('.modelChat').attr('style', 'display:none;position: fixed;');
         $('.blink').hide();
+    });
+
+    var slideout = new Slideout({
+        'panel': document.getElementById('panelMain'),
+        'menu': document.getElementById('panelMenu'),
+        'padding': 500,
+        'tolerance': 10
     });
 
     //

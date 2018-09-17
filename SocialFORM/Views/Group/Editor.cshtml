@@ -619,6 +619,7 @@
                                 AnswerType: 2,
                                 QuestionID: question_id
                             }
+                            console.log("Query >>>> ", query_answer);
                             $.ajax({
                                 type: "POST",
                                 url: "/Question/setAnswerAll",

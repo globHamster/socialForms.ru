@@ -68,7 +68,7 @@ namespace SocialFORM.Controllers
 
         //Добавление новой группы вопросов
         [HttpPost]
-        public void AddNewGroup(int id_p)
+        public int AddNewGroup(int id_p)
         {
             GroupModel tmp = new GroupModel();
             if (db.SetGroupModels.Where(u => u.ProjectID == id_p && u.Group != null).Max(u => u.Group) == 0)
@@ -92,10 +92,11 @@ namespace SocialFORM.Controllers
                 db.SetGroupModels.Add(tmp);
                 db.SaveChanges();
             }
+            return (int)tmp.Group;
         }
 
         [HttpPost]
-        public void AddGroup(GroupModel tmp)
+        public int AddGroup(GroupModel tmp)
         {
             System.Diagnostics.Debug.WriteLine("GroupID : " + tmp.GroupID);
             QuestionModel tmp_q = new QuestionModel();
@@ -107,14 +108,35 @@ namespace SocialFORM.Controllers
             db2.SaveChanges();
             int index;
             if (db.SetGroupModels.Where(u => u.ProjectID == tmp.ProjectID && u.GroupID == tmp.GroupID).Count() != 0)
-                index = (int)db.SetGroupModels.Where(u => u.ProjectID == tmp.ProjectID && u.GroupID == tmp.GroupID).Max(s => s.IndexQuestion) + 1;
+            {
+                if (db.SetGroupModels.Where(u => u.ProjectID == tmp.ProjectID && u.GroupID == tmp.GroupID).Count() != 0)
+                    index = (int)db.SetGroupModels.Where(u => u.ProjectID == tmp.ProjectID && u.GroupID == tmp.GroupID).Max(s => s.IndexQuestion) + 1;
+                else
+                    index = (int)db.SetGroupModels.First(u => u.ProjectID == tmp.ProjectID && u.Group == tmp.GroupID).IndexQuestion + 1;
+            }
             else
-                index = 1;
+            {
+                if (tmp.GroupID > 0)
+                {
+                    index = (int)db.SetGroupModels.First(u => u.ProjectID == tmp.ProjectID && u.Group == tmp.GroupID).IndexQuestion + 1;
+                }
+                else
+                {
+                    index = 1;
+                }
+            }
             tmp.QuestionID = tmp_q.Id;
             tmp.GroupName = "Вопрос" + index;
             tmp.IndexQuestion = index;
             db.SetGroupModels.Add(tmp);
             db.SaveChanges();
+            return tmp.Id;
+        }
+
+        [HttpGet]
+        public JsonResult GetGroupItem(int id_group)
+        {
+            return Json(db.SetGroupModels.FirstOrDefault(u => u.Id == id_group), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -209,8 +231,29 @@ namespace SocialFORM.Controllers
             using (QuestionContext q_context = new QuestionContext())
             {
                 var tmp = q_context.GetFiles.FirstOrDefault(u => u.PathFile == path);
-                q_context.GetFiles.Remove(tmp);
-                q_context.SaveChanges();
+                if (tmp != null)
+                {
+                    q_context.GetFiles.Remove(tmp);
+                    q_context.SaveChanges();
+                }
+            }
+        }
+
+        [HttpPost]
+        public void DeleteFileQuestion(int id_question)
+        {
+            using (QuestionContext q_context = new QuestionContext())
+            {
+                var tmp = q_context.GetFiles.FirstOrDefault(u => u.QuestionID == id_question);
+                if (tmp != null)
+                {
+                    if (System.IO.File.Exists(tmp.PathFile))
+                    {
+                        System.IO.File.Delete(tmp.PathFile);
+                    }
+                    q_context.GetFiles.Remove(tmp);
+                    q_context.SaveChanges();
+                }
             }
         }
 
@@ -229,10 +272,10 @@ namespace SocialFORM.Controllers
             int count_answer = 1;
             foreach (var item in new_set)
             {
-                
+
                 if (item < 0)
                 {
-                    GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.Group == (-1)*item && u.ProjectID == id_p);
+                    GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.Group == (-1) * item && u.ProjectID == id_p);
                     group_item.IndexQuestion = count;
                     group_item.GroupName = "Группа " + count_group;
                     count_group++;
@@ -263,12 +306,12 @@ namespace SocialFORM.Controllers
             List<GroupModel> tmp = new List<GroupModel>();
             tmp.AddRange(db.SetGroupModels.Where(u => u.GroupID == id_group && u.ProjectID == id_project).ToList());
             List<QuestionModel> question_tmp = new List<QuestionModel>();
-            foreach(var item in tmp)
+            foreach (var item in tmp)
             {
                 question_tmp.Add(db2.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID));
             }
             List<AnswerAll> answerAll_tmp = new List<AnswerAll>();
-            foreach(var item in question_tmp)
+            foreach (var item in question_tmp)
             {
                 answerAll_tmp.AddRange(db2.SetAnswerAll.Where(u => u.QuestionID == item.Id).ToList());
             }
@@ -307,7 +350,7 @@ namespace SocialFORM.Controllers
         public void RemoveAllBindGroup(int id_q)
         {
             List<AnswerAll> tmp_list = db2.SetAnswerAll.Where(u => u.QuestionID == id_q).ToList();
-            foreach(var item in tmp_list)
+            foreach (var item in tmp_list)
             {
                 item.BindGroup = null;
             }

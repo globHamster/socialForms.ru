@@ -1,0 +1,440 @@
+﻿.BlockQuestionEditor {
+    padding: 5px;
+}
+
+.QuestionBlock {
+    width: 100%;
+    height: auto;
+    margin-bottom: 5px;
+    padding: 10px;
+    font-family: "Century Gothic";
+    color: #fff;
+    background-color: #008bb2;
+}
+
+.QuestionText {
+    width: 100%;
+    height: 250px;
+    margin-bottom: 3px;
+}
+
+.ShortNameQuestion {
+    display: inline-flex;
+    width: 100%;
+    height: 30px;
+    background-color: #b0bec5;
+    justify-content: flex-start;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 3px;
+    padding-left: 5px;
+    color: black;
+    font-size: 18px;
+}
+
+.AnswerItem {
+    display: flex;
+    justify-content: flex-start;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 3px;
+    box-shadow: 1px 1px black;
+}
+
+.Scaled {
+    transform: scale(1.1,1.1);
+    box-shadow: 5px 5px black;
+    transition: 0.1s linear;
+}
+
+.NotScaled {
+    transform: scale(1,1);
+    box-shadow: 0px 0px black;
+    transition: 0.1s linear;
+}
+
+.ButtonType {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    background-color: #b0bec5;
+    color: #fff;
+    font-family: 'Century Gothic';
+    border-bottom: 1px solid black;
+}
+
+.NameType {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    background-color: #008bb2;
+    color: #fff;
+    font-family: 'Century Gothic';
+}
+
+.WallOfTypes {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    background-color: #81c784;
+}
+
+.NameButton:hover {
+    transform: scale(1.1,1.1);
+    box-shadow: 5px 5px black;
+    transition: 0.1s linear;
+}
+
+.SettingsPanel {
+    display: inline-flex;
+    justify-content: flex-start;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+.AnswerSettings {
+    display: inline-flex;
+    justify-content: flex-start;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    height: 40px;
+    background-color: #b0bec5;
+}
+
+.AddAnswerSingle {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    background-color: #81c784;
+}
+
+.AddAnswerMulti {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    background-color: #81c784;
+}
+
+.AddAnswerFree {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    background-color: #81c784;
+}
+
+.SaveChange{
+    width: 100%;
+    height: 30px;
+    background-color: #b0bec5;
+}
+
+.SaveChangeButton {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    background-color: #b0bec5;
+}
+
+.DeleteAnswerItem {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    background-color: #f44336;
+    border-radius: 2px;
+}
+
+.EditAnswer {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    background-color: #b0bec5;
+    border-radius: 2px;
+    color: #000;
+}
+
+.SaveChangeAnswer {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    content: "&10004;";
+    font-size: 18px;
+    background-color: #81c784;
+    border-radius: 2px;
+    color: #000;
+}
+
+.NewChangeQuestion{
+    background-color: #81c784;
+}
+
+
+td.TypeItemTable {
+    border: 1px solid black;
+    background-color: #b0bec5;
+}
+
+td.TypeItemTable > div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+}
+
+td.TableColumnText{
+    border: 1px solid black;
+    border-top: 0px;
+    text-align: center;
+    color: #fff;
+    background-color: #81c784;
+}
+
+td.TableRowText {
+    border: 1px solid black;
+    border-left: 0px;
+    color: #fff;
+    background-color: #81c784;
+}
+
+.ItemPanelProject {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 200px;
+    height: 50px;
+    background-color: #81c784;
+}
+
+.DeleteRow {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.EditQuestionName {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    background-color: #b0bec5;
+    border-radius: 2px;
+    color: #000;
+}
+
+.SaveChangeQuestionName {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    background-color: #81c784;
+    border-radius: 2px;
+    color: #000;
+}
+
+.DeleteQuestion {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    background-color: #f44336;
+    border-radius: 2px;
+    color: #000;
+}
+
+.ChangeIndex {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    background-color: #ff5722;
+    border-radius: 2px;
+    color: #fff;
+}
+
+.ButtonSlideSettings {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    background-color: #81c784;
+}
+
+.PanelSettings {
+    width: 100%;
+    height: auto;
+    display: none;
+}
+
+.TextSettingPanel {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+    height: 30px;
+    font-family: "Century Gothic";
+}
+
+.QYes {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+}
+
+.QNo {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+}
+
+.StyleButton {
+    display: inline-flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 100px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.QOn{
+    background-color: #81c784;
+}
+
+.TransitionSettingsPanel{
+    width: 500px;
+    height: 500px;
+    position: fixed;
+    top: calc(100vh/2 - 250px);
+    left: calc(100vw/2 - 250px);
+    background-color: #b0bec5;
+    border: 5px inset #f44336;
+    z-index: 1010;
+    padding: 10px;
+}
+
+.BlockingSettingsPanel {
+    width: 500px;
+    height: 500px;
+    position: fixed;
+    top: calc(100vh/2 - 250px);
+    left: calc(100vw/2 - 250px);
+    background-color: #b0bec5;
+    border: 5px inset #f44336;
+    z-index: 1010;
+    padding: 10px;
+}
+
+.BlockWallTrans{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(100,100,100,0.7);
+    z-index: 1010;
+}
+
+.CloseBlockWallTrans {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    position: fixed;
+    border-radius: 15px;
+    top: calc(100vh/2 - 265px);
+    left: calc(100vw/2 + 235px);
+    width: 30px;
+    height: 30px;
+    background-color: #f44336;
+    z-index: 1010;
+}
+
+.IndexAnswer {
+    margin-right: 5px;
+}
+
+.FreeArea {
+    background-color: #81c784;
+}

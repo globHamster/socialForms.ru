@@ -300,11 +300,13 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\ManagerStyle.css" />
     <Content Include="Content\map-marker-icon.png" />
     <Content Include="Content\media\style.css" />
     <Content Include="Content\PagedList.css" />
     <Content Include="Content\radio-button.css" />
     <Content Include="Content\slide_down.png" />
+    <Content Include="Content\streets.txt" />
     <Content Include="Helpers\nicEditorIcons.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -331,13 +333,13 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Политика конфиденциальности и согласие на обработку персональных данных.docx" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\chosen.jquery.js" />
     <Content Include="Scripts\daterangepicker.js" />
     <Content Include="Scripts\device.js" />
+    <Content Include="Scripts\export2Doc.js" />
     <Content Include="Scripts\FileSaver.js" />
     <Content Include="Scripts\FileSaver.min.js" />
     <Content Include="Scripts\ifvisible.js" />
@@ -394,6 +396,7 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\script.js" />
+    <Content Include="Scripts\slideout.min.js" />
     <Content Include="Scripts\socket.js" />
     <Content Include="Scripts\tableexport.js" />
     <Content Include="Scripts\tableexport.min.js" />
@@ -443,7 +446,9 @@
     <Content Include="Content\emoticons\whistling.png" />
     <Content Include="Content\emoticons\wink.png" />
     <Content Include="Content\emoticons\wub.png" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>

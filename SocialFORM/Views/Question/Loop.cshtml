@@ -125,7 +125,10 @@
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
                     if (item.TypeQuestion != 5) {
-                        $('.PanelOfLoopQuestion').append('<div class="QuestionLoop" id="' + item.Id + '"> Вопрос' + item.Id + '</div>')
+                        if (item.IsKvot != true)
+                            $('.PanelOfLoopQuestion').append('<div class="QuestionLoop" id="' + item.Id + '"> Вопрос' + item.Id + '</div>');
+                        else
+                            $('.PanelOfLoopQuestion').append('<div class="QuestionLoop" id="' + item.Id + '"> Вопрос' + item.Id + '(Квотируемый)</div>');
                         list_question[item.Id] = item;
                     }
                 })
@@ -140,6 +143,7 @@
             $.each(server_data, function (i, item) {
                 list_group_question[item.QuestionID] = item;
             })
+            console.warn("Group >>>> ", list_group_question);
         })
 
     $.get("/Question/GetLoopRange", { id_p: $('input[name=ProjectID]').val() })
@@ -201,11 +205,18 @@
             CountLoop: count_loop,
             ProjectID: $('input[name=ProjectID]').val()
         }
-
-        $.post("/Question/SetLoopRange", query)
-            .success(function (server_data) {
-                $('.ListOfLoop').append('<div class="LoopRange"><div style="display: inline-block;">Цикл начинается с ' + list_group_question[fromQ].GroupName + ' до ' + list_group_question[toQ].GroupName + ' в количестве ' + count_loop + '</div><div class="DeleteRangeLoop" id="' + server_data + '">&#10006;</div></div> ');
-            })
+        var start_loop = false;
+        $.each(list_question, function (i, item) {
+            if (item.Id == fromQ) start_loop = true;
+            if (start_loop) {
+                if (item.IsKvot == true) alert("Не допускается квотируемый вопрос в цикле");
+            }
+            if (item.Id == toQ) { start_loop = false; return false; }
+        })
+        //$.post("/Question/SetLoopRange", query)
+        //    .success(function (server_data) {
+        //        $('.ListOfLoop').append('<div class="LoopRange"><div style="display: inline-block;">Цикл начинается с ' + list_group_question[fromQ].GroupName + ' до ' + list_group_question[toQ].GroupName + ' в количестве ' + count_loop + '</div><div class="DeleteRangeLoop" id="' + server_data + '">&#10006;</div></div> ');
+        //    })
         //alert("From " + fromQ + " To " + toQ + " for " + count_loop);
        
 
