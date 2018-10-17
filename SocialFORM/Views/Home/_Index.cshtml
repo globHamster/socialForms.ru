@@ -77,6 +77,7 @@
 
 <div class="col-md-9 cont">
     <div class="row" id="session"></div>
+    <div class="row" id="timea" hidden>@ViewBag.TimeID</div>
     <div class="Chat row">
         <button class="openChat btnLogin" style="border:none;outline:none;background-color:white"><img src="~/images/icon/mess.png" height="20" /></button><span class="blink" name="@ViewData["Role"]"><b>НОВОЕ СООБЩЕНИЕ</b></span>
         <div class="modelChat" style="display:none;position: fixed;z-index:1000;">
@@ -99,8 +100,7 @@
         <script src="~/Scripts/anime.min.js"></script>
         <!--Ссылка на автоматически сгенерированный скрипт хаба SignalR -->
         <script src="~/signalr/hubs"></script>
-        <script src="~/Scripts/jqueri.session.js"></script>
-        <script src="~/Scripts/util.js"></script>
+        <script src="~/Scripts/jquery.HUB.js"></script>
     </div>
     <div id="Tables" class="Tables">
 
@@ -113,13 +113,13 @@
 <script src="~/Scripts/slideout.min.js" type="text/javascript"></script>
 <script type="text/javascript">
     var root = window.addEventListener || window.attachEvent ? window : document.addEventListener ? document : null;
-    if (root) {
-        root.onbeforeunload = function () {
-            $('.PreLoader').hide();
-            $.post("/Account/Logofff");
-            return 'Exit';
-        }
-    }
+    //if (root) {
+    //    root.onbeforeunload = function () {
+    //        $('.PreLoader').hide();
+    //        $.post("/Account/Logofff");
+    //        return 'Exit';
+    //    }
+    //}
 
     //
     // Стилистика МЕНЮ

@@ -237,15 +237,24 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Hubs\ChatHub.cs" />
-    <Compile Include="Hubs\SessionHub.cs" />
+    <Compile Include="Hubs\AppHub.cs" />
     <Compile Include="Models\ChatUser.cs" />
+    <Compile Include="Models\DB\Diap.cs" />
+    <Compile Include="Models\DB\listRange.cs" />
+    <Compile Include="Models\NumberAppContext.cs" />
+    <Compile Include="Models\Number\GOR.cs" />
+    <Compile Include="Models\Number\OB.cs" />
+    <Compile Include="Models\Number\FO.cs" />
     <Compile Include="Models\Opros.cs" />
+    <Compile Include="Models\OprosNN.cs" />
+    <Compile Include="Models\OprosYaroslav.cs" />
     <Compile Include="Models\ProjectViewModel.cs" />
     <Compile Include="Models\Question\Kvot.cs" />
     <Compile Include="Models\Question\LoopModel.cs" />
     <Compile Include="Models\Question\QuotaModel.cs" />
     <Compile Include="Models\Question\RangeModel.cs" />
     <Compile Include="Models\Session\SessionHubModel.cs" />
+    <Compile Include="Models\Session\SetTimeAfk.cs" />
     <Compile Include="Models\Statistick\StatResViewModel.cs" />
     <Compile Include="Startup.cs" />
     <Content Include="Content\ajax-loader.gif" />
@@ -364,6 +373,8 @@
     </Content>
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
+    <None Include="Properties\PublishProfiles\CustomProfile2.pubxml" />
+    <None Include="Properties\PublishProfiles\CustomProfile3.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\chosen.jquery.js" />
     <Content Include="Scripts\daterangepicker.js" />
@@ -415,7 +426,7 @@
     <Content Include="Scripts\i18n\grid.locale-ua.js" />
     <Content Include="Scripts\i18n\grid.locale-vi.js" />
     <Content Include="Scripts\ifvisible.js" />
-    <Content Include="Scripts\jqueri.session.js" />
+    <Content Include="Scripts\jquery.HUB.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -483,6 +494,7 @@
     <Content Include="Views\Group\TableForm.cshtml" />
     <Content Include="Views\Home\BeginForm.cshtml" />
     <Content Include="Views\Group\FilterForm.cshtml" />
+    <Content Include="Views\Home\DataBeseAll.cshtml" />
     <None Include="Views\Home\demo01.cshtml" />
     <Content Include="Content\emoticons\alien.png" />
     <Content Include="Content\emoticons\angel.png" />
@@ -568,6 +580,8 @@
     <Content Include="Views\Question\Loop.cshtml" />
     <Content Include="Views\Question\BaseAnswer.cshtml" />
     <Content Include="Views\Home\SuccessOpros.cshtml" />
+    <Content Include="Views\Home\OprosYaroslavl.cshtml" />
+    <Content Include="Views\Home\OprosNarkNas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,793 @@
+﻿@Scripts.Render("~/scripts/jquery-1.10.2.js")
+
+<div class="form">
+    <div class="hello" style="padding:10px">
+        <p align="center">
+            Здравствуйте! Мы проводим всероссийское исследование, посвященное изучению привычек и убеждений молодежи России. В исследовании участвуют жители всех субъектов Российской Федерации, проживающие в городских и сельских населенных пунктах. Мы просим Вас высказать свое мнение по ряду вопросов. Анкета анонимная, Вам не нужно указывать фамилию. Все данные будут использованы только в обобщенном виде для научных целей.
+            Обведите в кружок цифру около варианта ответа, который выражает Ваше мнение, или напишите свой вариант. Пожалуйста, ответьте на ВСЕ вопросы, которые относятся к Вашему стилю жизни.
+            Ваше мнение очень важно для нас!
+        </p>
+    </div>
+    <div class="hello" style="border:2px solid #ccc; border-radius:10px;background-color:#ccc">
+        <p align="center" style="margin:5px">
+            Для начала просим Вас рассказать немного о себе
+        </p>
+    </div>
+    <div class="question q1" id="1">
+        <p class="p1" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            1. Укажите, пожалуйста, Ваш пол?
+        </p>
+        <ul>
+            <li><input type="radio" name="q1" value="1">Мужской</li>
+            <li><input type="radio" name="q1" value="2">Женский</li>
+        </ul>
+    </div>
+    <div class="question q2" id="1">
+        <p class="p2" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            2. Ваш возраст?
+        </p>
+        <ul>
+            <li><input type="radio" name="q2" value="1">14-18 лет</li>
+            <li><input type="radio" name="q2" value="2">19-22 лет</li>
+            <li><input type="radio" name="q2" value="3">23-30 лет</li>
+
+        </ul>
+    </div>
+    <div class="question q3" id="1">
+        <p class="p3" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            3. Ваше образование в настоящее время?
+        </p>
+        <ul>
+            <li><input type="radio" name="q3" value="1">Основное общее образование</li>
+            <li><input type="radio" name="q3" value="2">Среднее общее образование</li>
+            <li><input type="radio" name="q3" value="3">Среднее профессиональное образование</li>
+            <li><input type="radio" name="q3" value="4">Высшее образование – бакалавриат</li>
+            <li><input type="radio" name="q3" value="5">Высшее образование – специалист, магистратура</li>
+            <li><input type="radio" name="q3" value="6">Высшее образование – подготовка кадров высшей категории</li>
+        </ul>
+    </div>
+    <div class="question q4" id="1">
+        <p class="p4" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            4. Как Вы считаете, к какой категории, из перечисленных ниже, относится Ваша семья по уровню материального положения? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q4" value="1">Высоко обеспеченная</li>
+            <li><input type="radio" name="q4" value="2">Обеспеченная выше среднего</li>
+            <li><input type="radio" name="q4" value="3">Обеспеченная на среднем уровне</li>
+            <li><input type="radio" name="q4" value="4">Обеспеченная ниже среднего</li>
+            <li><input type="radio" name="q4" value="5">Не обеспеченная самым необходимым</li>
+        </ul>
+    </div>
+    <div class="question q5" id="1">
+        <p class="p5" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            5. Есть ли у Вас вредные привычки? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q5" value="1">Да</li>
+            <li><input type="radio" name="q5" value="2">Скорее да</li>
+            <li><input type="radio" name="q5" value="3">Нет</li>
+            <li><input type="radio" name="q5" value="4">Скорее нет</li>
+        </ul>
+    </div>
+    <div class="hello" style="border:2px solid #ccc; border-radius:10px;background-color:#ccc">
+        <p align="center" style="margin:5px">
+            Теперь просим рассказать о волнующих Вас проблемах
+        </p>
+    </div>
+    <div class="question q6" id="1">
+        <p class="p6" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            6. Укажите, пожалуйста, 5 наиболее острых проблем, требующих решения в первую очередь в Вашем населенном пункте (несколько ответов)
+        </p>
+        <div class="ccount" hidden>5</div>
+        <ul>
+            <li><input type="checkbox" name="q6" value="1">Нехватка жилья</li>
+            <li><input type="checkbox" name="q6" value="2">Качество дорог</li>
+            <li><input type="checkbox" name="q6" value="3">Алкоголизм</li>
+            <li><input type="checkbox" name="q6" value="4">Безработица</li>
+            <li><input type="checkbox" name="q6" value="5">Состояние жилищно-коммунальной сферы</li>
+            <li><input type="checkbox" name="q6" value="6">Наркомания</li>
+            <li><input type="checkbox" name="q6" value="7">Качество медицинского обслуживания</li>
+            <li><input type="checkbox" name="q6" value="8">Преступность</li>
+            <li><input type="checkbox" name="q6" value="9">Другое (впишите) <input type="text" class="q6" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q6"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 9) {
+                    $('input[class$="q6"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 9)
+                        $('input[class$="q6"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q7" id="1">
+        <p class="p7" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            7. Как Вы считаете, в населенном пункте, где Вы живете, достаточно возможностей, чтобы интересно проводить свободное время? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q7" value="1">Да</li>
+            <li><input type="radio" name="q7" value="2">Скорее да</li>
+            <li><input type="radio" name="q7" value="3">Нет</li>
+            <li><input type="radio" name="q7" value="4">Скорее нет</li>
+        </ul>
+    </div>
+    <div class="question q8" id="1">
+        <p class="p8" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            8. Что ДОПОЛНИТЕЛЬНО Вам нужно для того, чтобы интересно проводить свободное время? (не более 3 ответов)
+        </p>
+        <div class="ccount" hidden>3</div>
+        <ul>
+            <li><input type="checkbox" name="q8" value="1">Новый спортивный клуб</li>
+            <li><input type="checkbox" name="q8" value="2">Больше кинотеатров</li>
+            <li><input type="checkbox" name="q8" value="3">Новые парки, зеленые территории</li>
+            <li><input type="checkbox" name="q8" value="4">Бассейн</li>
+            <li><input type="checkbox" name="q8" value="5">Новый интернет-клуб</li>
+            <li><input type="checkbox" name="q8" value="6">Новые ночные клубы, бары</li>
+            <li><input type="checkbox" name="q8" value="7">Новые кафе, рестораны</li>
+            <li><input type="checkbox" name="q8" value="8">Торгово-развлекательные комплексы</li>
+            <li><input type="checkbox" name="q8" value="9">Ничего дополнительно не нужно, все есть</li>
+            <li><input type="checkbox" name="q8" value="10">Другое (что именно?) <input type="text" class="q8" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q8"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 10) {
+                    $('input[class$="q8"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 10)
+                        $('input[class$="q8"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="hello" style="border:2px solid #ccc; border-radius:10px;background-color:#ccc">
+        <p align="center" style="margin:5px">
+            А теперь просим поделиться Вашим отношением к проблеме наркомании
+        </p>
+    </div>
+    <div class="question q9" id="1">
+        <p class="p9" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            9. Как Вы считаете, насколько проблема наркомании распространена в Вашем населенном пункте (крае, области и т.д.)? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q9" value="1">Очень распространена</li>
+            <li><input type="radio" name="q9" value="2">Распространена, но не больше, чем везде</li>
+            <li><input type="radio" name="q9" value="3">Совсем не распространена</li>
+            <li><input type="radio" name="q9" value="4">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q10" id="1">
+        <p class="p10" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            10. Как Вы считаете, в чем причина распространения наркомании в последнее время? (несколько ответов)
+        </p>
+        <div class="ccount" hidden>9</div>
+        <ul>
+            <li><input type="checkbox" name="q10" value="1">Неудовлетворенность жизнью, социальное неблагополучие</li>
+            <li><input type="checkbox" name="q10" value="2">Моральная деградация общества, вседозволенность</li>
+            <li><input type="checkbox" name="q10" value="3">Плохая работа правоохранительных органов</li>
+            <li><input type="checkbox" name="q10" value="4">Излишняя свобода, отсутствие организованного досуга</li>
+            <li><input type="checkbox" name="q10" value="5">Влияние наркобизнеса, доступность наркотиков</li>
+            <li><input type="checkbox" name="q10" value="6">Безработица, экономические проблемы</li>
+            <li><input type="checkbox" name="q10" value="7">Влияние массовой культуры и СМИ</li>
+            <li><input type="checkbox" name="q10" value="8">Слабость профилактической работы</li>
+            <li><input type="checkbox" name="q10" value="9">Другое (что именно?) <input type="text" class="q10" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q10"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 9) {
+                    $('input[class$="q10"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 9)
+                        $('input[class$="q10"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q11" id="1">
+        <p class="p11" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            11. Какие мероприятия, по Вашему мнению, более эффективны для профилактики и решения проблем наркомании? (несколько ответов)
+        </p>
+        <div class="ccount" hidden>12</div>
+        <ul>
+            <li><input type="checkbox" name="q11" value="1">Специальные концерты, фестивали</li>
+            <li><input type="checkbox" name="q11" value="2">Физкультурные и спортивные мероприятия</li>
+            <li><input type="checkbox" name="q11" value="3">Тематические программы и фильмы на телевидении</li>
+            <li><input type="checkbox" name="q11" value="4">Публикации в Интернете, специализированные сайты</li>
+            <li><input type="checkbox" name="q11" value="5">Лекции и беседы в учебных заведениях</li>
+            <li><input type="checkbox" name="q11" value="6">Расширение работы с молодежью</li>
+            <li><input type="checkbox" name="q11" value="7">Беседы специалистов-наркологов с родителями учащихся, студентов</li>
+            <li><input type="checkbox" name="q11" value="8">Выступления бывших наркоманов</li>
+            <li><input type="checkbox" name="q11" value="8">Повышение доступности помощи психологов, психотерапевтов</li>
+            <li><input type="checkbox" name="q11" value="10">Ужесточение мер наказания за наркопреступления</li>
+            <li><input type="checkbox" name="q11" value="11">Принудительное лечение наркоманов</li>
+            <li><input type="checkbox" name="q11" value="12">Другое (что именно?) <input type="text" class="q11" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q11"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 12) {
+                    $('input[class$="q11"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 12)
+                        $('input[class$="q11"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q12" id="1">
+        <p class="p12" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            12. Как Вы думаете, трудно ли достать сегодня наркотики? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q12" value="1">Очень трудно</li>
+            <li><input type="radio" name="q12" value="2">Трудно</li>
+            <li><input type="radio" name="q12" value="3">Сравнительно легко</li>
+            <li><input type="radio" name="q12" value="4">Очень легко</li>
+            <li><input type="radio" name="q12" value="5">Не знаю</li>
+        </ul>
+    </div>
+    <div class="question q13" id="1">
+        <p class="p13" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            13. Знакомы ли Вы лично с людьми, употребляющими наркотики? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q13" value="1">Нет, я не общаюсь с такими людьми</li>
+            <li><input type="radio" name="q13" value="2">Да, в кругу моих друзей, знакомых такие люди есть</li>
+            <li><input type="radio" name="q13" value="3">Да, я знаю много таких людей</li>
+            <li><input type="radio" name="q13" value="4">Да, все мои знакомые, так или иначе, употребляют наркотики</li>
+        </ul>
+    </div>
+    <div class="question q14" id="1">
+        <p class="p14" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            14. Прибегали ли Вы или Ваши знакомые к услугам сети «Интернет» для получения сведений о наркотиках или способах их употребления?
+        </p>
+        <ul>
+            <li><input type="radio" name="q14" value="1">Да</li>
+            <li><input type="radio" name="q14" value="2">Нет</li>
+        </ul>
+    </div>
+    <div class="question q15" id="1">
+        <p class="p15" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            15. Что удерживает Вас от употребления наркотиков? (несколько ответов)
+        </p>
+        <div class="ccount" hidden>9</div>
+        <ul>
+            <li><input type="checkbox" name="q15" value="1">Опасность заболеть ВИЧ-инфекцией и вирусными гепатитами В и С</li>
+            <li><input type="checkbox" name="q15" value="2">Полное привыкание</li>
+            <li><input type="checkbox" name="q15" value="3">Ранняя смерть</li>
+            <li><input type="checkbox" name="q15" value="4">Боязнь оказаться в тюрьме</li>
+            <li><input type="checkbox" name="q15" value="5">Боязнь остаться ненужным обществу</li>
+            <li><input type="checkbox" name="q15" value="6">Потеря уважения близких</li>
+            <li><input type="checkbox" name="q15" value="7">Боязнь отлучения от семьи</li>
+            <li><input type="checkbox" name="q15" value="8">Осознанное отрицательное отношение к употреблению наркотиков</li>
+            <li><input type="checkbox" name="q15" value="9">Другое (что именно?) <input type="text" class="q15" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q15"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 9) {
+                    $('input[class$="q15"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 9)
+                        $('input[class$="q15"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q16" id="1">
+        <p class="p16" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            16. Известна ли Вам законодательная ответственность Российской Федерации за употребление, хранение и сбыт наркотических веществ? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q16" value="1">Да, очень хорошо известна</li>
+            <li><input type="radio" name="q16" value="2">Да, известна в общих чертах</li>
+            <li><input type="radio" name="q16" value="3">Мало известна</li>
+            <li><input type="radio" name="q16" value="4">Совсем не известна</li>
+        </ul>
+    </div>
+    <div class="hello" style="border:2px solid #ccc; border-radius:10px;background-color:#ccc">
+        <p align="center" style="margin:5px">
+            А теперь просим Вас ответить на ряд вопросов, связанных с употреблением наркотических веществ
+        </p>
+    </div>
+    <div class="question q17" id="1">
+        <p class="p17" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            17. Предлагали ли Вам когда-либо попробовать наркотики? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q17" value="1">Да</li>
+            <li><input type="radio" name="q17" value="2">Нет</li>
+            <li><input type="radio" name="q17" value="3">Отказ от ответа</li>
+        </ul>
+    </div>
+    <div class="question q18" id="1">
+        <p class="p18" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            18. Как бы Вы поступили, если бы Вам предложили попробовать наркотики?
+            Я скорее всего… (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q18" value="1">Отказался (лась) бы</li>
+            <li><input type="radio" name="q18" value="2">Исходил (а) бы из того, какой наркотик</li>
+            <li><input type="radio" name="q18" value="3">Повел (а) бы себя в зависимости от ситуации и настроения</li>
+            <li><input type="radio" name="q18" value="4">Попробовал (а) бы</li>
+            <li><input type="radio" name="q18" value="5">Не знаю</li>
+        </ul>
+    </div>
+    <div class="question q19" id="1">
+        <p class="p19" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            19. Пробовали ли Вы наркотические вещества?
+        </p>
+        <ul>
+            <li><input type="radio" name="q19" value="1">Нет</li>
+            <li><input type="radio" name="q19" value="2">Да</li>
+        </ul>
+    </div>
+    <div class="hello blockText" style="border:2px solid #ccc; border-radius:10px;background-color:#ccc">
+        <p align="center" style="margin:5px">
+            Далее просим ответить на вопросы тех, кто имеет опыт потребления наркотиков
+        </p>
+    </div>
+    <div class="question q20" id="2">
+        <p class="p20" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            20. Какие причины привели Вас к тому, что Вы употребляете (употребляли) наркотики?
+        </p>
+        <textarea name="text1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q21" id="1">
+        <p class="p21" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            21. Вспомните, пожалуйста, в каком возрасте Вы ВПЕРВЫЕ попробовали наркотическое вещество? (один ответ) __________ лет
+        </p>
+        <ul>
+            <li><input type="radio" name="q21" value="1">До 12 лет</li>
+            <li><input type="radio" name="q21" value="2">12-15 лет</li>
+            <li><input type="radio" name="q21" value="3">16-18 лет</li>
+            <li><input type="radio" name="q21" value="4">19-22 лет</li>
+            <li><input type="radio" name="q21" value="5">23-30 лет</li>
+        </ul>
+    </div>
+    <div class="question q22" id="1">
+        <p class="p22" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            22. Как часто Вы употребляете наркотики? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q22" value="1">Попробовал(а), но перестал(а) употреблять</li>
+            <li><input type="radio" name="q22" value="2">Употребляю редко (от случая к случаю, не каждый месяц) </li>
+            <li><input type="radio" name="q22" value="3">Употребляю регулярно (раз в месяц и чаще)</li>
+            <li><input type="radio" name="q22" value="4">Употребляю постоянно (несколько раз в неделю)</li>
+            <li><input type="radio" name="q22" value="5">Употребляю ежедневно</li>
+        </ul>
+    </div>
+    <div class="question q23" id="2">
+        <p class="p23" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            23. Какой наркотик Вы употребляете (употребляли)?
+        </p>
+        <textarea name="text2" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q24" id="2">
+        <p class="p24" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            24. Каким способом Вы употребляете наркотики?
+        </p>
+        <textarea name="text3" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q25" id="1">
+        <p class="p25" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            25. Почему Вы потребляли / потребляете именно эти наркотики? (несколько ответов)
+        </p>
+        <div class="ccount" hidden>8</div>
+        <ul>
+            <li><input type="checkbox" name="q25" value="1">Легче достать</li>
+            <li><input type="checkbox" name="q25" value="2">Дешевле</li>
+            <li><input type="checkbox" name="q25" value="3">Менее вредны для организма</li>
+            <li><input type="checkbox" name="q25" value="4">Легче изготовить</li>
+            <li><input type="checkbox" name="q25" value="5">Легче отвыкнуть в последующем</li>
+            <li><input type="checkbox" name="q25" value="6">Уже привык (привыкла) к нему/ним</li>
+            <li><input type="checkbox" name="q25" value="7">За компанию</li>
+            <li><input type="checkbox" name="q25" value="8">По другой причине (какой именно?)<input type="text" class="q25" hidden /></li>
+            <li><input type="checkbox" name="q25" value="9">Отказ от ответа</li>
+        </ul>
+        <script>
+            $('input[name="q25"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 8) {
+                    $('input[class$="q25"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 8)
+                        $('input[class$="q25"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q26" id="1">
+        <p class="p26" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            26. Где Вы ВПЕРВЫЕ попробовали наркотики? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q26" value="1">На природе, за городом</li>
+            <li><input type="radio" name="q26" value="2">Дома</li>
+            <li><input type="radio" name="q26" value="3">На улице, во дворе, в подъезде</li>
+            <li><input type="radio" name="q26" value="4">В клубах, на дискотеках</li>
+            <li><input type="radio" name="q26" value="5">В гостях у друзей, знакомых</li>
+            <li><input type="radio" name="q26" value="6">В учебном заведении</li>
+            <li><input type="radio" name="q26" value="7">На работе</li>
+            <li><input type="radio" name="q26" value="8">В общественном туалете</li>
+            <li><input type="radio" name="q26" value="9">В армии</li>
+            <li><input type="radio" name="q26" value="10">В других местах (каких именно?)<input type="text" class="q26" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q26"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 10) {
+                    $('input[class$="q26"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 10)
+                        $('input[class$="q26"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q27" id="1">
+        <p class="p27" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            27. Кто ВПЕРВЫЕ предложил Вам попробовать наркотик? (один ответ)
+        </p>
+        <ul>
+            <li><input type="radio" name="q27" value="1">Коллеги по учебе/ работе</li>
+            <li><input type="radio" name="q27" value="2">Друзья, с которыми я встречаюсь после учебы/работы</li>
+            <li><input type="radio" name="q27" value="3">Кто-то из членов семьи</li>
+            <li><input type="radio" name="q27" value="4">Кто-то из знакомых</li>
+            <li><input type="radio" name="q27" value="5">Сам (а) решил (а) попробовать</li>
+            <li><input type="radio" name="q27" value="6">Кто-то другой (кто именно?)<input type="text" class="q27" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q27"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 6) {
+                    $('input[class$="q27"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 6)
+                        $('input[class$="q27"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q28" id="1">
+        <p class="p28" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            28. Каким способом Вы обычно получаете наркотики? (отметьте все подходящие для Вас варианты)
+        </p>
+        <div class="ccount" hidden>6</div>
+        <ul>
+            <li><input type="checkbox" name="q28" value="1">Покупаю</li>
+            <li><input type="checkbox" name="q28" value="2">«Угощают»</li>
+            <li><input type="checkbox" name="q28" value="3">В обмен на услуги различного рода</li>
+            <li><input type="checkbox" name="q28" value="4">Беру в долг</li>
+            <li><input type="checkbox" name="q28" value="5">Изготавливаю сам(а)</li>
+            <li><input type="checkbox" name="q28" value="6">Другим образом (как именно?)<input type="text" class="q28" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q28"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 6) {
+                    $('input[class$="q28"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 6)
+                        $('input[class$="q28"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q29" id="1">
+        <p class="p29" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            28. Каким способом Вы обычно получаете наркотики? (отметьте все подходящие для Вас варианты)
+        </p>
+        <div class="ccount" hidden>8</div>
+        <ul>
+            <li><input type="checkbox" name="q29" value="1">Зарабатываю</li>
+            <li><input type="checkbox" name="q29" value="2">Дают родители, супруг(а), другие родные</li>
+            <li><input type="checkbox" name="q29" value="3">Дают друзья и знакомые</li>
+            <li><input type="checkbox" name="q29" value="4">Продаю свои вещи</li>
+            <li><input type="checkbox" name="q29" value="5">Всякими другими законными путями</li>
+            <li><input type="checkbox" name="q29" value="6">Всякими другими незаконными путями</li>
+            <li><input type="checkbox" name="q29" value="7">Вообще не покупаю сам(а)</li>
+            <li><input type="checkbox" name="q29" value="8">Иным образом (каким именно?)<input type="text" class="q29" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q29"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 8) {
+                    $('input[class$="q29"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 8)
+                        $('input[class$="q29"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q30" id="2">
+        <p class="p30" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            30. Где Вам удается доставать наркотики?
+        </p>
+        <textarea name="text4" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <p align="center" style="margin:5px">СПАСИБО ЗА УЧАСТИЕ В ИССЛЕДОВАНИИ !</p>
+    <p><input type="checkbox" name="if" id="if" />Нажимая на кнопку "ОТПРАВИТЬ", Вы даете <a href="~/Content/Политика конфиденциальности и согласие на обработку персональных данных.docx">согласие на обработку персональных данных и соглашаетесь c политикой конфиденциальности.</a></p>
+    <button id="SaveData" disabled>ОТПРАВИТЬ</button>
+</div>
+<style>
+    li {
+        list-style-type: none; /* Убираем маркеры */
+    }
+
+    p {
+        font-weight: 600;
+    }
+
+    .question {
+        width: 100%;
+        margin: 15px;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    input {
+        margin-right: 20px !important;
+    }
+
+    .table {
+        margin-right: 0px !important;
+    }
+
+    #er {
+        color: red;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        $('input[type="checkbox"]').bind('click', function () {
+            $('.form').find('p#er').each(function () {
+                $(this).hide();
+            });
+            var parent_div = $('div[class$="' + $(this).attr('name') + '"]');
+            var ccount = $('div[class$="' + $(this).attr('name') + '"]').find('div[class$="ccount"]').text();
+            if (LimitAnswer(parent_div) == ccount) {
+                parent_div.children('ul').find('input[name="' + $(this).attr('name') + '"]').each(function () {
+                    if (!$(this).is(':checked')) $(this).prop('disabled', true);
+                });
+            }
+            else {
+                if (LimitAnswer(parent_div) < ccount) {
+                    parent_div.children('ul').find('input[name="' + $(this).attr('name') + '"]').each(function () {
+                        if (!$(this).is(':checked')) $(this).prop('disabled', false);
+                    });
+                }
+            }
+        });
+    });
+
+    $('textarea').click(function () {
+        $('.form').find('p#er').each(function () {
+            $(this).hide();
+        });
+    });
+
+    $('input[type="radio"]').click(function () {
+        $('.form').find('p#er').each(function () {
+            $(this).hide();
+        });
+
+    });
+
+    $('#if').click(function () {
+        if ($(this).is(':checked')) $('#SaveData').prop('disabled', false);
+        else $('#SaveData').prop('disabled', true);
+    });
+
+
+    $('input[name="q19"]').change(function () {
+        if ($(this).is(':checked') && $(this).val() == 1) {
+            $('div[class$="blockText"]').hide();
+            $('div[class$="q20"]').hide();
+            $('div[class$="q21"]').hide();
+            $('div[class$="q22"]').hide();
+            $('div[class$="q23"]').hide();
+            $('div[class$="q24"]').hide();
+            $('div[class$="q25"]').hide();
+            $('div[class$="q26"]').hide();
+            $('div[class$="q27"]').hide();
+            $('div[class$="q28"]').hide();
+            $('div[class$="q29"]').hide();
+            $('div[class$="q30"]').hide();
+        }
+        else {
+            $('div[class$="blockText"]').show();
+            $('div[class$="q20"]').show();
+            $('div[class$="q21"]').show();
+            $('div[class$="q22"]').show();
+            $('div[class$="q23"]').show();
+            $('div[class$="q24"]').show();
+            $('div[class$="q25"]').show();
+            $('div[class$="q26"]').show();
+            $('div[class$="q27"]').show();
+            $('div[class$="q28"]').show();
+            $('div[class$="q29"]').show();
+            $('div[class$="q30"]').show();
+        }
+    });
+
+
+    function LimitAnswer(block) {
+        var count_checked_answer = 0;
+        block.children('ul').find('input').each(function () {
+            if ($(this).is(':checked')) count_checked_answer++;
+        });
+        return count_checked_answer;
+    };
+
+    $('button[id="SaveData"]').click(function () {
+
+        var conteiner = [];
+        for (var i = 1; i <= 30; i++) {
+            switch ($('div[class$="q' + i + '"]').attr('id')) {
+                case '1':
+                    switch ($('div[class$="q' + i + '"]').find('input:first').attr('type')) {
+                        case 'checkbox':
+                            var count = 0;
+                            $('div[class$="q' + i + '"]').find('input').each(function () {
+                                if ($(this).is(':checked')) {
+                                    conteiner.push($(this).attr('value'));
+                                    count++;
+                                }
+                            });
+                            var ccount = $('div[class$="q' + i + '"]').find('div[class$="ccount"]').text();
+                            while (count < ccount) {
+                                conteiner.push('');
+                                count++;
+                            }
+                            if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
+                                conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
+                            } else {
+                                conteiner.push('');
+                            };
+                            console.log("++++" + i + "+CCOUNT>>>>>>" + ccount);
+                            break;
+                        case 'radio':
+                            if ($('div[class$="q' + i + '"]').find('input:checked').length == 0) {
+                                conteiner.push('');
+                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').length > 0) conteiner.push('');
+                            }
+                            else {
+                                $('div[class$="q' + i + '"]').find('input').each(function () {
+                                    if ($(this).is(':checked')) conteiner.push($(this).attr('value'));
+                                });
+                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').length > 0)
+                                    if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
+                                        conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
+                                    } else {
+                                        conteiner.push('');
+                                    };
+                            }
+                            break;
+                    }
+                    break;
+                case '2':
+                    $('div[class$="q' + i + '"]').find('textarea').each(function () {
+                        conteiner.push($(this).val());
+                    });
+                    break;
+                case '3':
+                    $('div[class$="q' + i + '"]').find('tr:not(.tableheader)').each(function () {
+                        if ($(this).find('input:checked').length >= 1)
+                            conteiner.push($(this).find('input:checked').attr('value'));
+                        else
+                            conteiner.push('');
+                    });
+                    break;
+            }
+        }
+        //
+        //ЗАПРОС НА СОХРАНЕНИЕ
+        //фаил
+        //сервер
+        $.post("/Home/postSaveOpNN", { mass: conteiner })
+            .success(function (code) {
+                console.log(code);
+                $('div.form').empty().load('/Home/SuccessOpros?id_op=' + code);
+                //window.location.reload();
+            })
+            .error(function () {
+                console.error("Ошибка отправки данных на postSaveOp");
+            });
+        console.log('save =>>>>>>', conteiner);
+    });
+</script>

@@ -81,3 +81,11 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $('#save_tab4').click(function () {
+        var str_time = $('#time_timer_afk').val();
+        alert(str_time);
+        $.get("/Home/TimeAfkBase?time=" + str_time);
+    });
+</script>
