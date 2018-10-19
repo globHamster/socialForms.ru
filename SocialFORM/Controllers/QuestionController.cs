@@ -283,26 +283,29 @@ namespace SocialFORM.Controllers
         public void setTableRow(int id_q, List<TableRow> text_row, List<AnswerModel> data)
         {
             List<TableRow> tmp = new List<TableRow>();
-            foreach (var item in text_row)
+            if (text_row != null)
             {
-                if (item.Id > 0)
+                foreach (var item in text_row)
                 {
-                    db.Entry(item).State = EntityState.Modified;
+                    if (item.Id > 0)
+                    {
+                        db.Entry(item).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        db.Entry(item).State = EntityState.Added;
+                    }
                 }
-                else
+                db.SetTableRows.AddRange(tmp);
+                db.SaveChanges();
+            }
+            if (data != null)
+            {
+                foreach (var item in data)
                 {
-                    db.Entry(item).State = EntityState.Added;
+                    Answer(item);
                 }
             }
-
-            db.SetTableRows.AddRange(tmp);
-            db.SaveChanges();
-            System.Diagnostics.Debug.WriteLine("Length of data answer ---->" + data.Count);
-            foreach (var item in data)
-            {
-                Answer(item);
-            }
-
         }
 
         [HttpGet]
@@ -402,8 +405,11 @@ namespace SocialFORM.Controllers
         public void deleteAnswerAll(int id_answer)
         {
             AnswerAll tmpAnswerAll = db.SetAnswerAll.Where(u => u.Id == id_answer).FirstOrDefault();
-            db.SetAnswerAll.Remove(tmpAnswerAll);
-            db.SaveChanges();
+            if (tmpAnswerAll != null)
+            {
+                db.SetAnswerAll.Remove(tmpAnswerAll);
+                db.SaveChanges();
+            }
         }
 
         //Функция выгузки листа вопросов

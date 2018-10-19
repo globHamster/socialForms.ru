@@ -70,7 +70,7 @@
                     if ($(this).hasClass("AnswerTableLine")) {
                         $(this).find("td").each(function () {
                             if ($(this).hasClass("TableColumnText")) {
-                                text_e += "<td  style='border-right: 1px solid black;border-bottom: 1px solid black'>" + $(this).find(".TextAnswerDiv").text() + "</td>";
+                                text_e += "<td  style='border-right: 1px solid black;border-bottom: 1px solid black; min-width: 100px;'>" + $(this).find(".TextAnswerDiv").text() + "</td>";
                             } else {
                                 text_e += "<td style='border-right: 1px solid black;border-bottom: 1px solid black'></td>";
                             }
