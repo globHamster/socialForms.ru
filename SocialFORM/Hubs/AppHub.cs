@@ -5,14 +5,24 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
+using SocialFORM.Models;
 using SocialFORM.Models.Session;
 
 namespace SocialFORM.Hubs
 {
-    public class SessionHub : Hub
+    [HubName("appHub")]
+    public class AppHub : Hub
     {
+        static List<ChatUser> UsersChat = new List<ChatUser>();
         static List<SessionHubModel> sessionHubs = new List<SessionHubModel>();
         Models.ApplicationContext context = new Models.ApplicationContext();
+
+        // Отправка сообщений
+        public void Send(string name, string message)
+        {
+            Clients.All.addMessage(name, message);
+        }
 
         // Подключение нового пользователя
         public void Connect(string userid ,string userName)
@@ -20,10 +30,11 @@ namespace SocialFORM.Hubs
             var id = Context.ConnectionId;
             var time = TimeSpan.Parse(DateTime.Now.ToLongTimeString());
             var date_tmp = DateTime.Now.ToShortDateString();
-
+            ApplicationContext db = new ApplicationContext();
+            int IID = Convert.ToInt32(userid);
+            var usersID = db.SetUser.Where(u => u.Id == IID).First().RoleId;
             //
             // Создаем в БД запись
-            //System.Diagnostics.Debug.WriteLine("==========>>>>>Пользователь Авторизировался<<<<<============");
             context.SetSessionHubModel.Add(new SessionHubModel
             {
                 ConnectionId = id,
@@ -31,12 +42,17 @@ namespace SocialFORM.Hubs
                 UserName = userName,
                 Date = DateTime.Now.ToShortDateString(),
                 StartTime = DateTime.Now.ToLongTimeString(),
-                IsAction = true
+                IsAction = true,
+                UserRole = usersID.ToString()
             });
             context.SaveChanges();
 
             // Посылаем сообщение текущему пользователю
             Clients.Caller.onConnected(id, userName, time);
+
+            //
+            //Добовляем пользователя в чат
+            UsersChat.Add(new ChatUser { ConnectionId = id, Name = userName });
 
             // Посылаем сообщение всем пользователям, кроме текущего
             string DateNow = DateTime.Now.ToShortDateString();
@@ -122,6 +138,14 @@ namespace SocialFORM.Hubs
                 var item = context.SetSessionHubModel.FirstOrDefault(x => x.ConnectionId == connectionId);
                 Clients.All.onUserDisconnected(connectionId, item.UserName);
 
+            }
+
+            var itemChat = UsersChat.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+            if (itemChat != null)
+            {
+                UsersChat.Remove(itemChat);
+                var id = Context.ConnectionId;
+                Clients.All.onUserDisconnected(id, itemChat.Name);
             }
 
             return base.OnDisconnected(stopCalled);

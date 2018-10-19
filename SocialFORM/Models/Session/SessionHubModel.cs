@@ -17,5 +17,6 @@ namespace SocialFORM.Models.Session
         public string TimeInSystem { get; set; }
         public string AfkTime { get; set; }
         public Boolean IsAction { get; set; }
+        public string UserRole { get; set; }
     }
 }

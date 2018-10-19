@@ -629,7 +629,7 @@
                                     return;
                             }
                             console.info("___________>", item);
-                            //console.info("________>", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
+                            console.info("________>", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
                             skip = Check_blocks_Row(item);
                             if (skip) { skip = false; return; }
                             code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
@@ -861,7 +861,7 @@
                 break;
             case 3:
                 $('input.free_text').each(function () {
-                    mas.push($(this).attr('id') + "#" + $(this).val().replace(',', ';'));
+                    mas.push($(this).attr('id') + "#" + $(this).val().replace(/[,]/g, ';'));
                 });
                 result[index] = mas;
                 text_other[index] = ['null'];
@@ -1238,9 +1238,24 @@
                             }
                         });
                     }
+                    if (item_block.fromQuestion == id_q && item_block.typeBlock == 2) {
+                        skip = true;
+                        $.each(result[massiv_question_id.indexOf(Number(item_block.toQuestion))], function (i, item_tmp) {
+                            if (Number(item_tmp) <= 1) {
+                                skip = false; return;
+                            }
+                            if (item.AnswerType != 2) {
+                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
+                                    skip = false; return;
+                            }
+                            else {
+                                skip = false;
+                            }
+                        });
+                    }
                     //------
                 })
-            } /*else if (list_blocks[id_q].length == 1) {
+            }/* else if (list_blocks[id_q].length == 1) {
                 // --------
                 if (list_question[id_q].Bind_Blocks != null) {
                     if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {

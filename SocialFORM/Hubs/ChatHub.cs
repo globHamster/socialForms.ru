@@ -11,11 +11,7 @@ namespace SocialFORM.Hubs
     {
         static List<ChatUser> UsersChat = new List<ChatUser>();
 
-        // Отправка сообщений
-        public void Send(string name, string message)
-        {
-            Clients.All.addMessage(name, message);
-        }
+
 
         // Подключение нового пользователя
         public void Connect(string userName)

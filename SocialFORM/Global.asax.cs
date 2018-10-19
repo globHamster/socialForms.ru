@@ -17,6 +17,7 @@ namespace SocialFORM
         {
             Database.SetInitializer<ApplicationContext>(null);
             Database.SetInitializer<ProjectContext>(null);
+            Database.SetInitializer<NumberAppContext>(null);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

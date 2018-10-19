@@ -3,18 +3,50 @@
 }
 <div class="container">
     <div class="row">
-        <p>ifsocialForms - это...</p>
+        <p><h2>ifsocialForms</h2> - это веб-приложение позволяющее создовать анкеты</p>
     </div>
     <div class="row">
         <div class="col-md-4">
-            <p>Функционал</p>
+            <h3 align="center">Функционал</h3>
+            <p>Типы вопросов:</p>
+            <ul>
+                <li>Обычный текст(Text)</li>
+                <li>С одиночным выбором(Single)</li>
+                <li>С множественным выбором(Multi)</li>
+                <li>С свободным ответом(Free)</li>
+                <li>Табличный(Table)</li>
+                <li>Фильтрующий(Filter)</li>
+            </ul>
         </div>
         <div class="col-md-4">
-            <p>Логика</p>
+            <h3 align="center">Логика</h3>
+            <p>Типы блокировок и переходов</p>
+            <ul>
+                <li>Скрываем ответы выбранных результатов</li>
+                <li>Скрываем ответы не выбранных результатов</li>
+                <li>Переход от вопроса к вопросам</li>
+                <li>Возможность задавать вопрос(группу) по результатам</li>
+            </ul>
         </div>
         <div class="col-md-4">
-            <p>Опция 3</p>
+            <h3 align="center">Опция 3</h3>
         </div>
-
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <h3 align="center">Политика</h3>
+        </div>
+        <div class="col-md-4">
+            <h3 align="center">Наркоситуация</h3>
+            <p align="center" style="border:2px solid #0094ff; border-radius:10px; padding:10px; background:#b4b1b1">
+                <b>@Html.ActionLink("Наркоситуация в молодежной среде в Ярославская область (Население)", "OprosNarkNas", "Home")</b>
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h3 align="center">Коррупция</h3>
+            <p align="center" style="border:2px solid #0094ff; border-radius:10px; padding:10px; background:#b4b1b1 ">
+                <b>@Html.ActionLink("Коррупция в Ярославской области (Предприятия)", "OprosYaroslavl", "Home")</b>
+            </p>
+        </div>
     </div>
 </div>

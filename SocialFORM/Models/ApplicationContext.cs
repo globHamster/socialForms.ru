@@ -1,4 +1,5 @@
-﻿using SocialFORM.Models.Form;
+﻿using SocialFORM.Models.DB;
+using SocialFORM.Models.Form;
 using SocialFORM.Models.Menu;
 using SocialFORM.Models.Session;
 using System;
@@ -23,5 +24,9 @@ namespace SocialFORM.Models
         public DbSet<SchoolDay> SetSchoolDay { get; set; }
         public DbSet<SessionHubModel> SetSessionHubModel { get; set; }
         public DbSet<Opros> SetOpros { get; set; }
+        public DbSet<OprosYaroslav> SetOprosYaroslav { get; set; }
+        public DbSet<OprosNN> SetOprosNN { get; set; }
+        public DbSet<SetTimeAfk> SetTimeAfk { get; set; }
+
     }
 }

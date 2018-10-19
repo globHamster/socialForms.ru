@@ -56,6 +56,7 @@ namespace SocialFORM.Controllers
 
                         // Добавить куки в ответ
                         Response.Cookies.Add(cookie);
+
                         return RedirectToAction("_Index", "Home");
                     }
                     else

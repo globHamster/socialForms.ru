@@ -11,6 +11,7 @@ using SocialFORM.Models.Group;
 using SocialFORM.Models.Form;
 using SocialFORM.Models.Session;
 using SocialFORM.Models.Statistick;
+using SocialFORM.Models.Number;
 using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -89,6 +90,9 @@ namespace SocialFORM.Controllers
                 }
             }
 
+            SetTimeAfk tmp = db.SetTimeAfk.Where(u => u.Id == 1).First();
+            System.Diagnostics.Debug.WriteLine("=====>>>>> time " + Convert.ToInt32(tmp.Time) * 1000);
+            ViewBag.TimeID = (Convert.ToInt32(tmp.Time) * 1000).ToString();
 
             return View();
         }
@@ -120,7 +124,7 @@ namespace SocialFORM.Controllers
         public static List<ProjectModel> listProject = new List<ProjectModel>();
         public static List<ProjectModel> tmp_listProject = new List<ProjectModel>();
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult Project(int? page)
         {
             tmp_listProject = db4.SetProjectModels.ToList();
@@ -131,7 +135,7 @@ namespace SocialFORM.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult _Project(int? page)
         {
             tmp_listProject = db4.SetProjectModels.ToList();
@@ -142,13 +146,13 @@ namespace SocialFORM.Controllers
         }
         //
 
-        [Authorize(Roles = "Operator")]
+        //[Authorize(Roles = "Operator")]
         public ActionResult ProjectOperator()
         {
             return PartialView(db4.SetProjectModels.Where(u => u.ActionProject == true));
         }
 
-        [Authorize(Roles = "Operator")]
+        //[Authorize(Roles = "Operator")]
         public ActionResult BeginForm(int id_p)
         {
             ViewBag.ProjectID = id_p;
@@ -247,7 +251,7 @@ namespace SocialFORM.Controllers
 
                 UPuser.Login = model.LoginView;
 
-                UPuser.Password = model.PasswordView;
+                UPuser.Password = CodePass(model.PasswordView);
                 UPuser.RoleId = Convert.ToInt32(model.RoleView);
                 UPuser.SchoolDay = model.SchoolDayView;
 
@@ -269,7 +273,7 @@ namespace SocialFORM.Controllers
             // действия по созданию
             using (ApplicationContext db = new ApplicationContext())
             {
-                db.SetUser.Add(new User { Login = model.LoginView, Password = model.PasswordView, RoleId = Convert.ToInt32(model.RoleView), SchoolDay = model.SchoolDayView });
+                db.SetUser.Add(new User { Login = model.LoginView, Password = CodePass(model.PasswordView), RoleId = Convert.ToInt32(model.RoleView), SchoolDay = model.SchoolDayView });
                 db.SaveChanges();
                 db.SetDataUsers.Add(new DataUser { Name = model.NameView, Family = model.FamilyView, Age = model.AgeView, Fool = model.FoolView, Email = model.EmailView, UserId = db.SetUser.First(u => u.Login == model.LoginView).Id });
                 db.SaveChanges();
@@ -1624,6 +1628,62 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
+        //
+        //DataBase
+        public ActionResult DataBeseAll()
+        {
+            return PartialView();
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetDiapazon(string NameD, string KodFO, string KodOB, string KodGOR, List<listRange> Diapaz)
+        {
+            bool flag = false;
+            NumberAppContext context = new NumberAppContext();
+            Diap res = new Diap();
+            System.Diagnostics.Debug.WriteLine(NameD);
+            //foreach (var item in Diapaz)
+            //{
+            //    res.Kod = item.kod;
+            //    res.KodFO = KodFO;
+            //    res.KodOB = KodOB;
+            //    res.KodGOR = KodGOR;
+            //    res.NameD = NameD;
+            //    res.Num1 = "";
+            //    res.NumN = "";
+            //}
+            context.SetDiap.Add(res);
+            await context.SaveChangesAsync();
+            flag = true;
+            return Json(flag, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetListFO()
+        {
+            NumberAppContext dbN = new NumberAppContext();
+            List<FO> fo = dbN.SetFO.ToList();
+            return Json(fo, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetListOB()
+        {
+            NumberAppContext dbN = new NumberAppContext();
+            List<OB> ob = dbN.SetOB.ToList();
+
+            return Json(ob, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetListGOR()
+        {
+            NumberAppContext dbN = new NumberAppContext();
+            List<GOR> gor = dbN.SetGOR.ToList();
+
+            return Json(gor, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult Kvot(int id_p)
         {
             ViewBag.ProjectID = id_p;
@@ -1699,9 +1759,6 @@ namespace SocialFORM.Controllers
             return Json(db2.SetProjectModels.ToList(), JsonRequestBehavior.AllowGet);
         }
 
-
-
-
         //
         //Таблица Статистика PATH 1
         //
@@ -1753,7 +1810,9 @@ namespace SocialFORM.Controllers
         {
             List<StatResViewModel> StatRes = new List<StatResViewModel>();
             List<ResultModel> tmp1 = db.SetResultModels.ToList();
+            List<ResultModel> tmp1_t = db.SetResultModels.ToList();
             List<SessionHubModel> tmp2 = new List<SessionHubModel>();
+            tmp2 = db.SetSessionHubModel.Where(u => u.UserRole == "2").ToList();
 
             //
             //Обработка списка результатов по фильтрам
@@ -1761,6 +1820,7 @@ namespace SocialFORM.Controllers
             if (id > 0)
             {
                 tmp1 = tmp1.Where(u => u.ProjectID == id).ToList();
+                tmp1_t = tmp1.Where(u => u.ProjectID == id).ToList();
             }
             if (idop > 0)
             {
@@ -1768,12 +1828,10 @@ namespace SocialFORM.Controllers
             }
             if (sd != "-1" && ed != "-1")
             {
-                System.Diagnostics.Debug.WriteLine("Nice");
                 tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 1 && Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == -1 || Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 0 || Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 0).ToList();
             }
             if (st != "-1" && et != "-1")
             {
-                System.Diagnostics.Debug.WriteLine("Nice");
                 tmp1 = tmp1.Where(u => TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
             }
 
@@ -1864,12 +1922,18 @@ namespace SocialFORM.Controllers
                         //Время работы
                         string tmp_new = i.Key.Date.ToShortDateString();
                         tmp2 = db.SetSessionHubModel.Where(u => u.UserId == idop && u.Date == tmp_new).ToList();
-                        List<SessionHubModel> sessionHubs = db.SetSessionHubModel.Where(u => u.Date == tmp_new).OrderBy(s => s.UserId).ToList();
+                        List<SessionHubModel> sessionHubs = db.SetSessionHubModel.Where(u => u.Date == tmp_new && u.UserRole == "2").OrderBy(s => s.UserId).ToList();
                         int countUser = 0;
-                        for (var item = 0; item < sessionHubs.Count() - 1; item++)
+                        //КОЛИЧЕСТВО ПОЛЬЗОВАТЕЛЕЙ!!
+                        if (st == "-1" && et == "-1")
                         {
-                            if (sessionHubs[item].UserId != sessionHubs[item + 1].UserId) countUser++;
+                            countUser = sessionHubs.GroupBy(u => u.UserId).Select(group => group.First()).Count();
                         }
+                        else
+                        {
+                            countUser = sessionHubs.Where(q => q.EndTime == null || TimeSpan.Parse(q.EndTime).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserId).Select(group => group.First()).Count();
+                        }
+
                         string sessionStartTime = "";
                         string sessionEndTime = "";
                         string sessionTimeInSystem = "00:00:00";
@@ -1923,10 +1987,102 @@ namespace SocialFORM.Controllers
             }
             else
             {
-                //нет анкет
-                return "";
-            }
+                Dictionary<DateTime, List<ResultModel>> keys = new Dictionary<DateTime, List<ResultModel>>();
+                string startData, endData, startTime, endTime = "";
 
+                if (sd != "-1" && ed != "-1")
+                {
+                    startData = sd;
+                    startTime = st;
+                    endData = ed;
+                    endTime = et;
+                }
+                else
+                {
+                    startData = tmp1_t.First().Data.ToShortDateString();
+                    startTime = tmp1_t.First().Data.ToLongTimeString();
+                    List<ResultModel> tmp1t = tmp1_t.Reverse<ResultModel>().ToList();
+                    endData = tmp1t.First().Data.ToShortDateString();
+                    endTime = tmp1t.First().Data.ToLongTimeString();
+                }
+
+                DateTime BeginData = Convert.ToDateTime(startData).Date;
+                DateTime EndData = Convert.ToDateTime(endData).Date;
+                int countID = 0;
+
+                while (BeginData <= EndData)
+                {
+                    keys.Add(BeginData, tmp1.Where(u => u.Data.Date == BeginData.Date).ToList());
+                    BeginData = BeginData.AddDays(1);
+                }
+                foreach (var i in keys)
+                {
+                    List<ResultModel> tmp_list = i.Value;
+
+                    //Время работы
+                    string tmp_new = i.Key.Date.ToShortDateString();
+                    tmp2 = db.SetSessionHubModel.Where(u => u.UserId == idop && u.Date == tmp_new).ToList();
+                    List<SessionHubModel> sessionHubs = db.SetSessionHubModel.Where(u => u.Date == tmp_new).OrderBy(s => s.UserId).ToList();
+                    int countUser = 0;
+                    //КОЛИЧЕСТВО ПОЛЬЗОВАТЕЛЕЙ!!
+                    if (st == "-1" && et == "-1")
+                    {
+                        countUser = sessionHubs.GroupBy(u => u.UserId).Select(group => group.First()).Count();
+                    }
+                    else
+                    {
+                        countUser = sessionHubs.Where(q => q.EndTime == null || TimeSpan.Parse(q.EndTime).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserId).Select(group => group.First()).Count();
+                    }
+                    string sessionStartTime = "";
+                    string sessionEndTime = "";
+                    string sessionTimeInSystem = "00:00:00";
+                    string sessionAfkTime = "00:00:00";
+                    if (tmp2.Count != 0)
+                    {
+                        sessionStartTime = tmp2.First().StartTime;
+                        sessionEndTime = tmp2.Reverse<SessionHubModel>().First().EndTime;
+                        if (sessionEndTime == null) sessionEndTime = DateTime.Now.ToLongTimeString();
+                        foreach (var q in tmp2)
+                        {
+                            if (q.TimeInSystem == null)
+                            {
+                                sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(DateTime.Now.ToLongTimeString()) - TimeSpan.Parse(q.StartTime)).ToString();
+                            }
+                            else
+                            {
+                                sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
+                            }
+                            if (q.AfkTime == null)
+                            {
+                                sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse("00:00:00")).ToString();
+                            }
+                            else
+                            {
+                                sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
+                            }
+                        }
+                    }
+
+                    StatResViewModel tmp_statResViewModel = new StatResViewModel();
+                    tmp_statResViewModel.IdView = countID;
+                    tmp_statResViewModel.DataView = i.Key.ToShortDateString();
+                    tmp_statResViewModel.CountUserView = idop == -1 ? countUser.ToString() : "0";
+                    tmp_statResViewModel.CountProjectView = "0";
+                    tmp_statResViewModel.CountHourView = "0";
+                    tmp_statResViewModel.MediumTimeView = "00:00:00";
+                    tmp_statResViewModel.MinLenghtView = "00:00:00";
+                    tmp_statResViewModel.MaxLenghtView = "00:00:00";
+                    tmp_statResViewModel.MediumView = "00:00:00";
+                    tmp_statResViewModel.TimeUpView = tmp2.Count != 0 ? sessionStartTime : "0";
+                    tmp_statResViewModel.TimeOutView = tmp2.Count != 0 ? sessionEndTime : "0";
+                    tmp_statResViewModel.TimeWorkView = tmp2.Count != 0 ? sessionTimeInSystem : "0";
+                    tmp_statResViewModel.OneNView = "00:00:00";
+                    tmp_statResViewModel.TimeAfkView = tmp2.Count != 0 ? sessionAfkTime : "0";
+
+                    StatRes.Add(tmp_statResViewModel);
+                    countID++;
+                }
+            }
             return JsonConvert.SerializeObject(StatRes);
         }
 
@@ -2146,5 +2302,245 @@ namespace SocialFORM.Controllers
                 pc.Database.ExecuteSqlCommand("TRUNCATE TABLE table" + id);
             }
         }
+
+        public void TimeAfkBase(string time)
+        {
+
+            SetTimeAfk tmp = db.SetTimeAfk.Where(u => u.Id == 1).First();
+            tmp.Time = (Convert.ToInt32(time) * 60).ToString();
+
+            db.Entry(tmp).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+
+
+        public ActionResult OprosYaroslavl()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<int> postSaveOpYA(List<string> mass)
+        {
+            System.Diagnostics.Debug.WriteLine(mass.Count());
+            ApplicationContext context = new ApplicationContext();
+            OprosYaroslav list = new OprosYaroslav();
+            list.q1 = mass[0];
+            list.q2 = mass[1];
+            list.q3 = mass[2];
+            list.q4 = mass[3];
+            list.q5 = mass[4];
+            list.q6 = mass[5];
+            list.q7 = mass[6];
+            list.q8 = mass[7];
+            list.q9 = mass[8];
+            list.q10 = mass[9];
+            list.q11 = mass[10];
+            list.q12 = mass[11];
+            list.q13 = mass[12];
+            list.q14 = mass[13];
+            list.q15 = mass[14];
+            list.q16 = mass[15];
+            list.q17 = mass[16];
+            list.q18 = mass[17];
+            list.q19 = mass[18];
+            list.q20 = mass[19];
+            list.q21 = mass[20];
+            list.q22 = mass[21];
+            list.q23 = mass[22];
+            list.q24 = mass[23];
+            list.q25 = mass[24];
+            list.q26 = mass[25];
+            list.q27 = mass[26];
+            list.q28 = mass[27];
+            list.q29 = mass[28];
+            list.q30 = mass[29];
+            list.q31 = mass[30];
+            list.q32 = mass[31];
+            list.q33 = mass[32];
+            list.q34 = mass[33];
+            list.q35 = mass[34];
+            list.q36 = mass[35];
+            list.q37 = mass[36];
+            list.q38 = mass[37];
+            list.q39 = mass[38];
+            list.q40 = mass[39];
+            list.q41 = mass[40];
+            list.q42 = mass[41];
+            list.q43 = mass[42];
+            list.q44 = mass[43];
+            list.q45 = mass[44];
+            list.q46 = mass[45];
+            list.q47 = mass[46];
+            list.q48 = mass[47];
+            list.q49 = mass[48];
+            list.q50 = mass[49];
+            list.q51 = mass[50];
+            list.q52 = mass[51];
+            list.q53 = mass[52];
+            list.q54 = mass[53];
+            list.q55 = mass[54];
+            list.q56 = mass[55];
+            list.q57 = mass[56];
+            list.q58 = mass[57];
+            list.q59 = mass[58];
+            list.q60 = mass[59];
+            list.q61 = mass[60];
+            list.q62 = mass[61];
+            list.q63 = mass[62];
+            list.q64 = mass[63];
+            list.q65 = mass[64];
+            list.q66 = mass[65];
+            list.q67 = mass[66];
+            list.q68 = mass[67];
+            list.q69 = mass[68];
+            list.q70 = mass[69];
+            list.q71 = mass[70];
+            list.q72 = mass[71];
+            list.q73 = mass[72];
+            list.q74 = mass[73];
+            list.q75 = mass[74];
+            list.q76 = mass[75];
+            list.q77 = mass[76];
+            list.q78 = mass[77];
+            list.q79 = mass[78];
+            list.q80 = mass[79];
+            list.q81 = mass[80];
+            list.q82 = mass[81];
+            list.q83 = mass[82];
+            list.q84 = mass[83];
+            list.q85 = mass[84];
+            list.q86 = mass[85];
+            list.q87 = mass[86];
+            list.q88 = mass[87];
+            list.q89 = mass[88];
+            list.q90 = mass[89];
+            list.q91 = mass[90];
+            list.q92 = mass[91];
+            list.q93 = mass[92];
+            list.q94 = mass[93];
+            list.q95 = mass[94];
+            list.q96 = mass[95];
+            list.q97 = mass[96];
+            list.q98 = mass[97];
+            context.SetOprosYaroslav.Add(list);
+            await context.SaveChangesAsync();
+            return list.id;
+        }
+
+        public ActionResult OprosNarkNas()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<int> postSaveOpNN(List<string> mass)
+        {
+            System.Diagnostics.Debug.WriteLine(mass.Count());
+            ApplicationContext context = new ApplicationContext();
+            OprosNN list = new OprosNN();
+            list.q1 = mass[0];
+            list.q2 = mass[1];
+            list.q3 = mass[2];
+            list.q4 = mass[3];
+            list.q5 = mass[4];
+            list.q6 = mass[5];
+            list.q7 = mass[6];
+            list.q8 = mass[7];
+            list.q9 = mass[8];
+            list.q10 = mass[9];
+            list.q11 = mass[10];
+            list.q12 = mass[11];
+            list.q13 = mass[12];
+            list.q14 = mass[13];
+            list.q15 = mass[14];
+            list.q16 = mass[15];
+            list.q17 = mass[16];
+            list.q18 = mass[17];
+            list.q19 = mass[18];
+            list.q20 = mass[19];
+            list.q21 = mass[20];
+            list.q22 = mass[21];
+            list.q23 = mass[22];
+            list.q24 = mass[23];
+            list.q25 = mass[24];
+            list.q26 = mass[25];
+            list.q27 = mass[26];
+            list.q28 = mass[27];
+            list.q29 = mass[28];
+            list.q30 = mass[29];
+            list.q31 = mass[30];
+            list.q32 = mass[31];
+            list.q33 = mass[32];
+            list.q34 = mass[33];
+            list.q35 = mass[34];
+            list.q36 = mass[35];
+            list.q37 = mass[36];
+            list.q38 = mass[37];
+            list.q39 = mass[38];
+            list.q40 = mass[39];
+            list.q41 = mass[40];
+            list.q42 = mass[41];
+            list.q43 = mass[42];
+            list.q44 = mass[43];
+            list.q45 = mass[44];
+            list.q46 = mass[45];
+            list.q47 = mass[46];
+            list.q48 = mass[47];
+            list.q49 = mass[48];
+            list.q50 = mass[49];
+            list.q51 = mass[50];
+            list.q52 = mass[51];
+            list.q53 = mass[52];
+            list.q54 = mass[53];
+            list.q55 = mass[54];
+            list.q56 = mass[55];
+            list.q57 = mass[56];
+            list.q58 = mass[57];
+            list.q59 = mass[58];
+            list.q60 = mass[59];
+            list.q61 = mass[60];
+            list.q62 = mass[61];
+            list.q63 = mass[62];
+            list.q64 = mass[63];
+            list.q65 = mass[64];
+            list.q66 = mass[65];
+            list.q67 = mass[66];
+            list.q68 = mass[67];
+            list.q69 = mass[68];
+            list.q70 = mass[69];
+            list.q71 = mass[70];
+            list.q72 = mass[71];
+            list.q73 = mass[72];
+            list.q74 = mass[73];
+            list.q75 = mass[74];
+            list.q76 = mass[75];
+            list.q77 = mass[76];
+            list.q78 = mass[77];
+            list.q79 = mass[78];
+            list.q80 = mass[79];
+            list.q81 = mass[80];
+            list.q82 = mass[81];
+            list.q83 = mass[82];
+            list.q84 = mass[83];
+            list.q85 = mass[84];
+            list.q86 = mass[85];
+            list.q87 = mass[86];
+            list.q88 = mass[87];
+            list.q89 = mass[88];
+            list.q90 = mass[89];
+            list.q91 = mass[90];
+            list.q92 = mass[91];
+            //list.q93 = mass[92];
+            //list.q94 = mass[93];
+            //list.q95 = mass[94];
+            //list.q96 = mass[95];
+            //list.q97 = mass[96];
+            //list.q98 = mass[97];
+            context.SetOprosNN.Add(list);
+            await context.SaveChangesAsync();
+            return list.id;
+        }
+
     }
 }

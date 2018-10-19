@@ -1,0 +1,849 @@
+﻿@Scripts.Render("~/scripts/jquery-1.10.2.js")
+
+<div class="form">
+    <div class="hello">
+        <p>
+            Здравствуйте! Независимое аналитическое агентство «ИМИДЖ-ФАКТОР» проводит социологическое исследование с целью обсуждения с экспертным сообществом проблемы коррупции в Ярославской области и оценки эффективности антикоррупционных мероприятий в регионе. Просим Вас, как эксперта по данной проблеме, принять участие в опросе.
+            Это не займет у Вас много времени. Ваше мнение очень важно для нас! Убедительно просим Вас искренне отвечать на все вопросы анкеты. Анонимность опроса гарантируется: все данные будут использоваться исключительно в  обобщенном виде.
+        </p>
+    </div>
+    <div class="question q1" id="2">
+        <p class="p3" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            Населенный пункт?
+        </p>
+        <textarea name="text1" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q2" id="2">
+        <p class="p3" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            Муниципальный район (городской округ)?
+        </p>
+        <textarea name="text2" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q3" id="1">
+        <p class="p3" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            1.	УКАЖИТЕ, ПОЖАЛУЙСТА, СФЕРУ ВАШЕЙ ПРОФЕССИОНАЛЬНОЙ ДЕЯТЕЛЬНОСТИ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q3" value="1">Сотрудник правоохранительных органов и силовых ведомств (МВД, ФСБ, МЧС, Суд, Прокуратура и т.д.)</li>
+            <li><input type="radio" name="q3" value="2">Депутат законодательного и представительных органов власти Ярославской области</li>
+            <li><input type="radio" name="q3" value="3">Государственный или муниципальный служащий</li>
+            <li><input type="radio" name="q3" value="4">Эксперт, занимающийся социальной или политической проблематикой (журналист, ученый, руководитель независимой исследовательской организации)</li>
+            <li><input type="radio" name="q3" value="5">Владелец предприятия, менеджер высшего звена в компании</li>
+        </ul>
+    </div>
+    <div class="question q4" id="1">
+        <p class="p4" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            2.	КАК ВЫ ДУМАЕТЕ, НАСКОЛЬКО РАСПРОСТРАНЕНА КОРРУПЦИЯ И ВЗЯТОЧНИЧЕСТВО СРЕДИ ЧИНОВНИКОВ И ДОЛЖНОСТНЫХ ЛИЦ В РОССИИ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q4" value="1">Меньшинство чиновников и должностных лиц берут взятки</li>
+            <li><input type="radio" name="q4" value="2">Большинство чиновников и должностных лиц берут взятки</li>
+            <li><input type="radio" name="q4" value="3">Ни то, ни другое, примерно поровну</li>
+            <li><input type="radio" name="q4" value="4">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q5" id="1">
+        <p class="p5" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            3.	ПО ВАШЕМУ МНЕНИЮ, ПРЕСТУПЛЕНИЯ, ИМЕЮЩИЕ КОРРУПЦИОННЫЙ ХАРАКТЕР… (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q5" value="1">Являются таким же видом неправового поведения, как и все остальные уголовные преступления</li>
+            <li><input type="radio" name="q5" value="2">Обладают своей спецификой и несут большую социальную опасность, чем прочие уголовные деяния</li>
+            <li><input type="radio" name="q5" value="3">Обладают своей спецификой и несут меньшую социальную опасность, чем прочие уголовные деяния</li>
+            <li><input type="radio" name="q5" value="4">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q6" id="2">
+        <p class="p6" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            4.	ПРОКОММЕНТИРУЙТЕ, ПОЖАЛУЙСТА, ВАШУ ТОЧКУ ЗРЕНИЯ?
+        </p>
+        <textarea name="text3" cols="170" rows="5" style="resize:none; max-width:100% !important;"></textarea>
+    </div>
+    <div class="question q7" id="1">
+        <p class="p7" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            5.	КАК ВЫ СЧИТАЕТЕ, ЗА ПОСЛЕДНИЕ 2-3 ГОДА УРОВЕНЬ КОРРУПЦИИ В НАШЕЙ СТРАНЕ… (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q7" value="1">Значительно повысился</li>
+            <li><input type="radio" name="q7" value="2">Повысился</li>
+            <li><input type="radio" name="q7" value="3">Не изменился</li>
+            <li><input type="radio" name="q7" value="4">Снизился</li>
+            <li><input type="radio" name="q7" value="5">Значительно снизился</li>
+            <li><input type="radio" name="q7" value="6">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q8" id="1">
+        <p class="p8" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            6.	КАК ВЫ СЧИТАЕТЕ, В КАКОЙ СТЕПЕНИ РАСПРОСТРАНЕНА КОРРУПЦИЯ В ЯРОСЛАВСКОЙ ОБЛАСТИ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q8" value="1">Широко распространена</li>
+            <li><input type="radio" name="q8" value="2">Скорее распространена</li>
+            <li><input type="radio" name="q8" value="3">Скорее не распространена</li>
+            <li><input type="radio" name="q8" value="4">Считаю, что коррупции нет</li>
+            <li><input type="radio" name="q8" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q9" id="1">
+        <p class="p9" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            7.	ПО ВАШЕМУ МНЕНИЮ, УРОВЕНЬ КОРРУПЦИИ В ЯРОСЛАВСКОЙ ОБЛАСТИ… (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q9" value="1">Ниже, чем в других регионах России</li>
+            <li><input type="radio" name="q9" value="2">Такой же, как и в других регионах России</li>
+            <li><input type="radio" name="q9" value="3">Выше, чем в других регионах России</li>
+            <li><input type="radio" name="q9" value="4">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q10" id="1">
+        <p class="p10" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            8.	КАК ВЫ СЧИТАЕТЕ, ЗА ПОСЛЕДНИЕ 2-3 ГОДА КОРРУПЦИИ В ЯРОСЛАВСКОЙ ОБЛАСТИ СТАЛО БОЛЬШЕ, МЕНЬШЕ ИЛИ ЕЕ УРОВЕНЬ НЕ ИЗМЕНИЛСЯ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q10" value="1">Стало больше</li>
+            <li><input type="radio" name="q10" value="2">Уровень не изменился</li>
+            <li><input type="radio" name="q10" value="3">Стало меньше</li>
+            <li><input type="radio" name="q10" value="4">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q11" id="1">
+        <p class="p11" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            9.	КАК ВЫ ПОЛАГАЕТЕ, В БЛИЖАЙШИЕ 2-3 ГОДА КОРРУПЦИИ В ЯРОСЛАВСКОЙ ОБЛАСТИ СТАНЕТ БОЛЬШЕ, МЕНЬШЕ ИЛИ УРОВЕНЬ КОРРУПЦИИ НЕ ИЗМЕНИТСЯ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q11" value="1">Коррупции станет больше</li>
+            <li><input type="radio" name="q11" value="2">Уровень коррупции не изменится</li>
+            <li><input type="radio" name="q11" value="3">Коррупции станет меньше</li>
+            <li><input type="radio" name="q11" value="4">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q12" id="1">
+        <p class="p12" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            10.	КАКИЕ, НА ВАШ ВЗГЛЯД, ФАКТОРЫ В НАИБОЛЬШЕЙ СТЕПЕНИ СПОСОБСТВУЮТ РАЗВИТИЮ КОРРУПЦИИ В РОССИИ?
+        </p>
+        <i>
+            (не более 5 вариантов ответа)
+        </i>
+        <div class="ccount" hidden>5</div>
+        <ul>
+            <li><input type="checkbox" name="q12" value="1">Слабые гарантии достойного социального обеспечения чиновника при уходе с государственной службы</li>
+            <li><input type="checkbox" name="q12" value="2">Влияние крупных бизнесменов на власть</li>
+            <li><input type="checkbox" name="q12" value="3">Нечеткость и противоречивость законов, дающая возможность их широкого толкования чиновником</li>
+            <li><input type="checkbox" name="q12" value="4">Исторические традиции в культуре (взяточничество, воровство как обыденное явление, как обязательный элемент функционирования государства)</li>
+            <li><input type="checkbox" name="q12" value="5">Влияние и давление власти на бизнес</li>
+            <li><input type="checkbox" name="q12" value="6">Необходимость получения множества согласований и разрешений (разрешительный принцип превалирует над заявительным)</li>
+            <li><input type="checkbox" name="q12" value="7">Личные качества политиков, государственных и муниципальных служащих, должностных лиц (жадность, алчность, аморальность, безответственность)</li>
+            <li><input type="checkbox" name="q12" value="8">Дефицит государственных и муниципальных услуг (спрос на услуги многократно превышает предложение), сложность получения услуг законным путем (бюрократизация)</li>
+            <li><input type="checkbox" name="q12" value="9">Слишком обширное вмешательство государства в экономику и другие сферы</li>
+            <li><input type="checkbox" name="q12" value="10">Неупорядоченность контрольной деятельности государства (масса контролирующих инстанций, неограниченное число проверок и т.п.)</li>
+            <li><input type="checkbox" name="q12" value="11">Низкий образовательный и культурный уровень чиновников</li>
+            <li><input type="checkbox" name="q12" value="12">Чрезмерные налоги и сборы</li>
+            <li><input type="checkbox" name="q12" value="13">Недостаточность юридических полномочий и отсутствие нормативно-правовой базы у контрольно-следственных органов (Прокуратура, МВД, УБЭП) для раскрытия коррупционных преступлений</li>
+            <li><input type="checkbox" name="q12" value="14">Юридическая и правовая безграмотность населения</li>
+            <li><input type="checkbox" name="q12" value="15">Низкая зарплата чиновников</li>
+            <li><input type="checkbox" name="q12" value="16">Неудовлетворительная работа правоохранительной системы, судопроизводства, исполнения судебных решений</li>
+            <li><input type="checkbox" name="q12" value="17">Клановость, зависимость чиновников друг от друга, круговая порука</li>
+            <li><input type="checkbox" name="q12" value="18">Отсутствие четких и жестких санкций за неисполнение чиновником своих служебных обязанностей, гуманность наказания за совершение коррупционных преступлений</li>
+            <li><input type="checkbox" name="q12" value="19">Низкий уровень конкуренции (наличие естественных и искусственных монополий)</li>
+            <li><input type="checkbox" name="q12" value="20">Обилие ведомственных и должностных инструкций, сильно зарегламентированные правила поведения чиновников</li>
+            <li><input type="checkbox" name="q12" value="21">Иные факторы (укажите, какие) <input type="text" class="q12" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q12"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 21) {
+                    $('input[class$="q12"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 21)
+                        $('input[class$="q12"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q13" id="3">
+        <p class="p13" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            11.	КАК БЫ ВЫ ОЦЕНИЛИ СЛЕДУЮЩИЕ ОРГАНЫ ВЛАСТИ, ОРГАНИЗАЦИИ: НАСКОЛЬКО ОНИ ЧЕСТНЫ, СВОБОДНЫ ОТ КОРРУПЦИИ ИЛИ, НАПРОТИВ, НЕЧЕСТНЫ, КОРРУМПИРОВАНЫ? (один ответ по каждой строке)
+        </p>
+        <i>(ответ дайте, пожалуйста, по каждой строке)</i>
+        <div style="padding-left:15%; width:100%;">
+            <table border="1" style="text-align:center">
+                <tr class="tableheader"><th></th><th>Абсолютно честные</th><th>Довольно честные</th><th>Довольно нечестные</th><th>Абсолютно нечестные</th><th>Не могу оценить</th></tr>
+                <tr>
+                    <td>Правительство РФ (кабинет министров)</td>
+                    <td><input class="table" type="radio" name="q131" value="1"></td>
+                    <td><input class="table" type="radio" name="q131" value="2"></td>
+                    <td><input class="table" type="radio" name="q131" value="3"></td>
+                    <td><input class="table" type="radio" name="q131" value="4"></td>
+                    <td><input class="table" type="radio" name="q131" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Государственная Дума РФ (депутаты)</td>
+                    <td><input class="table" type="radio" name="q132" value="1"></td>
+                    <td><input class="table" type="radio" name="q132" value="2"></td>
+                    <td><input class="table" type="radio" name="q132" value="3"></td>
+                    <td><input class="table" type="radio" name="q132" value="4"></td>
+                    <td><input class="table" type="radio" name="q132" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Власти Вашего края</td>
+                    <td><input class="table" type="radio" name="q133" value="1"></td>
+                    <td><input class="table" type="radio" name="q133" value="2"></td>
+                    <td><input class="table" type="radio" name="q133" value="3"></td>
+                    <td><input class="table" type="radio" name="q133" value="4"></td>
+                    <td><input class="table" type="radio" name="q133" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Власти Вашего города (района)</td>
+                    <td><input class="table" type="radio" name="q134" value="1"></td>
+                    <td><input class="table" type="radio" name="q134" value="2"></td>
+                    <td><input class="table" type="radio" name="q134" value="3"></td>
+                    <td><input class="table" type="radio" name="q134" value="4"></td>
+                    <td><input class="table" type="radio" name="q134" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Политические партии</td>
+                    <td><input class="table" type="radio" name="q135" value="1"></td>
+                    <td><input class="table" type="radio" name="q135" value="2"></td>
+                    <td><input class="table" type="radio" name="q135" value="3"></td>
+                    <td><input class="table" type="radio" name="q135" value="4"></td>
+                    <td><input class="table" type="radio" name="q135" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Армия</td>
+                    <td><input class="table" type="radio" name="q136" value="1"></td>
+                    <td><input class="table" type="radio" name="q136" value="2"></td>
+                    <td><input class="table" type="radio" name="q136" value="3"></td>
+                    <td><input class="table" type="radio" name="q136" value="4"></td>
+                    <td><input class="table" type="radio" name="q136" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Районные и окружные суды</td>
+                    <td><input class="table" type="radio" name="q137" value="1"></td>
+                    <td><input class="table" type="radio" name="q137" value="2"></td>
+                    <td><input class="table" type="radio" name="q137" value="3"></td>
+                    <td><input class="table" type="radio" name="q137" value="4"></td>
+                    <td><input class="table" type="radio" name="q137" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Правоохранительные органы (полиция, прокуратура и т.п.)</td>
+                    <td><input class="table" type="radio" name="q138" value="1"></td>
+                    <td><input class="table" type="radio" name="q138" value="2"></td>
+                    <td><input class="table" type="radio" name="q138" value="3"></td>
+                    <td><input class="table" type="radio" name="q138" value="4"></td>
+                    <td><input class="table" type="radio" name="q138" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Органы национальной безопасности (ФСБ и пр.)</td>
+                    <td><input class="table" type="radio" name="q139" value="1"></td>
+                    <td><input class="table" type="radio" name="q139" value="2"></td>
+                    <td><input class="table" type="radio" name="q139" value="3"></td>
+                    <td><input class="table" type="radio" name="q139" value="4"></td>
+                    <td><input class="table" type="radio" name="q139" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Средства массовой информации</td>
+                    <td><input class="table" type="radio" name="q1310" value="1"></td>
+                    <td><input class="table" type="radio" name="q1310" value="2"></td>
+                    <td><input class="table" type="radio" name="q1310" value="3"></td>
+                    <td><input class="table" type="radio" name="q1310" value="4"></td>
+                    <td><input class="table" type="radio" name="q1310" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Общественные организации по охране окружающей среды</td>
+                    <td><input class="table" type="radio" name="q1311" value="1"></td>
+                    <td><input class="table" type="radio" name="q1311" value="2"></td>
+                    <td><input class="table" type="radio" name="q1311" value="3"></td>
+                    <td><input class="table" type="radio" name="q1311" value="4"></td>
+                    <td><input class="table" type="radio" name="q1311" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Правозащитные организации</td>
+                    <td><input class="table" type="radio" name="q1312" value="1"></td>
+                    <td><input class="table" type="radio" name="q1312" value="2"></td>
+                    <td><input class="table" type="radio" name="q1312" value="3"></td>
+                    <td><input class="table" type="radio" name="q1312" value="4"></td>
+                    <td><input class="table" type="radio" name="q1312" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Коммунальные службы</td>
+                    <td><input class="table" type="radio" name="q1313" value="1"></td>
+                    <td><input class="table" type="radio" name="q1313" value="2"></td>
+                    <td><input class="table" type="radio" name="q1313" value="3"></td>
+                    <td><input class="table" type="radio" name="q1313" value="4"></td>
+                    <td><input class="table" type="radio" name="q1313" value="5"></td>
+                </tr>
+                <tr>
+                    <td>ГИБДД</td>
+                    <td><input class="table" type="radio" name="q1314" value="1"></td>
+                    <td><input class="table" type="radio" name="q1314" value="2"></td>
+                    <td><input class="table" type="radio" name="q1314" value="3"></td>
+                    <td><input class="table" type="radio" name="q1314" value="4"></td>
+                    <td><input class="table" type="radio" name="q1314" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Средние школы, училища, техникумы</td>
+                    <td><input class="table" type="radio" name="q1315" value="1"></td>
+                    <td><input class="table" type="radio" name="q1315" value="2"></td>
+                    <td><input class="table" type="radio" name="q1315" value="3"></td>
+                    <td><input class="table" type="radio" name="q1315" value="4"></td>
+                    <td><input class="table" type="radio" name="q1315" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Высшие учебные заведения</td>
+                    <td><input class="table" type="radio" name="q1316" value="1"></td>
+                    <td><input class="table" type="radio" name="q1316" value="2"></td>
+                    <td><input class="table" type="radio" name="q1316" value="3"></td>
+                    <td><input class="table" type="radio" name="q1316" value="4"></td>
+                    <td><input class="table" type="radio" name="q1316" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Поликлиники и больницы</td>
+                    <td><input class="table" type="radio" name="q1317" value="1"></td>
+                    <td><input class="table" type="radio" name="q1317" value="2"></td>
+                    <td><input class="table" type="radio" name="q1317" value="3"></td>
+                    <td><input class="table" type="radio" name="q1317" value="4"></td>
+                    <td><input class="table" type="radio" name="q1317" value="5"></td>
+                </tr>
+                <tr>
+                    <td>Собесы, службы занятости, другие социальные учреждения</td>
+                    <td><input class="table" type="radio" name="q1318" value="1"></td>
+                    <td><input class="table" type="radio" name="q1318" value="2"></td>
+                    <td><input class="table" type="radio" name="q1318" value="3"></td>
+                    <td><input class="table" type="radio" name="q1318" value="4"></td>
+                    <td><input class="table" type="radio" name="q1318" value="5"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="question q14" id="1">
+        <p class="p14" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            12.	СЕЙЧАС НЕРЕДКО ПРИХОДИТСЯ СЛЫШАТЬ, ЧТО ПОЛИТИКИ, ЧИНОВНИКИ, ГОСУДАРСТВЕННЫЕ И МУНИЦИПАЛЬНЫЕ СЛУЖАЩИЕ, ИНЫЕ ДОЛЖНОСТНЫЕ ЛИЦА БЕРУТ ВЗЯТКИ. СКАЖИТЕ, ПОЖАЛУЙСТА, ИЗВЕСТНО ЛИ ВАМ О КАКИХ-ЛИБО СЛУЧАЯХ КОРРУПЦИИ, ПРОИЗОШЕДШИХ ЗА ПОСЛЕДНИЙ ГОД В ВАШЕМ ВЕДОМСТВЕ ИЛИ ОРГАНИЗАЦИИ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q14" value="1">Да, мне известно об одном-двух таких случаях</li>
+            <li><input type="radio" name="q14" value="2">Мне известно о нескольких случаях коррупции</li>
+            <li><input type="radio" name="q14" value="3">Мне известно о множестве случаев коррупции</li>
+            <li><input type="radio" name="q14" value="4">Нет, мне неизвестно ни об одном таком случае</li>
+        </ul>
+    </div>
+    <div class="question q15" id="1">
+        <p class="p14" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            13.	ЕСТЬ ЛИ СРЕДИ ВАШИХ ЗНАКОМЫХ, КОЛЛЕГ ПО СЛУЖБЕ ПРИМЕРНО ТАКОГО УРОВНЯ, КАК ВЫ, ЛЮДИ, КОТОРЫЕ, НАРЯДУ С ГОССЛУЖБОЙ, ЗАНИМАЮТСЯ КОММЕРЧЕСКОЙ ДЕЯТЕЛЬНОСТЬЮ, БИЗНЕСОМ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q15" value="1">Да</li>
+            <li><input type="radio" name="q15" value="2">Нет</li>
+            <li><input type="radio" name="q15" value="3">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q16" id="1">
+        <p class="p16" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            14.	ПРЕДПОЛОЖИМ, ЧТО ГОСУДАРСТВЕННЫЙ ИЛИ МУНИЦИПАЛЬНЫЙ СЛУЖАЩИЙ, ДОЛЖНОСТНОЕ ЛИЦО, РАБОТАЮЩЕЕ В СХОДНЫХ С ВАМИ УСЛОВИЯХ, В СХОДНОМ ОРГАНЕ ВЛАСТИ НА ТАКОМ ЖЕ ПРИМЕРНО УРОВНЕ КАК ВЫ, ПОПАДАЕТ В СИТУАЦИЮ, В КОТОРОЙ ЕМУ ПРЕДЛАГАЮТ ВЗЯТКУ, И ОН ОТКАЗЫВАЕТСЯ ЕЕ ВЗЯТЬ. КАК ВЫ ДУМАЕТЕ, КАКИЕ МОТИВЫ, ОБСТОЯТЕЛЬСТВА ИЛИ СООБРАЖЕНИЯ МОГЛИ БЫ ПОБУДИТЬ ЕГО ОТКАЗАТЬСЯ ОТ ВЗЯТКИ?
+        </p>
+        <i>
+            (не более 3 вариантов ответа)
+        </i>
+        <div class="ccount" hidden>3</div>
+        <ul>
+            <li><input type="checkbox" name="q16" value="1">Невозможность переступить через моральные нормы</li>
+            <li><input type="checkbox" name="q16" value="2">Удовлетворенность своим материальным положением и недостаточная сумма взятки</li>
+            <li><input type="checkbox" name="q16" value="3">Страх понести уголовную ответственность и оказаться в тюрьме</li>
+            <li><input type="checkbox" name="q16" value="4">Боязнь потерять свое место и преимущества государственной службы (зарплата, льготы, надежность)</li>
+            <li><input type="checkbox" name="q16" value="5">Опасение попасть в зависимость перед взяткодателем или его организацией</li>
+            <li><input type="checkbox" name="q16" value="6">Традиции, сложившиеся на работе</li>
+            <li><input type="checkbox" name="q16" value="7">Неприязнь к личности взяткодателя</li>
+            <li><input type="checkbox" name="q16" value="8">Опасение вызвать недоверие коллег</li>
+            <li><input type="checkbox" name="q16" value="9">Иные факторы (укажите, какие) <input type="text" class="q16" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q16"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 9) {
+                    $('input[class$="q16"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 9)
+                        $('input[class$="q16"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q17" id="1">
+        <p class="p17" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            15.	А КАК ВЫ ДУМАЕТЕ, ЕСЛИ ОН ВОЗЬМЕТ ВЗЯТКУ, КАКИЕ МОТИВЫ, ОБСТОЯТЕЛЬСТВА ИЛИ СООБРАЖЕНИЯ МОГЛИ БЫ ЕГО ПОДТОЛКНУТЬ К ТОМУ, ЧТОБЫ ВСТУПИТЬ В ПРЕДЛАГАЕМУЮ КОРРУПЦИОННУЮ СДЕЛКУ?
+        </p>
+        <i>
+            (не более 3 вариантов ответа)
+        </i>
+        <div class="ccount" hidden>3</div>
+        <ul>
+            <li><input type="checkbox" name="q17" value="1">Отсутствие моральных ограничителей </li>
+            <li><input type="checkbox" name="q17" value="2">Затрудненное материальное положение, нехватка средств и большая сумма взятки</li>
+            <li><input type="checkbox" name="q17" value="3">Ощущение безнаказанности и отсутствие правовых последствий</li>
+            <li><input type="checkbox" name="q17" value="4">Невысокая «ценность» государственной службы (зарплата, льготы, надежность)</li>
+            <li><input type="checkbox" name="q17" value="5">Обязательства (наличие зависимости) перед взяткодателем или его организацией</li>
+            <li><input type="checkbox" name="q17" value="6">Традиции, сложившиеся на работе</li>
+            <li><input type="checkbox" name="q17" value="7">Личное знакомство (приятельские, дружеские отношения) с взяткодателем</li>
+            <li><input type="checkbox" name="q17" value="8">Необходимость поддерживать доверие коллег</li>
+            <li><input type="checkbox" name="q17" value="9">Иные факторы (укажите, какие) <input type="text" class="q17" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q17"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 9) {
+                    $('input[class$="q17"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 9)
+                        $('input[class$="q17"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q18" id="1">
+        <p class="p18" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            16.	КАК ВЫ ДУМАЕТЕ, КАК СКОРО С МОМЕНТА НАЧАЛА РАБОТЫ В ОРГАНИЗАЦИИ ПОДОБНО ВАШЕЙ СЛУЖАЩИЙ ИЛИ ДОЛЖНОСТНОЕ ЛИЦО ВПЕРВЫЕ ПОПАДЕТ В СИТУАЦИЮ ВЫБОРА – УЧАСТВОВАТЬ ИЛИ НЕ УЧАСТВОВАТЬ В КОРРУПЦИОННОЙ СДЕЛКЕ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q18" value="1">В течение первой недели</li>
+            <li><input type="radio" name="q18" value="2">В течение первого месяца</li>
+            <li><input type="radio" name="q18" value="3">В течение полугода</li>
+            <li><input type="radio" name="q18" value="4">В течение года</li>
+            <li><input type="radio" name="q18" value="5">Такая ситуация вообще не возникнет</li>
+            <li><input type="radio" name="q18" value="6">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q19" id="1">
+        <p class="p19" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            17.	ПРЕДПОЛОЖИМ, В СРЕДСТВАХ МАССОВОЙ ИНФОРМАЦИИ (СМИ) ПОЯВИЛИСЬ СООБЩЕНИЯ О ТОМ, ЧТО НЕКОЕ ДОЛЖНОСТНОЕ ЛИЦО В ВАШЕЙ ОРГАНИЗАЦИИ ВОВЛЕЧЕНО В КОРРУПЦИЮ, ЧТО С НИМ МОЖЕТ ПРОИЗОЙТИ В РЕЗУЛЬТАТЕ ЭТОЙ ПУБЛИКАЦИИ?
+        </p>
+        <i>
+            (любое количество вариантов ответа)
+        </i>
+        <div class="ccount" hidden>10</div>
+        <ul>
+            <li><input type="checkbox" name="q19" value="1">Будет проведено служебное расследование, и информация будет передана в правоохранительные органы</li>
+            <li><input type="checkbox" name="q19" value="2">Он подвергнется дисциплинарному взысканию</li>
+            <li><input type="checkbox" name="q19" value="3">Его постараются уволить</li>
+            <li><input type="checkbox" name="q19" value="4">Его перестанут продвигать по службе</li>
+            <li><input type="checkbox" name="q19" value="5">Он временно лишится поощрений со стороны начальства</li>
+            <li><input type="checkbox" name="q19" value="6">Это негативно повлияет лишь на отношение к нему коллектива</li>
+            <li><input type="checkbox" name="q19" value="7">Особой реакции не последует</li>
+            <li><input type="checkbox" name="q19" value="8">Руководство будет защищать этого сотрудника, подаст в суд на СМИ</li>
+            <li><input type="checkbox" name="q19" value="9">Это будет способствовать его продвижению по службе</li>
+            <li><input type="checkbox" name="q19" value="10">Иные факторы (укажите, какие) <input type="text" class="q19" hidden /></li>
+            <li><input type="checkbox" name="q19" value="11">Затрудняюсь ответить</li>
+        </ul>
+        <script>
+            $('input[name="q19"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 10) {
+                    $('input[class$="q19"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 10)
+                        $('input[class$="q19"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <div class="question q20" id="1">
+        <p class="p18" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            18.	БЫЛИ ЛИ НА ВАШЕЙ ПАМЯТИ СЛУЧАИ НАКАЗАНИЯ КОГО-ЛИБО ЗА КОРРУПЦИЮ ИЗ ВАШЕЙ ОРГАНИЗАЦИИ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q20" value="1">Да, мне известно об одном-двух таких случаях</li>
+            <li><input type="radio" name="q20" value="2">Мне известно о нескольких случаях наказания за коррупцию</li>
+            <li><input type="radio" name="q20" value="3">Мне известно о множестве случаев наказания за коррупцию</li>
+            <li><input type="radio" name="q20" value="4">Нет, мне неизвестно ни об одном случае наказания за коррупцию</li>
+        </ul>
+    </div>
+    <div class="question q21" id="1">
+        <p class="p21" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            19.	ВАМ ИЗВЕСТНО ИЛИ НЕИЗВЕСТНО О МЕРАХ, КОТОРЫЕ ВЛАСТИ ЯРОСЛАВСКОЙ ОБЛАСТИ ПРЕДПРИНИМАЮТ ДЛЯ ПРОФИЛАКТИКИ И ПРОТИВОДЕЙСТВИЯ КОРРУПЦИИ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q21" value="1">Да, известно, постоянно слежу за этим</li>
+            <li><input type="radio" name="q21" value="2">Да, известно, но специально не слежу за этим</li>
+            <li><input type="radio" name="q21" value="3">Что-то слышал, но ничего определенного припомнить не могу</li>
+            <li><input type="radio" name="q21" value="4">Ничего не знаю об этом</li>
+            <li><input type="radio" name="q21" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q22" id="1">
+        <p class="p22" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            20.	О КАКИХ КОНКРЕТНЫХ МЕРОПРИЯТИЯХ ПО ПРОФИЛАКТИКЕ И ПРОТИВОДЕЙСТВИЮ КОРРУПЦИИ, ПРЕДПРИНИМАЕМЫХ НА ТЕРРИТОРИИ ЯРОСЛАВСКОЙ ОБЛАСТИ, ВЫ СЛЫШАЛИ?
+        </p>
+        <i>
+            (любое количество вариантов ответа)
+        </i>
+        <div class="ccount" hidden>14</div>
+        <ul>
+            <li><input type="checkbox" name="q22" value="1">Антикоррупционная экспертиза нормативно-правовых актов Ярославской области</li>
+            <li><input type="checkbox" name="q22" value="2">Деятельность в регионе Комиссии по координации работы по противодействию коррупции</li>
+            <li><input type="checkbox" name="q22" value="3">Плановые и внеплановые проверки государственных и муниципальных учреждений, предприятий, организаций, хозяйственных обществ</li>
+            <li><input type="checkbox" name="q22" value="4">Проведение дней бесплатной юридической помощи жителям Ярославской области, оказание бесплатных консультаций органами власти</li>
+            <li><input type="checkbox" name="q22" value="5">Работа антикоррупционного телефона доверия и антикоррупционных «прямых линий»</li>
+            <li><input type="checkbox" name="q22" value="6">Реализация Областной целевой программы и планов по противодействию коррупции</li>
+            <li><input type="checkbox" name="q22" value="7">Проведение «круглых столов» по антикоррупционной тематике с привлечением экспертов</li>
+            <li><input type="checkbox" name="q22" value="8">Проведение публичных слушаний с участием населения в городах и районах Ярославской области по наиболее значимым социальным и экономическим вопросам</li>
+            <li><input type="checkbox" name="q22" value="9">Освещение в СМИ (телевидение, радио, пресса) темы противодействия коррупции, антикоррупционная пропаганда и просвещение населения</li>
+            <li><input type="checkbox" name="q22" value="10">Размещение информации о работе органов власти на официальных интернет-сайтах</li>
+            <li><input type="checkbox" name="q22" value="11">Проверки сведений о доходах, расходах, имуществе и обязательствах имущественного характера служащих</li>
+            <li><input type="checkbox" name="q22" value="12">Проведение социологических исследований по изучению уровня коррупции в регионе</li>
+            <li><input type="checkbox" name="q22" value="13">Контроль за соблюдением законодательства Российской Федерации и иных нормативных правовых актов о контрактной системе в сфере закупок</li>
+            <li><input type="checkbox" name="q22" value="14">Проведение курсов повышения квалификации государственных и муниципальных служащих в сфере противодействия коррупции</li>
+            <li><input type="checkbox" name="q22" value="15">Не слышал ни о каких мероприятиях</li>
+        </ul>
+    </div>
+    <div class="question q23" id="1">
+        <p class="p23" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            21.	КАКИЕ ИЗ ВЫШЕПЕРЕЧИСЛЕННЫХ МЕРОПРИЯТИЙ ЯВЛЯЮТСЯ, НА ВАШ ВЗГЛЯД, НАИБОЛЕЕ ЭФФЕКТИВНЫМИ?
+        </p>
+        <div class="ccount" hidden>14</div>
+        <ul>
+            <li><input type="checkbox" name="q23" value="1">Антикоррупционная экспертиза нормативно-правовых актов Ярославской области</li>
+            <li><input type="checkbox" name="q23" value="2">Деятельность в регионе Комиссии по координации работы по противодействию коррупции</li>
+            <li><input type="checkbox" name="q23" value="3">Плановые и внеплановые проверки государственных и муниципальных учреждений, предприятий, организаций, хозяйственных обществ</li>
+            <li><input type="checkbox" name="q23" value="4">Проведение дней бесплатной юридической помощи жителям Ярославской области, оказание бесплатных консультаций органами власти</li>
+            <li><input type="checkbox" name="q23" value="5">Работа антикоррупционного телефона доверия и антикоррупционных «прямых линий»</li>
+            <li><input type="checkbox" name="q23" value="6">Реализация Областной целевой программы и планов по противодействию коррупции</li>
+            <li><input type="checkbox" name="q23" value="7">Проведение «круглых столов» по антикоррупционной тематике с привлечением экспертов</li>
+            <li><input type="checkbox" name="q23" value="8">Проведение публичных слушаний с участием населения в городах и районах Ярославской области по наиболее значимым социальным и экономическим вопросам</li>
+            <li><input type="checkbox" name="q23" value="9">Освещение в СМИ (телевидение, радио, пресса) темы противодействия коррупции, антикоррупционная пропаганда и просвещение населения</li>
+            <li><input type="checkbox" name="q23" value="10">Размещение информации о работе органов власти на официальных интернет-сайтах</li>
+            <li><input type="checkbox" name="q23" value="11">Проверки сведений о доходах, расходах, имуществе и обязательствах имущественного характера служащих</li>
+            <li><input type="checkbox" name="q23" value="12">Проведение социологических исследований по изучению уровня коррупции в регионе</li>
+            <li><input type="checkbox" name="q23" value="13">Контроль за соблюдением законодательства Российской Федерации и иных нормативных правовых актов о контрактной системе в сфере закупок</li>
+            <li><input type="checkbox" name="q23" value="14">Проведение курсов повышения квалификации государственных и муниципальных служащих в сфере противодействия коррупции</li>
+            <li><input type="checkbox" name="q23" value="15">Никакие из вышеперечисленных</li>
+        </ul>
+    </div>
+    <div class="question q24" id="1">
+        <p class="p24" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            22.	КАК ВЫ СЧИТАЕТЕ, ВЛАСТИ ЯРОСЛАВСКОЙ ОБЛАСТИ ДЕЛАЮТ ДЛЯ ПРОТИВОДЕЙСТВИЯ КОРРУПЦИИ ВСЕ ВОЗМОЖНОЕ, ДЕЛАЮТ МНОГО, ДЕЛАЮТ МАЛО ИЛИ ВООБЩЕ НИЧЕГО НЕ ДЕЛАЮТ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q24" value="1">Делают все возможное</li>
+            <li><input type="radio" name="q24" value="2">Делают много</li>
+            <li><input type="radio" name="q24" value="3">Делают мало</li>
+            <li><input type="radio" name="q24" value="4">Ничего не делают</li>
+            <li><input type="radio" name="q24" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q25" id="1">
+        <p class="p25" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            23.	С КАКИМ ИЗ ПРИВЕДЕННЫХ СУЖДЕНИЙ О  БОРЬБЕ С КОРРУПЦИЕЙ В ЯРОСЛАВСКОЙ ОБЛАСТИ ВЫ СОГЛАСНЫ?(один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q25" value="1">Руководство региона хочет и может эффективно бороться с коррупцией</li>
+            <li><input type="radio" name="q25" value="2">Руководство региона хочет, но не может эффективно бороться с коррупцией</li>
+            <li><input type="radio" name="q25" value="3">Руководство региона может, но не хочет эффективно бороться с коррупцией</li>
+            <li><input type="radio" name="q25" value="4">Руководство региона не хочет и не может эффективно бороться с коррупцией </li>
+            <li><input type="radio" name="q25" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q26" id="1">
+        <p class="p26" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            24.	НАСКОЛЬКО ВЫ УДОВЛЕТВОРЕНЫ ИЛИ НЕ УДОВЛЕТВОРЕНЫ ДЕЯТЕЛЬНОСТЬЮ ОРГАНОВ ВЛАСТИ ЯРОСЛАВСКОЙ ОБЛАСТИ ПО БОРЬБЕ С КОРРУПЦИЕЙ В РЕГИОНЕ? (один вариант ответа)
+        </p>
+        <ul>
+            <li><input type="radio" name="q26" value="1">Полностью удовлетворен</li>
+            <li><input type="radio" name="q26" value="2">Скорее удовлетворен</li>
+            <li><input type="radio" name="q26" value="3">Скорее не удовлетворен</li>
+            <li><input type="radio" name="q26" value="4">Не удовлетворен совсем</li>
+            <li><input type="radio" name="q26" value="5">Затрудняюсь ответить</li>
+        </ul>
+    </div>
+    <div class="question q27" id="1">
+        <p class="p27" hidden id="er">
+            Не выбран вариант ответа
+        </p>
+        <p>
+            25.	КАКИЕ, НА ВАШ ВЗГЛЯД, МЕРЫ В НАИБОЛЬШЕЙ СТЕПЕНИ МОГУТ ПРОТИВОДЕЙСТВОВАТЬ РАЗВИТИЮ КОРРУПЦИИ В РОССИИ?
+        </p>
+        <i>
+            (не более 5 вариантов ответа)
+        </i>
+        <div class="ccount" hidden>5</div>
+        <ul>
+            <li><input type="checkbox" name="q27" value="1">Усиление общественного и парламентского контроля за соблюдением антикоррупционного законодательства Российской Федерации</li>
+            <li><input type="checkbox" name="q27" value="2">Внедрение в практику механизма ротации государственных служащих</li>
+            <li><input type="checkbox" name="q27" value="3">Автоматизация системы предоставления государственных и муниципальных услуг</li>
+            <li><input type="checkbox" name="q27" value="4">Ужесточения уголовного наказания для тех, кто дает взятку</li>
+            <li><input type="checkbox" name="q27" value="5">Реформирование законодательства в части расширения полномочий следственных органов при расследовании коррупционных преступлений</li>
+            <li><input type="checkbox" name="q27" value="6">Совершенствование механизма антикоррупционной экспертизы нормативных правовых актов Российской Федерации</li>
+            <li><input type="checkbox" name="q27" value="7">Совершенствование системы и структуры государственных органов, оптимизация и конкретизация их полномочий</li>
+            <li><input type="checkbox" name="q27" value="8">Усиление контроля работы чиновников</li>
+            <li><input type="checkbox" name="q27" value="9">Обязательное декларирование чиновниками своих доходов и доходов своих семей и ближайших родственников</li>
+            <li><input type="checkbox" name="q27" value="10">Разработка системы мер, направленных на стимулирование добросовестного исполнения обязанностей государственной и муниципальной службы на высоком профессиональной уровне</li>
+            <li><input type="checkbox" name="q27" value="11">Проведение научно-исследовательских работ по измерению уровня коррупции в стране в целом и регионах России в частности</li>
+            <li><input type="checkbox" name="q27" value="12">Ужесточения уголовного наказания для тех, кто берет взятку</li>
+            <li><input type="checkbox" name="q27" value="13">Воспитание гражданского общества в духе противодействия коррупции, формирование нетерпимости к коррупции</li>
+            <li><input type="checkbox" name="q27" value="14">Освещение в средствах массовой информации фактов взяточничества и коррупции</li>
+            <li><input type="checkbox" name="q27" value="15">Обязательное декларирование чиновниками своих расходов и расходов своих семей и ближайших родственников</li>
+            <li><input type="checkbox" name="q27" value="16">Обеспечение справедливой и равной для всех доступности правосудия и повышение оперативности рассмотрения дел в судах</li>
+            <li><input type="checkbox" name="q27" value="17">Совершенствование норм и создание условий для справедливой конкуренции в ходе проведения закупок для государственных и муниципальных нужд в целях исключения возможности их произвольного толкования, дискриминации и предоставления неоправданных преимуществ</li>
+            <li><input type="checkbox" name="q27" value="18">Реализацию прав граждан на получение достоверной информации, повышение независимости средств массовой информации</li>
+            <li><input type="checkbox" name="q27" value="19">Создание системы контроля деятельности государственных и муниципальных служащих со стороны институтов гражданского общества</li>
+            <li><input type="checkbox" name="q27" value="20">Сокращение излишней численности государственных и муниципальных служащих с одновременным привлечением на государственную и муниципальную службу квалифицированных специалистов и созданием адекватных материальных стимулов в зависимости от объема и результатов работы</li>
+            <li><input type="checkbox" name="q27" value="21">Иные меры (укажите какие) <input type="text" class="q27" hidden /></li>
+        </ul>
+        <script>
+            $('input[name="q27"]').change(function () {
+                if ($(this).is(':checked') && $(this).val() == 21) {
+                    $('input[class$="q27"]').show();
+                }
+                else {
+                    if (!$(this).is(':checked') && $(this).val() == 21)
+                        $('input[class$="q27"]').hide();
+                }
+            });
+        </script>
+    </div>
+    <p>
+        БЛАГОДАРИМ ВАС ЗА УЧАСТИЕ В ОПРОСЕ!
+        УСПЕХОВ ВАМ В РАБОТЕ!
+    </p>
+    <p><input type="checkbox" name="if" id="if" />Нажимая на кнопку "ОТПРАВИТЬ", Вы даете <a href="~/Content/Политика конфиденциальности и согласие на обработку персональных данных.docx">согласие на обработку персональных данных и соглашаетесь c политикой конфиденциальности.</a></p>
+    <button id="SaveData" disabled>ОТПРАВИТЬ</button>
+</div>
+<style>
+    li {
+        list-style-type: none; /* Убираем маркеры */
+    }
+
+    p {
+        font-weight: 600;
+    }
+
+    .question {
+        width: 100%;
+        margin: 15px;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    input {
+        margin-right: 20px !important;
+    }
+
+    .table {
+        margin-right: 0px !important;
+    }
+
+    #er {
+        color: red;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        $('input[type="checkbox"]').bind('click', function () {
+            $('.form').find('p#er').each(function () {
+                $(this).hide();
+            });
+            var parent_div = $('div[class$="' + $(this).attr('name') + '"]');
+            var ccount = $('div[class$="' + $(this).attr('name') + '"]').find('div[class$="ccount"]').text();
+            if (LimitAnswer(parent_div) == ccount) {
+                parent_div.children('ul').find('input[name="' + $(this).attr('name') + '"]').each(function () {
+                    if (!$(this).is(':checked')) $(this).prop('disabled', true);
+                });
+            }
+            else {
+                if (LimitAnswer(parent_div) < ccount) {
+                    parent_div.children('ul').find('input[name="' + $(this).attr('name') + '"]').each(function () {
+                        if (!$(this).is(':checked')) $(this).prop('disabled', false);
+                    });
+                }
+            }
+        });
+    });
+
+    $('textarea').click(function () {
+        $('.form').find('p#er').each(function () {
+            $(this).hide();
+        });
+    });
+
+    $('input[type="radio"]').click(function () {
+        $('.form').find('p#er').each(function () {
+            $(this).hide();
+        });
+
+    });
+
+    $('#if').click(function () {
+        if ($(this).is(':checked')) $('#SaveData').prop('disabled', false);
+        else $('#SaveData').prop('disabled', true);
+    });
+
+
+    $('input[name="q8"]').change(function () {
+        if ($(this).is(':checked') && ($(this).val() == 4 || $(this).val() == 5)) {
+            $('div[class$="q9"]').hide();
+        }
+        else {
+            $('div[class$="q9"]').show();
+        }
+    });
+
+
+    function LimitAnswer(block) {
+        var count_checked_answer = 0;
+        block.children('ul').find('input').each(function () {
+            if ($(this).is(':checked')) count_checked_answer++;
+        });
+        return count_checked_answer;
+    };
+
+    $('button[id="SaveData"]').click(function () {
+
+        var conteiner = [];
+        for (var i = 1; i <= 27; i++) {
+            switch ($('div[class$="q' + i + '"]').attr('id')) {
+                case '1':
+                    switch ($('div[class$="q' + i + '"]').find('input:first').attr('type')) {
+                        case 'checkbox':
+                            var count = 0;
+                            $('div[class$="q' + i + '"]').find('input').each(function () {
+                                if ($(this).is(':checked')) {
+                                    conteiner.push($(this).attr('value'));
+                                    count++;
+                                }
+                            });
+                            var ccount = $('div[class$="q' + i + '"]').find('div[class$="ccount"]').text();
+                            while (count < ccount) {
+                                conteiner.push('');
+                                count++;
+                            }
+                            if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
+                                conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
+                            } else {
+                                conteiner.push('');
+                            };
+                            break;
+                        case 'radio':
+                            if ($('div[class$="q' + i + '"]').find('input:checked').length == 0) {
+                                conteiner.push('');
+                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').length > 0) conteiner.push('');
+                            }
+                            else {
+                                $('div[class$="q' + i + '"]').find('input').each(function () {
+                                    if ($(this).is(':checked')) conteiner.push($(this).attr('value'));
+                                });
+                                if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').length > 0)
+                                    if ($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val() != '') {
+                                        conteiner.push($('div[class$="q' + i + '"]').find('input[class$="q' + i + '"]').val());
+                                    } else {
+                                        conteiner.push('');
+                                    };
+                            }
+                            break;
+                    }
+                    break;
+                case '2':
+                    $('div[class$="q' + i + '"]').find('textarea').each(function () {
+                        conteiner.push($(this).val());
+                    });
+                    break;
+                case '3':
+                    $('div[class$="q' + i + '"]').find('tr:not(.tableheader)').each(function () {
+                        if ($(this).find('input:checked').length >= 1)
+                            conteiner.push($(this).find('input:checked').attr('value'));
+                        else
+                            conteiner.push('');
+                    });
+                    break;
+            }
+        }
+        //
+        //ЗАПРОС НА СОХРАНЕНИЕ
+        //фаил
+        //сервер
+        $.post("/Home/postSaveOpYA", { mass: conteiner })
+            .success(function (code) {
+                console.log(code);
+                $('div.form').empty().load('/Home/SuccessOpros?id_op=' + code);
+                //window.location.reload();
+            })
+            .error(function () {
+                console.error("Ошибка отправки данных на postSaveOp");
+            });
+        console.log('save =>>>>>>', conteiner);
+    });
+</script>
