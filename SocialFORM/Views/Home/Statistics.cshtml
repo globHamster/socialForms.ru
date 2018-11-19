@@ -154,6 +154,10 @@
 <div class="res2">
 
 </div>
+<div class="res3">
+    Итог:
+    @ViewData["Test"]
+</div>
 <script type="text/javascript">
     //
     //Запрос на список проекта
@@ -312,7 +316,7 @@
         $("#jqgStatRes").jqGrid({
             url: "/Home/GetDataStatResult?id=" + spr + "&idop=" + sop + "&sd=" + sd + "&ed=" + ed + "&st=" + st + "&et=" + et,
             datatype: "json",
-            colNames: ['№', 'Дата', 'К.Польз.', 'К.Анкет', 'К.Анк.Час', 'Ср.Время', 'Мин.Длит', 'Макс.Длит', 'Сред.Откл', 'В.Входа', 'В.Выхода', 'В.Системе', '1..N', 'Бездействие'],
+            colNames: ['№', 'Дата', 'К.Польз.', 'К.Анкет', 'К.Анк.Час', 'Ср.Время', 'Мин.Длит', 'Макс.Длит', 'Сред.Откл', '1..N'],
             colModel: [
                 { name: 'IdView', index: 'IdView', width: 50, stype: 'text', key: true, editable: true },
                 { name: 'DataView', index: 'DataView', width: 150, sortable: true, editable: true, edittype: 'text' },
@@ -323,11 +327,11 @@
                 { name: 'MinLenghtView', index: 'MinLenghtView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 { name: 'MaxLenghtView', index: 'MaxLenghtView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 { name: 'MediumView', index: 'MediumView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'TimeUpView', index: 'TimeUpView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'TimeOutView', index: 'TimeOutView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'TimeWorkView', index: 'TimeWorkView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'OneNView', index: 'OneNView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'TimeAfkView', index: 'TimeAfkView', width: 100, sortable: true, editable: true, edittype: 'text' }
+                //{ name: 'TimeUpView', index: 'TimeUpView', width: 100, sortable: true, editable: true, edittype: 'text' },
+                //{ name: 'TimeOutView', index: 'TimeOutView', width: 100, sortable: true, editable: true, edittype: 'text' },
+                //{ name: 'TimeWorkView', index: 'TimeWorkView', width: 100, sortable: true, editable: true, edittype: 'text' },
+                { name: 'OneNView', index: 'OneNView', width: 100, sortable: true, editable: true, edittype: 'text' }
+                //{ name: 'TimeAfkView', index: 'TimeAfkView', width: 100, sortable: true, editable: true, edittype: 'text' }
             ],
             rowNum: 25,
             rowList: [25, 50, 75],

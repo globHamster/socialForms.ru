@@ -1637,28 +1637,36 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
-        //[HttpGet]
-        //public async Task<JsonResult> GetDiapazon(string NameD, string KodFO, string KodOB, string KodGOR, List<listRange> Diapaz)
-        //{
-        //    bool flag = false;
-        //    NumberAppContext context = new NumberAppContext();
-        //    Diap res = new Diap();
-        //    System.Diagnostics.Debug.WriteLine(NameD);
-        //    //foreach (var item in Diapaz)
-        //    //{
-        //    //    res.Kod = item.kod;
-        //    //    res.KodFO = KodFO;
-        //    //    res.KodOB = KodOB;
-        //    //    res.KodGOR = KodGOR;
-        //    //    res.NameD = NameD;
-        //    //    res.Num1 = "";
-        //    //    res.NumN = "";
-        //    //}
-        //    context.SetDiap.Add(res);
-        //    await context.SaveChangesAsync();
-        //    flag = true;
-        //    return Json(flag, JsonRequestBehavior.AllowGet);
-        //}
+        [HttpGet]
+        public JsonResult GetDiapazon(string NameD, string KodFO, string KodOB, string KodGOR, string str_dip)
+        {
+            bool flag = false;
+            NumberAppContext context = new NumberAppContext();
+            Diap res = new Diap();
+            var diap = str_dip.Split('#');
+            foreach (var i in diap)
+            {
+                System.Diagnostics.Debug.WriteLine(i);
+            }
+            foreach (var item in diap)
+            {
+                if (item != "")
+                {
+                    var diap_tmp = item.Split('|');
+                    res.Kod = diap_tmp[0];
+                    res.KodFO = KodFO;
+                    res.KodOB = KodOB;
+                    res.KodGOR = KodGOR;
+                    res.NameD = NameD;
+                    res.Num1 = diap_tmp[1];
+                    res.NumN = diap_tmp[2];
+                    context.SetDiap.Add(res);
+                    context.SaveChanges();
+                    flag = true;
+                }
+            }
+            return Json(flag, JsonRequestBehavior.AllowGet);
+        }
 
         [HttpGet]
         public JsonResult GetListFO()
@@ -1783,8 +1791,10 @@ namespace SocialFORM.Controllers
             }
             if (st != "-1" && et != "-1")
             {
-                System.Diagnostics.Debug.WriteLine("Nice");
-                tmp1 = tmp1.Where(u => TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
+                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Time) <= Convert.ToDateTime(ed + " " + et) && Convert.ToDateTime(u.Data) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Data) <= Convert.ToDateTime(ed + " " + et)).ToList();
+                //tmp1_1 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
+                //tmp1_2 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 1 && Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
+                //tmp1_3 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
             }
             foreach (var item in tmp1)
             {
@@ -1812,6 +1822,9 @@ namespace SocialFORM.Controllers
         {
             List<StatResViewModel> StatRes = new List<StatResViewModel>();
             List<ResultModel> tmp1 = db.SetResultModels.ToList();
+            List<ResultModel> tmp1_1 = db.SetResultModels.ToList();
+            List<ResultModel> tmp1_2 = db.SetResultModels.ToList();
+            List<ResultModel> tmp1_3 = db.SetResultModels.ToList();
             List<ResultModel> tmp1_t = db.SetResultModels.ToList();
             List<SessionHubModel> tmp2 = new List<SessionHubModel>();
             tmp2 = db.SetSessionHubModel.Where(u => u.UserRole == "2").ToList();
@@ -1834,7 +1847,10 @@ namespace SocialFORM.Controllers
             }
             if (st != "-1" && et != "-1")
             {
-                tmp1 = tmp1.Where(u => TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
+                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Time) <= Convert.ToDateTime(ed + " " + et) && Convert.ToDateTime(u.Data) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Data) <= Convert.ToDateTime(ed + " " + et)).ToList();
+                //tmp1_1 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
+                //tmp1_2 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 1 && Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
+                //tmp1_3 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
             }
 
             //
@@ -1936,35 +1952,35 @@ namespace SocialFORM.Controllers
                             countUser = sessionHubs.Where(q => q.EndTime == null || TimeSpan.Parse(q.EndTime).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserId).Select(group => group.First()).Count();
                         }
 
-                        string sessionStartTime = "";
-                        string sessionEndTime = "";
-                        string sessionTimeInSystem = "00:00:00";
-                        string sessionAfkTime = "00:00:00";
-                        if (tmp2.Count != 0)
-                        {
-                            sessionStartTime = tmp2.First().StartTime;
-                            sessionEndTime = tmp2.Reverse<SessionHubModel>().First().EndTime;
-                            if (sessionEndTime == null) sessionEndTime = DateTime.Now.ToLongTimeString();
-                            foreach (var q in tmp2)
-                            {
-                                if (q.TimeInSystem == null)
-                                {
-                                    sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(DateTime.Now.ToLongTimeString()) - TimeSpan.Parse(q.StartTime)).ToString();
-                                }
-                                else
-                                {
-                                    sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
-                                }
-                                if (q.AfkTime == null)
-                                {
-                                    sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse("00:00:00")).ToString();
-                                }
-                                else
-                                {
-                                    sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
-                                }
-                            }
-                        }
+                        //string sessionStartTime = "";
+                        //string sessionEndTime = "";
+                        //string sessionTimeInSystem = "00:00:00";
+                        //string sessionAfkTime = "00:00:00";
+                        //if (tmp2.Count != 0)
+                        //{
+                        //    sessionStartTime = tmp2.First().StartTime;
+                        //    sessionEndTime = tmp2.Reverse<SessionHubModel>().First().EndTime;
+                        //    if (sessionEndTime == null) sessionEndTime = DateTime.Now.ToLongTimeString();
+                        //    foreach (var q in tmp2)
+                        //    {
+                        //        if (q.TimeInSystem == null)
+                        //        {
+                        //            sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(DateTime.Now.ToLongTimeString()) - TimeSpan.Parse(q.StartTime)).ToString();
+                        //        }
+                        //        else
+                        //        {
+                        //            sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
+                        //        }
+                        //        if (q.AfkTime == null)
+                        //        {
+                        //            sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse("00:00:00")).ToString();
+                        //        }
+                        //        else
+                        //        {
+                        //            sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
+                        //        }
+                        //    }
+                        //}
 
                         StatResViewModel tmp_statResViewModel = new StatResViewModel();
                         tmp_statResViewModel.IdView = countID;
@@ -1976,11 +1992,11 @@ namespace SocialFORM.Controllers
                         tmp_statResViewModel.MinLenghtView = min.ToString();
                         tmp_statResViewModel.MaxLenghtView = max.ToString();
                         tmp_statResViewModel.MediumView = ttmp2.ToLongTimeString();
-                        tmp_statResViewModel.TimeUpView = tmp2.Count != 0 ? sessionStartTime : "0";
-                        tmp_statResViewModel.TimeOutView = tmp2.Count != 0 ? sessionEndTime : "0";
-                        tmp_statResViewModel.TimeWorkView = tmp2.Count != 0 ? sessionTimeInSystem : "0";
+                        //tmp_statResViewModel.TimeUpView = tmp2.Count != 0 ? sessionStartTime : "0";
+                        //tmp_statResViewModel.TimeOutView = tmp2.Count != 0 ? sessionEndTime : "0";
+                        //tmp_statResViewModel.TimeWorkView = tmp2.Count != 0 ? sessionTimeInSystem : "0";
                         tmp_statResViewModel.OneNView = t1.ToString(); ;
-                        tmp_statResViewModel.TimeAfkView = tmp2.Count != 0 ? sessionAfkTime : "0";
+                        //tmp_statResViewModel.TimeAfkView = tmp2.Count != 0 ? sessionAfkTime : "0";
 
                         StatRes.Add(tmp_statResViewModel);
                         countID++;
@@ -2035,35 +2051,35 @@ namespace SocialFORM.Controllers
                     {
                         countUser = sessionHubs.Where(q => q.EndTime == null || TimeSpan.Parse(q.EndTime).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserId).Select(group => group.First()).Count();
                     }
-                    string sessionStartTime = "";
-                    string sessionEndTime = "";
-                    string sessionTimeInSystem = "00:00:00";
-                    string sessionAfkTime = "00:00:00";
-                    if (tmp2.Count != 0)
-                    {
-                        sessionStartTime = tmp2.First().StartTime;
-                        sessionEndTime = tmp2.Reverse<SessionHubModel>().First().EndTime;
-                        if (sessionEndTime == null) sessionEndTime = DateTime.Now.ToLongTimeString();
-                        foreach (var q in tmp2)
-                        {
-                            if (q.TimeInSystem == null)
-                            {
-                                sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(DateTime.Now.ToLongTimeString()) - TimeSpan.Parse(q.StartTime)).ToString();
-                            }
-                            else
-                            {
-                                sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
-                            }
-                            if (q.AfkTime == null)
-                            {
-                                sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse("00:00:00")).ToString();
-                            }
-                            else
-                            {
-                                sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
-                            }
-                        }
-                    }
+                    //string sessionStartTime = "";
+                    //string sessionEndTime = "";
+                    //string sessionTimeInSystem = "00:00:00";
+                    //string sessionAfkTime = "00:00:00";
+                    //if (tmp2.Count != 0)
+                    //{
+                    //    sessionStartTime = tmp2.First().StartTime;
+                    //    sessionEndTime = tmp2.Reverse<SessionHubModel>().First().EndTime;
+                    //    if (sessionEndTime == null) sessionEndTime = DateTime.Now.ToLongTimeString();
+                    //    foreach (var q in tmp2)
+                    //    {
+                    //        if (q.TimeInSystem == null)
+                    //        {
+                    //            sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(DateTime.Now.ToLongTimeString()) - TimeSpan.Parse(q.StartTime)).ToString();
+                    //        }
+                    //        else
+                    //        {
+                    //            sessionTimeInSystem = (TimeSpan.Parse(sessionTimeInSystem) + TimeSpan.Parse(q.TimeInSystem)).ToString();
+                    //        }
+                    //        if (q.AfkTime == null)
+                    //        {
+                    //            sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse("00:00:00")).ToString();
+                    //        }
+                    //        else
+                    //        {
+                    //            sessionAfkTime = (TimeSpan.Parse(sessionAfkTime) + TimeSpan.Parse(q.AfkTime)).ToString();
+                    //        }
+                    //    }
+                    //}
 
                     StatResViewModel tmp_statResViewModel = new StatResViewModel();
                     tmp_statResViewModel.IdView = countID;
@@ -2075,16 +2091,162 @@ namespace SocialFORM.Controllers
                     tmp_statResViewModel.MinLenghtView = "00:00:00";
                     tmp_statResViewModel.MaxLenghtView = "00:00:00";
                     tmp_statResViewModel.MediumView = "00:00:00";
-                    tmp_statResViewModel.TimeUpView = tmp2.Count != 0 ? sessionStartTime : "0";
-                    tmp_statResViewModel.TimeOutView = tmp2.Count != 0 ? sessionEndTime : "0";
-                    tmp_statResViewModel.TimeWorkView = tmp2.Count != 0 ? sessionTimeInSystem : "0";
+                    //tmp_statResViewModel.TimeUpView = tmp2.Count != 0 ? sessionStartTime : "0";
+                    //tmp_statResViewModel.TimeOutView = tmp2.Count != 0 ? sessionEndTime : "0";
+                    //tmp_statResViewModel.TimeWorkView = tmp2.Count != 0 ? sessionTimeInSystem : "0";
                     tmp_statResViewModel.OneNView = "00:00:00";
-                    tmp_statResViewModel.TimeAfkView = tmp2.Count != 0 ? sessionAfkTime : "0";
+                    //tmp_statResViewModel.TimeAfkView = tmp2.Count != 0 ? sessionAfkTime : "0";
 
                     StatRes.Add(tmp_statResViewModel);
                     countID++;
                 }
             }
+
+            //ИТОГ
+            double ccount = 0;
+            double ccountMAX = 0;
+            double ccountMIN = 0;
+            double tmpd1 = 0;
+            double tmpd1MAX = 0;
+            double tmpd1MIN = 0;
+            double tmpd2 = 0;
+            double tmpd3 = 0;
+            double tmpd3MAX = 0;
+            double tmpd3MIN = 0;
+            long ticks1 = 0;
+            long ticks1MAX = 0;
+            long ticks1MIN = 0;
+            long ticks2 = 0;
+            long ticks3 = 0;
+            long ticks4 = 0;
+            long ticks4MAX = 0;
+            long ticks4MIN = 0;
+            long ticks5 = 0;
+            long ticks5MAX = 0;
+            long ticks5MIN = 0;
+            long ticksmax = 0;
+            long ticksmin = 0;
+
+            StatResItogViewModel model = new StatResItogViewModel();
+            ticksmax = TimeSpan.Parse(StatRes.First().MaxLenghtView).Ticks;
+            ticksmin = TimeSpan.Parse(StatRes.First().MinLenghtView).Ticks;
+            ccountMAX = ccountMIN = Convert.ToDouble(StatRes.First().CountUserView);
+            tmpd1MAX = tmpd1MIN = Convert.ToDouble(StatRes.First().CountProjectView);
+            tmpd3MAX = tmpd3MIN = Convert.ToDouble(StatRes.First().CountHourView);
+            ticks1MAX = ticks1MIN = TimeSpan.Parse(StatRes.First().MediumTimeView).Ticks;
+            ticks4MAX = ticks4MIN = TimeSpan.Parse(StatRes.First().MediumView).Ticks;
+            ticks5MAX = ticks5MIN = TimeSpan.Parse(StatRes.First().OneNView).Ticks;
+            foreach (var i in StatRes)
+            {
+                ccount += Convert.ToDouble(i.CountUserView);
+                if (ccountMAX < Convert.ToDouble(i.CountUserView)) ccountMAX = Convert.ToDouble(i.CountUserView);
+                if (ccountMIN > Convert.ToDouble(i.CountUserView)) ccountMIN = Convert.ToDouble(i.CountUserView);
+                tmpd1 += Convert.ToDouble(i.CountProjectView);
+                if (tmpd1MAX < Convert.ToDouble(i.CountProjectView)) tmpd1MAX = Convert.ToDouble(i.CountProjectView);
+                if (tmpd1MIN > Convert.ToDouble(i.CountProjectView)) tmpd1MIN = Convert.ToDouble(i.CountProjectView);
+                tmpd2 += Convert.ToDouble(i.CountProjectView);
+                tmpd3 += Convert.ToDouble(i.CountHourView);
+                if (tmpd3MAX < Convert.ToDouble(i.CountHourView)) tmpd3MAX = Convert.ToDouble(i.CountHourView);
+                if (tmpd3MIN > Convert.ToDouble(i.CountHourView)) tmpd3MIN = Convert.ToDouble(i.CountHourView);
+                ticks1 += TimeSpan.Parse(i.MediumTimeView).Ticks;
+                if (ticks1MAX < TimeSpan.Parse(i.MediumTimeView).Ticks) ticks1MAX = TimeSpan.Parse(i.MediumTimeView).Ticks;
+                if (ticks1MIN > TimeSpan.Parse(i.MediumTimeView).Ticks) ticks1MIN = TimeSpan.Parse(i.MediumTimeView).Ticks;
+                ticks2 += TimeSpan.Parse(i.MinLenghtView).Ticks;
+                if (ticksmin > TimeSpan.Parse(i.MinLenghtView).Ticks) ticksmin = TimeSpan.Parse(i.MinLenghtView).Ticks;
+                ticks3 += TimeSpan.Parse(i.MaxLenghtView).Ticks;
+                if (ticksmax < TimeSpan.Parse(i.MaxLenghtView).Ticks) ticksmax = TimeSpan.Parse(i.MaxLenghtView).Ticks;
+                ticks4 += TimeSpan.Parse(i.MediumView).Ticks;
+                if (ticks4MAX < TimeSpan.Parse(i.MediumView).Ticks) ticks4MAX = TimeSpan.Parse(i.MediumView).Ticks;
+                if (ticks4MIN > TimeSpan.Parse(i.MediumView).Ticks) ticks4MIN = TimeSpan.Parse(i.MediumView).Ticks;
+                ticks5 += TimeSpan.Parse(i.OneNView).Ticks;
+                if (ticks5MAX < TimeSpan.Parse(i.OneNView).Ticks) ticks5MAX = TimeSpan.Parse(i.OneNView).Ticks;
+                if (ticks5MIN > TimeSpan.Parse(i.OneNView).Ticks) ticks5MIN = TimeSpan.Parse(i.OneNView).Ticks;
+            }
+
+            StatResViewModel II = new StatResViewModel();
+            StatResViewModel SR = new StatResViewModel();
+            StatResViewModel MAX = new StatResViewModel();
+            StatResViewModel MIN = new StatResViewModel();
+            //ИТОГ
+            II.DataView = "ИТОГ:";
+            //Количество пользователей
+            II.CountUserView = "";
+            //Кол-во анкет
+            II.CountProjectView = tmpd1.ToString("0");
+            //Количество анкет в час
+            II.CountHourView = "";
+            //Среднее время 
+            II.MediumTimeView = "";
+            //Минимально
+            II.MinLenghtView = "";
+            //Максимальное
+            II.MaxLenghtView = "";
+            //Среднее
+            II.MediumView = TimeSpan.FromTicks(ticks4).ToString(@"hh\:mm\:ss");
+            //Общее время
+            II.OneNView = TimeSpan.FromTicks(ticks5).ToString();
+
+            //СРЕДНЕЕ
+            SR.DataView = "СРЕДНЕЕ:";
+            //Количество пользователей
+            SR.CountUserView = (ccount / StatRes.Count).ToString("0");
+            //Кол-во анкет
+            SR.CountProjectView = (tmpd2 / StatRes.Count).ToString("0.0");
+            //Количество анкет в час
+            SR.CountHourView = (tmpd3 / StatRes.Count).ToString("0.0");
+            //Среднее время
+            SR.MediumTimeView = TimeSpan.FromTicks(ticks1 / (long)StatRes.Count).ToString(@"hh\:mm\:ss");
+            //Минимально
+            SR.MinLenghtView = TimeSpan.FromTicks(ticks2 / (long)StatRes.Count).ToString(@"hh\:mm\:ss");
+            //Максимальное
+            SR.MaxLenghtView = TimeSpan.FromTicks(ticks3 / (long)StatRes.Count).ToString(@"hh\:mm\:ss");
+            //Среднее
+            SR.MediumView = TimeSpan.FromTicks(ticks4 / (long)StatRes.Count).ToString(@"hh\:mm\:ss");
+            //Общее время
+            SR.OneNView = TimeSpan.FromTicks(ticks5 / (long)StatRes.Count).ToString(@"hh\:mm\:ss");
+
+            //MAX
+            MAX.DataView = "MAX:";
+            //Количество пользователей
+            MAX.CountUserView = ccountMAX.ToString("0");
+            //Кол-во анкет
+            MAX.CountProjectView = (tmpd1MAX).ToString("0");
+            //Количество анкет в час
+            MAX.CountHourView = (tmpd3MAX).ToString("0.0");
+            //Среднее время
+            MAX.MediumTimeView = TimeSpan.FromTicks(ticks1MAX).ToString(@"hh\:mm\:ss");
+            //Минимально
+            MAX.MinLenghtView = "";
+            //Максимальное
+            MAX.MaxLenghtView = TimeSpan.FromTicks(ticksmax).ToString(@"hh\:mm\:ss");
+            //Среднее
+            MAX.MediumView = TimeSpan.FromTicks(ticks4MAX).ToString(@"hh\:mm\:ss");
+            //Общее время
+            MAX.OneNView = TimeSpan.FromTicks(ticks5MAX).ToString(@"hh\:mm\:ss");
+
+            //MIN
+            MIN.DataView = "MIN:";
+            //Количество пользователей
+            MIN.CountUserView = ccountMIN.ToString("0");
+            //Кол-во анкет
+            MIN.CountProjectView = (tmpd1MIN).ToString("0");
+            //Количество анкет в час
+            MIN.CountHourView = (tmpd3MIN).ToString("0.0");
+            //Среднее время
+            MIN.MediumTimeView = TimeSpan.FromTicks(ticks1MIN).ToString(@"hh\:mm\:ss");
+            //Минимально
+            MIN.MinLenghtView = TimeSpan.FromTicks(ticksmin).ToString(@"hh\:mm\:ss");
+            //Максимальное
+            MIN.MaxLenghtView = "";
+            //Среднее
+            MIN.MediumView = TimeSpan.FromTicks(ticks4MIN).ToString(@"hh\:mm\:ss");
+            //Общее время
+            MIN.OneNView = TimeSpan.FromTicks(ticks5MIN).ToString(@"hh\:mm\:ss");
+
+            StatRes.Add(II);
+            StatRes.Add(SR);
+            StatRes.Add(MAX);
+            StatRes.Add(MIN);
             return JsonConvert.SerializeObject(StatRes);
         }
 
@@ -2293,6 +2455,17 @@ namespace SocialFORM.Controllers
                 pc.Database.ExecuteSqlCommand("UPDATE name_table SET Name=null WHERE Id=" + id);
                 pc.Database.ExecuteSqlCommand("TRUNCATE TABLE table" + id);
             }
+        }
+        public class StatResItogViewModel
+        {
+            public string CountViewI { get; set; }
+            public string CountDateViewI { get; set; }
+            public string CountHourViewI { get; set; }
+            public string MediumTimeViewI { get; set; }
+            public string MinLenghtViewI { get; set; }
+            public string MaxLenghtViewI { get; set; }
+            public string MediumViewI { get; set; }
+            public string OneNViewI { get; set; }
         }
 
         public void TimeAfkBase(string time)

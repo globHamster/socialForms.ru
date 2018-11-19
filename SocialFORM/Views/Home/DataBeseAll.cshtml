@@ -320,12 +320,17 @@
         var currentGOR = GORSelObj.value;
         var named = document.getElementById('named');
         var currentNamed = named.value;
-        console.log(listRange);
+        var str = "";
+        listRange.forEach(function (item, i, listRange) {
+            console.log(i + ": " + item.sd + " " + item.ed + " (массив:" + listRange + ")");
+            str += item.kod + "|" + item.sd + "|" + item.ed + "#" 
+        });
+        console.log(str);
         if (currentFO == "" || currentOB == "" || currentGOR == "") {
             alert("Ошибка!");
         }
         else {
-            var data = { NameD: currentNamed, KodFO: currentFO, KodOB: currentOB, KodGOR: currentGOR, Diapaz: listRange };
+            var data = { NameD: currentNamed, KodFO: currentFO, KodOB: currentOB, KodGOR: currentGOR, str_dip: str };
             console.log("===>>>>", data);
             $.get("/Home/GetDiapazon", data)
                 .success(function (res) {

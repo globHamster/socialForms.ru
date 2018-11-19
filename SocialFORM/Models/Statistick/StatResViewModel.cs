@@ -17,9 +17,9 @@ namespace SocialFORM.Models.Statistick
         public string MaxLenghtView { get; set; }
         public string MediumView { get; set; }
         public string OneNView { get; set; }
-        public string TimeUpView { get; set; }
-        public string TimeOutView { get; set; }
-        public string TimeWorkView { get; set; }
-        public string TimeAfkView { get; set; }
+        //public string TimeUpView { get; set; }
+        //public string TimeOutView { get; set; }
+        //public string TimeWorkView { get; set; }
+        //public string TimeAfkView { get; set; }
     }
 }
