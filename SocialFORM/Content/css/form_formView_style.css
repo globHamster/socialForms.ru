@@ -1,0 +1,210 @@
+﻿.tool_layer {
+    background-color: #FFF;
+    border-bottom: 1px solid black;
+    height: 35px;
+}
+
+.view_form {
+    padding: 20px;
+    margin-bottom: 15px;
+    background-color: #ccc;
+}
+
+.answer_table {
+    margin-bottom: 20px;
+}
+
+div.title {
+    padding: 20px;
+    border: 2px solid black;
+    background-color: #72afff;
+    text-align: center;
+    font-size: 30px;
+    font-family: 'Courier New';
+    font-weight: 900;
+}
+
+div.wrong_choise {
+    padding: 5px;
+    margin: 5px;
+    display: none;
+    border: 1px solid red;
+    background-color: #ff9999;
+}
+
+tr.table_answer:first-child {
+    background-color: #72afff;
+}
+
+td.table_answer:first-child {
+    background-color: #72afff;
+}
+
+td.table_answer {
+    border: 1px solid black;
+    text-align: center;
+    min-width: 20px;
+}
+
+tr.beginer > td {
+    min-width: 100px;
+}
+
+#map {
+    width: 600px;
+    height: 400px;
+    padding: 0;
+    margin: 0;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+    input[type="radio"] + label span {
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        margin: -1px 4px 0 0;
+        vertical-align: middle;
+        cursor: pointer;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+    }
+
+    input[type="radio"] + label span {
+        border: 2px solid black;
+        background-color: #fff;
+    }
+
+    input[type="radio"]:checked + label span {
+        background-color: #72aFFF;
+    }
+
+    input[type="radio"] + label span,
+    input[type="radio"]:checked + label span {
+        -webkit-transition: background-color 0.2s linear;
+        -o-transition: background-color 0.2s linear;
+        -moz-transition: background-color 0.3s linear;
+        transition: background-color 0.2s linear;
+    }
+
+.TextLimitQuota {
+    position: fixed;
+    display: none;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(100, 100, 100, 0.4);
+}
+
+.NewButton {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    height: 30px;
+    top: calc(50% - 190px);
+    left: calc(50% - 50px);
+    background-color: #008dd2;
+    color: #fff;
+    font-family: 'Century Gothic';
+}
+
+.TextDiv {
+    position: relative;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    top: calc(50% - 200px);
+    left: calc(50% - 200px);
+    color: #f44336;
+    font-size: 24px;
+    font-family: 'Century Gothic';
+    font-weight: 600;
+    width: 400px;
+    height: 400px;
+    border: 5px inset #008dd2;
+    background-color: #fff;
+}
+
+.Scaled {
+    transform: scale(1.1,1.1);
+    box-shadow: 5px 5px black;
+    transition: 0.1s linear;
+}
+
+.NotScaled {
+    transform: scale(1,1);
+    box-shadow: 0px 0px black;
+    transition: 0.1s linear;
+}
+
+@media (any-pointer: coarse) {
+    @media screen and (max-width: 768px) {
+        .previous {
+            width: 40px;
+            height: 40px;
+        }
+
+        .next {
+            width: 40px;
+            height: 40px;
+        }
+    }
+    @media screen and (max-width: 1920px){
+        .previous {
+            width: 60px;
+            height: 60px;
+        }
+
+        .next {
+            width: 60px;
+            height: 60px;
+        }
+
+        td.tool_layer {
+            width: 60px;
+            height: 90px;
+        }
+    }
+
+    .tool_layer {
+        min-height: 60px;
+        min-width: 60px;
+        height: 80px;
+    }
+
+    
+
+    li {
+        display: inline;
+    }
+
+    div#session {
+        display: none;
+    }
+
+    div.Chat {
+        display: none;
+    }
+
+    div.min > div.row {
+        display: inline-flex;
+    }
+
+    div.tmp {
+        display: inline;
+    }
+}

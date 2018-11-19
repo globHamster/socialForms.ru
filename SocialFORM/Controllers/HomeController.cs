@@ -38,7 +38,7 @@ namespace SocialFORM.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin , Operator")]
+        [Authorize(Roles = "Admin , Operator, Customer")]
         public ActionResult _Index()
         {
             string result2 = "Вы не авторизованы";
@@ -455,6 +455,7 @@ namespace SocialFORM.Controllers
             products.Columns.Add("Начало анкеты");
             products.Columns.Add("Конец анкеты");
             products.Columns.Add("Учебный день");
+            products.Columns.Add("Координаты");
             foreach (var item in listGroupExport)
             {
                 QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
@@ -464,7 +465,7 @@ namespace SocialFORM.Controllers
                         if (item.GroupID > 0)
                             products.Columns.Add(("Г" + item.GroupID + " " + item.GroupName.ToString()).ToString());
                         else
-                            products.Columns.Add(item.GroupName.ToString());
+                            products.Columns.Add("(Single)"+item.GroupName.ToString());
                         if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
                         {
                             if (item.GroupID > 0)
@@ -486,7 +487,7 @@ namespace SocialFORM.Controllers
                                 if (item.GroupID > 0)
                                     products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
                                 else
-                                    products.Columns.Add(item.GroupName + "_" + i);
+                                    products.Columns.Add("(Multi)"+item.GroupName + "_" + i);
                             }
                             if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
                             {
@@ -517,7 +518,7 @@ namespace SocialFORM.Controllers
                                 if (item.GroupID > 0)
                                     products.Columns.Add("Г" + item.GroupID + " " + item.GroupName);
                                 else
-                                    products.Columns.Add(item.GroupName.ToString());
+                                    products.Columns.Add("(Free)"+item.GroupName.ToString());
                             }
                             else
                             {
@@ -538,7 +539,7 @@ namespace SocialFORM.Controllers
                     case Models.Question.Type.Table:
                         {
                             int count_row = listTableRow[(int)item.QuestionID].Count();
-                            int null_count_row = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == null).Count();
+                            int null_count_row = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == 0).Count();
                             int max_cont_row = 0;
                             foreach (var item_row in listTableRow[(int)item.QuestionID])
                             {
@@ -561,7 +562,7 @@ namespace SocialFORM.Controllers
                                 if (item.GroupID > 0)
                                     products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
                                 else
-                                    products.Columns.Add(item.GroupName + "_" + i);
+                                    products.Columns.Add("(Table)"+item.GroupName + "_" + i);
                             }
                         }
                         break;
@@ -602,6 +603,7 @@ namespace SocialFORM.Controllers
                     }
                 }
                 tmp_str.Add(is_introduce_day);
+                tmp_str.Add(item.CoordWidth.ToString() + "," + item.CoordHeight.ToString());
                 List<BlankModel> tmp_blank = listBlankExport[item.Id];
 
                 foreach (var group_item in listGroupExport)
@@ -1635,28 +1637,28 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
-        [HttpGet]
-        public async Task<JsonResult> GetDiapazon(string NameD, string KodFO, string KodOB, string KodGOR, List<listRange> Diapaz)
-        {
-            bool flag = false;
-            NumberAppContext context = new NumberAppContext();
-            Diap res = new Diap();
-            System.Diagnostics.Debug.WriteLine(NameD);
-            //foreach (var item in Diapaz)
-            //{
-            //    res.Kod = item.kod;
-            //    res.KodFO = KodFO;
-            //    res.KodOB = KodOB;
-            //    res.KodGOR = KodGOR;
-            //    res.NameD = NameD;
-            //    res.Num1 = "";
-            //    res.NumN = "";
-            //}
-            context.SetDiap.Add(res);
-            await context.SaveChangesAsync();
-            flag = true;
-            return Json(flag, JsonRequestBehavior.AllowGet);
-        }
+        //[HttpGet]
+        //public async Task<JsonResult> GetDiapazon(string NameD, string KodFO, string KodOB, string KodGOR, List<listRange> Diapaz)
+        //{
+        //    bool flag = false;
+        //    NumberAppContext context = new NumberAppContext();
+        //    Diap res = new Diap();
+        //    System.Diagnostics.Debug.WriteLine(NameD);
+        //    //foreach (var item in Diapaz)
+        //    //{
+        //    //    res.Kod = item.kod;
+        //    //    res.KodFO = KodFO;
+        //    //    res.KodOB = KodOB;
+        //    //    res.KodGOR = KodGOR;
+        //    //    res.NameD = NameD;
+        //    //    res.Num1 = "";
+        //    //    res.NumN = "";
+        //    //}
+        //    context.SetDiap.Add(res);
+        //    await context.SaveChangesAsync();
+        //    flag = true;
+        //    return Json(flag, JsonRequestBehavior.AllowGet);
+        //}
 
         [HttpGet]
         public JsonResult GetListFO()
@@ -2086,24 +2088,9 @@ namespace SocialFORM.Controllers
             return JsonConvert.SerializeObject(StatRes);
         }
 
-        
+        [Authorize(Roles = "Admin")]
         public ActionResult Test()
         {
-            //string connStr = "server=localhost;port=3306;user=root;database=test_db;password=123456";
-            //MySqlConnection conn = new MySqlConnection(connStr);
-            //try
-            //{
-            //    System.Diagnostics.Debug.WriteLine("Connecting to MySQL...");
-            //    conn.Open();
-            //    // Perform database operations
-            //}
-            //catch (Exception ex)
-            //{
-            //    System.Diagnostics.Debug.WriteLine(ex.ToString());
-            //}
-            //conn.Close();
-            //System.Diagnostics.Debug.WriteLine("Done.");
-
             return PartialView();
         }
 
@@ -2114,13 +2101,13 @@ namespace SocialFORM.Controllers
             {
                 return Json(pc.Phones.ToList(), JsonRequestBehavior.AllowGet);
             }
-
         }
 
         [HttpPost]
         public void SetNumber(string str_numb)
         {
-            using (PhoneContext pc = new PhoneContext()) {
+            using (PhoneContext pc = new PhoneContext())
+            {
                 Phone tmp = new Phone();
                 tmp.Number = str_numb;
                 pc.Phones.Add(tmp);
@@ -2133,9 +2120,9 @@ namespace SocialFORM.Controllers
         {
             using (PhoneContext pc = new PhoneContext())
             {
-                for (int i = 1; i<=10; i++)
+                for (int i = 1; i <= 10; i++)
                 {
-                    pc.Database.ExecuteSqlCommand("INSERT INTO testtable VALUES ("+i+","+(i*100)+")");
+                    pc.Database.ExecuteSqlCommand("INSERT INTO testtable VALUES (" + i + "," + (i * 100) + ")");
                 }
             }
         }
@@ -2163,12 +2150,12 @@ namespace SocialFORM.Controllers
                 if (fileContent != null && fileContent.ContentLength > 0)
                 {
                     string name_file = fileContent.FileName;
-                    fileContent.SaveAs("C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Data\\number\\tmp_file.csv");
+                    fileContent.SaveAs("\\\\192.168.0.3\\number\\tmp_file.csv");
                     using (PhoneContext pc = new PhoneContext())
                     {
-                        pc.Database.ExecuteSqlCommand("LOAD DATA INFILE \"tmp_file.csv\" INTO TABLE table"+table+" character set cp1251 FIELDS TERMINATED BY  \";\" ENCLOSED BY  \"\" ESCAPED BY  \"\\\\\" LINES TERMINATED BY  \"\\r\\n\"");
+                        pc.Database.ExecuteSqlCommand("LOAD DATA INFILE \"D:/number/tmp_file.csv\" INTO TABLE table" + table + " character set cp1251 FIELDS TERMINATED BY  \";\" ENCLOSED BY  \"\" ESCAPED BY  \"\\\\\" LINES TERMINATED BY  \"\\r\\n\"");
 
-                        string full_path = "C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Data\\number\\tmp_file.csv";
+                        string full_path = "\\\\192.168.0.3\\number\\tmp_file.csv";
                         if (System.IO.File.Exists(full_path))
                         {
                             System.IO.File.Delete(full_path);
@@ -2176,7 +2163,7 @@ namespace SocialFORM.Controllers
 
                         pc.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_file + "\" WHERE Id=" + table);
 
-                        var tmp = pc.Database.SqlQuery<TmpClass>("SELECT * FROM table"+table);
+                        var tmp = pc.Database.SqlQuery<TmpClass>("SELECT * FROM table" + table);
                         callback.Add("Common", tmp.Count());
                         callback.Add("Not_answer", tmp.Where(u => u.Status == "нет ответа" || u.Status == "линия не найдена").ToList().Count());
                         callback.Add("Connect", tmp.Where(u => u.Status == "connect" || u.Status == "завершено").ToList().Count());
@@ -2188,7 +2175,8 @@ namespace SocialFORM.Controllers
 
 
 
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.ToString());
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -2198,21 +2186,23 @@ namespace SocialFORM.Controllers
 
         class TableInfo
         {
-            public string Tables_in_number { get; set; }
+            public string Tables_in_phone { get; set; }
         }
+
 
         [HttpGet]
         public JsonResult GetListTable()
         {
-         
             using (PhoneContext pc = new PhoneContext())
             {
-               var tmp = pc.Database.SqlQuery<TableInfo>("SHOW TABLES FROM number");
+                var tmp = pc.Database.SqlQuery<TableInfo>("SHOW TABLES FROM phone").ToList();
                 System.Diagnostics.Debug.WriteLine("Count >>> " + tmp.Count());
+                if (tmp == null) { throw new Exception("tmp is null"); }
                 List<string> send_list = new List<string>();
-                foreach(var item in tmp)
+                foreach (var item in tmp)
                 {
-                    send_list.Add(item.Tables_in_number);
+                    System.Diagnostics.Debug.WriteLine(">>> " + item.Tables_in_phone);
+                    send_list.Add(item.Tables_in_phone);
                 }
                 return Json(send_list, JsonRequestBehavior.AllowGet);
             }
@@ -2232,7 +2222,8 @@ namespace SocialFORM.Controllers
             {
                 var tmp_list = pc.Database.SqlQuery<NameTable>("SELECT * FROM name_table");
                 System.Diagnostics.Debug.WriteLine(tmp_list.Count());
-                foreach(var item in tmp_list) {
+                foreach (var item in tmp_list)
+                {
                     list_name.Add(item);
                 }
                 return Json(list_name, JsonRequestBehavior.AllowGet);
@@ -2256,19 +2247,20 @@ namespace SocialFORM.Controllers
             }
             return Json(callback, JsonRequestBehavior.AllowGet);
         }
-        
+
         public FileResult ExportToCSV(int id)
         {
             using (PhoneContext pc = new PhoneContext())
             {
                 var tmp = pc.Database.SqlQuery<TmpClass>("SELECT * FROM table" + id);
-                var name_file = pc.Database.SqlQuery<NameTable>("SELECT * FROM name_table WHERE Id=" + id+" ").ToList();
+                var name_file = pc.Database.SqlQuery<NameTable>("SELECT * FROM name_table WHERE Id=" + id + " ").ToList();
                 StringWriter sw = new StringWriter();
-                foreach(var item in tmp)
+                foreach (var item in tmp)
                 {
                     sw.WriteLine(string.Format("\"{0}\";\"{1}\";\"{2}\"", item.Id, item.Number, item.Status));
                 }
-                return File(Encoding.GetEncoding(1251).GetBytes(sw.ToString()) ,"text/csv", name_file[0].Name);
+                
+                return File(Encoding.GetEncoding(1251).GetBytes(sw.ToString()), "text/csv", name_file[0].Name);
             }
         }
 
@@ -2296,7 +2288,7 @@ namespace SocialFORM.Controllers
         public void ClearTable(int id)
         {
             System.Diagnostics.Debug.WriteLine("ID >>> " + id);
-            using(PhoneContext pc = new PhoneContext())
+            using (PhoneContext pc = new PhoneContext())
             {
                 pc.Database.ExecuteSqlCommand("UPDATE name_table SET Name=null WHERE Id=" + id);
                 pc.Database.ExecuteSqlCommand("TRUNCATE TABLE table" + id);

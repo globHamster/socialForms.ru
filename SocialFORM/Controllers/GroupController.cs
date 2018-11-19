@@ -96,7 +96,7 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public int AddGroup(GroupModel tmp)
+        public JsonResult AddGroup(GroupModel tmp)
         {
             System.Diagnostics.Debug.WriteLine("GroupID : " + tmp.GroupID);
             QuestionModel tmp_q = new QuestionModel();
@@ -130,7 +130,7 @@ namespace SocialFORM.Controllers
             tmp.IndexQuestion = index;
             db.SetGroupModels.Add(tmp);
             db.SaveChanges();
-            return tmp.Id;
+            return Json(tmp);
         }
 
         [HttpGet]
@@ -277,14 +277,14 @@ namespace SocialFORM.Controllers
                 {
                     GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.Group == (-1) * item && u.ProjectID == id_p);
                     group_item.IndexQuestion = count;
-                    group_item.GroupName = "Группа " + count_group;
+                  //  group_item.GroupName = "Группа " + count_group;
                     count_group++;
                 }
                 else
                 {
                     GroupModel group_item = db.SetGroupModels.FirstOrDefault(u => u.QuestionID == item);
                     group_item.IndexQuestion = count;
-                    group_item.GroupName = "Вопрос " + count_answer;
+                  //  group_item.GroupName = "Вопрос " + count_answer;
                     count_answer++;
                 }
                 db.SaveChanges();
@@ -355,6 +355,20 @@ namespace SocialFORM.Controllers
                 item.BindGroup = null;
             }
             db2.SaveChanges();
+        }
+
+        [HttpPost]
+        public void RenameGroup(int id, string name)
+        {
+            System.Diagnostics.Debug.WriteLine("ID group --- " + id);
+            System.Diagnostics.Debug.WriteLine("Name group --- " + name);
+            GroupModel tmp = db.SetGroupModels.FirstOrDefault(u => u.Id == id);
+            if (tmp != null)
+            {
+                tmp.GroupName = name;
+                db.Entry(tmp).State = EntityState.Modified;
+                db.SaveChanges();
+            }
         }
 
     }

@@ -171,7 +171,6 @@
                 })
             })
 
-
         $.get('/Question/GetListQuestionKvot', { id_p: project_id })
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
@@ -209,30 +208,12 @@
                                     }
 
                                 })
-                                is_over_load = true;
+                                
                             })
                     }
                 })
+                is_over_load = true;
             })
-
-        //$('select[name=question_name]').change(function () {
-        //    var id_question = $('select[name=question_name] option:checked').val();
-        //    $('div.answer_type').empty();
-        //    $.get("/Question/getAnswer", { id_question: id_question })
-        //        .success(function (server_data) {
-        //            var sublist_kvot = {};
-        //            //$.each(list_kvot[id_question], function (i, item) {
-        //            //    sublist_kvot[item.Target] = item;
-        //            //});
-        //            $.each(server_data, function (i, item) {
-        //                $('div.answer_type').append('<p id="' + item.Id + '"><span style="margin-right: 10px;">' + item.AnswerText + '</span><input type="text" /></p>');
-
-        //            })
-        //        })
-
-
-        //})
-
     })
 
     function SaveKvot() {
@@ -255,7 +236,6 @@
                 $('.Tables').empty();
                 $('.Tables').load('/Home/Kvot?id_p=' + project_id);
             });
-
     }
 
     $('div.list_all_kvot').on("click", ".delete_kvot", function () {
@@ -264,8 +244,9 @@
         var h3_kvot = div_kvot.prev();
         div_kvot.remove();
         h3_kvot.remove();
-        $('/Question/DeleteQuota', { id_p: $('input[name=project_id]').val() });
-        $.post("/Question/DeleteKvot", { id_question: id_question });
+        console.log("ID question >>>> " + id_question)
+        //$('/Question/DeleteQuota', { id_p: $('input[name=project_id]').val() });
+        //$.post("/Question/DeleteKvot", { id_question: id_question });
     })
 
     $('div.list_all_kvot').on("click", ".save_kvot", function () {
@@ -297,8 +278,6 @@
             }
         });
     })
-
-
 
     $('.PanelQuestion').on("click", 'p.hover_question', function () {
         //alert($(this).attr('id'));
@@ -376,7 +355,6 @@
         });
     })
 
-
     $('.QuotaPanel').on("click", ".RemoveLevelQuota", function () {
         var id_question = $(this).attr('id');
         if ($(this).hasClass('Root')) {
@@ -384,7 +362,7 @@
             parent_div.find(".QuotaManager").each(function () {
                 $('.PanelQuestion').find('p[id=' + $(this).attr('id') + ']').show();
             })
-            $(this).parent().addClass('Rebild');
+            $(this).parent().addClass('Rebild'); //  Не нужный элементё
             $('.PanelQuestion').find('p[id=' + id_question + ']').show();
             $(this).parent().remove();
         }
@@ -483,6 +461,11 @@
     function CreateChainQuota(container, id_num, str_tmp, list_quota) {
         var new_id_num = id_num + 1;
         var chain_str;
+        if (new_id_num == 0) {
+            var id_quota_q = container.find('div.QuotaDiv[id=' + new_id_num + ']:first').find('input.InfoQuestion:first').attr('id');
+            $.post('/Question/DeleteQuota', { id_p: $('input[name=project_id]').val(), id_q: id_quota_q });
+            console.log("Id QUEsTION >>> " + id_quota_q);
+        }
         container.find('div.QuotaDiv[id=' + new_id_num + ']').each(function () {
             if ($(this).hasClass('QuotaLastName')) {
                 chain_str = str_tmp.substr(0);
@@ -495,6 +478,7 @@
                 var id_question = $(this).find('input.InfoQuestion:first').attr('id');
                 var id_answer = $(this).find('input.InfoAnswer:first').attr('id');
                 chain_str += id_question + "/" + id_answer + "#";
+                if (new_id_num == 0) { console.log("ID q: " + id_question + " ID a: " + id_answer); }
                 CreateChainQuota($(this), new_id_num, chain_str.slice(0), list_quota);
             }
         })
@@ -542,13 +526,9 @@
                             $('div[id=' + massiv_tmp[0] + '][name=quota_question_manager]').append('<div class="PanelTotalCount"><div class="TextTotalCount">Всего : </div><div class="Total_Count">1</div></div><div class="TargetAnswerPanel"></div>');
                             $('.PanelQuestion').find('p[id=' + massiv_tmp[i] + ']').hide();
                         } else {
-                            $('.AddNewLevel').after('<div name="quota_question_manager" class="QuotaManager Child" id="' + massiv_tmp[i] + '"><div class="SpaceArrow">&#10148;</div><div class="name_quota_question">' + list_group_question[massiv_tmp[i]].GroupName + '</div><div class="RemoveLevelQuota Child" id="' + massiv_tmp[i] + '">&#10006;</div><div class="UnionWith Child"> &#10010; Уровень</div></div>');
+                            $('div.QuotaManager[id=' + massiv_tmp[i-1] + ']').find('.UnionWith').after('<div name="quota_question_manager" class="QuotaManager Child" id="' + massiv_tmp[i] + '"><div class="SpaceArrow">&#10148;</div><div class="name_quota_question">' + list_group_question[massiv_tmp[i]].GroupName + '</div><div class="RemoveLevelQuota Child" id="' + massiv_tmp[i] + '">&#10006;</div><div class="UnionWith Child"> &#10010; Уровень</div></div>');
                             $('.PanelQuestion').find('p[id=' + massiv_tmp[i] + ']').hide();
-                            if (i == massiv_tmp.length - 1) {
-                                $('div.Root[id=' + massiv_tmp[0] + ']').find('.AddNewLevel').removeClass('AddNewLevel');
-                            }
                         }
-
                     }
                     var container_rebild = $('div.Root[id=' + massiv_tmp[0] + ']');
 
@@ -630,7 +610,6 @@
         parent_panel.prev().find('.Total_Count').first().text(total_count);
         CheckTotalCount();
     })
-
 
     function CheckTotalCount() {
         var prev_count;

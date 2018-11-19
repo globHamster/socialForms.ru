@@ -351,7 +351,6 @@ function Init() {
     })
     // END Animation block
 
-
     $('.NewBlock').on("click", ".WallOfTypes", function () {
         var wall_left = $(this).offset().left;
         var wall_top = $(this).offset().top;
@@ -727,9 +726,9 @@ function Init() {
                                     })
                                 });
                         })
-                    if (pool_data.DeleteListAnswerSM != undefined) {
-                        $.post("/Question/DeleteListAnswer", pool_data.DeleteListAnswerSM);
-                    }
+                    //if (pool_data.DeleteListAnswerSM != undefined) {
+                    //    $.post("/Question/DeleteListAnswer", pool_data.DeleteListAnswerSM);
+                    //}
 
                 }
                 break;
@@ -1906,9 +1905,10 @@ function LoadSettingsTable(panel, q_data) {
                 panel_bind.next().animate({ width: "150px" }, 1000);
                 var block = panel_bind.next();
                 var code = "<select style='width: 100%; height: 100%;'>";
-                panel_bind.parents(".BlockQuestionEditor").find(".QuestionBlock").each(function () {
-                    if (bind_id == Number($(this).find(".QuestionText").attr("id"))) code += "<option value='" + $(this).find(".QuestionText").attr("id") + "' selected>" + $(this).find(".ShortNameQuestion").find("div:first").text() + "</option>";
-                    else code += "<option value='" + $(this).find(".QuestionText").attr("id") + "'>" + $(this).find(".ShortNameQuestion").find("div:first").text() + "</option>";
+                $(".NewBlockQuestions").find(".NewClass").each(function () {
+                    console.log("Bind >>>> " + bind_id);
+                    if (bind_id == Number($(this).find(".ShowPanelQuestion").attr("id"))) code += "<option value='" + $(this).find(".ShowPanelQuestion").attr("id") + "' selected>" + $(this).find(".GroupName").text() + "</option>";
+                    else code += "<option value='" + $(this).find(".ShowPanelQuestion").attr("id") + "'>" + $(this).find(".GroupName").text() + "</option>";
                 })
                 code += "</select>";
                 block.append(code);

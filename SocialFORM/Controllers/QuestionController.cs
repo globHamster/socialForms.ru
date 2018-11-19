@@ -632,28 +632,44 @@ namespace SocialFORM.Controllers
             await db.SaveChangesAsync();
         }
 
-        //[HttpPost]
-        //public void DeleteKvot(int id_question)
-        //{
-        //    if (db.SetQuotaModels.Where(u => u.QuestionID == id_question).Count() > 0)
-        //    {
-        //        List<Kvot> tmp_kvot = db.SetKvots.Where(u => u.QuestionID == id_question).ToList();
-        //        db.SetKvots.RemoveRange(tmp_kvot);
-        //        db.SaveChanges();
-        //    }
-        //}
-
         [HttpPost]
-        public void DeleteQuota(List<int> list_quota)
+        public void DeleteQuota(int id_p, int id_q)
         {
-            List<QuotaModel> list_tmp = new List<QuotaModel>();
-            foreach(var item in list_quota)
+            bool is_find = false;
+            if (db.SetQuotaModels.Where(u => u.ProjectID == id_p).Count() > 0)
             {
-                list_tmp.Add(db.SetQuotaModels.First(u => u.Id == item));
+                List<QuotaModel> tmp_kvot = db.SetQuotaModels.Where(u => u.ProjectID == id_p).ToList();
+                foreach(var item in tmp_kvot)
+                {
+                    foreach(var arg in item.ChainString.Split('#'))
+                    {
+                        if (Int32.Parse(arg.Split('/')[0]) == id_q)
+                        {
+                            is_find = true;
+                        }
+                    }
+                    if (is_find)
+                    {
+                        db.SetQuotaModels.Remove(item);
+                        System.Diagnostics.Debug.WriteLine("Id quota : " + item.Id + " // String : " + item.ChainString);
+                        is_find = false;
+                    }
+                }
+                db.SaveChanges();
             }
-            db.SetQuotaModels.RemoveRange(list_tmp);
-            db.SaveChanges();
         }
+
+        //[HttpPost]
+        //public void DeleteQuota(List<int> list_quota)
+        //{
+        //    List<QuotaModel> list_tmp = new List<QuotaModel>();
+        //    foreach(var item in list_quota)
+        //    {
+        //        list_tmp.Add(db.SetQuotaModels.First(u => u.Id == item));
+        //    }
+        //    db.SetQuotaModels.RemoveRange(list_tmp);
+        //    db.SaveChanges();
+        //}
         
         [HttpPost]
         public void ChangeKvot(List<string> new_changes)
@@ -672,24 +688,28 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void SaveQuota(int id_p, List<string> list_quota)
         {
-            foreach(var item in list_quota)
+            if (list_quota != null)
             {
-                var tmp_string = item.Split('=');
-                string chain_string = tmp_string[0];
-                QuotaModel tmp_quota = db.SetQuotaModels.FirstOrDefault(u => u.ChainString == chain_string);
-                if (tmp_quota == null)
+                foreach (var item in list_quota)
                 {
-                    tmp_quota = new QuotaModel();
-                    tmp_quota.ProjectID = id_p;
-                    tmp_quota.ChainString = tmp_string[0];
-                    tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
-                    db.SetQuotaModels.Add(tmp_quota);
-                } else
-                {
-                    tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
+                    var tmp_string = item.Split('=');
+                    string chain_string = tmp_string[0];
+                    QuotaModel tmp_quota = db.SetQuotaModels.FirstOrDefault(u => u.ChainString == chain_string);
+                    if (tmp_quota == null)
+                    {
+                        tmp_quota = new QuotaModel();
+                        tmp_quota.ProjectID = id_p;
+                        tmp_quota.ChainString = tmp_string[0];
+                        tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
+                        db.SetQuotaModels.Add(tmp_quota);
+                    }
+                    else
+                    {
+                        tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
+                    }
                 }
+                db.SaveChanges();
             }
-            db.SaveChanges();
         }
 
         [HttpGet]
@@ -772,21 +792,21 @@ namespace SocialFORM.Controllers
             }
         }
 
-        [HttpPost]
-        public void DeleteQuota(int id_p, int id_q)
-        {
-            List<QuotaModel> tmp_quota = db.SetQuotaModels.Where(u => u.ProjectID == id_p).ToList();
-            List<QuotaModel> quota_list_to_remove = new List<QuotaModel>();
-            foreach(var item in tmp_quota)
-            {
-                if (item.ChainString.Contains(id_q.ToString()))
-                {
-                    quota_list_to_remove.Add(item);
-                }
-            }
-            db.SetQuotaModels.RemoveRange(quota_list_to_remove);
-            db.SaveChanges();
-        }
+        //[HttpPost]
+        //public void DeleteQuota(int id_p, int id_q)
+        //{
+        //    List<QuotaModel> tmp_quota = db.SetQuotaModels.Where(u => u.ProjectID == id_p).ToList();
+        //    List<QuotaModel> quota_list_to_remove = new List<QuotaModel>();
+        //    foreach(var item in tmp_quota)
+        //    {
+        //        if (item.ChainString.Contains(id_q.ToString()))
+        //        {
+        //            quota_list_to_remove.Add(item);
+        //        }
+        //    }
+        //    db.SetQuotaModels.RemoveRange(quota_list_to_remove);
+        //    db.SaveChanges();
+        //}
 
         public ActionResult Loop(int id_p)
         {

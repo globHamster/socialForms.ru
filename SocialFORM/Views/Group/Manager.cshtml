@@ -252,9 +252,7 @@
 <div name="ProjectInfo">
     <input type="hidden" name="project_id" value="@ViewBag.ProjectID" />
 </div>
-<button onclick="Reload()">Обновить</button>
-<button onclick="HideAll()">Скрыть все</button>
-<button onclick="ShowAll()">Показать все</button>
+
 <div class="NewBlockQuestions sortable-ul"></div>
 
 <div class="BlockQuestionEditor"></div>
@@ -350,15 +348,15 @@
     $.get("/Group/getGroup", { id_p: $('div[name=ProjectInfo]').find('input[name=project_id]').val() })
         .success(function (server_data) {
             $.each(server_data, function (i, item) {
-                console.log("Log ---- ", item);
                 if (item.Group == null) {
                     var code = "<div class='NewClass MainItem' style='width: 100%; height: 30px; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(111,190,230,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: inline-flex;'>" +
                         "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
-                        "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'></div>" +
+                        "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'><img src='../Content/movement.png' width='19px' height='19px' /></div>" +
                         "</div>" +
-                        "<div class='ShowPanelQuestion' style='width:100%;height:80%;margin:2px;' id='" + item.QuestionID + "'><div>" + item.GroupName +
+                        "<div class='ShowPanelQuestion' style='width:100%;height:60%;margin:2px;' id='" + item.QuestionID + "'><div class='GroupName' id='"+item.Id+"'>" + item.GroupName +
                         "</div><textarea class='QuestionObject' hidden>" + JSON.stringify(item) + "</textarea>" +
                         "</div>" +
+                        "<div style='width:30px; height:100%; background-color: #81c784;' class='ChangeNameGroup'><img src='../Content/images/pencel.png' width='29px' height='29px' /></div>"+
                         "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
                         "<div class='DeleteQuestion' style='width:20px;height:20px;background-color:#f44336;text-align:center;'>&#10006;</div>" +
                         "</div>" +
@@ -369,10 +367,10 @@
                         $('.NewBlockQuestions').find('.ShowPanelGroupText').filter('#' + item.GroupID).parents('.NewGroup').find('.BlockQuestionGroup').append(code);
                     }
                 } else { 
-                    $('.NewBlockQuestions').append("<div class='NewGroup MainItem' style='width: 100%; height: auto; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(50,50,50,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: block;'>" +
+                    $('.NewBlockQuestions').append("<div class='NewGroup MainItem' style='width: 100%; height: auto; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(50,50,50,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: block;' id='"+item.Group+"'>" +
                         "<div style='display: flex;'>"+
                         "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
-                        "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'></div>" +
+                        "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'><img src='../Content/movement.png' width='19px' height='19px' /></div>" +
                         "</div>" +
                         "<div class='ShowPanelGroupText' style='width:100%;height:80%;margin:2px;' id='" + item.Group + "'>" + item.GroupName +
                         "<textarea class='QuestionObject' hidden></textarea>" +
@@ -432,7 +430,6 @@
             "</div>" +
             "</div>"
         );
-        //alert($(this).find('textarea.QuestionObject').text());
         var panel_item = $(this);
         $.when(SetQuestionBlock($('.AddAnswerBlock'), panel_item.find('textarea.QuestionObject').text() != ""?JSON.parse($(this).find('textarea.QuestionObject').text()):null))
             .then(function () {
@@ -447,14 +444,39 @@
                         toolbar: 'bold,italic,underline|left,center,right,justify|font,size,color,removeformat|code,quote,horizontalrule|source,maximize'
                     });
                     SetQuestionNew(item, item.parentElement.getAttribute('id'), panel_item.find('textarea.QuestionObject').text() != ""?JSON.parse(panel_item.find('textarea.QuestionObject').text()) : null);
-                    // SetAnswer(item.parentElement.getAttribute('id'));
                 })
             });
-      //  SetAnswerNew($(this).attr('id'), $('.AddAnswer'));
     })
 
     $('.NewBlockQuestions').on("click", ".ClosePanelQuestion", function () {
         $('.NewBlockQuestions').find('.PanelQuestion').remove();
+    })
+
+    //Изменение нименование блока вопроса
+    $('.NewBlockQuestions').on("click", ".ChangeNameGroup", function () {
+        if ($('.RenamePanelQuestion').length != 0) { return; }
+        var str_g_name = $(this).parents('.NewClass').find('.GroupName').text();
+        $(this).parents('.NewClass').find('.GroupName').empty().append('<input style="width:100%;" class="NewNameGroup" value="'+str_g_name+'" />');
+        $(this).parents('.NewClass').find('.ShowPanelQuestion').removeClass('ShowPanelQuestion').addClass('RenamePanelQuestion');
+        $('.NewNameGroup').focus().select();
+        $(this).parents('.NewClass').find('.GroupName').find('input').keydown(function (event) {
+            if (event.keyCode == 13) {
+                var str = $(this).val();
+                var container = $(this);
+                console.log("ID Change >>> ", $('.RenamePanelQuestion').find('.GroupName').attr('id'));
+                console.log("Name Change", str);
+                $.post("/Group/RenameGroup", { id: $('.RenamePanelQuestion').find('.GroupName').attr('id'), name: str })
+                    .success(function () {
+                        container.parents('.GroupName').empty().text(str);
+                        $('.RenamePanelQuestion').removeClass('RenamePanelQuestion').addClass('ShowPanelQuestion');
+                    })
+            }
+            if (event.keyCode == 27) {
+                var container = $(this);
+                container.parents('.GroupName').empty().text(str_g_name);
+                $('.RenamePanelQuestion').removeClass('RenamePanelQuestion').addClass('ShowPanelQuestion');
+            }
+        })
     })
 
     {
@@ -2669,13 +2691,12 @@
 
     // Кнопка добавления вопроса в проект
     $('.AddQuestionInProject').click(function (event) {
-        if ($('.NewBlockQuestions').find(".Group").length > 0) {
+        if ($('.NewBlockQuestions').find(".NewGroup").length > 0) {
             var offset_x = event.clientX;
             var offset_y = event.clientY;
-            console.log("X " + offset_x + " Y " + offset_y);
             var code = "<div class='ShowPanelGroup' style='background-color: #fff; border: 1px solid black; position: fixed; left: " + offset_x + "px; top: " + offset_y + "px; z-index: 1020; display: flex; flex-direction: column;'>"
             code += "<div class='StyleButton AddQuestionInGroup Root' style='background-color: #008dd2; color: #fff;' id='0'>Главная ветвь</div>";
-            $(".BlockQuestionEditor").find(".Group").each(function () {
+            $(".NewBlockQuestions").find(".NewGroup").each(function () {
                 code += "<div class='StyleButton AddQuestionInGroup' style='background-color: #008dd2; color: #fff;' id='" + $(this).attr('id') + "'>" + $(this).find("div:first").text() + "</div>";
             })
             code += "</div>";
@@ -2695,44 +2716,23 @@
                 }
                 var block_group = $(this);
                 $.post("/Group/AddGroup", query)
-                    .success(function (group_id) {
-                        var add_panel = query.GroupID == 0 ? $('.BlockQuestionEditor') : $('.BlockQuestionEditor').find(".Group").filter("#" + block_group.attr("id"));
-                        add_panel.append("<div class='QuestionBlock sortable IsChange " + (query.GroupID == 0 ? "MainItem" : "")+"'><div name='QuestionInfo' style='display: none'>" +
-                            "<input name='groupInfo' type='hidden' value='" + group_id + "' />" +
-                            "<input name='questionInfo' type='hidden' value=0 />" +
-                            "<input name='questionType' type='hidden' value=1 />" +
+                    .success(function (server_data) {
+                        var add_panel = query.GroupID == 0 ? $('.NewBlockQuestions') : $('.NewBlockQuestions').find(".NewGroup").filter("#" + block_group.attr("id")).find('.BlockQuestionGroup');
+                        var code = "<div class='NewClass MainItem' style='width: 100%; height: 30px; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(111,190,230,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: inline-flex;'>" +
+                            "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
+                            "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'><img src='../Content/movement.png' width='19px' height='19px' /></div>" +
                             "</div>" +
-                            "<div class='ShortNameQuestion'><div style='width: 100%;'>New Question</div><div class='EditQuestionName'>&#9000;</div><div class='DeleteQuestion' style='color: #fff;'>&#10006;</div><button class='hidePanel' style='display: inline-flex'>hide</button></div>" +
-                            "<div class='QuestionText HideOff NewQuestionBlock IsChange' id=0><textarea id='example' style='width: 80 %; height: 300px; display: none;'></textarea></div>" +
-                            "<div class='SettingsPanel'><div class='NameType'>Type</div><div class='WallOfTypes' style='position: relative; z - index: 5; height: 30px; width: 30px'>></div></div>" +
-                            "<div class='AnswerBlock HideOff' style='overflow-y: auto;'><div class='AnswerSettings'></div></div>" +
-                            "<div class='SaveChange'><div class='SaveChangeButton'>Save</div></div></div>");
+                            "<div class='ShowPanelQuestion' style='width:100%;height:60%;margin:2px;' id='" + server_data.QuestionID + "'><div class='GroupName' id='" + server_data.Id + "'>Новый вопрос" +
+                            "</div><textarea class='QuestionObject' hidden></textarea>" +
+                            "</div>" +
+                            "<div style='width:30px; height:100%; background-color: #81c784;' class='ChangeNameGroup'><img src='../Content/images/pencel.png' width='29px' height='29px' /></div>" +
+                            "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
+                            "<div class='DeleteQuestion' style='width:20px;height:20px;background-color:#f44336;text-align:center;'>&#10006;</div>" +
+                            "</div>" +
+                            "</div>";
+                        add_panel.append(code);
+                        ChangeIndexQuestion();
                         block_group.parent().remove();
-                        var item_tmp = $('.BlockQuestionEditor').find('.NewQuestionBlock').find('textarea');
-                        $.each(item_tmp, function (i, item) {
-                            sceditor.create(item, {
-                                resizeEnabled: false,
-                                format: 'xhtml',
-                                icons: 'monocons',
-                                style: '/Scripts/minified/themes/content/default.min.css',
-                                toolbar: 'bold,italic,underline|left,center,right,justify|font,size,color,removeformat|code,quote,horizontalrule|source,maximize'
-                            });
-                        })
-                        $('.BlockQuestionEditor').find('.NewQuestionBlock').removeClass('NewQuestionBlock');
-                        $.get('/Group/GetGroupItem', { id_group: group_id })
-                            .success(function (data) {
-                                console.log("Data group >>> ", data);
-                                var id_question = data.QuestionID;
-                                var item_block = $('.BlockQuestionEditor').find('.QuestionBlock').filter(".IsChange");
-                                item_block.find('.QuestionText').attr("id", id_question);
-                                item_block.find("div[name=QuestionInfo]").find('input[name=questionInfo]').val(id_question);
-                                item_block.find("div[name=QuestionInfo]").append('<input type="hidden" name="questionType" value="1">');
-                                item_block.find(".NameType").text("Single");
-                                LoadSettingsSingle(item_block.find(".AnswerSettings"));
-                                item_block.removeClass("IsChange");
-                                ChangeIndexQuestion();
-                            })
-                            .error(function () { console.error("Can't load group item") })
                     })
                     .error(function () { alert("Error")});
             })
@@ -2743,51 +2743,21 @@
             }
             console.log("ProjectInfo >>> ", query);
             $.post("/Group/AddGroup", query).
-                success(function (group_id) {
-                    //var code = "<div class='QuestionBlock sortable IsChange MainItem'><div name='QuestionInfo' style='display: none'>" +
-                    //    "<input name='groupInfo' type='hidden' value='" + group_id + "' />" +
-                    //    "<input name='questionInfo' type='hidden' value=0 />" +
-                    //    "<input name='questionType' type='hidden' value=1 />" +
-                    //    "</div>" +
-                    //    "<div class='ShortNameQuestion'><div style='width: 100%;'>New Question</div><div class='EditQuestionName'>&#9000;</div><div class='DeleteQuestion' style='color: #fff;'>&#10006;</div><button class='hidePanel' style='display: inline-flex'>hide</button></div>" +
-                    //    "<div class='QuestionText HideOff NewQuestionBlock IsChange' id=0><textarea id='example' style='width: 80 %; height: 300px; display: none;'></textarea></div>" +
-                    //    "<div class='SettingsPanel'><div class='NameType'>Type</div><div class='WallOfTypes' style='position: relative; z - index: 5; height: 30px; width: 30px'>></div></div>" +
-                    //    "<div class='AnswerBlock HideOff' style='overflow-y: auto;'><div class='AnswerSettings'></div></div>" +
-                    //    "<div class='SaveChange'><div class='SaveChangeButton'>Save</div></div></div>";
-                    var code = "<div class='NewClass' style='width: 100%; height: 30px; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(111,190,230,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: inline-flex;'>" +
+                success(function (server_data) {
+                    console.log("Server DATA >>> ", server_data);
+                   var code = "<div class='NewClass MainItem' style='width: 100%; height: 30px; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(111,190,230,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: inline-flex;'>" +
                         "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
-                        "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'></div>" +
+                        "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'><img src='../Content/movement.png' width='19px' height='19px' /></div>" +
+                       "</div>" +
+                       "<div class='ShowPanelQuestion' style='width:100%;height:60%;margin:2px;' id='" + server_data.QuestionID + "'><div class='GroupName' id='" + server_data.Id + "'>Новый вопрос" +
+                        "</div><textarea class='QuestionObject' hidden></textarea>" +
                         "</div>" +
-                        "<div class='ShowPanelQuestion' style='width:100%;height:80%;margin:2px;' id='" + group_id + "'>New question" +
-                        "<textarea class='QuestionObject' hidden></textarea>" +
+                        "<div style='width:30px; height:100%; background-color: #81c784;' class='ChangeNameGroup'><img src='../Content/images/pencel.png' width='29px' height='29px' /></div>" +
+                        "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
+                        "<div class='DeleteQuestion' style='width:20px;height:20px;background-color:#f44336;text-align:center;'>&#10006;</div>" +
                         "</div>" +
                         "</div>";
                     $('.NewBlockQuestions').append(code);
-                    //var item_tmp = $('.BlockQuestionEditor').find('.NewQuestionBlock').find('textarea');
-                    //$.each(item_tmp, function (i, item) {
-                    //    sceditor.create(item, {
-                    //        resizeEnabled: false,
-                    //        format: 'xhtml',
-                    //        icons: 'monocons',
-                    //        style: '/Scripts/minified/themes/content/default.min.css',
-                    //        toolbar: 'bold,italic,underline|left,center,right,justify|font,size,color,removeformat|code,quote,horizontalrule|source,maximize'
-                    //    });
-                    //})
-                    //$('.BlockQuestionEditor').find('.NewQuestionBlock').removeClass('NewQuestionBlock');
-                    //$.get('/Group/GetGroupItem', { id_group: group_id })
-                    //    .success(function (data) {
-                    //        console.log("Data group >>> ", data);
-                    //        var id_question = data.QuestionID;
-                    //        var item_block = $('.BlockQuestionEditor').find('.QuestionBlock').filter(".IsChange");
-                    //        item_block.find('.QuestionText').attr("id", id_question);
-                    //        item_block.find("div[name=QuestionInfo]").find('input[name=questionInfo]').val(id_question);
-                    //        item_block.find("div[name=QuestionInfo]").append('<input type="hidden" name="questionType" value="1">');
-                    //        item_block.find(".NameType").text("Single");
-                    //        LoadSettingsSingle(item_block.find(".AnswerSettings"));
-                    //        item_block.removeClass("IsChange");
-                    //        ChangeIndexQuestion();
-                    //    })
-                    //    .error(function () { console.error("Can't load group item") })
                 })
         }
 
@@ -2838,10 +2808,10 @@
         })
         $.post("/Group/AddNewGroup", { id_p: $('div[name=ProjectInfo]').find('input[name=project_id]').val() })
             .success(function (index_group) {
-                $('.NewBlockQuestions').append("<div class='NewGroup MainItem' style='width: 100%; height: auto; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(50,50,50,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: block;'>" +
+                $('.NewBlockQuestions').append("<div class='NewGroup MainItem' style='width: 100%; height: auto; background:linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(50,50,50,1) 100%); border-bottom: 1px solid black; border-right:1px solid black; margin: 1px; display: block;' id='" + index_group + "'>" +
                     "<div style='display: flex;'>" +
                     "<div style='width:30px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;'>" +
-                    "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'></div>" +
+                    "<div style='width:20px;height:20px;background-color:#008dd2;' class='handler'><img src='../Content/movement.png' width='19px' height='19px' /></div>" +
                     "</div>" +
                     "<div class='ShowPanelGroupText' style='width:100%;height:80%;margin:2px;' id='" + index_group + "'>Группа" + index_group +
                     "<textarea class='QuestionObject' hidden></textarea>" +
@@ -2860,10 +2830,9 @@
     $('.SettingsProject').on("click", ".DeleteGroupInProject", function (event) {
         var offset_x = event.clientX;
         var offset_y = event.clientY;
-        console.log("X " + offset_x + " Y " + offset_y);
         var code = "<div class='ShowPanelGroup' style='background-color: #fff; border: 1px solid black; position: fixed; left: " + offset_x + "px; top: " + offset_y + "px; z-index: 1020; display: flex; flex-direction: column;'>"
         $(".NewBlockQuestions").find(".NewGroup").each(function () {
-            code += "<div class='StyleButton DeleteGroup' style='background-color: #008dd2; color: #fff;' id='" + $(this).find('.ShowPanelGroupText').attr('id') + "'>" + $(this).find('.ShowPanelGroupText').text() + "</div>";
+            code += "<div class='StyleButton DeleteGroup' style='background-color: #008dd2; color: #fff;' id='" + $(this).attr('id') + "'>" + $(this).find('.ShowPanelGroupText').text() + "</div>";
         })
         code += "</div>";
         $('body').append(code);
@@ -2906,7 +2875,6 @@
             }
         })
         $.post("/Group/ChangeIndexQuestion", { new_set: list_id_questtion, id_p: $('div[name=ProjectInfo]').find('input[name=project_id]').val() });
-        console.log("List --- > ", list_id_questtion);
     }
 
     {

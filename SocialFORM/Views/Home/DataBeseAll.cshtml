@@ -67,7 +67,7 @@
 <div class="row">
     <div class="tabs">
         <input type="radio" name="inset" value="" id="tab_1" checked>
-        <label for="tab_1">Подключение</label>
+        <label name="loadCSV" for="tab_1">Подключение</label>
 
         <input type="radio" name="inset" value="" id="tab_2">
         <label for="tab_2">Конструктор Базы</label>
@@ -150,6 +150,10 @@
 <script type="text/javascript">
     let pool_data = {};
 
+    $(function () {
+        $('div#txt_1').load("/Home/Test");
+    })
+
     $('body').on("click", ".hide1", function () {
         if ($(this).hasClass("HideOn")) {
             $(this).next().slideDown(1000);
@@ -205,6 +209,8 @@
                 block.append('<div class="' + item.KodGOR + '">' + item.NameGOR + '<div id="AllGGGOR"></div></div>')
             });
         });
+
+    
 
     function FO_init() {
         var FOSelObj = document.getElementById('SFO');

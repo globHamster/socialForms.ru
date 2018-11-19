@@ -74,8 +74,11 @@
 @Scripts.Render("~/Scripts/pdfmake.min.js")
 @Scripts.Render("~/Scripts/vfs_fonts.js")
 @Scripts.Render("~/Scripts/jquery.maskedinput.js")
-
+<script src="~/Scripts/device.js"></script>
 <script type="text/javascript">
+
+    let coord_lat = 0;
+    let coord_long = 0;
 
     $(function () {
 
@@ -85,7 +88,23 @@
                 $.post("/Question/SubtractionQuota", { id_quota: item.Id });
             }
         })
-  
+
+        if (device.android()) {
+            var watch = navigator.geolocation.watchPosition(
+                function (position) {
+                    coord_lat = position.coords.latitude;
+                    coord_long = position.coords.longitude;
+                    navigator.geolocation.clearWatch(watch);
+                },
+                function (err) {
+                    if (err.code == 1) {
+                        alert("ERROR: Access is denied");
+                    } else if (err.code == 2) {
+                        alert("ERROR: Position is unavailable");
+                    }
+                }
+            )
+        }
     });
 
     $('input[name=phone_number]').focus(function () {
@@ -140,7 +159,6 @@
                         var tmp = data.split('#');
                         tmp_mas[tmp[0]] = tmp[1];
                     })
-                    console.info('text --- ', tmp_mas);
                     $.each(result[i], function (i, data) {
                         query_q[count] = {
                             Id: Number(data),
@@ -151,16 +169,12 @@
                     })
                     break;
                 case 3:
-                    console.info("index ---- ", i);
-                    console.info("result ---- ", result[i]);
                     var mas = String(result[i]).split(',');
-                    console.info("mas ---- ", mas);
                     var tmp_mas = [];
                     $.each(mas, function (i, data) {
                         var tmp = data.split('#');
                         tmp_mas.push(tmp);
                     })
-                    console.info('text --- ', tmp_mas);
                     $.each(tmp_mas, function (i, data) {
                         query_q[count] = {
                             Id: Number(data[0]),
@@ -204,7 +218,9 @@
             phone_number: str_number,
             list: query_q,
             time_begin: begin_time,
-            time_end: end_time
+            time_end: end_time,
+            c_lat: coord_lat,
+            c_long: coord_long
         }
         sendData(query);
     });

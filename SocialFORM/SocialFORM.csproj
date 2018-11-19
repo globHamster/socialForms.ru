@@ -385,6 +385,7 @@
     <Compile Include="Models\Opros.cs" />
     <Compile Include="Models\OprosNN.cs" />
     <Compile Include="Models\OprosYaroslav.cs" />
+    <Compile Include="Models\Phone.cs" />
     <Compile Include="Models\ProjectViewModel.cs" />
     <Compile Include="Models\Question\Kvot.cs" />
     <Compile Include="Models\Question\LoopModel.cs" />
@@ -398,7 +399,10 @@
     <Content Include="Content\chosen-sprite.png" />
     <Content Include="Content\chosen.css" />
     <Content Include="Content\contextmenu.css" />
+    <Content Include="Content\css\form_formView_style.css" />
+    <Content Include="Content\css\home_test_style.css" />
     <Content Include="Content\daterangepicker.css" />
+    <Content Include="Content\images\pencel.png" />
     <Content Include="Content\images\ui-icons_444444_256x240.png" />
     <Content Include="Content\images\ui-icons_555555_256x240.png" />
     <Content Include="Content\images\ui-icons_777620_256x240.png" />
@@ -456,6 +460,7 @@
     <Content Include="Content\ManagerStyle.css" />
     <Content Include="Content\map-marker-icon.png" />
     <Content Include="Content\media\style.css" />
+    <Content Include="Content\movement.png" />
     <Content Include="Content\PagedList.css" />
     <Content Include="Content\radio-button.css" />
     <Content Include="Content\slide_down.png" />
@@ -482,8 +487,8 @@
     <Content Include="Content\themes\ui\theme.css" />
     <Content Include="Content\ui.jqgrid.css" />
     <Content Include="count.php" />
-    <Content Include="Helpers\nicEditorIcons.gif" />
     <Content Include="favicon.ico" />
+    <Content Include="Helpers\nicEditorIcons.gif" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -508,7 +513,6 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\PriceMobile.csv" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile2.pubxml" />

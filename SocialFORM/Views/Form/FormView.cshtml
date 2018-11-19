@@ -1,196 +1,10 @@
-﻿<style>
-    .tool_layer {
-        background-color: #FFF;
-        border-bottom: 1px solid black;
-        height: 35px;
-    }
-
-    .view_form {
-        padding: 20px;
-        margin-bottom: 15px;
-        background-color: #ccc;
-    }
-
-    .answer_table {
-        margin-bottom: 20px;
-    }
-
-    div.title {
-        padding: 20px;
-        border: 2px solid black;
-        background-color: #72afff;
-        text-align: center;
-        font-size: 30px;
-        font-family: 'Courier New';
-        font-weight: 900;
-    }
-
-    div.wrong_choise {
-        padding: 5px;
-        margin: 5px;
-        display: none;
-        border: 1px solid red;
-        background-color: #ff9999;
-    }
-
-    tr.table_answer:first-child {
-        background-color: #72afff;
-    }
-
-    td.table_answer:first-child {
-        background-color: #72afff;
-    }
-
-    td.table_answer {
-        border: 1px solid black;
-        text-align: center;
-        min-width: 20px;
-    }
-
-    tr.beginer > td {
-        min-width: 100px;
-    }
-
-    #map {
-        width: 600px;
-        height: 400px;
-        padding: 0;
-        margin: 0;
-    }
-
-    input[type="radio"] {
-        display: none;
-    }
-
-        input[type="radio"] + label span {
-            display: inline-block;
-            width: 13px;
-            height: 13px;
-            margin: -1px 4px 0 0;
-            vertical-align: middle;
-            cursor: pointer;
-            -moz-border-radius: 50%;
-            border-radius: 50%;
-        }
-
-        input[type="radio"] + label span {
-            border: 2px solid black;
-            background-color: #fff;
-        }
-
-        input[type="radio"]:checked + label span {
-            background-color: #72aFFF;
-        }
-
-        input[type="radio"] + label span,
-        input[type="radio"]:checked + label span {
-            -webkit-transition: background-color 0.2s linear;
-            -o-transition: background-color 0.2s linear;
-            -moz-transition: background-color 0.3s linear;
-            transition: background-color 0.2s linear;
-        }
-    .TextLimitQuota {
-        position: fixed;
-        display: none;
-        justify-content: center;
-        align-content: space-between;
-        align-items: center;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        background-color: rgba(100, 100, 100, 0.4);
-    }
-    .NewButton {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-content: space-between;
-        align-items: center;
-        flex-direction: column;
-        width: 100px;
-        height: 30px;
-        top: calc(50% - 190px);
-        left: calc(50% - 50px);
-        background-color: #008dd2;
-        color: #fff;
-        font-family: 'Century Gothic';
-    }
-    .TextDiv {
-        position: relative;
-        display: flex;
-        text-align: center;
-        justify-content: center;
-        align-content: space-between;
-        align-items: center;
-        flex-direction: column;
-        top: calc(50% - 200px);
-        left: calc(50% - 200px);
-        color: #f44336;
-        font-size: 24px;
-        font-family: 'Century Gothic';
-        font-weight: 600;
-        width: 400px;
-        height: 400px;
-        border: 5px inset #008dd2;
-        background-color: #fff;
-    }
-    .Scaled {
-        transform: scale(1.1,1.1);
-        box-shadow: 5px 5px black;
-        transition: 0.1s linear;
-    }
-
-    .NotScaled {
-        transform: scale(1,1);
-        box-shadow: 0px 0px black;
-        transition: 0.1s linear;
-    }
-    @@media screen and (max-width: 768px){
-        .previous {
-            width: 40px;
-            height: 40px;
-        }
-        .next{
-            width: 40px;
-            height: 40px;
-        }
-        .tool_layer {
-            min-height: 60px;
-            min-width: 60px;
-            height: 80px;
-        }
-        td.tool_layer {
-            width: 60px;
-            height: 60px;
-        }
-
-        li {
-            display: inline;
-        }
-
-        div#session {
-            display: none;
-        }
-
-        div.Chat {
-            display: none;
-        }
-
-        div.min > div.row {
-            display: inline-flex;
-        }
-
-        div.tmp {
-            display: inline;
-        }
-    }
-</style>
+﻿
 <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
 <link href="~/Content/chosen.css" rel="stylesheet" />
+<link href="~/Content/css/form_formView_style.css" rel="stylesheet" />
 
 <script src="~/Scripts/chosen.jquery.js" type="text/javascript"></script>
+
 <div class="title">@ViewBag.Title</div>
 <div name="projectID" id="@ViewBag.ProjectID" style="display: none;" />
 <div name="operatorID" id="@ViewBag.ProjectID" style="display: none;" />
@@ -265,7 +79,6 @@
     var count_ajax = 0;
     var massive_quota_id = [];
     let massive_string_chain = [];
-    let list_loop = {};
     var list_quota = {};
     var list_range = {};
     var loop_result = [];
@@ -278,7 +91,6 @@
                 $.each(server_data, function (i, item) {
                     list_base_answer[item.Id] = item;
                 })
-                //console.log('Загргузка базовых вопросов успешна ', list_base_answer);
                 count_ajax++;
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListAnswerBase ", err) });
@@ -317,7 +129,6 @@
         q4 = $.get("/Group/getIdQuestionGroup", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
                 massiv_question_id = server_data;
-                //console.info("Успешная выгрузка данных --- ", massiv_question_id);
                 console.log("Prime massive >>> ", massiv_question_id);
                 count_ajax++;
                 is_load_id = true;
@@ -330,7 +141,6 @@
                 $.each(server_data, function (i, data) {
                     list_massk[data.Id] = data.TextMassk;
                 })
-                //console.info("Успешная выгрузка листа масок ---- ", list_massk);
                 count_ajax++;
             })
             .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getListMassk", err) })
@@ -342,7 +152,6 @@
                     $.each(server_data, function (i, item) {
                         list_answer[item.Id] = item;
                     })
-                    //console.info("Успешная выгрузка данных листа ответов --- ", list_answer);
                     count_ajax++;
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
@@ -362,9 +171,6 @@
                                 list_question_bind_group[item.QuestionID].push(item.BindGroup);
                         }
                     })
-                    //console.log("Сформирован список вопросов связаных с группой : ", list_question_bind_group);
-                    //console.info("Сформировон массив связок с группой --->", list_bind_answer_group);
-                    //console.info("Успешная выгрузка данных листа id всех ответов  --- ", list_id_answer_all);
                     count_ajax++;
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getIdAnswerAllGrow", err) })
@@ -375,7 +181,6 @@
             q7 = $.get("/Question/getAllTableRow", { massiv: massiv_question_id.join() })
                 .success(function (server_data) {
                     list_table_row = server_data;
-                    //console.info("Успешная выгрузка данных --- ", list_table_row);
                     count_ajax++;
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllTableRow", err) })
@@ -392,8 +197,6 @@
                             list_text_file[item.QuestionID] = server_file;
                         });
                 })
-                //console.info("Успешная выгрузка листа путей файла --- ", list_file);
-                //console.info("Успешная выгрузка листа текста файла --- ", list_text_file);
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/GetListFile", err); })
 
@@ -413,9 +216,6 @@
                     if (item.GroupID > 0)
                         list_group[item.QuestionID] = item.GroupID;
                 });
-                //console.log("Активность группы :", active_group);
-                //console.log("Лист группы по вопросам : ", list_group);
-                //console.info("list group --->", list_id_question_group);
             })
 
         $.get("/Question/GetAllRange", { id_p: $('div[name=projectID]').attr('id') })
@@ -442,15 +242,6 @@
                 console.log("Успешна выгрузка квот ==== ", list_quota);
             })
 
-        $.get("/Question/GetLoopRange", { id_p: $('div[name=projectID]').attr('id') })
-            .success(function (server_data) {
-              
-                $.each(server_data, function (i, item) {
-                    list_loop[item.Id] = item;
-                    list_loop[item.Id].IsActive = false;
-                })
-                console.log("Loop massive >>> ", massiv_question_id);
-            })
     }
 
     //Ожидание выгрузки данных с сервера
@@ -469,6 +260,16 @@
         return this.sort(function () { return 0.5 - Math.random(); })
     }
 
+    let interval_active;
+    let handler = function () {
+        clearInterval(interval_active);
+        interval_active = setInterval(function () {
+            clearInterval(interval_active);
+            $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), function () { $('body').unbind("mousemove keydown", handler) });
+            console.log("Not active");
+        }, 30000);
+    }
+
     //Блок отрисовки анкеты
     function getStart() {
         if (index >= massiv_question_id.length) {
@@ -480,17 +281,17 @@
                     .success(function (server_time) {
                         if (begin_time == undefined)
                             begin_time = server_time;
+                        console.log("begin time --- " + begin_time);
                         status = 1;
-                        console.log("Test time begin   ", begin_time);
                     })
                     .error(function () { alert("Error"); })
+                
             }
             if (index == massiv_question_id.length - 1) {
                 $.get("/Form/GetServerTime")
                     .success(function (server_time) {
                         if (end_time == undefined)
                             end_time = server_time;
-                        console.log("Test time end  ", end_time);
                     })
             }
             if (index == 1) {
@@ -544,8 +345,7 @@
                     break;
                 // Прорисовка ответов Multi
                 case 2:
-                    {
-                        
+                    { 
                         var skip = false;
                         var array_answer = [];
                         var array_base_anwer = [];
@@ -589,7 +389,6 @@
                     });
                     var id_massk = list_question[massiv_question_id[index]].TypeMassk;
                     if (id_massk > 0) {
-                        //console.info("id_massk ---- ", id_massk);
                         BindMassk(id_massk);
                     }
                     FindAnswer();
@@ -619,8 +418,6 @@
                     $.each(array_row, function (i, item) {
                         if (item.TableID == id_q) {
                             if (list_question[massiv_question_id[index]].Bind != null) {
-                                //console.info("index ---- ", list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]]);
-
                                 if (list_question[list_question[massiv_question_id[index]].Bind].TypeQuestion == 6) {
                                     if (item.IndexRow != null && item.IndexRow != result[massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind)]) {
                                         return;
@@ -628,8 +425,6 @@
                                 } else if (item.IndexRow != null && (item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index && item.IndexRow != 0))
                                     return;
                             }
-                            console.info("___________>", item);
-                            console.info("________>", result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)]);
                             skip = Check_blocks_Row(item);
                             if (skip) { skip = false; return; }
                             code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
@@ -647,9 +442,6 @@
                     break;
                 case 6:
                     var availableTags = [];
-                    //var path_file = list_file[massiv_question_id[index]].PathFile;
-                    // console.info("path --- ", path_file);
-
                     var tmp_massive = {};
                     $.each(list_text_file[massiv_question_id[index]], function (i, item) {
                         var tmp_str = item.split('#');
@@ -681,7 +473,6 @@
 
     //Проверка активности группы при проходе вперед
     function CheckGroup() {
-
         if (list_group[massiv_question_id[index]] != null) {
             var number_group = list_group[massiv_question_id[index]];
             if (active_group[number_group] == false) {
@@ -701,14 +492,12 @@
     //Проверка активности группы при возврате назад
     function CheckGroup_Back() {
         if (list_group[massiv_question_id[index]] != null) {
-
             var number_group = list_group[massiv_question_id[index]];
             if (active_group[number_group] == false) {
                 var length_group = list_id_question_group[number_group].length;
                 for (var i = index; i < index + length_group; i++) {
                     result[i] = -404;
                     text_other[i] = ['null'];
-
                 }
                 index -= length_group;
                 CheckGroup_Back();
@@ -720,13 +509,18 @@
 
     //Осуществление шага вперед по анкете
     $(".next").click(function () {
-        //  $.when(function () {
-
+        if (index == 0) {
+            handler();
+            $('body').bind("mousemove keydown", handler);
+        }
+        if (index == 1) {
+            $('body').unbind("mousemove keydown", handler);
+            clearInterval(interval_active);
+        } 
         switch (type_q) {
             case 1:
                 if ($("input[name=group]:radio:checked").length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
-                    //     $('div.limit_checked_div').remove();
                 }
                 else {
                     $('div.wrong_choise').fadeOut('fast');
@@ -898,8 +692,6 @@
     //Проверка перехода при проходе вперед
     function checkTransitionGo() {
         var code_transition = find_transition_move(id_q, result[index]);
-        console.log("Code transition ==== ", code_transition);
-        console.log("result list ====== ", result[index]);
         if (code_transition >= 0) {
             if (Number(result[index]) > 0) {
                 if (result[index] == list_transition[code_transition].TriggerAnswer) {
@@ -912,7 +704,6 @@
                     }
                     index = jump_index;
                 } else {
-
                     index++;
                 }
             } else {
@@ -926,12 +717,10 @@
                     }
                     index = jump_index;
                 } else {
-
                     index++;
                 }
             }
         } else {
-
             index++;
         }
     }
@@ -950,10 +739,6 @@
 
     //Проверка выбраного ответа на прикрепленность к переходу к группе
     function CheckGroupGo() {
-        console.log(list_question_bind_group);
-        console.log(list_bind_answer_group);
-        console.log(result[index]);
-        console.log(list_base_answer)
         switch (type_q) {
             case 1:
                 if (list_bind_answer_group[result[index]] != null) {
@@ -1053,9 +838,6 @@
                     $.each(mas_ans, function (i, item) {
                         var tmp = $('.answer_table').find('input[id=' + item[0] + ']');
                         tmp.val(item[1]);
-                        /* if (tmp.parent().parent().hasClass('base_answer')) {
-                             checkedAnswerBase(tmp.parent().parent());
-                         } */
                     })
                     break;
                 case 4:
@@ -1115,7 +897,6 @@
                     change_list['length'] = count;
                 }
             });
-            console.info("cchange list -0---- ", change_list);
             if (change_list.length > 0) {
                 delete change_list['length'];
                 code = '<div class="change_answer_table"><table>';
@@ -1123,7 +904,6 @@
                     if (result[massiv_question_id[index]] == undefined)
                         code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '"/><label for="' + item.Id + '"><span></span></label><span>' + item.AnswerText + '</span></td></tr>';
                     else {
-                        console.info("op[wpeoropwre ------- ", result[massiv_question_id[index]]);
                         if (result[massiv_question_id[index]] == item.Id)
                             code += '<tr class="tool_layer"><td><input type="radio" name="group" id ="' + item.Id + '" checked/><label for="' + item.Id + '"><span></span></label><span>' + item.AnswerText + '</span></td></tr>';
                         else
@@ -1149,6 +929,7 @@
             getStart();
         }
     });
+
     $(document).off("mouseenter", ".tool_layer");
     $(document).on("mouseenter", ".tool_layer", function () {
         if ($(this).find('input[name=group]').is(':disabled')) {
@@ -1215,18 +996,12 @@
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), '', function () { $('div.waiting_screen').remove(); });
     })
 
-
     //Дополнительные функции
     function Check_blocks(item) {
         var skip = false;
-
         if (list_blocks[id_q] != null) {
             if (list_blocks[id_q].length >= 1) {
-
-                console.log("List block length ===== ", list_blocks[id_q].length);
                 $.each(list_blocks[id_q], function (i, item_block) {
-                    //--------
-                    console.log("List block length ===== ", item_block);
                     if (item_block.fromQuestion == id_q && item_block.typeBlock == 1) {
                         $.each(result[massiv_question_id.indexOf(Number(item_block.toQuestion))], function (i, item_tmp) {
                             if (Number(item_tmp) <= 1) {
@@ -1253,52 +1028,14 @@
                             }
                         });
                     }
-                    //------
                 })
-            }/* else if (list_blocks[id_q].length == 1) {
-                // --------
-                if (list_question[id_q].Bind_Blocks != null) {
-                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 1) {
-                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
-                            if (Number(item_tmp) <= 1) {
-                                skip = false; return;
-                            }
-                            if (item.AnswerType != 2) {
-                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
-                                    skip = true; return;
-                            }
-                        });
-                    }
-                    if (list_blocks[id_q].fromQuestion == id_q && list_blocks[id_q].typeBlock == 2) {
-                        skip = true;
-                        $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
-                            if (Number(item_tmp) <= 1) {
-                                skip = false; return;
-                            }
-                            if (item.AnswerType != 2) {
-                                if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index) {
-                                    skip = false; return;
-                                }
-                            }
-                            else {
-                                skip = false;
-                            }
-                        });
-                    }
-                }
-                // --------
-            }*/
+            }
         }
-
-        /*
-        */
         return skip;
     }
     function Check_blocks_Row(item) {
         var skip = false;
         if (list_question[id_q].Bind_Blocks != null) {
-           // console.warn(list_blocks);
-           // alert(list_blocks[id_q][0].fromQuestion + " " + id_q + " " + list_blocks[id_q][0].typeBlock + " " + list_blocks["446"].fromQuestion);
             if (list_blocks[id_q][0].fromQuestion == id_q && list_blocks[id_q][0].typeBlock == 1) {
                 $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
                     if (item.AnswerType != 2) {
@@ -1324,7 +1061,6 @@
                 });
             }
         }
-        console.info(skip);
         return skip;
     }
 
@@ -1384,7 +1120,6 @@
                 console.log("ID question ==== ", id_question);
                 for (var j = 0; j < list_result.length; j++) {
                     if (Number(list_result[j]) < 0) {
-                        console.log("Find minus id ===== ", Number(list_result[j]));
                         var is_find = false;
                         var item_find;
 
@@ -1481,7 +1216,6 @@
             }
             var break_loop = false;
             $.each(list_quota, function (i, item) {
-
                 if (item.ChainString.indexOf(id_q + '/') == 0) {
                     var str_chain = id_q + '/' + res;
                     $.each(list_quota, function (i, item) {
@@ -1503,7 +1237,6 @@
                 } else {
                     $.each(massive_string_chain, function (index_chain, item_chain) {
                         var str_chain = item_chain + '#' + id_q + '/' + res;
-
                         $.each(list_quota, function (i, item) {
                             if (item.ChainString == str_chain) {
                                 item.IsActive = true;
@@ -1525,8 +1258,6 @@
 
             });
         }
-        console.warn("Chain >>> ", massive_string_chain);
-        console.log("Massive string chain ==== ", list_quota);
     }
 
     function CheckQuotaBack() {
@@ -1587,37 +1318,6 @@
         $('.PreLoader').show();
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'));
     })
-
-    //Проверка вхождения вопроса в цикл
-    function CheckLoop() {
-        if (list_loop.length != 0) {
-            var id_n_q = id_q;
-            console.warn("ID question >>> ", id_n_q);
-        }
-        //var id_question = massiv_question_id[index];
-        //$.each(list_loop, function (i, item) {
-
-        //    if (item.IsActive == true) {
-        //        if (item.toQuestion == id_question) {
-
-        //            list_loop[i].CountLoop = list_loop[i].CountLoop - 1;
-        //            if (list_loop[i].CountLoop <= 0) {
-        //                alert("End of loop");
-        //                list_loop[i].IsActive = false;
-        //                return false;
-        //            } else {
-        //                index = massiv_question_id.indexOf(item.fromQuestion);
-        //            }
-        //        }
-        //    } else {
-        //        if (item.fromQuestion == id_question) {
-        //            list_loop[i].IsActive = true;
-        //        }
-        //    }
-
-        //})
-        //console.log("List loop >>> ", list_loop);
-    }
 
     $('.NewButton').hover(
         function () {
