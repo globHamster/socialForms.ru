@@ -2310,19 +2310,17 @@ namespace SocialFORM.Controllers
             try
             {
                 var fileContent = Request.Files[0];
+                Response.AppendToLog("11111");
                 if (fileContent != null && fileContent.ContentLength > 0)
                 {
+                    Response.AppendToLog("sup before saveAs");
                     string name_file = fileContent.FileName;
-                    fileContent.SaveAs("\\\\192.168.0.3\\number\\tmp_file.csv");
+                    Response.AppendToLog("before saveAs");
+                    
+                    Response.AppendToLog("after saveAs");
                     using (PhoneContext pc = new PhoneContext())
                     {
-                        pc.Database.ExecuteSqlCommand("LOAD DATA INFILE \"D:/number/tmp_file.csv\" INTO TABLE table" + table + " character set cp1251 FIELDS TERMINATED BY  \";\" ENCLOSED BY  \"\" ESCAPED BY  \"\\\\\" LINES TERMINATED BY  \"\\r\\n\"");
-
-                        string full_path = "\\\\192.168.0.3\\number\\tmp_file.csv";
-                        if (System.IO.File.Exists(full_path))
-                        {
-                            System.IO.File.Delete(full_path);
-                        }
+                        pc.Database.ExecuteSqlCommand("LOAD DATA INFILE \"D:/number/"+name_file+"\" INTO TABLE table" + table + " character set cp1251 FIELDS TERMINATED BY  \";\" ENCLOSED BY  \"\" ESCAPED BY  \"\\\\\" LINES TERMINATED BY  \"\\r\\n\"");
 
                         pc.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_file + "\" WHERE Id=" + table);
 
@@ -2343,6 +2341,9 @@ namespace SocialFORM.Controllers
             {
                 System.Diagnostics.Debug.WriteLine(e.ToString());
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                Response.AppendToLog(e.Message);
+                Response.AppendToLog(e.TargetSite.ToString());
+                Response.AppendToLog(e.ToString());
             }
             return Json(callback);
         }
@@ -2706,6 +2707,17 @@ namespace SocialFORM.Controllers
             context.SetOprosNN.Add(list);
             await context.SaveChangesAsync();
             return list.id;
+        }
+
+        [HttpPost]
+        public void ChangeEncodeProject(int id, string encode)
+        {
+            ProjectModel tmp = db2.SetProjectModels.FirstOrDefault(u => u.Id == id);
+            if (tmp != null)
+            {
+                tmp.SettingEncode = encode;
+                db2.SaveChanges();
+            }
         }
 
     }
