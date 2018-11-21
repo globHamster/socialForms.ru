@@ -28,18 +28,7 @@ function SetQuestionBlock(block, item) {
             "</div><div class='PanelSettings'></div></div>" +
             "<div class='SaveChange'><div class='SaveChangeButton'>Сохранить</div></div></div>"
         );
-    } else {
-        block.append("<div class='QuestionBlock sortable IsChange MainItem'><div name='QuestionInfo' style='display: none'>" +
-                        "<input name='groupInfo' type='hidden' value='" + group_id + "' />" +
-                        "<input name='questionInfo' type='hidden' value=0 />" +
-                        "<input name='questionType' type='hidden' value=1 />" +
-                        "</div>" +
-                        "<div class='ShortNameQuestion'><div style='width: 100%;'>New Question</div><div class='EditQuestionName'>&#9000;</div><div class='DeleteQuestion' style='color: #fff;'>&#10006;</div><button class='hidePanel' style='display: inline-flex'>hide</button></div>" +
-                        "<div class='QuestionText HideOff NewQuestionBlock IsChange' id=0><textarea id='example' style='width: 80 %; height: 300px; display: none;'></textarea></div>" +
-                        "<div class='SettingsPanel'><div class='NameType'>Type</div><div class='WallOfTypes' style='position: relative; z - index: 5; height: 30px; width: 30px'>></div></div>" +
-                        "<div class='AnswerBlock HideOff' style='overflow-y: auto;'><div class='AnswerSettings'></div></div>" +
-                        "<div class='SaveChange'><div class='SaveChangeButton'>Сохранить</div></div></div>");
-    }
+    } 
    // SetAnswerNew(id_question, $('.NewBlock'));
     Init();
 }
@@ -1203,9 +1192,9 @@ function Init() {
                             '<div style="display: inline-flex; width: 30%;"><div class="toQuestion" style="margin-right: 20px;">Переход к </div><div>' + query.toQuestion + '</div></div>' +
                             '<div style="display: inline-flex; width: 30%;"><div class="TriggerAnswer" style="margin-right: 20px;">По вопросу </div><div>' + query.TriggerAnswer + '</div></div>' +
                             '<div class="StyleButton DeleteTrans" style="width: 30px; height: 30px; background-color: #f44336;">&#10006;</div>' +
-                            '</div>')
+                        '</div>')
+                    $('.AddAnswer').find('.AnswerItem[id=' + query.TriggerAnswer + ']').append('<div class="isTransition" style="width:10px;height:10px;border-radius:10px;background-color:#71c874;"></div>')
                     enableScroll();
-                    $('.PanelQuestion').off("click", ".SaveTransition");
                     block.parents(".BlockWallTrans").remove();
                 })
                 .error(function () {
@@ -1217,9 +1206,11 @@ function Init() {
     $('.NewBlock').on("click", ".DeleteTrans", function () {
         var block = $(this).parent();
         var id_trans = Number(block.attr('id'));
+        var trigger_answer = $(this).parent().find('.TriggerAnswer').next().text();
         $.post("/Question/deleteTransition", { id_transition: id_trans })
             .success(function () {
                 block.remove();
+                $('.AddAnswer').find('.AnswerItem[id=' + trigger_answer + ']').find('.isTransition').remove();
             })
     })
 
@@ -1753,6 +1744,7 @@ function LoadSettingsSingle(panel, q_data) {
                             '<div style="display: inline-flex; width: 30%;"><div class="TriggerAnswer" style="margin-right: 20px;">По вопросу </div><div>' + item.TriggerAnswer + '</div></div>' +
                             '<div class="StyleButton DeleteTrans" style="width: 30px; height: 30px; background-color: #f44336;">&#10006;</div>' +
                             '</div>')
+                        $('.AddAnswer').find('.AnswerItem[id=' + item.TriggerAnswer + ']').append('<div class="isTransition" style="width:10px;height:10px;border-radius:10px:background-color:#71c874;"></div>');
                     })
                 }
                 console.log("Transition >>> ", tr_data);

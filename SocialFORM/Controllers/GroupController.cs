@@ -315,6 +315,18 @@ namespace SocialFORM.Controllers
             {
                 answerAll_tmp.AddRange(db2.SetAnswerAll.Where(u => u.QuestionID == item.Id).ToList());
             }
+            List<AnswerAll> bind_list_answer = db2.SetAnswerAll.Where(u => u.BindGroup == id_group).ToList();
+            foreach(var item in bind_list_answer)
+            {
+                QuestionModel t_question = db2.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID);
+                if (t_question != null)
+                {
+                    if (t_question.ProjectID == id_project)
+                    {
+                        item.BindGroup = null;
+                    }
+                }
+            }
             db2.SetAnswerAll.RemoveRange(answerAll_tmp);
             db2.SetQuestions.RemoveRange(question_tmp);
             db2.SaveChanges();

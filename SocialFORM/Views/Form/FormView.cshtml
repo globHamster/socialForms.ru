@@ -4,7 +4,7 @@
 <link href="~/Content/css/form_formView_style.css" rel="stylesheet" />
 
 <script src="~/Scripts/chosen.jquery.js" type="text/javascript"></script>
-
+@Scripts.Render("~/Scripts/jquery.maskedinput.js")
 <div class="title">@ViewBag.Title</div>
 <div name="projectID" id="@ViewBag.ProjectID" style="display: none;" />
 <div name="operatorID" id="@ViewBag.ProjectID" style="display: none;" />
@@ -37,7 +37,7 @@
     </div>
     <button class="all_again" style="margin-top: 20px; display: none;">Начать заново</button>
     <br />
-    
+
 </div>
 <div class="TextLimitQuota">
     <div class="TextDiv">
@@ -285,7 +285,7 @@
                         status = 1;
                     })
                     .error(function () { alert("Error"); })
-                
+
             }
             if (index == massiv_question_id.length - 1) {
                 $.get("/Form/GetServerTime")
@@ -345,7 +345,7 @@
                     break;
                 // Прорисовка ответов Multi
                 case 2:
-                    { 
+                    {
                         var skip = false;
                         var array_answer = [];
                         var array_base_anwer = [];
@@ -414,7 +414,7 @@
                         }
                     });
                     if (is_rotate) { array_row.rand(); } // Осуществляет перетасовку ответов в случайном порядке
-                    
+
                     $.each(array_row, function (i, item) {
                         if (item.TableID == id_q) {
                             if (list_question[massiv_question_id[index]].Bind != null) {
@@ -516,7 +516,7 @@
         if (index == 1) {
             $('body').unbind("mousemove keydown", handler);
             clearInterval(interval_active);
-        } 
+        }
         switch (type_q) {
             case 1:
                 if ($("input[name=group]:radio:checked").length == 0) {
@@ -856,12 +856,24 @@
     }
 
     function BindMassk(id_massk) {
-        $('.answer_table input[name=group]').bind("change keyup input", function () {
-            if (this.value.match(RegExp(String(list_massk[id_massk])))) {
-                this.value = this.value.substr(0, this.value.length - 1);
-            }
-
-        });
+        if (id_massk == 1) {
+            $.mask.definitions['H'] = '[1-9]';
+            $('input.free_text').mask("H9", {
+                completed: function () {
+                    if (this.val() < 18) {
+                        this.val("");
+                        $('input.free_text').val("").focus();
+                    }
+                }
+            });
+        }
+        if (id_massk != 1) {
+            $('.answer_table input[name=group]').bind("change keyup input", function () {
+                if (this.value.match(RegExp(String(list_massk[id_massk])))) {
+                    this.value = this.value.substr(0, this.value.length - 1);
+                }
+            });
+        }
     }
 
     function CheckCountAnswer(check_id_question) {

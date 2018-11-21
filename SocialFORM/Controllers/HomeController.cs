@@ -25,6 +25,7 @@ using ClosedXML.Excel;
 using System.Data;
 using LumenWorks.Framework.IO.Csv;
 using System.Net;
+using SocialFORM.Models.DB;
 
 namespace SocialFORM.Controllers
 {
@@ -465,7 +466,7 @@ namespace SocialFORM.Controllers
                         if (item.GroupID > 0)
                             products.Columns.Add(("Г" + item.GroupID + " " + item.GroupName.ToString()).ToString());
                         else
-                            products.Columns.Add("(Single)"+item.GroupName.ToString());
+                            products.Columns.Add(item.GroupName.ToString());
                         if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
                         {
                             if (item.GroupID > 0)
@@ -485,9 +486,9 @@ namespace SocialFORM.Controllers
                             for (int i = 1; i <= tmp_count; i++)
                             {
                                 if (item.GroupID > 0)
-                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
+                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_в" + i);
                                 else
-                                    products.Columns.Add("(Multi)"+item.GroupName + "_" + i);
+                                    products.Columns.Add(item.GroupName + "_в" + i);
                             }
                             if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
                             {
@@ -502,9 +503,9 @@ namespace SocialFORM.Controllers
                                 foreach (var item_answer in listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true))
                                 {
                                     if (item.GroupID > 0)
-                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др_" + count);
+                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др_в" + count);
                                     else
-                                        products.Columns.Add(item.GroupName + "_др_" + count);
+                                        products.Columns.Add(item.GroupName + "_др_в" + count);
                                     count++;
                                 }
                             }
@@ -518,7 +519,7 @@ namespace SocialFORM.Controllers
                                 if (item.GroupID > 0)
                                     products.Columns.Add("Г" + item.GroupID + " " + item.GroupName);
                                 else
-                                    products.Columns.Add("(Free)"+item.GroupName.ToString());
+                                    products.Columns.Add(item.GroupName.ToString());
                             }
                             else
                             {
@@ -560,9 +561,9 @@ namespace SocialFORM.Controllers
                             for (int i = 1; i <= count_row; i++)
                             {
                                 if (item.GroupID > 0)
-                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
+                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_стр" + i);
                                 else
-                                    products.Columns.Add("(Table)"+item.GroupName + "_" + i);
+                                    products.Columns.Add(item.GroupName + "_стр" + i);
                             }
                         }
                         break;
@@ -764,7 +765,7 @@ namespace SocialFORM.Controllers
                             {
                                 int count_row = listTableRow[(int)group_item.QuestionID].Count();
                                 int count_row_result = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).Count();
-                                int null_count_row = listTableRow[(int)group_item.QuestionID].Where(u => u.IndexRow == null).Count();
+                                int null_count_row = listTableRow[(int)group_item.QuestionID].Where(u => u.IndexRow == 0).Count();
                                 int max_cont_row = 0;
                                 foreach (var item_row in listTableRow[(int)group_item.QuestionID])
                                 {
