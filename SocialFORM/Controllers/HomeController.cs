@@ -1792,7 +1792,9 @@ namespace SocialFORM.Controllers
             }
             if (st != "-1" && et != "-1")
             {
-                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Time) <= Convert.ToDateTime(ed + " " + et) && Convert.ToDateTime(u.Data) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Data) <= Convert.ToDateTime(ed + " " + et)).ToList();
+                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time).Ticks - ((Convert.ToDateTime(u.Time).Ticks - Convert.ToDateTime(u.Data).Ticks) / 2) >= Convert.ToDateTime(sd + " " + st).Ticks && Convert.ToDateTime(u.Time).Ticks - ((Convert.ToDateTime(u.Time).Ticks - Convert.ToDateTime(u.Data).Ticks) / 2) <= Convert.ToDateTime(ed + " " + et).Ticks).ToList();
+
+                //tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Time) <= Convert.ToDateTime(ed + " " + et) && Convert.ToDateTime(u.Data) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Data) <= Convert.ToDateTime(ed + " " + et)).ToList();
                 //tmp1_1 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
                 //tmp1_2 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 1 && Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
                 //tmp1_3 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
@@ -1821,6 +1823,7 @@ namespace SocialFORM.Controllers
         {
             List<StatResViewModel> StatRes = new List<StatResViewModel>();
             List<ResultModel> tmp1 = db.SetResultModels.ToList();
+            List<ResultModel> tmp1_k = db.SetResultModels.ToList();
             List<ResultModel> tmp1_1 = db.SetResultModels.ToList();
             List<ResultModel> tmp1_2 = db.SetResultModels.ToList();
             List<ResultModel> tmp1_3 = db.SetResultModels.ToList();
@@ -1846,10 +1849,9 @@ namespace SocialFORM.Controllers
             }
             if (st != "-1" && et != "-1")
             {
-                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Time) <= Convert.ToDateTime(ed + " " + et) && Convert.ToDateTime(u.Data) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Data) <= Convert.ToDateTime(ed + " " + et)).ToList();
-                //tmp1_1 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
-                //tmp1_2 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(sd)) == 1 && Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("23:59:59")) == -1).ToList();
-                //tmp1_3 = tmp1.Where(u => Convert.ToDateTime(u.Data.ToShortDateString()).CompareTo(Convert.ToDateTime(ed)) == 0 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse("00:00:00")) == 1 && TimeSpan.Parse(u.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(et)) == -1).ToList();
+                //(TimeSpan.Parse(u.Time).Ticks - ((TimeSpan.Parse(u.Time).Ticks - (TimeSpan.Parse(Convert.ToDateTime(u.Data).ToLongTimeString()).Ticks / 2)))))
+                tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time).Ticks - ((Convert.ToDateTime(u.Time).Ticks - Convert.ToDateTime(u.Data).Ticks) / 2) >= Convert.ToDateTime(sd + " " + st).Ticks && Convert.ToDateTime(u.Time).Ticks - ((Convert.ToDateTime(u.Time).Ticks - Convert.ToDateTime(u.Data).Ticks) / 2) <= Convert.ToDateTime(ed + " " + et).Ticks).ToList();
+                //tmp1 = tmp1.Where(u => Convert.ToDateTime(u.Time) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Time) <= Convert.ToDateTime(ed + " " + et) && Convert.ToDateTime(u.Data) >= Convert.ToDateTime(sd + " " + st) && Convert.ToDateTime(u.Data) <= Convert.ToDateTime(ed + " " + et)).ToList();
             }
 
             //
@@ -1905,6 +1907,19 @@ namespace SocialFORM.Controllers
                             if (min >= DateTime.Parse(item.Time).Subtract(item.Data)) { min = DateTime.Parse(item.Time).Subtract(item.Data); }
                             if (max <= DateTime.Parse(item.Time).Subtract(item.Data)) { max = DateTime.Parse(item.Time).Subtract(item.Data); }
                         }
+                        if (count == 1)
+                        {
+                            double seconds = 0;
+                            foreach (ResultModel item in tmp_list)
+                            {
+                                seconds += DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds;
+                            }
+                            seconds = seconds / tmp_list.Count;
+                            int minutes = (int)Math.Floor(seconds / 60);
+                            seconds -= minutes * 60;
+                            ttmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
+                            ttmp2 = new DateTime(1, 1, 1, 0, 0, 0);
+                        }
                         if (count > 1)
                         {
                             double seconds = 0; double secondsOT = 0;
@@ -1917,23 +1932,14 @@ namespace SocialFORM.Controllers
                             {
                                 secondsOT += Math.Pow(DateTime.Parse(item.Time).Subtract(item.Data).TotalSeconds - seconds, 2);
                             }
-                            secondsOT /= (tmp_list.Count - 1); secondsOT = Math.Sqrt(secondsOT);
+                            secondsOT /= (tmp_list.Count - 1);
+                            secondsOT = Math.Sqrt(secondsOT);
                             int minutesOt = (int)Math.Floor(secondsOT / 60);
                             int minutes = (int)Math.Floor(seconds / 60);
                             seconds -= minutes * 60;
                             secondsOT -= minutesOt * 60;
                             ttmp = new DateTime(1, 1, 1, 0, minutes, (int)seconds);
                             ttmp2 = new DateTime(1, 1, 1, 0, minutesOt, (int)secondsOT);
-                        }
-
-                        //Количество анкет в час
-                        List<ResultModel> t_tmp = tmp_list.Reverse<ResultModel>().ToList();
-                        TimeSpan t1 = new TimeSpan();
-                        if (count != 0)
-                        {
-                            t1 = TimeSpan.Parse(DateTime.Parse(t_tmp.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
-                            Double t2 = t1.TotalHours;
-                            count_ch = count / t2;
                         }
 
                         //Время работы
@@ -1948,7 +1954,45 @@ namespace SocialFORM.Controllers
                         }
                         else
                         {
-                            countUser = sessionHubs.Where(q => q.EndTime == null || TimeSpan.Parse(q.EndTime).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserId).Select(group => group.First()).Count();
+                            countUser = tmp_list.Where(q => q.Data == null || TimeSpan.Parse(q.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserID).Select(group => group.First()).Count();
+                            //countUser = sessionHubs.Where(q => q.EndTime == null || TimeSpan.Parse(q.EndTime).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserId).Select(group => group.First()).Count();
+                        }
+
+                        //Количество анкет в час
+                        List<ResultModel> t_tmp = tmp_list.Reverse<ResultModel>().ToList();
+                        List<ResultModel> tt_tmp1 = new List<ResultModel>();
+                        List<ResultModel> tt_tmp2 = new List<ResultModel>();
+                        List<ResultModel> tt_tmp3 = new List<ResultModel>();
+                        List<User> tmp_users = db.SetUser.ToList();
+                        TimeSpan t1 = new TimeSpan();
+                        if (count != 0)
+                        {
+                            Double t2 = 0;
+                            count_ch = 0;
+                            foreach (var tu in tmp_users)
+                            {
+
+                                tt_tmp1 = t_tmp.Where(c => c.UserID == tu.Id).ToList();
+                                tt_tmp2 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
+                                tt_tmp3 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
+                                if (tt_tmp2.Count != 0)
+                                {
+                                    string tstr1 = tt_tmp2.First().Data.ToLongDateString();
+                                    int tstr2 = tt_tmp2.First().BlankID;
+                                    int tstr3 = tt_tmp2.First().UserID;
+                                    if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() != 0)
+                                    {
+                                        t1 = TimeSpan.Parse(et).Subtract(TimeSpan.Parse(st));
+                                    }
+                                    else
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("1..n => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  "  + tt_tmp2.First().Data.ToLongTimeString());
+                                    }
+                                    t2 = t1.TotalHours;
+                                    count_ch += tt_tmp2.Count / t2;
+                                }
+                            }
+                            count_ch = count_ch / countUser;
                         }
 
                         //string sessionStartTime = "";
@@ -2190,9 +2234,9 @@ namespace SocialFORM.Controllers
             //Количество пользователей
             SR.CountUserView = (ccount / StatRes.Count).ToString("0");
             //Кол-во анкет
-            SR.CountProjectView = (tmpd2 / StatRes.Count).ToString("0.0");
+            SR.CountProjectView = (tmpd2 / StatRes.Count).ToString("0");
             //Количество анкет в час
-            SR.CountHourView = (tmpd3 / StatRes.Count).ToString("0.0");
+            SR.CountHourView = (tmpd3 / StatRes.Count).ToString("0.00");
             //Среднее время
             SR.MediumTimeView = TimeSpan.FromTicks(ticks1 / (long)StatRes.Count).ToString(@"hh\:mm\:ss");
             //Минимально
@@ -2211,7 +2255,7 @@ namespace SocialFORM.Controllers
             //Кол-во анкет
             MAX.CountProjectView = (tmpd1MAX).ToString("0");
             //Количество анкет в час
-            MAX.CountHourView = (tmpd3MAX).ToString("0.0");
+            MAX.CountHourView = (tmpd3MAX).ToString("0.00");
             //Среднее время
             MAX.MediumTimeView = TimeSpan.FromTicks(ticks1MAX).ToString(@"hh\:mm\:ss");
             //Минимально
@@ -2230,7 +2274,7 @@ namespace SocialFORM.Controllers
             //Кол-во анкет
             MIN.CountProjectView = (tmpd1MIN).ToString("0");
             //Количество анкет в час
-            MIN.CountHourView = (tmpd3MIN).ToString("0.0");
+            MIN.CountHourView = (tmpd3MIN).ToString("0.00");
             //Среднее время
             MIN.MediumTimeView = TimeSpan.FromTicks(ticks1MIN).ToString(@"hh\:mm\:ss");
             //Минимально
@@ -2267,8 +2311,7 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void SetNumber(string str_numb)
         {
-            using (PhoneContext pc = new PhoneContext())
-            {
+            using (PhoneContext pc = new PhoneContext()) {
                 Phone tmp = new Phone();
                 tmp.Number = str_numb;
                 pc.Phones.Add(tmp);
@@ -2281,9 +2324,9 @@ namespace SocialFORM.Controllers
         {
             using (PhoneContext pc = new PhoneContext())
             {
-                for (int i = 1; i <= 10; i++)
+                for (int i = 1; i<=10; i++)
                 {
-                    pc.Database.ExecuteSqlCommand("INSERT INTO testtable VALUES (" + i + "," + (i * 100) + ")");
+                    pc.Database.ExecuteSqlCommand("INSERT INTO testtable VALUES ("+i+","+(i*100)+")");
                 }
             }
         }
@@ -2347,6 +2390,7 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public JsonResult GetListTable()
         {
+         
             using (PhoneContext pc = new PhoneContext())
             {
                 var tmp = pc.Database.SqlQuery<TableInfo>("SHOW TABLES FROM phone").ToList();

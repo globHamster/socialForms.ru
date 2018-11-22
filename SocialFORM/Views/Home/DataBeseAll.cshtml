@@ -335,6 +335,11 @@
             $.get("/Home/GetDiapazon", data)
                 .success(function (res) {
                     alert(res);
+                    document.getElementById('named').value = "";
+                    document.getElementById('kod').value = "";
+                    document.getElementById('sd').value = "";
+                    document.getElementById('ed').value = "";
+                    $('.numD').empty();
                 });
         }
     });
