@@ -1,122 +1,6 @@
 ﻿@model PagedList.IPagedList<SocialFORM.Models.Project.ProjectModel>
 @using PagedList.Mvc;
-<style>
-    .Button{
-        width: 150px;
-        height: 30px;
-        background-color: #72afff;
-        font-family: 'Century Gothic';
-        align-items: center;
-        display: inline-flex;
-        position:relative;
-        top: -1px;
-    }
-    .Text{
-        width: 100%;
-        text-align: center;
-    }
-    .ProjectName {
-        width: 350px;
-        font-family: 'Century Gothic';
-        padding: 5px;
-        display: inline-flex;
-    }
-    .PanelOfProject{
-        width: 100%;
-        padding: 10px;
-        box-shadow: 0 0 5px 1px black;
-    }
-    .ProjectLayer{
-        display: flex;
-        height: 30px;
-        border: 1px solid black;
-        border-left: 15px solid black;
-        border-bottom-left-radius: 15px;
-        border-top-left-radius: 15px;
-        margin-bottom: 5px;
-    }
-    .ExportButton {
-        display: flex;
-        justify-content: center;
-        align-content: space-between;
-        align-items: center;
-        flex-direction: column;
-        width: 100px;
-        height: 30px;
-        background-color: #008dd2;
-        cursor: default;
-        color: #fff;
-    }
-    .ShowDB {
-        display: flex;
-        justify-content: center;
-        align-content: space-between;
-        align-items: center;
-        flex-direction: column;
-        width: 100px;
-        height: 30px;
-        background-color: #008dd2;
-        cursor: default;
-        color: #fff;
-    }
-    .CheckEncode {
-        display: flex;
-        justify-content: center;
-        align-content: space-between;
-        align-items: center;
-        flex-direction: column;
-        width: 30px;
-        height: 30px;
-        background-color: #008dd2;
-        border-left: 2px solid #b0bec5;
-        cursor: pointer;
-        color: #fff;
-    }
-    .NameProjectDiv {
-        display: flex;
-        justify-content: center;
-        align-content: space-between;
-        align-items: flex-start;
-        flex-direction: column;
-        width: 100%;
-        height: 30px;
-        background-color: #008dd2;
-        cursor: pointer;
-        color: #fff;
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-    .SettingExport{
-        display:inline-flex;
-    }
-    .Scaled {
-        transform: scale(1.1,1.1);
-        box-shadow: 5px 5px black;
-        transition: 0.1s linear;
-    }
-
-    .NotScaled {
-        transform: scale(1,1);
-        box-shadow: 0px 0px black;
-        transition: 0.1s linear;
-    }
-    .EncodingString{
-        display: none;
-        position: fixed;
-        border: 5px inset #008dd2;
-        z-index: 999;
-        background: #fff;
-        padding: 5px;
-        font-family: 'Century Gothic';
-    }
-    .EncodingString > div {
-        background-color: #fff;
-        margin: 5px;
-    }
-    .EncodingString > div > input{
-        margin-right: 5px;
-    }
-</style>
+<link rel="stylesheet" href="~/Content/css/home_project.css" />
 
 
 <h2>Список проектов</h2>
@@ -140,7 +24,7 @@
                <div class="NameProjectDiv" id="@item.Id"> @Html.DisplayFor(modelItem => item.NameProject) </div>
             </td>
             <td style="display: inline-flex;">
-                <button class="infoP" id="@item.Id">?</button>
+                <div class="infoP" id="@item.Id">?</div>
                 <div class="ShowDB" id="@item.Id">База данных</div>
                 <div style="width:2px;"/>
                 <div class="SettingExport">
@@ -151,9 +35,9 @@
                 @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
                 @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
                 @if (item.ActionProject == true)
-                {<button class="actionProject" id="@item.Id">В работе</button>}
+                {<div class="actionProject Action" id="@item.Id">В работе</div>}
                 else
-                {<button class="actionProject" id="@item.Id">Заблокирован</button>}
+                {<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>}
             </td>
         </tr>
         <tr class="info_project" id="@item.Id" style="display:none">
@@ -185,7 +69,7 @@
         $('tr.info_project[id =' + id_project + ']').attr('style', 'display:none');
     });
 
-    $('button.infoP').click(function () {
+    $('div.infoP').click(function () {
         var id_project = $(this).attr('id');
         $('tr.info_project[id =' + id_project + ']').attr('style', 'display:normal');
         var code = null;
@@ -206,7 +90,7 @@
             });
     });
 
-    $('button.actionProject').click(function () {
+    $('div.actionProject').click(function () {
         var id_project = $(this).attr('id');
         $.ajax({
             type: "POST",
@@ -225,12 +109,6 @@
             document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id') + "&name_file=" + $(this).parent().parent().find('td').first().text();
         })
         
-        //$(".table").on("click", "button", function () {
-        //    alert("ewrqweq");
-        //    $("#Tables").load("/Form/SingleFormView?id_q=1");
-        //});
-
-
     });
 
     $('.create_project').click(function () {
@@ -250,6 +128,7 @@
             $('.create_project_button').fadeIn('slow');
         }
     });
+
     $('.create_project_button').click(function () {
         $.get('/Home/AddProject', { name_project: $('.create_project').text() })
             .success(function (data) {
@@ -264,7 +143,6 @@
                 $('.table').append(code);
             })
             .error(function () { alert('Не удалось добавить проект') });
-
     });
 
     $('.show_blanks').click(function () {
@@ -296,7 +174,6 @@
     $('table.table').on("mousedown", ".ExportButton", function () {
         $(this).addClass('NotScaled').removeClass('Scaled');
         setTimeout(function () { $('.PreLoader').hide(); }, 1000);
-        
     })
 
     $('table.table').on("mouseup", ".ExportButton", function () {
@@ -391,4 +268,19 @@
         }
     })
 
+    $('table.table').on("mouseenter", ".infoP", function () {
+        $(this).addClass('Scaled')
+    });
+
+    $('table.table').on("mouseleave", ".infoP", function () {
+        $(this).removeClass('Scaled');
+    })
+
+    $('table.table').on("mouseenter", ".actionProject", function () {
+        $(this).addClass("Scaled");
+    })
+
+    $('table.table').on("mouseleave", ".actionProject", function () {
+        $(this).removeClass("Scaled");
+    })
 </script>

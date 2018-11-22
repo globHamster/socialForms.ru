@@ -1809,13 +1809,11 @@ namespace SocialFORM.Controllers
                 tmp2.StartTimeView = item.Data.ToLongTimeString();
                 tmp2.EndTimeView = DateTime.Parse(item.Time).ToLongTimeString();
                 tmp2.LenghtTimeView = (DateTime.Parse(item.Time) - item.Data).ToString();
-
                 res.Add(tmp2);
-
             }
-
             return JsonConvert.SerializeObject(res);
         }
+
         //
         //Таблица Статистика PATH 2
         //
@@ -2328,9 +2326,6 @@ namespace SocialFORM.Controllers
                         callback.Add("Recall", tmp.Where(u => u.Status == "перезвонить").ToList().Count());
                     }
                 }
-
-
-
             }
             catch (Exception e)
             {
