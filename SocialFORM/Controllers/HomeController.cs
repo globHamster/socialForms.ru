@@ -1986,6 +1986,7 @@ namespace SocialFORM.Controllers
                                     }
                                     else
                                     {
+                                        t1 = TimeSpan.Parse(DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tt_tmp2.First().Data.ToLongTimeString()));
                                         System.Diagnostics.Debug.WriteLine("1..n => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  "  + tt_tmp2.First().Data.ToLongTimeString());
                                     }
                                     t2 = t1.TotalHours;
