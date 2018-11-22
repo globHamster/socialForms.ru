@@ -1744,7 +1744,7 @@ function LoadSettingsSingle(panel, q_data) {
                             '<div style="display: inline-flex; width: 30%;"><div class="TriggerAnswer" style="margin-right: 20px;">По вопросу </div><div>' + item.TriggerAnswer + '</div></div>' +
                             '<div class="StyleButton DeleteTrans" style="width: 30px; height: 30px; background-color: #f44336;">&#10006;</div>' +
                             '</div>')
-                        $('.AddAnswer').find('.AnswerItem[id=' + item.TriggerAnswer + ']').append('<div class="isTransition" style="width:10px;height:10px;border-radius:10px:background-color:#71c874;"></div>');
+                        $('.AddAnswer').find('.AnswerItem[id=' + item.TriggerAnswer + ']').append('<div class="isTransition" style="width:10px;height:10px;border-radius:10px;background-color:#71c874;"></div>');
                     })
                 }
                 console.log("Transition >>> ", tr_data);

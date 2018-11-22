@@ -2310,14 +2310,9 @@ namespace SocialFORM.Controllers
             try
             {
                 var fileContent = Request.Files[0];
-                Response.AppendToLog("11111");
                 if (fileContent != null && fileContent.ContentLength > 0)
                 {
-                    Response.AppendToLog("sup before saveAs");
                     string name_file = fileContent.FileName;
-                    Response.AppendToLog("before saveAs");
-                    
-                    Response.AppendToLog("after saveAs");
                     using (PhoneContext pc = new PhoneContext())
                     {
                         pc.Database.ExecuteSqlCommand("LOAD DATA INFILE \"D:/number/"+name_file+"\" INTO TABLE table" + table + " character set cp1251 FIELDS TERMINATED BY  \";\" ENCLOSED BY  \"\" ESCAPED BY  \"\\\\\" LINES TERMINATED BY  \"\\r\\n\"");
