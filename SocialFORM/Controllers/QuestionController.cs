@@ -234,7 +234,6 @@ namespace SocialFORM.Controllers
                     foreach (var item in list_tmp)
                     {
                         item.IndexQuestion = item_tmp.IndexQuestion + index;
-                        item.GroupName = "Вопрос " + (item_tmp.IndexQuestion + index);
                         db2.Entry(item).State = EntityState.Modified;
                         db2.SaveChanges();
                         index++;
