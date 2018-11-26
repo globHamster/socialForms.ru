@@ -897,6 +897,8 @@ function Init() {
             var container = $('.SaveChangeAnswer');
             if (container.has(event.target).length === 0 && container.parent().find('.TextAnswer').has(event.target).length === 0) {
                 var str_tmp = container.parent().find('.TextAnswer').find('input').val();
+                if (str_tmp == undefined || str_tmp == "") { return; }
+                
                 container.parent().find('.TextAnswer').empty().text(str_tmp);
                 container.removeClass("SaveChangeAnswer").addClass("EditAnswer");
                 container.empty().html("&#9000;");
@@ -906,7 +908,13 @@ function Init() {
         var text_str = item.text();
         item.empty();
         item.append('<input type="text" value="' + text_str + '" style="max-width: 99%; width: 99%;"/>');
-        item.find('input').focus().select();
+        item.find('input').focus().select().keydown(function (event) {
+            if (event.keyCode == 13) {
+                var str_tmp = item.find('input').val();
+                item.empty().text(str_tmp);
+                item.parent().find('.SaveChangeAnswer').removeClass('SaveChangeAnswer').addClass('EditAnswer').empty().html("&#9000;");
+            }
+        });
     })
 
     $('.NewBlock').on("click", ".AddAnswerMulti", function () {
@@ -1298,7 +1306,7 @@ function Init() {
             '<div class="BlockingSettingsPanel">' +
             '<input type="hidden" name="Project_id" value="' + project_id + '" />' +
             '<input type="hidden" name="Question_id" value="' + question_id + '" />' +
-            '<div style="display: inline-flex; width: 100%; height: 30px; font-family: Century Gothic;"><div class="ToQuestion" style="width: 50%;">Перейти к </div></div>' +
+            '<div style="display: inline-flex; width: 100%; height: 30px; font-family: Century Gothic;"><div class="ToQuestion" style="width: 50%;">Блокировать по</div></div>' +
             '<div style="display: inline-flex; width: 100%; height: 30px; font-family: Century Gothic;"><div class="TypeBlocking" style="width: 50%;">Тип блокировки </div></div>' +
             '<div class="StyleButton SaveBlocking" style="background-color: #81c784;">Сохранить</div>' +
             '</div>' +
