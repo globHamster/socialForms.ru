@@ -898,7 +898,6 @@ function Init() {
             if (container.has(event.target).length === 0 && container.parent().find('.TextAnswer').has(event.target).length === 0) {
                 var str_tmp = container.parent().find('.TextAnswer').find('input').val();
                 if (str_tmp == undefined || str_tmp == "") { return; }
-                
                 container.parent().find('.TextAnswer').empty().text(str_tmp);
                 container.removeClass("SaveChangeAnswer").addClass("EditAnswer");
                 container.empty().html("&#9000;");
