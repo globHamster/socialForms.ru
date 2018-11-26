@@ -26,21 +26,16 @@ namespace SocialFORM.Controllers
 
         public ActionResult ListQuestions(int project_id)
         {
-
-
             IEnumerable<QuestionModel> result = db.SetQuestions
                 .Where(u => u.ProjectID == project_id)
                 .ToList();
-
             int[] array = new int[result.Count()];
-
             int count = 0;
             foreach (var i in result)
             {
                 array[count] = i.Id;
                 count++;
             }
-
             ViewBag.Array = array;
             ViewBag.Count = 0;
             return PartialView(result);
@@ -48,7 +43,6 @@ namespace SocialFORM.Controllers
 
         public ActionResult Question(int array)
         {
-
             QuestionModel q = db.SetQuestions.FirstOrDefault(u => u.Id == 1);
             IEnumerable<ProjectModel> projects;
             using (ProjectContext project_db = new ProjectContext())
@@ -60,66 +54,56 @@ namespace SocialFORM.Controllers
             return View();
         }
 
-
-
+        //Сохранение вопроса в базу данных
         [HttpPost]
         public int Question(QuestionModel q)
         {
-            System.Diagnostics.Debug.WriteLine("Text : " + q.TextQuestion);
             QuestionModel tmp = q;
             db.Entry(tmp).State = EntityState.Modified;
             db.SaveChanges();
             return tmp.Id;
         }
 
-        [HttpPost]
-        public void Info(string str)
-        {
-            System.Diagnostics.Debug.WriteLine("Post test : " + str);
-        }
+        //[HttpGet]
+        //public ActionResult SingleFormQuestion(int array)
+        //{
+        //    QuestionModel q = db.SetQuestions.FirstOrDefault(u => u.Id == array);
+        //    ViewBag.Text = q.TextQuestion;
+        //    return View();
+        //}
 
-        [HttpGet]
-        public ActionResult SingleFormQuestion(int array)
-        {
-            QuestionModel q = db.SetQuestions.FirstOrDefault(u => u.Id == array);
-            ViewBag.Text = q.TextQuestion;
-            return View();
-        }
+        //public string SingleFormQuestion(string answer)
+        //{
 
-        public string SingleFormQuestion(string answer)
-        {
+        //    AnswerModel a = new AnswerModel();
+        //    a.AnswerText = answer;
+        //    db.SetAnswers.Add(a);
+        //    db.SaveChanges();
+        //    return answer.ToString();
+        //}
 
-            AnswerModel a = new AnswerModel();
-            a.AnswerText = answer;
-            db.SetAnswers.Add(a);
-            db.SaveChanges();
+        //[HttpGet]
+        //public ActionResult MultipleFormQuestion()
+        //{
+        //    return View();
+        //}
 
+        //[HttpPost]
+        //public string MultipleFormQuestion(string[] resp)
+        //{
+        //    string answer = "";
+        //    for (int i = 0; i < resp.Length; i += 2)
+        //    {
+        //        answer += resp[i] + " ";
+        //    }
+        //    AnswerModel tmp = new AnswerModel();
+        //    tmp.AnswerText = answer;
+        //    db.SetAnswers.Add(tmp);
+        //    db.SaveChanges();
+        //    return answer;
+        //}
 
-            return answer.ToString();
-        }
-
-        [HttpGet]
-        public ActionResult MultipleFormQuestion()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public string MultipleFormQuestion(string[] resp)
-        {
-
-            string answer = "";
-            for (int i = 0; i < resp.Length; i += 2)
-            {
-                answer += resp[i] + " ";
-            }
-            AnswerModel tmp = new AnswerModel();
-            tmp.AnswerText = answer;
-            db.SetAnswers.Add(tmp);
-            db.SaveChanges();
-            return answer;
-        }
-
+        //Сохранение списка ответов (с переадресацией в другую функцию)
         [HttpPost]
         public void SaveAnswerRange(List<AnswerModel> tmp)
         {
@@ -133,12 +117,12 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Сохранение одного ответа
         [HttpPost]
         public void Answer(AnswerModel tmp)
         {
             if (ModelState.IsValid)
             {
-                
                 if (tmp.Id > 0)
                 {
                     QuestionModel question = db.SetQuestions.FirstOrDefault(u => u.Id == tmp.QuestionID);
@@ -148,10 +132,6 @@ namespace SocialFORM.Controllers
                     answer.isFreeArea = tmp.isFreeArea;
                     answer.Index = tmp.Index;
                     db.SaveChanges();
-                    //answerAll.AnswerKey = tmp.Id;
-                    //answerAll.QuestionID = tmp.QuestionID;
-                    //answerAll.AnswerType = 1;
-                    //db.Entry(answerAll).State = EntityState.Modified;
                 }
                 else
                 {
@@ -167,6 +147,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Удаление списка ответов (с переадресацией в другую функцию)
         [HttpPost]
         public void DeleteListAnswer(List<int> list)
         {
@@ -176,6 +157,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Удалить одного ответа
         [HttpPost]
         public void deleteAnswer(int Id)
         {
@@ -200,14 +182,15 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Взять вопрос по id
         [HttpGet]
         public JsonResult getQuestion(int id)
         {
-            System.Diagnostics.Debug.WriteLine("Get id -> " + id);
             QuestionModel question = db.SetQuestions.Where(u => u.Id == id).First();
             return Json(question, JsonRequestBehavior.AllowGet);
         }
 
+        //Удалить вопрос по id
         [HttpPost]
         public int deleteQuestion(int id)
         {
@@ -245,14 +228,15 @@ namespace SocialFORM.Controllers
             return 200;
         }
 
+        //Взать ответ по id
         [HttpGet]
         public JsonResult getAnswer(int id_question)
         {
-            System.Diagnostics.Debug.WriteLine("Зашло " + id_question);
             List<AnswerModel> answers = db.SetAnswers.Where(u => u.QuestionID == id_question).OrderBy(u=>u.Index).ToList();
             return Json(answers, JsonRequestBehavior.AllowGet);
         }
 
+        //Удалить ответы относящиеся к вопрос id_question
         [HttpPost]
         public int deleteAllAnswer(int id_question)
         {
@@ -266,11 +250,12 @@ namespace SocialFORM.Controllers
             return 200;
         }
 
-        public ActionResult showQuestion()
-        {
-            return View();
-        }
+        //public ActionResult showQuestion()
+        //{
+        //    return View();
+        //}
 
+        //Взятие вопроса по id
         [HttpGet]
         public JsonResult sQuestion(int id)
         {
@@ -278,6 +263,7 @@ namespace SocialFORM.Controllers
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
+        //Сохранить строки для таблицы
         [HttpPost]
         public void setTableRow(int id_q, List<TableRow> text_row, List<AnswerModel> data)
         {
@@ -307,10 +293,10 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Взять строки для таблицы
         [HttpGet]
         public JsonResult getTableRow(int id_q, int id_a)
         {
-            System.Diagnostics.Debug.WriteLine("Get element TableRow - >" + id_q + " " + id_a);
             if (id_a == 0)
                 return Json(db.SetTableRows.Where(u => u.TableID == id_q).ToList(), JsonRequestBehavior.AllowGet);
             else
@@ -320,6 +306,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Удалить строки для таблицы
         [HttpPost]
         public void DeleteTableRow(int id_table_row)
         {
@@ -331,6 +318,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Удалить список строк для таблицы
         [HttpPost]
         public void DeleteAllTableRow(int id_q)
         {
@@ -342,6 +330,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Получение количества строк в таблице
         [HttpGet]
         public JsonResult getTableRowCount(int id_q)
         {
@@ -381,12 +370,14 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Получение списка базовых ответов
         [HttpGet]
         public JsonResult getAnswerBase()
         {
             return Json(db.SetAnswerBaseModels.ToList(), JsonRequestBehavior.AllowGet);
         }
 
+        //Сохранение указателя на ответ
         [HttpPost]
         public void setAnswerAll(AnswerAll answer)
         {
@@ -394,12 +385,14 @@ namespace SocialFORM.Controllers
             db.SaveChanges();
         }
 
+        //Получение указателя на ответ
         [HttpGet]
         public JsonResult getAnswerAll(int question_id)
         {
             return Json(db.SetAnswerAll.Where(u => u.QuestionID == question_id).ToList(), JsonRequestBehavior.AllowGet);
         }
 
+        //Удалить указателя на ответ
         [HttpPost]
         public void deleteAnswerAll(int id_answer)
         {
@@ -424,7 +417,6 @@ namespace SocialFORM.Controllers
             return Json(list_answer, JsonRequestBehavior.AllowGet);
         }
 
-        // Нужна ли эта функция?????
         //Функция выгрузки листа id всех ответов
         [HttpGet]
         public async Task<JsonResult> getIdAnswerAllGrow(string massiv) // Асинхронный метод выгрузки всех id ответов по вопросам
@@ -451,47 +443,42 @@ namespace SocialFORM.Controllers
             return Json(list_table_row, JsonRequestBehavior.AllowGet);
         }
 
+        //Получение количество указателей на ответ по вопросу
         [HttpGet]
         public JsonResult getAnswerAllCount(int question_id)
         {
             return Json(db.SetAnswerAll.Where(u => u.QuestionID == question_id).Count(), JsonRequestBehavior.AllowGet);
         }
 
-
+        //Получение списка вопросов относящихся к проекту
         [HttpGet]
         public async Task<JsonResult> getListQuestion(int id_p) // Асинхронный метод вывода листа с вопросами
         {
-            //List<GroupModel> tmp_list_group = new List<GroupModel>();
-            //using (GroupContext group_context = new GroupContext())
-            //{
-            //    tmp_list_group.AddRange(await group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u=>u.IndexQuestion).ToListAsync());
-            //}
-            //List<QuestionModel> tmp_list_question = new List<QuestionModel>();
-            //foreach(var item in tmp_list_group)
-            //{
-                //tmp_list_question.Add(await db.SetQuestions.FirstOrDefaultAsync(u => u.Id == item.QuestionID));
-            //}
             return Json(await db.SetQuestions.Where(u=>u.ProjectID == id_p).ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
+        //Получение списка базовых ответов
         [HttpGet]
         public async Task<JsonResult> getListAnswerBase() // Асинхроный метод вывода базовых ответов
         {
             return Json(await db.SetAnswerBaseModels.ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
+        //Получение списка переходов
         [HttpGet]
         public async Task<JsonResult> getListTransition(int id_p) //Асинхроный метод вывода таблицы переходов
         {
             return Json(await db.SetTransition.Where(u => u.ProjectID == id_p).ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
+        //Получение списка переходов относящиеся к вопросу
         [HttpGet]
         public JsonResult getListTransitionQuestion(int id_q)
         {
             return Json(db.SetTransition.Where(u => u.fromQuestion == id_q).ToList(), JsonRequestBehavior.AllowGet);
         }
 
+        //Сохранение перехода
         [HttpPost]
         public int setTransition(Transition transition)
         {
@@ -500,6 +487,7 @@ namespace SocialFORM.Controllers
             return transition.Id;
         }
 
+        //Удаление одного перехода
         [HttpPost]
         public void deleteTransition(int id_transition)
         {
@@ -508,6 +496,7 @@ namespace SocialFORM.Controllers
             db.SaveChanges();
         }
 
+        //Удаление списка переходов относящиеся к вопросу
         [HttpPost]
         public void deleteAllTransition(int id_question)
         {
@@ -516,12 +505,14 @@ namespace SocialFORM.Controllers
             db.SaveChanges();
         }
 
-        [HttpGet]
-        public JsonResult getListQuestionForTransite(int id_p)
-        {
-            return Json(db.SetQuestions.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
-        }
+        //????
+        //[HttpGet]
+        //public JsonResult getListQuestionForTransite(int id_p)
+        //{
+        //    return Json(db.SetQuestions.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
+        //}
 
+        
         [HttpGet]
         public JsonResult getMassk(int Id)
         {
@@ -534,11 +525,7 @@ namespace SocialFORM.Controllers
             return Json(await db.GetMassk.ToListAsync(), JsonRequestBehavior.AllowGet);
         }
 
-        /*
-         *РАбота с блокировками.
-         * 
-         */
-
+        //РАбота с блокировками.
         [HttpGet]
         public async Task<JsonResult> getListBlocks(int id_p)
         {
@@ -650,7 +637,6 @@ namespace SocialFORM.Controllers
                     if (is_find)
                     {
                         db.SetQuotaModels.Remove(item);
-                        System.Diagnostics.Debug.WriteLine("Id quota : " + item.Id + " // String : " + item.ChainString);
                         is_find = false;
                     }
                 }
@@ -658,18 +644,6 @@ namespace SocialFORM.Controllers
             }
         }
 
-        //[HttpPost]
-        //public void DeleteQuota(List<int> list_quota)
-        //{
-        //    List<QuotaModel> list_tmp = new List<QuotaModel>();
-        //    foreach(var item in list_quota)
-        //    {
-        //        list_tmp.Add(db.SetQuotaModels.First(u => u.Id == item));
-        //    }
-        //    db.SetQuotaModels.RemoveRange(list_tmp);
-        //    db.SaveChanges();
-        //}
-        
         [HttpPost]
         public void ChangeKvot(List<string> new_changes)
         {
@@ -790,22 +764,6 @@ namespace SocialFORM.Controllers
                 await db.SaveChangesAsync();
             }
         }
-
-        //[HttpPost]
-        //public void DeleteQuota(int id_p, int id_q)
-        //{
-        //    List<QuotaModel> tmp_quota = db.SetQuotaModels.Where(u => u.ProjectID == id_p).ToList();
-        //    List<QuotaModel> quota_list_to_remove = new List<QuotaModel>();
-        //    foreach(var item in tmp_quota)
-        //    {
-        //        if (item.ChainString.Contains(id_q.ToString()))
-        //        {
-        //            quota_list_to_remove.Add(item);
-        //        }
-        //    }
-        //    db.SetQuotaModels.RemoveRange(quota_list_to_remove);
-        //    db.SaveChanges();
-        //}
 
         public ActionResult Loop(int id_p)
         {

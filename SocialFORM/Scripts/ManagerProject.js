@@ -8,14 +8,8 @@ $.get("/Question/getAnswerBase")
         console.log("First Start --- ", list_base);
     })
 
+//Функция вывода функционала для редактора вопросов \
 function SetQuestionBlock(block, item) {
-    //$.get("/Question/getAnswerBase")
-    //    .success(function (base_data) {
-    //        $.each(base_data, function (i, b_item) {
-    //            list_base[b_item.Id] = b_item;
-    //        })
-    //    })
-    
     if (item != null & item != undefined) {
         var id_question = item.QuestionID;
         block.append("<div class='QuestionBlock NewBlock MainItem' id='" + item.IndexQuestion + "'><div name='QuestionInfo' style='display: none'>" +
@@ -29,10 +23,10 @@ function SetQuestionBlock(block, item) {
             "<div class='SaveChange'><div class='SaveChangeButton'>Сохранить</div></div></div>"
         );
     } 
-   // SetAnswerNew(id_question, $('.NewBlock'));
     Init();
 }
 
+//Функция присвоения типа вопроса
 function SetQuestionNew(item, parent, q_data) {
     $.get("/Question/getQuestion", { id: parent })
         .success(function (q_data) {
@@ -66,6 +60,7 @@ function SetQuestionNew(item, parent, q_data) {
         })
 }
 
+//Функция вывода ответов относящиеся к вопросу
 function SetAnswerNew(id_question, block, q_data) {
     //var type_question = $('.BlockQuestionEditor').find('div.QuestionText[id=' + id_question + ']').parent().find('div[name=QuestionInfo]').find('input[name=questionType]').val();
     var type_question = block.find('div[name=QuestionInfo]').find('input[name=questionType]').val();
@@ -81,7 +76,6 @@ function SetAnswerNew(id_question, block, q_data) {
                             })
                             var tmp = block.find('div.QuestionText[id=' + id_question + ']').parent().find('div.AnswerBlock');
                             $.each(answer_all, function (i, item) {
-                                console.log("Item --- ", item);
                                 if (item.AnswerType == 1)
                                     tmp.append('<div class="AnswerItem" id=' + item.AnswerKey + '><div style="margin-right: 15px"><input type="radio" disabled/></div><div class="IndexAnswer">' + list_answer[item.AnswerKey].Index + ') </div><div style="width: 70%;" class="TextAnswer">' + list_answer[item.AnswerKey].AnswerText +
                                         '</div>' +
@@ -94,7 +88,6 @@ function SetAnswerNew(id_question, block, q_data) {
                                         '<div style="width: 5px;"></div>' +
                                         '<input type="hidden" name="IndexAnswer" value=' + list_answer[item.AnswerKey].Index + '></div>');
                                 else {
-                                    console.log("LIST BASE ANSWER ---- ", list_base);
                                     tmp.append('<div class="AnswerItem BaseAnswer Existed" id=' + item.Id + '><div style="margin-right: 15px">' +
                                         '<input type="radio" disabled/></div><div class="IndexAnswer">' + -1 * Number(list_base[item.AnswerKey].BaseIndex) + ') </div>' +
                                         '<div style="width: 100%;" class="TextAnswer">' + list_base[item.AnswerKey].AnswerText + '</div>' +
@@ -230,6 +223,7 @@ function SetAnswerNew(id_question, block, q_data) {
     }
 }
 
+//Блок инициализации анимации и действий для редактора вопроса
 function Init() {
 
     //BEGIN Animation block
@@ -571,8 +565,6 @@ function Init() {
                                     }
                                 }
                             })
-                            console.log("Normal answer --- ", list_answer);
-                            console.log("Base answer ---- ", list_base_answer);
                             list_answer.sort(sortFN("Index"));
                             $.post("/Question/SaveAnswerRange", { tmp: list_answer })
                                 .success(function () {
@@ -631,7 +623,7 @@ function Init() {
                                             AnswerText: $(this).find('.TextAnswer').text(),
                                             QuestionID: id_question,
                                             Index: Number($(this).find("input[name=IndexAnswer]").val()),
-                                            isFreeArea: false
+                                            isFreeArea: $(this).find("input[name=FreeAreaCheckbox]").prop("checked") ? true : false
                                         };
                                         list_answer.push(query)
                                     }
@@ -676,7 +668,6 @@ function Init() {
                         IsKvot: item_block.find('.AnswerBlock').find('.QuotaDiv').find('.QYes').hasClass('QOn') ? true : false,
                         IsRotate: false
                     }
-                    console.log("Q_Query ---- ", q_query);
                     if (q_query.TypeMassk != 1) {
                         q_query.IsKvot = false;
                         if (item_block.find(".PanelOfRange").find(".RangeItem").length > 0) {
@@ -705,7 +696,6 @@ function Init() {
                                 }
                             })
                             list_answer.sort(sortFN("Index"));
-                            console.log("Answer list >>> ", list_answer);
                             $.post("/Question/SaveAnswerRange", { tmp: list_answer })
                                 .success(function () {
                                     item_block.find('.AnswerItem').each(function () {
@@ -760,7 +750,6 @@ function Init() {
                 count = 1;
                 var is_own_index = item_block.find(".OwnIndexDiv").find(".QYes").hasClass("QOn") ? true : false;
                 item_block.find(".AnswerBlock").find(".TableStyle").find("tr:not(.AnswerTableLine)").each(function () {
-                    console.log("Own Index ----- ", $(this).find("div.InputOwnIndex").find("input[name=OwnIndex]").val());
                     if (is_own_index == false) {
                         if (Number($(this).find("td.TableRowText").find("div.TextTableRowDiv").attr('id')) >= 0) {
                             bl_query.push({
@@ -799,9 +788,6 @@ function Init() {
                             }
                         })
                     });
-                console.log("Query >>> ", q_query);
-                console.log("A Query >>> ", a_query);
-                console.log("BL Query >>> ", bl_query);
             }
                 break;
             case 5: {
@@ -1704,6 +1690,7 @@ function CheckTypeQuestion(str_type, q_block) {
    
 }
 
+//Функиция загрузки настроек для Single вопросов
 function LoadSettingsSingle(panel, q_data) {
     panel.empty();
     panel.append("<div class='AddAnswerSingle StyleButton' style='height: 100%;'>&#10010; Ответ</div>");
@@ -1747,7 +1734,6 @@ function LoadSettingsSingle(panel, q_data) {
                         $('.AddAnswer').find('.AnswerItem[id=' + item.TriggerAnswer + ']').append('<div class="isTransition" style="width:10px;height:10px;border-radius:10px;background-color:#71c874;"></div>');
                     })
                 }
-                console.log("Transition >>> ", tr_data);
             })
         $.get("/Question/getListBlocksQuestion", { id_q: q_data.Id })
             .success(function (bl_data) {
@@ -1766,6 +1752,7 @@ function LoadSettingsSingle(panel, q_data) {
     }
 }
 
+//Функция загрузки настроек для Multi вопросов
 function LoadSettingsMilti(panel, q_data) {
     panel.empty();
     panel.append("<div class='AddAnswerMulti StyleButton' style='height: 100%;'>&#10010; Ответ</div>");
@@ -1807,6 +1794,7 @@ function LoadSettingsMilti(panel, q_data) {
     }
 }
 
+//Функция загрузки настроек для Free вопросов
 function LoadSettingsFree(panel, q_data) {
     panel.empty();
     panel.append("<div class='AddAnswerFree StyleButton' style='height: 100%;'>&#10010; Ответ</div>");
@@ -1863,6 +1851,7 @@ function LoadSettingsFree(panel, q_data) {
     }
 }
 
+//Функция загрузки настроек для Table вопросов
 function LoadSettingsTable(panel, q_data) {
     var answer_block = panel.parents(".AnswerBlock")
     console.log("Length --- ", answer_block.find('.TableStyle').length)
@@ -1932,6 +1921,7 @@ function LoadSettingsTable(panel, q_data) {
     }
 }
 
+//Функция загрузки настроек для Filter вопросов 
 function LoadSettingsFilter(panel, q_data) {
 
     if (q_data != undefined) {
@@ -1951,6 +1941,7 @@ function LoadSettingsFilter(panel, q_data) {
     }
 }
 
+//Функция перерисовки таблицы при её изменении
 function ResizeItem(block) {
     var panel = block.find('.TableStyle');
     panel.find("tr:not(AnswerTableLine)").each(function () {
@@ -1989,6 +1980,7 @@ function OwnIndexPanelBuild(panel) {
     ResizeItem(block);
 }
 
+//Функция переприсвоения индексов для ответов
 function ReplaceIndexAnswer(block, index) {
     var count = 0;
     block.find(".AnswerItem").each(function () {

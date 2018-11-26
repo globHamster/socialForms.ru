@@ -15,15 +15,14 @@ namespace SocialFORM.Controllers
 {
     public class FormController : Controller
     {
-
         QuestionContext db = new QuestionContext();
         ApplicationContext db2 = new ApplicationContext();
-
         public static int _index = 0;
         public static int max_index;
         public bool isReload = false;
         public FormModel form;
-        // GET: Form
+
+
         public ActionResult FormView(int id_p)
         {
             using (ProjectContext db3 = new ProjectContext())
@@ -31,7 +30,6 @@ namespace SocialFORM.Controllers
                 ViewBag.Title = db3.SetProjectModels.First(u=>u.Id == id_p).NameProject;
             }
             ViewBag.ProjectID = id_p;
-
             return PartialView();
         }
 
@@ -73,7 +71,6 @@ namespace SocialFORM.Controllers
         {
             using (GroupContext context_group = new GroupContext())
             {
-                System.Diagnostics.Debug.WriteLine("Get question on project -> " + id_p);
                 var result = context_group.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null).OrderBy(u => u.IndexQuestion).Select(u => u.QuestionID).ToList();
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
@@ -81,16 +78,13 @@ namespace SocialFORM.Controllers
 
         public JsonResult getAnswer(int id_q)
         {
-
             var result = db.SetAnswers.Where(u => u.QuestionID == id_q);
-
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
 
         public async Task<int> SaveData(string name, int project_id, int operator_id, string phone_number, List<SaveDataModel> list, string time_begin, string time_end, String c_lat, String c_long)
         {
-
             ResultModel result = new ResultModel();
             result.ProjectID = project_id;
             result.UserID = operator_id;
@@ -114,7 +108,6 @@ namespace SocialFORM.Controllers
             int result_id = db2.SetResultModels.Where(u => u.ProjectID == result.ProjectID).ToList().Last().Id;
 
             List<BlankModel> tmp_list = new List<BlankModel>();
-            System.Diagnostics.Debug.WriteLine("Length -> " + list.Count);
             foreach (var item in list)
             {
                 BlankModel tmp = new BlankModel();
@@ -152,10 +145,8 @@ namespace SocialFORM.Controllers
                 tmp_list.Add(tmp);
                 tmp = null;
             }
-
             db2.SetBlankModels.AddRange(tmp_list);
             await db2.SaveChangesAsync();
-
             return blank_id;
         }
 

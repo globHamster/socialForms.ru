@@ -654,46 +654,79 @@ namespace SocialFORM.Controllers
                                 if (tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).Count() > 0)
                                 {
                                     List<BlankModel> tmp_list_blank = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
+                                    List<AnswerModel> list_answer = new QuestionContext().SetAnswers.Where(u => u.QuestionID == group_item.QuestionID).ToList();
+                                    bool is_non_limited = true;
                                     int count_all_answer = listAnswerAllExport[(int)group_item.QuestionID].Count();
                                     if (listQuestionExport[(int)group_item.QuestionID].LimitCount > 1)
                                     {
                                         count_all_answer = (int)listQuestionExport[(int)group_item.QuestionID].LimitCount;
+                                        is_non_limited = false;
                                     }
                                     int count_other_column = listAnswerAllExport[(int)group_item.QuestionID].Where(u => u.isFreeArea == true).Count();
                                     List<string> other_column = new List<string>();
-                                    foreach (var blank_item in tmp_list_blank)
+                                    if (is_non_limited & name_file.Contains("население"))
                                     {
-                                        if (count_all_answer == 0) break;
-                                        if (blank_item.AnswerIndex != -404)
+                                        foreach (var item_answer in list_answer)
                                         {
-                                            if (blank_item.AnswerIndex < 0)
+                                            BlankModel blank_tmp_arg = tmp_list_blank.FirstOrDefault(u => u.AnswerIndex == item_answer.Index & u.AnswerID == item_answer.Id);
+                                            if (blank_tmp_arg != null)
                                             {
-                                                tmp_str.Add((-1 * blank_item.AnswerIndex).ToString());
+                                                System.Diagnostics.Debug.WriteLine("AnswerID : " + item_answer.Id +" isFreeArea :"+item_answer.isFreeArea+ " Text : " + blank_tmp_arg.Text+" ID: "+blank_tmp_arg.AnswerID);
+                                                tmp_str.Add(blank_tmp_arg.AnswerIndex.ToString());
+                                                if (item_answer.isFreeArea)
+                                                {
+                                                    System.Diagnostics.Debug.WriteLine("Text >> " + blank_tmp_arg.Text);
+                                                    other_column.Add(blank_tmp_arg.Text);
+                                                }
                                             }
                                             else
                                             {
-                                                tmp_str.Add(blank_item.AnswerIndex.ToString());
+                                                tmp_str.Add(" ");
+                                                if (item_answer.isFreeArea)
+                                                {
+                                                    other_column.Add(" ");
+                                                }
                                             }
                                         }
-                                        else
-                                            tmp_str.Add(" ");
-                                        if (blank_item.Text != null)
-                                            other_column.Add(blank_item.Text);
-                                        count_all_answer--;
-                                    }
-                                    for (int i = 0; i < count_all_answer; i++)
-                                    {
-                                        tmp_str.Add(" ");
-                                    }
-                                    for (int i = 0; i < count_other_column; i++)
-                                    {
-                                        if (i <= other_column.Count() - 1)
+                                        for (int iter =0; iter < other_column.Count(); iter++)
                                         {
-                                            tmp_str.Add(other_column[i]);
+                                            tmp_str.Add(other_column[iter]);
                                         }
-                                        else
+                                    } else {
+                                        foreach (var blank_item in tmp_list_blank)
+                                        {
+                                            if (count_all_answer == 0) break;
+                                            if (blank_item.AnswerIndex != -404)
+                                            {
+                                                if (blank_item.AnswerIndex < 0)
+                                                {
+                                                    tmp_str.Add((-1 * blank_item.AnswerIndex).ToString());
+                                                }
+                                                else
+                                                {
+                                                    tmp_str.Add(blank_item.AnswerIndex.ToString());
+                                                }
+                                            }
+                                            else
+                                                tmp_str.Add(" ");
+                                            if (blank_item.Text != null)
+                                                other_column.Add(blank_item.Text);
+                                            count_all_answer--;
+                                        }
+                                        for (int i = 0; i < count_all_answer; i++)
                                         {
                                             tmp_str.Add(" ");
+                                        }
+                                        for (int i = 0; i < count_other_column; i++)
+                                        {
+                                            if (i <= other_column.Count() - 1)
+                                            {
+                                                tmp_str.Add(other_column[i]);
+                                            }
+                                            else
+                                            {
+                                                tmp_str.Add(" ");
+                                            }
                                         }
                                     }
                                 }
