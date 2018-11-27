@@ -122,7 +122,7 @@ function SetAnswerNew(id_question, block, q_data) {
                                         '<div style="width: 5px;"></div>' +
                                         '<input type="hidden" name="IndexAnswer" value=' + list_answer[item.AnswerKey].Index + '></div>');
                                 else
-                                    tmp.append('<div class="AnswerItem BaseAnswer" id=' + item.Id + '><div style="margin-right: 15px"><input type="checkbox" disabled/></div><div class="IndexAnswer">' + -1 * Number(list_base[item.AnswerKey].BaseIndex) + ') </div><div style="width: 100%;" class="TextAnswer">' + list_base[item.AnswerKey].AnswerText + '</div><div class="DeleteAnswerItem">&#10006;</div></div>');
+                                    tmp.append('<div class="AnswerItem BaseAnswer Exist" id=' + item.Id + '><div style="margin-right: 15px"><input type="checkbox" disabled/></div><div class="IndexAnswer">' + -1 * Number(list_base[item.AnswerKey].BaseIndex) + ') </div><div style="width: 100%;" class="TextAnswer">' + list_base[item.AnswerKey].AnswerText + '</div><div class="DeleteAnswerItem">&#10006;</div></div>');
                             })
                             LoadSettingsMilti(tmp.find('.AnswerSettings'), q_data);
                         })
@@ -610,6 +610,7 @@ function Init() {
                             var list_base_answer = [];
                             item_block.find('.AnswerItem').each(function () {
                                 if ($(this).hasClass('BaseAnswer')) {
+                                    if ($(this).hasClass('Exist')) { return; }
                                     var query = {
                                         AnswerKey: $(this).attr('id'),
                                         AnswerType: 2,
