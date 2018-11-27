@@ -1023,6 +1023,7 @@
                                 if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
                                     skip = true; return;
                             }
+                            if (skip == true) { return false; }
                         });
                     }
                     if (item_block.fromQuestion == id_q && item_block.typeBlock == 2) {
