@@ -1980,8 +1980,6 @@ namespace SocialFORM.Controllers
                         tmp2 = db.SetSessionHubModel.Where(u => u.UserId == idop && u.Date == tmp_new).ToList();
                         List<SessionHubModel> sessionHubs = db.SetSessionHubModel.Where(u => u.Date == tmp_new && u.UserRole == "2").OrderBy(s => s.UserId).ToList();
                         int countUser = 0;
-                        //КОЛИЧЕСТВО ПОЛЬЗОВАТЕЛЕЙ!!
-                        countUser = tmp_list.Where(q => q.Data == null || TimeSpan.Parse(q.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserID).Select(group => group.First()).Count();
 
                         //if (st == "-1" && et == "-1")
                         //{
@@ -2002,17 +2000,19 @@ namespace SocialFORM.Controllers
                         List<User> tmp_users = db.SetUser.ToList();
                         TimeSpan t1 = new TimeSpan();
                         TimeSpan t1_go = new TimeSpan();
+                        countUser = 0;
                         if (count != 0)
                         {
                             if (tt_tmp2.Count != 0)
                             {
                                 t1_go = TimeSpan.Parse(DateTime.Parse(tmp_list.Reverse<ResultModel>().First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
+                                //КОЛИЧЕСТВО ПОЛЬЗОВАТЕЛЕЙ!!
+                                //countUser = tt_tmp2.Where(q => q.Data == null || TimeSpan.Parse(q.Data.ToLongTimeString()).CompareTo(TimeSpan.Parse(st)) == 1).GroupBy(u => u.UserID).Select(group => group.First()).Count();
                             }
                             Double t2 = 0;
                             count_ch = 0;
                             foreach (var tu in tmp_users)
                             {
-
                                 tt_tmp1 = t_tmp.Where(c => c.UserID == tu.Id).ToList();
                                 tt_tmp2 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
                                 tt_tmp3 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
@@ -2028,24 +2028,25 @@ namespace SocialFORM.Controllers
                                     {
                                         t1 = TimeSpan.Parse(et).Subtract(TimeSpan.Parse(st));
                                         System.Diagnostics.Debug.WriteLine("et - st => " + et + "  " + st);
-
+                                        countUser++;
                                     }
                                     if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() != 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() == 0)
                                     {
                                         t1 = TimeSpan.Parse(DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(st));
                                         System.Diagnostics.Debug.WriteLine("n - st => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  " + st);
-
+                                        countUser++;
                                     }
                                     if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() == 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() != 0)
                                     {
                                         t1 = TimeSpan.Parse(et).Subtract(TimeSpan.Parse(tt_tmp2.First().Data.ToLongTimeString()));
                                         System.Diagnostics.Debug.WriteLine("et - 1 => " + et + "  " + tt_tmp2.First().Data.ToLongTimeString());
-
+                                        countUser++;
                                     }
                                     if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() == 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() == 0)
                                     {
                                         t1 = TimeSpan.Parse(DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tt_tmp2.First().Data.ToLongTimeString()));
                                         System.Diagnostics.Debug.WriteLine("n - 1 => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  "  + tt_tmp2.First().Data.ToLongTimeString());
+                                        countUser++;
                                     }
                                     t2 = t1.TotalHours;
                                     count_ch += tt_tmp2.Count / t2;

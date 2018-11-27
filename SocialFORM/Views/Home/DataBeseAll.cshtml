@@ -47,20 +47,31 @@
     .hide1, .hide2 {
         border: 1px solid #ff0000;
     }
+
     #AllOBFO {
-        margin:0 2.5%;
+        margin: 0 2.5%;
     }
+
     #AllGOROB {
         margin: 0 2.5%;
     }
+
     .btn {
         border: 1px solid #0094ff;
     }
+
     .box {
-        margin:10px;
+        margin: 10px;
     }
+
     .select {
         padding: 5px;
+    }
+
+    .bblock {
+        margin: 10px;
+        padding: 5px;
+        background-color: #E0E0E0;
     }
 </style>
 
@@ -92,66 +103,70 @@
             <div class="box">
                 <h4>Генератор номеров</h4>
                 <div class="row">
-                    <select id="SFO" class="select" onchange="onchangeFOSelect();">
-                        <option value="">-- FO не выбран --</option>
-                    </select>
-                    <div id="OBCont" style="display: none;">
-                        <select id="SOB" class="select" onchange="onchangeOBSelect();">
-                            <option value="">-- OB не выбран --</option>
+                    <div class="bblock">
+                        <select id="SFO" class="select" onchange="onchangeFOSelect();">
+                            <option value="">-- FO не выбран --</option>
                         </select>
                     </div>
-                    <div id="GORCont" style="display: none;">
-                        <select id="SGOR" class="select" onchange="onchangeModelSelect(this);">
-                            <option value="">-- GOR не выбран --</option>
-                        </select>
+                    <div class="bblock">
+                        <div id="OBCont" style="display: none;">
+                            <select id="SOB" class="select" onchange="onchangeOBSelect();">
+                                <option value="">-- OB не выбран --</option>
+                            </select>
+                        </div>
                     </div>
-                    <label for="named"> Название:</label>&nbsp;&nbsp;&nbsp;
-                    <input type="text" value="" id="named" />
-                </div>
-                <div class="row">
-                    <div class="col-cd-8">
-
+                    <div class="bblock">
+                        <div id="GORCont" style="display: none;">
+                            <select id="SGOR" class="select" onchange="onchangeModelSelect(this);">
+                                <option value="">-- GOR не выбран --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bblock">
+                        <label for="named"> Название:</label>&nbsp;&nbsp;&nbsp;
+                        <input type="text" value="" id="named" />
+                    </div>
+                    <div class="bblock">
                         <label for="kod"> Код города (без первой восьмерки):</label>&nbsp;&nbsp;&nbsp;
                         <input type="text" value="" id="kod" />
+                        <label for="sd"> Начало диапазона:</label>&nbsp;&nbsp;&nbsp;
+                        <input type="text" value="" id="sd" />
+                        <label for="ed"> Конец диапазона:</label>&nbsp;&nbsp;&nbsp;
+                        <input type="text" value="" id="ed" />
                     </div>
-                    <div class="col-cd-4">
+                    <div class="bblock">
+                        <div class="btn Add">Добавить</div>
                         <div class="btn Res">Сброс</div>
                     </div>
-                </div>
-                <div class="row">
-                    <label for="sd"> Начало диапазона:</label>&nbsp;&nbsp;&nbsp;
-                    <input type="text" value="" id="sd" />
-                    <label for="ed"> Конец диапазона:</label>&nbsp;&nbsp;&nbsp;
-                    <input type="text" value="" id="ed" />
-                </div>
-                <div class="row">
-                    <div class="btn Add">Добавить</div>
-                </div>
-                <div class="row">
-                    Список диапазонов
-                    <div class="numD"></div>
-                </div>
+                    <div class="bblock">
+                        Список диапазонов
+                        <div class="numD"></div>
+                    </div>
 
-                <div class="row">
-                    <div class="btn Pus">Сгенерировать</div>
+                    <div class="bblock">
+                        <div class="btn Pus">Сгенерировать</div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="txt_5">
             Карта России
-
         </div>
     </div>
 </div>
 
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
+@Scripts.Render("~/Scripts/jquery.maskedinput.js")
+
 <script type="text/javascript">
     let pool_data = {};
-
     $(function () {
         $('div#txt_1').load("/Home/Test");
+        $("#kod").mask("999");
+        $("#sd").mask("9999999");
+        $("#ed").mask("9999999");
     })
 
     $('body').on("click", ".hide1", function () {
@@ -185,7 +200,7 @@
             });
             FO_init();
         });
-        
+
     $.get("/Home/GetListOB")
         .success(function (e) {
             var block;
@@ -202,7 +217,7 @@
         .success(function (e) {
             var block;
 
-            pool_data.ListGOR= e;
+            pool_data.ListGOR = e;
 
             $.each(e, function (i, item) {
                 block = $('div.' + item.KodFO).find('div.' + item.KodOB).find('#AllGOROB');
@@ -210,7 +225,7 @@
             });
         });
 
-    
+
 
     function FO_init() {
         var FOSelObj = document.getElementById('SFO');
@@ -230,9 +245,9 @@
         var OBContainer = document.getElementById('OBCont');
         var currentFO = FOSelObj.value;
         if (currentFO == "") {
-            OBContainer.style.display = "none"; //бренд не выбран 
+            OBContainer.style.display = "none"; //бренд не выбран
         } else {
-            var OBSelObj = document.getElementById('SOB'); //очистим список моделей - все, кроме первого элемента 
+            var OBSelObj = document.getElementById('SOB'); //очистим список моделей - все, кроме первого элемента
             for (var i = OBSelObj.options.length - 1; i > 0; i--) OBSelObj.remove(i);
             //загрузим список моделей соответствующего бренда
             var priceLen = pool_data.ListOB.length; //число строк прайса
@@ -252,9 +267,9 @@
         var currentFO = FOSelObj.value;
         var currentOB = OBSelObj.value;
         if (currentOB == "") {
-            GORContainer.style.display = "none"; //бренд не выбран 
+            GORContainer.style.display = "none"; //бренд не выбран
         } else {
-            var GORSelObj = document.getElementById('SGOR'); //очистим список моделей - все, кроме первого элемента 
+            var GORSelObj = document.getElementById('SGOR'); //очистим список моделей - все, кроме первого элемента
             for (var i = GORSelObj.options.length - 1; i > 0; i--) GORSelObj.remove(i);
             //загрузим список моделей соответствующего бренда
             var priceLen = pool_data.ListGOR.length; //число строк прайса
@@ -270,7 +285,7 @@
     function onchangeModelSelect(th) {
 
     }
-    
+
 
     let listRange = [];
 
@@ -287,7 +302,9 @@
         var kod = $('#kod').val();
         var sd = $('#sd').val();
         var ed = $('#ed').val();
-
+        if (kod.length != 3) { alert("Неверный код") }
+        if (sd.length != 7) { alert("Неверный начальный диапазон") }
+        if (ed.length != 7) { alert("Неверный конечный диапазон") }
 
         var tmpsd = '7' + kod + sd;
         var tmped = '7' + kod + ed;
@@ -323,7 +340,7 @@
         var str = "";
         listRange.forEach(function (item, i, listRange) {
             console.log(i + ": " + item.sd + " " + item.ed + " (массив:" + listRange + ")");
-            str += item.kod + "|" + item.sd + "|" + item.ed + "#" 
+            str += item.kod + "|" + item.sd + "|" + item.ed + "#"
         });
         console.log(str);
         if (currentFO == "" || currentOB == "" || currentGOR == "") {
