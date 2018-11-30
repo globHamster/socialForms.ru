@@ -316,12 +316,12 @@
         $("#jqgStatRes").jqGrid({
             url: "/Home/GetDataStatResult?id=" + spr + "&idop=" + sop + "&sd=" + sd + "&ed=" + ed + "&st=" + st + "&et=" + et,
             datatype: "json",
-            colNames: ['№', 'Дата', 'К.Польз.', 'К.Анкет', 'К.Анк.Час', 'Ср.Время', 'Мин.Длит', 'Макс.Длит', 'Сред.Откл', '1..N'],
+            colNames: ['№', 'Дата', 'К.Анкет', 'К.Польз.', 'К.Анк.Час', 'Ср.Время', 'Мин.Длит', 'Макс.Длит', 'Сред.Откл', '1..N'],
             colModel: [
                 { name: 'IdView', index: 'IdView', width: 50, stype: 'text', key: true, editable: true },
                 { name: 'DataView', index: 'DataView', width: 150, sortable: true, editable: true, edittype: 'text' },
-                { name: 'CountUserView', index: 'CountUserView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 { name: 'CountProjectView', index: 'CountProjectView', width: 100, sortable: true, editable: true, edittype: 'text' },
+                { name: 'CountUserView', index: 'CountUserView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 { name: 'CountHourView', index: 'CountHourView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 { name: 'MediumTimeView', index: 'MediumTimeView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 { name: 'MinLenghtView', index: 'MinLenghtView', width: 100, sortable: true, editable: true, edittype: 'text' },

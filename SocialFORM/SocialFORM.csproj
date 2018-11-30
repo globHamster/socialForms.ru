@@ -373,6 +373,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\DataBaseController.cs" />
     <Compile Include="Hubs\ChatHub.cs" />
     <Compile Include="Hubs\AppHub.cs" />
     <Compile Include="Models\ChatUser.cs" />
@@ -730,6 +731,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\DataBase\" />
     <Folder Include="Views\Home\Users\" />
     <Folder Include="Views\jqGrid\" />
     <Folder Include="Views\Statistik\" />

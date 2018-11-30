@@ -162,6 +162,7 @@
 
 <script type="text/javascript">
     let pool_data = {};
+    let countDip;
     $(function () {
         $('div#txt_1').load("/Home/Test");
         $("#kod").mask("999");
@@ -189,12 +190,40 @@
         }
     });
 
+    $('#SGOR').change(function () {
+        countDip = 1;
+        var FOSelObj = document.getElementById('SFO');
+        var OBSelObj = document.getElementById('SOB');
+        var GORSelObj = document.getElementById('SGOR');
+        var currentFO = FOSelObj.value;
+        var currentOB = OBSelObj.value;
+        var currentGOR = GORSelObj.value;
+        var data = { KodFO: currentFO, KodOB: currentOB, KodGOR: currentGOR };
+        $.get("/DataBase/GetListDIAP", data)
+            .success(function (res) {
+                var list = $('.numD');
+                $('.numD').empty();
+                list.append('<table id="TableDiap" border="1">'
+                    + '<tr>'
+                    + '<th style="display:none;">IDbd</th>'
+                    + '<th>ID</th>'
+                    + '<th>Num1</th>'
+                    + '<th>Num2</th>'
+                    + '<th>NameD</th>'
+                    + '<th>Del</th>'
+                    + '</tr></table >');
+                $.each(res, function (i, item) {
+                    console.log(item);
+                    $('#TableDiap').append('<tr><td style="display:none;">' + item.Id + '</td><td>' + countDip + '</td><td>' + item.Kod + item.Num1 + '</td><td>' + item.Kod + item.NumN + '</td><td>' + item.NameD + '</td><td><div>x</div></td></tr>');
+                    countDip++;
+                });
+            });
+    });
+
     $.get("/Home/GetListFO")
         .success(function (e) {
             var block = $('div#txt_5');
-
             pool_data.ListFO = e;
-
             $.each(e, function (i, item) {
                 block.append('<div id="FOall" class="' + item.KodFO + '"><div class="hide1">&#10004;</div>' + item.NameFO + '<div id="AllOBFO"></div></div>')
             });
@@ -204,9 +233,7 @@
     $.get("/Home/GetListOB")
         .success(function (e) {
             var block;
-
             pool_data.ListOB = e;
-
             $.each(e, function (i, item) {
                 block = $('div.' + item.KodFO).find('#AllOBFO');
                 block.append('<div class="' + item.KodOB + '"><div class="hide2">&#10004;</div>' + item.NameOB + '<div id="AllGOROB"></div></div>')
@@ -216,9 +243,7 @@
     $.get("/Home/GetListGOR")
         .success(function (e) {
             var block;
-
             pool_data.ListGOR = e;
-
             $.each(e, function (i, item) {
                 block = $('div.' + item.KodFO).find('div.' + item.KodOB).find('#AllGOROB');
                 block.append('<div class="' + item.KodGOR + '">' + item.NameGOR + '<div id="AllGGGOR"></div></div>')
@@ -298,7 +323,7 @@
 
     $('.Add').click(function () {
 
-        var code = '';
+        var name = $('#named').val();
         var kod = $('#kod').val();
         var sd = $('#sd').val();
         var ed = $('#ed').val();
@@ -315,17 +340,20 @@
             ed: ed
         }
 
+        $(".diap").each(function (str) {
+            console.log(str + ":" + kod + " " + sd);
+        });
+
         if (('8' + kod + sd).length != 11 || ('8' + kod + ed).length != 11) {
             alert('Неверно!');
         }
         else {
             listRange.push(item);
-
-            code = '<p> ' + item.sd + ' ... ' + item.ed + ' </p>';
+            $('#TableDiap').append('<tr><td style="display:none;">' + countDip + '</td><td>' + item.kod + item.sd + '</td><td>' + item.kod + item.ed + '</td><td>' + name + '</td><td><div>x</div></td></tr>');
+            countDip++;
             document.getElementById('sd').value = "";
             document.getElementById('ed').value = "";
         }
-        $('.numD').append(code);
     });
 
     $('.Pus').click(function () {

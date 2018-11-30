@@ -671,7 +671,7 @@ namespace SocialFORM.Controllers
                                             BlankModel blank_tmp_arg = tmp_list_blank.FirstOrDefault(u => u.AnswerIndex == item_answer.Index & u.AnswerID == item_answer.Id);
                                             if (blank_tmp_arg != null)
                                             {
-                                                System.Diagnostics.Debug.WriteLine("AnswerID : " + item_answer.Id +" isFreeArea :"+item_answer.isFreeArea+ " Text : " + blank_tmp_arg.Text+" ID: "+blank_tmp_arg.AnswerID);
+                                                System.Diagnostics.Debug.WriteLine("AnswerID : " + item_answer.Id + " isFreeArea :" + item_answer.isFreeArea + " Text : " + blank_tmp_arg.Text + " ID: " + blank_tmp_arg.AnswerID);
                                                 tmp_str.Add(blank_tmp_arg.AnswerIndex.ToString());
                                                 if (item_answer.isFreeArea)
                                                 {
@@ -688,11 +688,13 @@ namespace SocialFORM.Controllers
                                                 }
                                             }
                                         }
-                                        for (int iter =0; iter < other_column.Count(); iter++)
+                                        for (int iter = 0; iter < other_column.Count(); iter++)
                                         {
                                             tmp_str.Add(other_column[iter]);
                                         }
-                                    } else {
+                                    }
+                                    else
+                                    {
                                         foreach (var blank_item in tmp_list_blank)
                                         {
                                             if (count_all_answer == 0) break;
@@ -1856,7 +1858,7 @@ namespace SocialFORM.Controllers
         {
             List<StatResViewModel> StatRes = new List<StatResViewModel>();
             List<ResultModel> tmp1 = db.SetResultModels.ToList();
-            List<ResultModel> tmp1_k = db.SetResultModels.ToList();
+            List<ResultModel> tmp1_k = db.SetResultModels.Where(u => u.ProjectID == id).ToList();
             List<ResultModel> tmp1_1 = db.SetResultModels.ToList();
             List<ResultModel> tmp1_2 = db.SetResultModels.ToList();
             List<ResultModel> tmp1_3 = db.SetResultModels.ToList();
@@ -1917,6 +1919,8 @@ namespace SocialFORM.Controllers
                 DateTime ttmp2 = new DateTime();
                 TimeSpan min = new TimeSpan();
                 TimeSpan max = new TimeSpan();
+                List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
+
                 int count;
                 int countID = 0;
                 double count_ch = 0;
@@ -1931,6 +1935,22 @@ namespace SocialFORM.Controllers
                     List<ResultModel> tmp_list = i.Value;
                     if (tmp_list.Count != 0)
                     {
+                        int countlist = tmp_list.Count;
+                        int iter = 0;
+                        while( iter < countlist)
+                        {
+                            ResultModel item = tmp_list[iter];
+                            if (list_schoolday.Where(u => u.Date.ToShortDateString() == item.Data.ToShortDateString() && u.UserId == item.UserID).Count() != 0)
+                            {
+                                tmp_list.Remove(item);
+                                System.Diagnostics.Debug.WriteLine(item.UserName.ToString());
+                                countlist--;
+                            }
+                            else
+                            {
+                                iter++;
+                            }
+                        }
                         //Количество анкет
                         count = tmp_list.Count();
                         //Вычисляем Срею время, Мин. - Макс. время, Сре. отклонение
@@ -1997,7 +2017,7 @@ namespace SocialFORM.Controllers
                         List<ResultModel> tt_tmp1 = new List<ResultModel>();
                         List<ResultModel> tt_tmp2 = new List<ResultModel>();
                         List<ResultModel> tt_tmp3 = new List<ResultModel>();
-                        List<User> tmp_users = db.SetUser.ToList();
+                        List<User> tmp_users = db.SetUser.Where(u => u.RoleId == 2).ToList();
                         TimeSpan t1 = new TimeSpan();
                         TimeSpan t1_go = new TimeSpan();
                         countUser = 0;
@@ -2013,49 +2033,58 @@ namespace SocialFORM.Controllers
                             count_ch = 0;
                             foreach (var tu in tmp_users)
                             {
-                                tt_tmp1 = t_tmp.Where(c => c.UserID == tu.Id).ToList();
-                                tt_tmp2 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
-                                tt_tmp3 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
-                                if (tt_tmp2.Count != 0)
+                                if (t_tmp.Where(c => c.UserID == tu.Id).ToList().Count != 0)
                                 {
-                                    string tstr1 = tt_tmp2.First().Data.ToLongDateString();
-                                    string tstr1_tt_tmp1 = tt_tmp1.First().Data.ToLongDateString();
-                                    int tstr2 = tt_tmp2.First().BlankID;
-                                    int tstr2_tt_tmp1 = tt_tmp1.First().BlankID;
-                                    int tstr3 = tt_tmp2.First().UserID;
-                                    int tstr3_tt_tmp1 = tt_tmp1.First().UserID;
-                                    if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() != 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() != 0)
+                                    if (list_schoolday.Where(u => u.UserId == tu.Id && u.Date.ToShortDateString() == t_tmp.Where(c => c.UserID == tu.Id).ToList().First().Data.ToShortDateString()).Count() < 1)
                                     {
-                                        t1 = TimeSpan.Parse(et).Subtract(TimeSpan.Parse(st));
-                                        System.Diagnostics.Debug.WriteLine("et - st => " + et + "  " + st);
-                                        countUser++;
+                                        tt_tmp1 = t_tmp.Where(c => c.UserID == tu.Id).ToList();
+                                        tt_tmp2 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
+                                        tt_tmp3 = tmp_list.Where(c => c.UserID == tu.Id).ToList();
+                                        if (tt_tmp2.Count != 0)
+                                        {
+                                            string tstr1 = tt_tmp2.First().Data.ToLongDateString();
+                                            string tstr1_tt_tmp1 = tt_tmp1.First().Data.ToLongDateString();
+                                            int tstr2 = tt_tmp2.First().BlankID;
+                                            int tstr2_tt_tmp1 = tt_tmp1.First().BlankID;
+                                            int tstr3 = tt_tmp2.First().UserID;
+                                            int tstr3_tt_tmp1 = tt_tmp1.First().UserID;
+
+                                            if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() != 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() != 0)
+                                            {
+                                                t1 = TimeSpan.Parse(et).Subtract(TimeSpan.Parse(st));
+                                                System.Diagnostics.Debug.WriteLine("et - st => " + et + "  " + st);
+                                                countUser++;
+                                            }
+                                            if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() != 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() == 0)
+                                            {
+                                                t1 = TimeSpan.Parse(DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(st));
+                                                System.Diagnostics.Debug.WriteLine("n - st => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  " + st);
+                                                countUser++;
+                                            }
+                                            if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() == 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() != 0)
+                                            {
+                                                t1 = TimeSpan.Parse(et).Subtract(TimeSpan.Parse(tt_tmp2.Where(u => u.ProjectID == id).First().Data.ToLongTimeString()));
+                                                System.Diagnostics.Debug.WriteLine("et - 1 => " + et + "  " + tt_tmp2.First().Data.ToLongTimeString());
+                                                countUser++;
+                                            }
+                                            if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() == 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() == 0)
+                                            {
+                                                t1 = TimeSpan.Parse(DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tt_tmp2.First().Data.ToLongTimeString()));
+                                                System.Diagnostics.Debug.WriteLine("n - 1 => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  " + tt_tmp2.First().Data.ToLongTimeString());
+                                                countUser++;
+                                            }
+
+                                            t2 = t1.TotalHours;
+                                            count_ch += tt_tmp2.Count / t2;
+
+                                        }
                                     }
-                                    if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() != 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() == 0)
-                                    {
-                                        t1 = TimeSpan.Parse(DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(st));
-                                        System.Diagnostics.Debug.WriteLine("n - st => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  " + st);
-                                        countUser++;
-                                    }
-                                    if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() == 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() != 0)
-                                    {
-                                        t1 = TimeSpan.Parse(et).Subtract(TimeSpan.Parse(tt_tmp2.First().Data.ToLongTimeString()));
-                                        System.Diagnostics.Debug.WriteLine("et - 1 => " + et + "  " + tt_tmp2.First().Data.ToLongTimeString());
-                                        countUser++;
-                                    }
-                                    if (tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID < tstr2).Count() == 0 && tmp1_k.Where(u => u.Data.ToLongDateString() == tstr1 && u.UserID == tstr3 && u.BlankID > tstr2_tt_tmp1).Count() == 0)
-                                    {
-                                        t1 = TimeSpan.Parse(DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tt_tmp2.First().Data.ToLongTimeString()));
-                                        System.Diagnostics.Debug.WriteLine("n - 1 => " + DateTime.Parse(tt_tmp1.First().Time).ToLongTimeString() + "  "  + tt_tmp2.First().Data.ToLongTimeString());
-                                        countUser++;
-                                    }
-                                    t2 = t1.TotalHours;
-                                    count_ch += tt_tmp2.Count / t2;
                                 }
                             }
                             count_ch = count_ch / countUser;
 
                             t1_go = TimeSpan.Parse(DateTime.Parse(tmp_list.Reverse<ResultModel>().First().Time).ToLongTimeString()).Subtract(TimeSpan.Parse(tmp_list.First().Data.ToLongTimeString()));
-                            
+
                         }
 
                         //string sessionStartTime = "";
@@ -2375,7 +2404,8 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void SetNumber(string str_numb)
         {
-            using (PhoneContext pc = new PhoneContext()) {
+            using (PhoneContext pc = new PhoneContext())
+            {
                 Phone tmp = new Phone();
                 tmp.Number = str_numb;
                 pc.Phones.Add(tmp);
@@ -2388,9 +2418,9 @@ namespace SocialFORM.Controllers
         {
             using (PhoneContext pc = new PhoneContext())
             {
-                for (int i = 1; i<=10; i++)
+                for (int i = 1; i <= 10; i++)
                 {
-                    pc.Database.ExecuteSqlCommand("INSERT INTO testtable VALUES ("+i+","+(i*100)+")");
+                    pc.Database.ExecuteSqlCommand("INSERT INTO testtable VALUES (" + i + "," + (i * 100) + ")");
                 }
             }
         }
@@ -2420,7 +2450,7 @@ namespace SocialFORM.Controllers
                     string name_file = fileContent.FileName;
                     using (PhoneContext pc = new PhoneContext())
                     {
-                        pc.Database.ExecuteSqlCommand("LOAD DATA INFILE \"D:/number/"+name_file+"\" INTO TABLE table" + table + " character set cp1251 FIELDS TERMINATED BY  \";\" ENCLOSED BY  \"\" ESCAPED BY  \"\\\\\" LINES TERMINATED BY  \"\\r\\n\"");
+                        pc.Database.ExecuteSqlCommand("LOAD DATA INFILE \"D:/number/" + name_file + "\" INTO TABLE table" + table + " character set cp1251 FIELDS TERMINATED BY  \";\" ENCLOSED BY  \"\" ESCAPED BY  \"\\\\\" LINES TERMINATED BY  \"\\r\\n\"");
 
                         pc.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_file + "\" WHERE Id=" + table);
 
@@ -2454,7 +2484,7 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public JsonResult GetListTable()
         {
-         
+
             using (PhoneContext pc = new PhoneContext())
             {
                 var tmp = pc.Database.SqlQuery<TableInfo>("SHOW TABLES FROM phone").ToList();
@@ -2521,7 +2551,7 @@ namespace SocialFORM.Controllers
                 {
                     sw.WriteLine(string.Format("\"{0}\";\"{1}\";\"{2}\"", item.Id, item.Number, item.Status));
                 }
-                
+
                 return File(Encoding.GetEncoding(1251).GetBytes(sw.ToString()), "text/csv", name_file[0].Name);
             }
         }
