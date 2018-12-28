@@ -60,8 +60,6 @@ namespace SocialFORM.Controllers
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
-
-
         public int getMaxCount(int id_p)
         {
             return db.SetQuestions.Where(u => u.ProjectID == id_p).Count();
@@ -81,7 +79,6 @@ namespace SocialFORM.Controllers
             var result = db.SetAnswers.Where(u => u.QuestionID == id_q);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-
 
         public async Task<int> SaveData(string name, int project_id, int operator_id, string phone_number, List<SaveDataModel> list, string time_begin, string time_end, String c_lat, String c_long)
         {
@@ -167,7 +164,6 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
-
         [HttpPost]
         public void DeleteBlankResult(int id_res)
         {
@@ -188,6 +184,19 @@ namespace SocialFORM.Controllers
                 }
                 db2.SetResultModels.Remove(tmp_result);
                 db2.SaveChanges();
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetInfoAboutBlank(int q_id, int b_id)
+        {
+            BlankModel tmp = db2.SetBlankModels.FirstOrDefault(u => u.QuestionID == q_id && u.BlankID == b_id);
+            if (tmp != null)
+            {
+                return Json(tmp, JsonRequestBehavior.AllowGet);
+            } else
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
             }
         }
     }

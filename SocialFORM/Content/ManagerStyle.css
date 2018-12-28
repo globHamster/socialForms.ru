@@ -80,6 +80,8 @@
     background-color: #008bb2;
     color: #fff;
     font-family: 'Century Gothic';
+    border-bottom-left-radius: 15px;
+    border-top-left-radius: 15px;
 }
 
 .WallOfTypes {
@@ -89,6 +91,8 @@
     align-items: center;
     flex-direction: column;
     background-color: #81c784;
+    border-bottom-right-radius: 15px;
+    border-top-right-radius: 15px;
 }
 
 .NameButton:hover {
@@ -103,6 +107,9 @@
     align-content: space-between;
     align-items: center;
     flex-direction: row;
+    background-color: #fff;
+    padding: 2px;
+    border-radius: 15px;
 }
 
 .AnswerSettings {

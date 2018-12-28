@@ -53,7 +53,7 @@
     var id_project = $('div[name=projectID]').attr('id');
     var id_operator = $('div[name=operatorID]').attr('id');
     var isReload = false;
-    var index = 0, max_index = 0;
+    let index = 0, max_index = 0;
     var massiv_question_id;
     var result = [];
     var text_other = [];
@@ -76,7 +76,7 @@
     var is_load_id = false;
     var active_group = {};
     var q1, q2, q3, q4, q5, q6, q7;
-    var count_ajax = 0;
+    let count_ajax = 0;
     var massive_quota_id = [];
     let massive_string_chain = [];
     var list_quota = {};
@@ -244,30 +244,24 @@
 
     }
 
-    //Ожидание выгрузки данных с сервера
-    var interval = setInterval(function () {
+    function TestFunc() {
         if (count_ajax > 8) {
-            clearInterval(interval);
+            $('body').unbind();
             $('.PreLoader').hide();
             $('button.all_again').fadeIn("slow");
             $('.PreLoader').hide();
             getStart();
+        } else {
+            setTimeout(TestFunc, 50);
         }
-    }, 50);
+    }
+
+    //Ожидание выгрузки данных с сервера
+    setTimeout(TestFunc(), 50);
 
     // Функция тасовки элементов ответов в случайном порядке
     Array.prototype.rand = function () {
         return this.sort(function () { return 0.5 - Math.random(); })
-    }
-
-    let interval_active;
-    let handler = function () {
-        clearInterval(interval_active);
-        interval_active = setInterval(function () {
-            clearInterval(interval_active);
-            $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), function () { $('body').unbind("mousemove keydown", handler) });
-            console.log("Not active");
-        }, 30000);
     }
 
     //Блок отрисовки анкеты
@@ -281,7 +275,6 @@
                     .success(function (server_time) {
                         if (begin_time == undefined)
                             begin_time = server_time;
-                        console.log("begin time --- " + begin_time);
                         status = 1;
                     })
                     .error(function () { alert("Error"); })
@@ -466,7 +459,6 @@
                     break;
                 default:
                     break;
-
             }
         }
     }
@@ -509,14 +501,6 @@
 
     //Осуществление шага вперед по анкете
     $(".next").click(function () {
-        if (index == 0) {
-            handler();
-            $('body').bind("mousemove keydown", handler);
-        }
-        if (index == 1) {
-            $('body').unbind("mousemove keydown", handler);
-            clearInterval(interval_active);
-        }
         switch (type_q) {
             case 1:
                 if ($("input[name=group]:radio:checked").length == 0) {
@@ -1023,8 +1007,8 @@
                                 if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
                                     skip = true; return;
                             }
-                            if (skip == true) { return false; }
                         });
+                        if (skip == true) { return false; }
                     }
                     if (item_block.fromQuestion == id_q && item_block.typeBlock == 2) {
                         skip = true;

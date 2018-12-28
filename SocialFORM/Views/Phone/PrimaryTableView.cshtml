@@ -1,0 +1,380 @@
+﻿<style>
+    div.table_status_numb {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+    }
+
+    div[name=header_name] > div {
+        background: #008dd2;
+        color: #fff;
+        font-family: Dotum;
+        font-weight: 600;
+        font-size: 20px;
+        height: 30px;
+    }
+
+    div[name=text_name_status] > div {
+        height: 20px;
+    }
+
+    div.Header_Column_1 {
+        grid-column: span 4;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    div.Header_Column_2 {
+        grid-column: span 3;
+        text-align: center;
+        vertical-align: middle;
+        border-left: 3px solid white;
+    }
+
+    div.Header_Column_3 {
+        grid-column: span 3;
+        text-align: center;
+        vertical-align: middle;
+        border-left: 3px solid white;
+    }
+
+    div.FirstBlock {
+        background: #59748d;
+        color: #fff;
+    }
+
+    div.SecondBlock {
+        background: #fff;
+        color: #000;
+    }
+
+    div.btn_page_prev,
+    div.btn_page_next {
+        width: 20px;
+        height: 20px;
+        background: #008dd2;
+        border: 1px solid black;
+        border-radius: 15px;
+        cursor: pointer;
+        margin: 0px 3px;
+    }
+
+        div.btn_page_prev:hover,
+        div.btn_page_next:hover {
+            transform: scale(1.3,1.3);
+            transition: .1s linear;
+        }
+
+    div[name=div_limit_page] {
+        font-weight: 900;
+        font-family: 'DejaVu Sans';
+        font-size: 18px;
+    }
+
+    div[name=div_numb_page] {
+        font-weight: 900;
+        font-family: 'DejaVu Sans';
+        font-size: 18px;
+    }
+
+    div[name=panel_setting_load] {
+        width: 200px;
+        height: auto;
+        display: none;
+        position: absolute;
+        border: 1px solid #008dd2;
+        z-index: 10;
+        margin: 0px 3px;
+        background: #fff;
+        grid-template-columns: repeat(10, 1fr);
+        padding: 5px;
+    }
+
+        div[name=panel_setting_load] input[type=checkbox] {
+            display: none;
+        }
+
+        div[name=panel_setting_load] label:after {
+            content: '';
+            display: block;
+            height: 14px;
+            width: 14px;
+            outline: 1px solid #939598;
+        }
+
+        div[name=panel_setting_load] label:hover {
+            box-shadow: 0px 0px 3px 1px black;
+        }
+
+        div[name=panel_setting_load] input[type=checkbox]:checked + label:after {
+            outline: 1px solid #939598;
+            border: 2px solid #fff;
+            width: 14px;
+            height: 14px;
+            background-color: #008dd2;
+        }
+        div[name=free_table_mysql] > div:hover{
+            background: #008dd2;
+            color: #fff;
+            cursor: pointer;
+            transform: scale(1.1,1.1);
+            transition: .1s linear;
+            box-shadow: 3px 3px 5px black;
+        }
+</style>
+<div>
+    <input type="hidden" name="page_numb_status" value="1" />
+    <div style="display: inline-flex;padding:5px;background:#81c784;width:100%;border-radius: 10px 10px 0 0;">
+        <select style="width:200px;" name="list_FO_" onchange="ChangeListOB($(this).find('option:selected').val())">
+            <option value="" selected disabled>Выберите вариант</option>
+        </select>
+        <select style="width:200px;" name="list_OB_" onchange="ChangeListGOR($(this).parent().find('select[name=list_FO_]').find('option:selected').val(), $(this).find('option:selected').val())">
+            <option value="" selected disabled>Выберите вариант</option>
+        </select>
+        <select style="width:200px;" name="list_GOR_">
+            <option value="" selected disabled>Выберите вариант</option>
+        </select>
+        <div class="search_btn" style="border-radius: 10px;margin: 1px;" onclick="LoadListStatus()">Поиск</div>
+        <div>
+            <div style="display:inline-flex;margin: 1px;">
+                <div class="search_btn btn_ToOktell" style="border-radius: 10px 0 0 10px;" onclick="GetNameFreeTable()">в Oktell</div>
+                <div class="search_btn" style="width:30px;height:30px;margin-left:-4px;border-radius:0 10px 10px 0;" onclick="AddPanelSettingLoad()"><img src="../Content/images/gear_setting.png" width="20" height="20" /></div>
+            </div>
+
+            <div name='panel_setting_load'>
+                <div style='grid-column: span 8; height: 20px;'>Только не обзвоненые</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='not_connect' id="setting_1" checked/>
+                        <label for="setting_1"></label>
+                    </div>
+                </div>
+                <div style='grid-column: span 8; height: 20px; align-items:center;'>Только занятые</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='number_busy' id="setting_2" checked/>
+                        <label for="setting_2"></label>
+                    </div>
+                </div>
+                <div style='grid-column: span 8; height: 20px; align-items:center;'>Только нет ответа</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='not_answer' id="setting_3" checked/>
+                        <label for="setting_3"></label>
+                    </div>
+                </div>
+                <div style='grid-column: span 8; height: 20px; align-items:center;'>Только с соединением</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='line_connect' id="setting_4" checked/>
+                        <label for="setting_4"></label>
+                    </div>
+                </div>
+                <div style='grid-column: span 8; height: 20px; align-items:center;'>Только станционарные</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='only_stations' id="setting_5" onchange="CheckTypeNumber($(this))" />
+                        <label for="setting_5"></label>
+                    </div>
+                </div>
+                <div style='grid-column: span 8; height: 20px; align-items:center;'>Только мобильные</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='only_mobiles' id="setting_6" onchange="CheckTypeNumber($(this))"/>
+                        <label for="setting_6"></label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div style="display:inline-flex; width:100%;margin: 2px 0px;">
+        <div style="font-family:'DejaVu Sans'; font-size:14px;font-weight:900;width:30%;">Общие количество номеров</div>
+        <div style="width:70%;background: #008dd2;color: #fff;font-size:16px;font-weight:900;padding: 0px 5px;" name="count_numbers"></div>
+    </div>
+    <div name="header_name" class="table_status_numb">
+        <div class="Header_Column_1"><p>Телефон</p></div>
+        <div class="Header_Column_2"><p>Статус</p></div>
+        <div class="Header_Column_3"><p>Тип</p></div>
+    </div>
+    <div name="text_name_status" class="table_status_numb">
+    </div>
+    <div style="width:100%;height:25px;display:inline-flex; justify-content: center; align-items: center;">
+        <div class="btn_page_prev" onclick="GoPagePrev()" style="font-weight:900;color:#fff;display:flex;justify-content:center;align-items:center;"><div><</div></div>
+        <div name="div_numb_page"></div>
+        <div style="margin: 0px 3px;">-</div>
+        <div name="div_limit_page"></div>
+        <div class="btn_page_next" onclick="GoPageNext()" style="font-weight:900;color:#fff;display:flex;justify-content:center;align-items:center;"><div>></div></div>
+    </div>
+</div>
+
+<script>
+    let status_number_list = [];
+    Array.prototype.clone = function () {
+        return this.slice(0);
+    }
+
+    $(function () {
+        $.get("/Phone/getListFO")
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    $('select[name=list_FO_]').append("<option value='" + item.KodFO + "'>" + item.NameFO + "</option>");
+                })
+            })
+
+    })
+
+    function ChangeListOB(code) {
+        $('select[name=list_OB_]').find('option:not(:disabled)').remove();
+        $('select[name=list_OB_]').find('option:disabled').prop("selected", true);
+
+        $('select[name=list_GOR_]').find('option:not(:disabled)').remove();
+        $('select[name=list_GOR_]').find('option:disabled').prop("selected", true);
+        $.get("/Phone/getListOB", { code: code })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    $('select[name=list_OB_]').append("<option  value='" + item.KodOB + "'>" + item.NameOB + "</option>");
+                })
+            })
+    }
+
+    function ChangeListGOR(codeFO, codeOB) {
+        $('select[name=list_GOR_]').find('option:not(:disabled)').remove();
+        $('select[name=list_GOR_]').find('option:disabled').prop("selected", true);
+        $.get("/Phone/getListGOR", { codeFO: codeFO, codeOB: codeOB })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    $('select[name=list_GOR_]').append("<option value='" + item.KodGOR + "'>" + item.NameGOR + "</option>");
+                })
+            })
+    }
+
+    function LoadListStatus() {
+        var str_FO = $('select[name=list_FO_]').find('option:selected').val();
+        var str_OB = $('select[name=list_OB_]').find('option:selected').val();
+        var str_GOR = $('select[name=list_GOR_]').find('option:selected').val();
+        var panel_settings = $('div[name=panel_setting_load]');
+        const is_not_connect = panel_settings.find('input[name=not_connect]').is(':checked');
+        const is_number_busy = panel_settings.find('input[name=number_busy]').is(':checked');
+        const is_not_answer = panel_settings.find('input[name=not_answer]').is(':checked');
+        const is_line_connect = panel_settings.find('input[name=line_connect]').is(':checked');
+        const is_only_stations = panel_settings.find('input[name=only_stations]').is(':checked');
+        const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
+        let lst_setting = [];
+        lst_setting.push(is_not_connect);
+        lst_setting.push(is_number_busy);
+        lst_setting.push(is_not_answer);
+        lst_setting.push(is_line_connect);
+        lst_setting.push(is_only_stations);
+        lst_setting.push(is_only_mobiles);
+        $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString() })
+            .success(function (server_data) {
+                status_number_list = server_data.clone();
+                $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length  : 0);
+                BuildListStatus(1);
+                $('div[name=div_limit_page]').text(Math.ceil(status_number_list.length / 30));
+                $('div[name=div_numb_page]').text(1);
+                $('input[name=page_numb_status]').val(1);
+            })
+    }
+
+    function BuildListStatus(page_iter) {
+        var container = $('div[name=text_name_status]');
+        container.empty();
+        const massive_length = status_number_list.length;
+        const page_length = Math.ceil(massive_length / 30);
+        const limit_iter = (page_iter * 30) > massive_length ? massive_length : (page_iter * 30);
+        for (var i = (page_iter * 30) - 30; i < limit_iter; i++) {
+            if (i % 2 == 0) {
+                container.append("<div class='Header_Column_1 FirstBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 FirstBlock'>" + status_number_list[i].Status +
+                    "</div><div class='Header_Column_3 FirstBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>");
+            } else {
+                container.append("<div class='Header_Column_1 SecondBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 SecondBlock'>" + status_number_list[i].Status +
+                    "</div><div class='Header_Column_3 SecondBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>");
+            }
+        }
+    }
+
+    function GoPageNext() {
+        var numb_page = $('input[name=page_numb_status]').val();
+        if (Number(numb_page) >= Math.ceil(status_number_list.length / 30)) return;
+        $('input[name=page_numb_status]').val(Number(numb_page) + 1);
+        BuildListStatus(Number(numb_page) + 1);
+        $('div[name=div_numb_page]').text(Number(numb_page) + 1);
+    }
+    function GoPagePrev() {
+        var numb_page = $('input[name=page_numb_status]').val();
+        if (Number(numb_page) <= 1) return;
+        $('input[name=page_numb_status]').val(Number(numb_page) - 1);
+        BuildListStatus(Number(numb_page) - 1);
+        $('div[name=div_numb_page]').text(Number(numb_page) - 1);
+    }
+    function ToOktell(id_table) {
+        var FO = $('select[name=list_FO_]').find('option:selected').val();
+        var OB = $('select[name=list_OB_]').find('option:selected').val();
+        var GOR = $('select[name=list_GOR_]').find('option:selected').val();
+        var panel_settings = $('div[name=panel_setting_load]');
+        const is_not_connect = panel_settings.find('input[name=not_connect]').is(':checked');
+        const is_number_busy = panel_settings.find('input[name=number_busy]').is(':checked');
+        const is_not_answer = panel_settings.find('input[name=not_answer]').is(':checked');
+        const is_line_connect = panel_settings.find('input[name=line_connect]').is(':checked');
+        const is_only_stations = panel_settings.find('input[name=only_stations]').is(':checked');
+        const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
+        let lst_setting = [];
+        lst_setting.push(is_not_connect);
+        lst_setting.push(is_number_busy);
+        lst_setting.push(is_not_answer);
+        lst_setting.push(is_line_connect);
+        lst_setting.push(is_only_stations);
+        lst_setting.push(is_only_mobiles);
+        $.post("/Phone/ImportNumberToOktell", { FO: FO, OB: OB, GOR: GOR, id_table: Number(id_table), settings: lst_setting.toString() })
+            .success(function () {
+                alert("Номера загружены");
+            })
+            .error(function () {
+                alert("Ошибка загрузка номеров");
+            })
+    }
+
+    function GetNameFreeTable() {
+        var cont = $('.btn_ToOktell');
+        $('div[name=panel_setting_load]').css("display", "none");
+        if ($('div[name=free_table_mysql]').length >= 1) {
+            $('div[name=free_table_mysql]').remove()
+        } else {
+            cont.parent().after("<div style='width:200px;height:auto;display: block;position: absolute ; border: 1px solid #008dd2;z-index:10;margin: 0px 3px;background: #fff;' name='free_table_mysql'></div>");
+            $.get("/Phone/GetFreeNameTable")
+                .success(function (server_data) {
+                    var panel_free_table = $('div[name=free_table_mysql]');
+                    $.each(server_data, function (i, item) {
+                        if (item == "" || item == null) {
+                            panel_free_table.append("<div id='" + (i + 1) + "' onclick='GetIDTable($(this))'>Табллица " + (i + 1) + "</div>")
+                        }
+                    })
+                })
+        }
+    }
+
+    function GetIDTable(cont) {
+        ToOktell(cont.attr('id'));
+        $('div[name=free_table_mysql]').remove();
+    }
+
+    function AddPanelSettingLoad() {
+        var cont = $('.btn_ToOktell');
+        $('div[name=free_table_mysql]').remove();
+        if ($('div[name=panel_setting_load]').css("display") === 'grid') {
+            $('div[name=panel_setting_load]').css("display","none");
+        } else {
+            $('div[name=panel_setting_load]').css("display", "grid");
+        }
+    }
+
+    function CheckTypeNumber(container) {
+        if (container.attr('name') == "only_stations") {
+            if ($('input[name=only_mobiles]').is(":checked")) {
+                $('input[name=only_mobiles]').trigger("click");
+            }
+            return;
+        }
+        if (container.attr('name') == "only_mobiles") {
+            if ($('input[name=only_stations]').is(":checked")) {
+                $('input[name=only_stations]').trigger("click");
+            }
+            return;
+        }
+    }
+</script>

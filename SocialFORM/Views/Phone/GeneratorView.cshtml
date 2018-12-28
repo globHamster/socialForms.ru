@@ -1,0 +1,191 @@
+﻿<div class="box">
+    <style>
+        div[name=TableOfDiap]{
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            width: 100%;
+        }
+        div[name=ColumnOfCount]{
+            grid-column: span 2;
+        }
+        div[name=ColumnOfSD]{
+            grid-column: span 4;
+        }
+        div[name=ColumnOfED]{
+            grid-column: span 4;
+        }
+        div[name=ColumnOfDelete]{
+            grid-column: span 2;
+        }
+    </style>
+    <div style="display:inline-flex;width:100%;background:#008dd2;margin: 1px 0px;padding:5px;border-radius: 10px 10px 0 0;">
+        <fieldset style="margin: 0px 5px;width:33%;">
+            <legend style="font-size:14px;font-weight:900;color:#fff;">Федеральный округ</legend>
+            <select style="width:100%;" id="SFO" class="select" onchange="LoadListOB($(this).find('option:selected').val())">
+                <option value="" selected disabled>Выберите из списка</option>
+            </select>
+        </fieldset>
+        <fieldset style="margin: 0px 5px;width:33%;">
+            <legend style="font-size:14px;font-weight:900;color:#fff;">Области</legend>
+            <select style="width:100%;" id="SOB" class="select" onchange="LoadListGOR($('select#SFO').find('option:selected').val(), $(this).find('option:selected').val())">
+                <option value="" selected disabled>Выберите из списка</option>
+            </select>
+        </fieldset>
+        <fieldset style="margin: 0px 5px;width:33%;">
+            <legend style="font-size:14px;font-weight:900;color:#fff;">Городские округа</legend>
+            <select style="width:100%;" id="SGOR" class="select" >
+                <option value="" selected disabled>Выберите из списка</option>
+            </select>
+        </fieldset>
+    </div>
+
+    <div style="display:grid;grid-template-columns: repeat(10, 1fr);background:#008dd2;padding:5px;border-radius: 0 0 10px 10px;">
+        <div style="grid-column: span 4;margin-bottom:5px;">
+            <label style="color:#fff;"> Код города (без первой восьмерки):</label>
+        </div>
+        <div style="grid-column: span 6;">
+            <input type="text" value="" id="kod" />
+        </div>
+        <div style="grid-column: span 4;margin-bottom:5px;">
+            <label style="color:#fff;"> Начало диапазона:</label>
+        </div>
+        <div style="grid-column: span 6;">
+            <input type="text" value="" id="sd" />
+        </div>
+        <div style="grid-column: span 4;margin-bottom:5px;">
+            <label style="color:#fff;"> Конец диапазона:</label>
+        </div>
+        <div style="grid-column: span 6;">
+            <input type="text" value="" id="ed" />
+        </div>
+    </div>
+    <div style="display:inline-flex;padding:5px;">
+        <div class="search_btn" onclick="ButtonAdd()" style="border-radius:10px;">Добавить</div>
+    </div>
+    <div style="padding:5px;">
+        <p style="font-weight:900;font-size:14px;margin-bottom:0px;">Список диапазонов</p>
+        <div class="numD"></div>
+        <div name="TableOfDiap">
+            <div name="ColumnOfCount" style="background:#008dd2;color:#fff;display:flex;justify-content:center;align-items:center;font-weight:900;"><div>Номер</div></div>
+            <div name="ColumnOfSD" style="background:#008dd2;color:#fff;display:flex;justify-content:center;align-items:center;border-left:2px solid white;font-weight:900;"><div>Начало диапозона</div></div>
+            <div name="ColumnOfED" style="background:#008dd2;color:#fff;display:flex;justify-content:center;align-items:center;border-left:2px solid white;font-weight:900;"><div>Конец диапозона</div></div>
+            <div name="ColumnOfDelete"></div>
+        </div>
+    </div>
+
+    <div>
+        <div class="search_btn" style="border-radius:10px;width:150px" onclick="ButtonPush()">Сгенерировать</div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery.maskedinput.js"></script>
+<script>
+
+    $(function () {
+        $('div#txt_1').load("/Home/Test");
+        $("#kod").mask("999");
+        $("#sd").mask("9999999");
+        $("#ed").mask("9999999");
+
+        $.get("/Phone/getListFO")
+            .success(function (server_data) {
+                if (server_data != null) {
+                    $.each(server_data, function (i, item) {
+                        $('select#SFO').append("<option value='" + item.KodFO + "'>" + item.NameFO + "</option>")
+                    })
+                }
+            })
+    })
+
+    function LoadListOB(code) {
+        $('select#SOB').find('option:not(:disabled)').remove();
+        $('select#SOB').find('option:disabled').prop('selected', true);
+        $('select#SGOR').find('option:not(:disabled)').remove();
+        $('select#SGOR').find('option:disabled').prop('selected', true);
+        $.get("/Phone/getListOB", { code: code })
+            .success(function (server_data) {
+                if (server_data != null && server_data.length != 0) {
+                    $.each(server_data, function (i, item) {
+                        $('select#SOB').append("<option value='" + item.KodOB + "'>" + item.NameOB + "</option>");
+                    })
+                }
+            })
+    }
+
+    function LoadListGOR(codeFO, codeOB) {
+        $('select#SGOR').find('option:not(:disabled)').remove();
+        $('select#SGOR').find('option:disabled').prop('selected', true);
+        $.get("/Phone/getListGOR", { codeFO: codeFO, codeOB: codeOB })
+            .success(function (server_data) {
+                if (server_data != null && server_data.length != 0) {
+                    $.each(server_data, function (i, item) {
+                        $('select#SGOR').append("<option value='" + item.KodGOR + "'>" + item.NameGOR + "</option>");
+                    })
+                }
+            })
+    }
+
+    let listRange = [];
+
+    function ButtonAdd() {
+
+        var name = $('#named').val();
+        var kod = $('#kod').val();
+        var sd = $('#sd').val();
+        var ed = $('#ed').val();
+        if (kod.length != 3) { alert("Неверный код") }
+        if (sd.length != 7) { alert("Неверный начальный диапазон") }
+        if (ed.length != 7) { alert("Неверный конечный диапазон") }
+
+        var item = {
+            kod: kod,
+            sd: sd,
+            ed: ed
+        }
+
+        if (('8' + kod + sd).length != 11 || ('8' + kod + ed).length != 11) {
+            alert('Неверно!');
+        } else if (Number(item.sd) > Number(item.ed)) {
+            alert("Неверно задан диапазон");
+        }
+        else {
+            listRange.push(item);
+            let countDip = $('div.element_diap').length > 0 ? Number($('div.element_diap').last().find("div").text()) + 1 : 1;
+
+            $('div[name=TableOfDiap]:last').after('<div name="TableOfDiap"><div name="ColumnOfCount" class="element_diap" style="height:25px;display:flex;justify-content:center;align-items:center;border-bottom:1px solid black;"><div>' + countDip +
+                '</div></div><div name="ColumnOfSD" style="display:flex;justify-content:center;align-items:center;border-left:2px solid black;border-bottom:1px solid black;"><div>' + item.kod + item.sd +
+                '</div></div><div name="ColumnOfED" style="display:flex;justify-content:center;align-items:center;border-left:2px solid black;border-bottom:1px solid black;"><div>' + item.kod + item.ed +
+                '</div></div><div name="ColumnOfDelete" style="display:flex;justify-content:center;align-items:center;"><div style="width:20px;height:20px;border-radius:20px;background:red;" onclick="RemoveDiap($(this))"></div></div></div>');
+            document.getElementById('sd').value = "";
+            document.getElementById('ed').value = "";
+        }
+    };
+
+    function ButtonPush() {
+        var FOSelObj = document.getElementById('SFO');
+        var OBSelObj = document.getElementById('SOB');
+        var GORSelObj = document.getElementById('SGOR');
+        var currentFO = FOSelObj.value;
+        var currentOB = OBSelObj.value;
+        var currentGOR = GORSelObj.value;
+        var str = "";
+        var lst_number = [];
+        listRange.forEach(function (item, i, listRange) {
+            lst_number.push((item.kod + item.sd) + "-" + (item.kod + item.ed));
+        });
+        if (currentFO == "" || currentOB == "" || currentGOR == "") {
+            alert("Ошибка!");
+        }
+        else {
+            var number_status = { KodFO: currentFO, KodOB: currentOB, KodGOR: currentGOR, mas_numb: lst_number };
+            $.post("/Phone/PushNumbersStatus", number_status)
+                .success(function () {
+                    alert("Success");
+                })
+        }
+    }
+
+    function RemoveDiap(btn_remove) {
+        btn_remove.parents("div[name=TableOfDiap]").remove();
+    }
+</script>

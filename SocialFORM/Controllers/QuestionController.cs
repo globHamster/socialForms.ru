@@ -23,7 +23,6 @@ namespace SocialFORM.Controllers
         ApplicationContext db2 = new ApplicationContext();
         // GET: Question
 
-
         public ActionResult ListQuestions(int project_id)
         {
             IEnumerable<QuestionModel> result = db.SetQuestions
@@ -63,45 +62,6 @@ namespace SocialFORM.Controllers
             db.SaveChanges();
             return tmp.Id;
         }
-
-        //[HttpGet]
-        //public ActionResult SingleFormQuestion(int array)
-        //{
-        //    QuestionModel q = db.SetQuestions.FirstOrDefault(u => u.Id == array);
-        //    ViewBag.Text = q.TextQuestion;
-        //    return View();
-        //}
-
-        //public string SingleFormQuestion(string answer)
-        //{
-
-        //    AnswerModel a = new AnswerModel();
-        //    a.AnswerText = answer;
-        //    db.SetAnswers.Add(a);
-        //    db.SaveChanges();
-        //    return answer.ToString();
-        //}
-
-        //[HttpGet]
-        //public ActionResult MultipleFormQuestion()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public string MultipleFormQuestion(string[] resp)
-        //{
-        //    string answer = "";
-        //    for (int i = 0; i < resp.Length; i += 2)
-        //    {
-        //        answer += resp[i] + " ";
-        //    }
-        //    AnswerModel tmp = new AnswerModel();
-        //    tmp.AnswerText = answer;
-        //    db.SetAnswers.Add(tmp);
-        //    db.SaveChanges();
-        //    return answer;
-        //}
 
         //Сохранение списка ответов (с переадресацией в другую функцию)
         [HttpPost]
@@ -762,39 +722,6 @@ namespace SocialFORM.Controllers
             {
                 quotaModel.QuotaCount -= 1;
                 await db.SaveChangesAsync();
-            }
-        }
-
-        public ActionResult Loop(int id_p)
-        {
-            ViewBag.ProjectID = id_p;
-            return PartialView();
-        }
-
-        [HttpPost]
-        public int SetLoopRange(LoopModel tmp)
-        {
-            int id_loop;
-            db.SetLoopModels.Add(tmp);
-            db.SaveChanges();
-            id_loop = tmp.Id;
-            return id_loop;
-        }
-
-        [HttpGet]
-        public JsonResult GetLoopRange(int id_p)
-        {
-            return Json(db.SetLoopModels.Where(u => u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public void DeleteLoopRange(int id_loop)
-        {
-            LoopModel tmp = db.SetLoopModels.FirstOrDefault(u => u.Id == id_loop);
-            if (tmp != null)
-            {
-                db.SetLoopModels.Remove(tmp);
-                db.SaveChanges();
             }
         }
 

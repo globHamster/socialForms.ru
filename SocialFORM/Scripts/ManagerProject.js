@@ -537,7 +537,10 @@ function Init() {
                         IsKvot: item_block.find('.AnswerBlock').find('.QuotaDiv').find('.QYes').hasClass('QOn') ? true : false,
                         IsRotate: item_block.find('.AnswerBlock').find('.RotateDiv').find('.QYes').hasClass('QOn') ? true : false
                     }
-
+                    if (item_block.find('.AnswerItem').length == 0) {
+                        alert('Вопрос не содержит ответов');
+                        return;
+                    }
                     $.post("/Question/Question", q_query)
                         .success(function () {
                             var list_answer = [];
@@ -604,6 +607,10 @@ function Init() {
                         TypeMassk: null,
                         IsRotate: item_block.find('.AnswerBlock').find('.RotateDiv').find('.QYes').hasClass('QOn') ? true : false
                     }
+                    if (item_block.find('.AnswerItem').length == 0) {
+                        alert('Вопрос не содержит ответов');
+                        return;
+                    }
                     $.post("/Question/Question", q_query)
                         .success(function () {
                             var list_answer = [];
@@ -669,6 +676,10 @@ function Init() {
                         IsKvot: item_block.find('.AnswerBlock').find('.QuotaDiv').find('.QYes').hasClass('QOn') ? true : false,
                         IsRotate: false
                     }
+                    if (item_block.find('.AnswerItem').length == 0) {
+                        alert('Вопрос не содержит ответов');
+                        return;
+                    }
                     if (q_query.TypeMassk != 1) {
                         q_query.IsKvot = false;
                         if (item_block.find(".PanelOfRange").find(".RangeItem").length > 0) {
@@ -733,6 +744,10 @@ function Init() {
                     IsKvot: false,
                     IsRotate: false,
                     Bind: bind_id_question
+                }
+                if (item_block.find('table.TableStyle').length == 0) {
+                    alert('Вопрос не содержит ответов');
+                    return;
                 }
                 $.post("/Question/Question", q_query)
                     .error(function () { alert("ERROR") });

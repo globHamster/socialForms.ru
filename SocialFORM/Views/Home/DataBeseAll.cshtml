@@ -1,5 +1,4 @@
 ﻿<h3>База данных</h3>
-
 <style type="text/css">
     .tabs {
         width: 100%;
@@ -40,7 +39,8 @@
     #tab_2:checked ~ #txt_2,
     #tab_3:checked ~ #txt_3,
     #tab_4:checked ~ #txt_4,
-    #tab_5:checked ~ #txt_5 {
+    #tab_5:checked ~ #txt_5,
+    #tab_6:checked ~ #txt_6 {
         display: block;
     }
 
@@ -67,29 +67,25 @@
     .select {
         padding: 5px;
     }
-
-    .bblock {
-        margin: 10px;
-        padding: 5px;
-        background-color: #E0E0E0;
-    }
 </style>
 
 <div class="row">
     <div class="tabs">
         <input type="radio" name="inset" value="" id="tab_1" checked>
-        <label name="loadCSV" for="tab_1">Подключение</label>
+        <label name="tab1" for="tab_1">Подключение</label>
 
-        <input type="radio" name="inset" value="" id="tab_2">
-        <label for="tab_2">Конструктор Базы</label>
+        @*<input type="radio" name="inset" value="" id="tab_2">
+            <label name="tab2" for="tab_2">Конструктор Базы</label>*@
 
         <input type="radio" name="inset" value="" id="tab_3">
-        <label for="tab_3">База Данных</label>
+        <label name="tab3" for="tab_3">Информация об абоненте</label>
 
         <input type="radio" name="inset" value="" id="tab_4">
-        <label for="tab_4">Генератор</label>
+        <label name="tab4" for="tab_4">Генератор номеров</label>
         <input type="radio" name="inset" value="" id="tab_5">
-        <label for="tab_5">База Данных</label>
+        <label name="tab5" for="tab_5">База номеров</label>
+        <input type="radio" name="inset" value="" id="tab_6">
+        <label name="tab6" for="tab_6">Данные с анкеты</label>
         <div id="txt_1">
             Таблица для подключения
         </div>
@@ -100,74 +96,37 @@
             <p>База данных</p>
         </div>
         <div id="txt_4">
-            <div class="box">
-                <h4>Генератор номеров</h4>
-                <div class="row">
-                    <div class="bblock">
-                        <select id="SFO" class="select" onchange="onchangeFOSelect();">
-                            <option value="">-- FO не выбран --</option>
-                        </select>
-                    </div>
-                    <div class="bblock">
-                        <div id="OBCont" style="display: none;">
-                            <select id="SOB" class="select" onchange="onchangeOBSelect();">
-                                <option value="">-- OB не выбран --</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="bblock">
-                        <div id="GORCont" style="display: none;">
-                            <select id="SGOR" class="select" onchange="onchangeModelSelect(this);">
-                                <option value="">-- GOR не выбран --</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="bblock">
-                        <label for="named"> Название:</label>&nbsp;&nbsp;&nbsp;
-                        <input type="text" value="" id="named" />
-                    </div>
-                    <div class="bblock">
-                        <label for="kod"> Код города (без первой восьмерки):</label>&nbsp;&nbsp;&nbsp;
-                        <input type="text" value="" id="kod" />
-                        <label for="sd"> Начало диапазона:</label>&nbsp;&nbsp;&nbsp;
-                        <input type="text" value="" id="sd" />
-                        <label for="ed"> Конец диапазона:</label>&nbsp;&nbsp;&nbsp;
-                        <input type="text" value="" id="ed" />
-                    </div>
-                    <div class="bblock">
-                        <div class="btn Add">Добавить</div>
-                        <div class="btn Res">Сброс</div>
-                    </div>
-                    <div class="bblock">
-                        Список диапазонов
-                        <div class="numD"></div>
-                    </div>
 
-                    <div class="bblock">
-                        <div class="btn Pus">Сгенерировать</div>
-                    </div>
-                </div>
-            </div>
         </div>
-
         <div id="txt_5">
             Карта России
+        </div>
+        <div id="txt_6">
         </div>
     </div>
 </div>
 
 
-@Scripts.Render("~/Scripts/jquery-1.10.2.js")
-@Scripts.Render("~/Scripts/jquery.maskedinput.js")
+
 
 <script type="text/javascript">
     let pool_data = {};
     let countDip;
     $(function () {
         $('div#txt_1').load("/Home/Test");
-        $("#kod").mask("999");
-        $("#sd").mask("9999999");
-        $("#ed").mask("9999999");
+
+        $('label').click(function () {
+            if ($(this).attr('name') == 'tab1') {
+                $('div#txt_1').empty().load("/Home/Test");
+            } else if ($(this).attr('name') == 'tab6') {
+                $('div#txt_6').empty().load("/Phone/SyncWithBlanksView");
+            } else if ($(this).attr('name') == 'tab4') {
+                $('div#txt_4').empty().load("/Phone/GeneratorView");
+            }
+
+        })
+        $('div#txt_3').load("/Phone/DataBaseView");
+        $('div#txt_5').load("/Phone/PrimaryTableView");
     })
 
     $('body').on("click", ".hide1", function () {
@@ -189,204 +148,4 @@
             $(this).addClass("HideOn");
         }
     });
-
-    $('#SGOR').change(function () {
-        countDip = 1;
-        var FOSelObj = document.getElementById('SFO');
-        var OBSelObj = document.getElementById('SOB');
-        var GORSelObj = document.getElementById('SGOR');
-        var currentFO = FOSelObj.value;
-        var currentOB = OBSelObj.value;
-        var currentGOR = GORSelObj.value;
-        var data = { KodFO: currentFO, KodOB: currentOB, KodGOR: currentGOR };
-        $.get("/DataBase/GetListDIAP", data)
-            .success(function (res) {
-                var list = $('.numD');
-                $('.numD').empty();
-                list.append('<table id="TableDiap" border="1">'
-                    + '<tr>'
-                    + '<th style="display:none;">IDbd</th>'
-                    + '<th>ID</th>'
-                    + '<th>Num1</th>'
-                    + '<th>Num2</th>'
-                    + '<th>NameD</th>'
-                    + '<th>Del</th>'
-                    + '</tr></table >');
-                $.each(res, function (i, item) {
-                    console.log(item);
-                    $('#TableDiap').append('<tr><td style="display:none;">' + item.Id + '</td><td>' + countDip + '</td><td>' + item.Kod + item.Num1 + '</td><td>' + item.Kod + item.NumN + '</td><td>' + item.NameD + '</td><td><div>x</div></td></tr>');
-                    countDip++;
-                });
-            });
-    });
-
-    $.get("/Home/GetListFO")
-        .success(function (e) {
-            var block = $('div#txt_5');
-            pool_data.ListFO = e;
-            $.each(e, function (i, item) {
-                block.append('<div id="FOall" class="' + item.KodFO + '"><div class="hide1">&#10004;</div>' + item.NameFO + '<div id="AllOBFO"></div></div>')
-            });
-            FO_init();
-        });
-
-    $.get("/Home/GetListOB")
-        .success(function (e) {
-            var block;
-            pool_data.ListOB = e;
-            $.each(e, function (i, item) {
-                block = $('div.' + item.KodFO).find('#AllOBFO');
-                block.append('<div class="' + item.KodOB + '"><div class="hide2">&#10004;</div>' + item.NameOB + '<div id="AllGOROB"></div></div>')
-            });
-        });
-
-    $.get("/Home/GetListGOR")
-        .success(function (e) {
-            var block;
-            pool_data.ListGOR = e;
-            $.each(e, function (i, item) {
-                block = $('div.' + item.KodFO).find('div.' + item.KodOB).find('#AllGOROB');
-                block.append('<div class="' + item.KodGOR + '">' + item.NameGOR + '<div id="AllGGGOR"></div></div>')
-            });
-        });
-
-
-
-    function FO_init() {
-        var FOSelObj = document.getElementById('SFO');
-        var priceLen = pool_data.ListFO.length;
-        var selLen = FOSelObj.options.length;
-        var lastFO = "";
-        for (var i = 0; i < priceLen; i++) {
-            var t = pool_data.ListFO[i];
-            if (lastFO != t.KodFO) {
-                FOSelObj.options[selLen++] = new Option(t.NameFO, t.KodFO);
-                lastFO = t.KodFO;
-            }
-        }
-    }
-    function onchangeFOSelect() {
-        var FOSelObj = document.getElementById('SFO');
-        var OBContainer = document.getElementById('OBCont');
-        var currentFO = FOSelObj.value;
-        if (currentFO == "") {
-            OBContainer.style.display = "none"; //бренд не выбран
-        } else {
-            var OBSelObj = document.getElementById('SOB'); //очистим список моделей - все, кроме первого элемента
-            for (var i = OBSelObj.options.length - 1; i > 0; i--) OBSelObj.remove(i);
-            //загрузим список моделей соответствующего бренда
-            var priceLen = pool_data.ListOB.length; //число строк прайса
-            var selLen = OBSelObj.options.length; //текущее число строк будет равно единице
-            for (var i = 0; i < priceLen; i++) {
-                var t = pool_data.ListOB[i];
-                if (currentFO == t.KodFO)
-                    OBSelObj.options[selLen++] = new Option(t.NameOB, t.KodOB); //модель устройства (картридж), цена заправки в рублях
-            }
-            OBContainer.style.display = "block"; //бренд выбран, покажем список
-        }
-    }
-    function onchangeOBSelect() {
-        var FOSelObj = document.getElementById('SFO');
-        var OBSelObj = document.getElementById('SOB');
-        var GORContainer = document.getElementById('GORCont');
-        var currentFO = FOSelObj.value;
-        var currentOB = OBSelObj.value;
-        if (currentOB == "") {
-            GORContainer.style.display = "none"; //бренд не выбран
-        } else {
-            var GORSelObj = document.getElementById('SGOR'); //очистим список моделей - все, кроме первого элемента
-            for (var i = GORSelObj.options.length - 1; i > 0; i--) GORSelObj.remove(i);
-            //загрузим список моделей соответствующего бренда
-            var priceLen = pool_data.ListGOR.length; //число строк прайса
-            var selLen = GORSelObj.options.length; //текущее число строк будет равно единице
-            for (var i = 0; i < priceLen; i++) {
-                var t = pool_data.ListGOR[i];
-                if (currentOB == t.KodOB && currentFO == t.KodFO)
-                    GORSelObj.options[selLen++] = new Option(t.NameGOR, t.KodGOR); //модель устройства (картридж), цена заправки в рублях
-            }
-            GORContainer.style.display = "block"; //бренд выбран, покажем список
-        }
-    }
-    function onchangeModelSelect(th) {
-
-    }
-
-
-    let listRange = [];
-
-    $('.Res').click(function () {
-        document.getElementById('kod').value = "";
-        document.getElementById('sd').value = "";
-        document.getElementById('ed').value = "";
-        $('.numD').empty();
-    });
-
-    $('.Add').click(function () {
-
-        var name = $('#named').val();
-        var kod = $('#kod').val();
-        var sd = $('#sd').val();
-        var ed = $('#ed').val();
-        if (kod.length != 3) { alert("Неверный код") }
-        if (sd.length != 7) { alert("Неверный начальный диапазон") }
-        if (ed.length != 7) { alert("Неверный конечный диапазон") }
-
-        var tmpsd = '7' + kod + sd;
-        var tmped = '7' + kod + ed;
-
-        var item = {
-            kod: kod,
-            sd: sd,
-            ed: ed
-        }
-
-        $(".diap").each(function (str) {
-            console.log(str + ":" + kod + " " + sd);
-        });
-
-        if (('8' + kod + sd).length != 11 || ('8' + kod + ed).length != 11) {
-            alert('Неверно!');
-        }
-        else {
-            listRange.push(item);
-            $('#TableDiap').append('<tr><td style="display:none;">' + countDip + '</td><td>' + item.kod + item.sd + '</td><td>' + item.kod + item.ed + '</td><td>' + name + '</td><td><div>x</div></td></tr>');
-            countDip++;
-            document.getElementById('sd').value = "";
-            document.getElementById('ed').value = "";
-        }
-    });
-
-    $('.Pus').click(function () {
-        var FOSelObj = document.getElementById('SFO');
-        var OBSelObj = document.getElementById('SOB');
-        var GORSelObj = document.getElementById('SGOR');
-        var currentFO = FOSelObj.value;
-        var currentOB = OBSelObj.value;
-        var currentGOR = GORSelObj.value;
-        var named = document.getElementById('named');
-        var currentNamed = named.value;
-        var str = "";
-        listRange.forEach(function (item, i, listRange) {
-            console.log(i + ": " + item.sd + " " + item.ed + " (массив:" + listRange + ")");
-            str += item.kod + "|" + item.sd + "|" + item.ed + "#"
-        });
-        console.log(str);
-        if (currentFO == "" || currentOB == "" || currentGOR == "") {
-            alert("Ошибка!");
-        }
-        else {
-            var data = { NameD: currentNamed, KodFO: currentFO, KodOB: currentOB, KodGOR: currentGOR, str_dip: str };
-            console.log("===>>>>", data);
-            $.get("/Home/GetDiapazon", data)
-                .success(function (res) {
-                    alert(res);
-                    document.getElementById('named').value = "";
-                    document.getElementById('kod').value = "";
-                    document.getElementById('sd').value = "";
-                    document.getElementById('ed').value = "";
-                    $('.numD').empty();
-                });
-        }
-    });
-
 </script>

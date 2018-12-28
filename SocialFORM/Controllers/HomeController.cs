@@ -333,16 +333,7 @@ namespace SocialFORM.Controllers
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
 
-        //public ActionResult Test(int Id)
-        //{ 
-        //    string[] I = { Id.ToString() };
-        //    ActionResult viewuser = ViewUser(Id);
-        //    return viewuser;
-        //}
-
-        //
         //Отрисовка блока с результатами (НАЧАЛО)
-        //
         List<ResultModel> tmp_tableBlanks = null;
         [HttpGet]
         public ActionResult TableBlanks(int id_project, int? page)
@@ -359,9 +350,7 @@ namespace SocialFORM.Controllers
             //return PartialView(tmp);
         }
 
-        //
         //Отрисовка блока с результатами (ПО ПАНЕЛИ)
-        //
         [HttpGet]
         public ActionResult _TableBlanks(string id_project, int? page)
         {
@@ -405,7 +394,6 @@ namespace SocialFORM.Controllers
             db.SetResultModels.RemoveRange(tmp);
             db.SaveChanges();
         }
-
 
         public void ExportToEXCEL(int id_p, string name_file, string encode)
         {
@@ -888,7 +876,6 @@ namespace SocialFORM.Controllers
             Response.End();
         }
 
-
         [HttpPost]
         public void actionProject(int id)
         {
@@ -898,9 +885,7 @@ namespace SocialFORM.Controllers
             db2.SaveChanges();
         }
 
-        //
         //Статистика
-        //
         public ActionResult Statistics()
         {
             List<ResultModel> tmp_statFilter = db.SetResultModels.ToList();

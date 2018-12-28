@@ -1,0 +1,88 @@
+﻿<div>
+    <select name="list_Project_sync" onchange="LoadQuestionFromProject($(this).find('option:selected').val())">
+        <option value="" selected disabled>Выберите проект</option>
+    </select>
+    <div style="width:400px; display:grid ;grid-template-columns: repeat(8, 1fr);margin: 5px; background:#81c784; border-radius:10px;padding:5px;">
+        <div style="grid-column: span 5;">Населенный пункт</div><div style="grid-column:span 3;">
+            <select name="list_Q_NP">
+                <option value="" selected disabled>Выберите вопрос</option>
+            </select>
+        </div>
+        <div style="grid-column: span 5;">Пол</div><div style="grid-column: span 3;">
+            <select name="list_Q_Sex">
+                <option value="" selected disabled>Выберите вопрос</option>
+            </select>
+        </div>
+        <div style="grid-column: span 5;">Возраст</div><div style="grid-column: span 3;">
+            <select name="list_Q_Age">
+                <option value="" selected disabled>Выберите вопрос</option>
+            </select>
+        </div>
+    </div>
+    <div class="search_btn" style="width:150px; padding:5px;" onclick="SyncBlank()">Синхронизировать</div>
+</div>
+<script>
+
+    $(function () {
+        $.get("/Home/GetListProject")
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    $('select[name=list_Project_sync]').append("<option value='" + item.Id + "'>" + item.NameProject + "</option>");
+                })
+            })
+    })
+
+    function LoadQuestionFromProject(code_p) {
+        $.get("/Group/getGroup", { id_p: code_p })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    $('select[name=list_Q_NP]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
+                    $('select[name=list_Q_Sex]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
+                    $('select[name=list_Q_Age]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
+                })
+
+            })
+    }
+
+    function SyncBlank() {
+        const project_id = $('select[name=list_Project_sync]').find('option:selected').val();
+        const NP_id = $('select[name=list_Q_NP]').find('option:selected').val();
+        const Sex_id = $('select[name=list_Q_Sex]').find('option:selected').val();
+        const Age_id = $('select[name=list_Q_Age]').find('option:selected').val();
+        let lst_blank;
+        let lst_sync_info = [];
+        $.ajax({
+            type: "GET",
+            url: "/Form/getBlanks",
+            async: false,
+            data: { id_project: project_id },
+            success: function (server_data) {
+                lst_blank = server_data;
+            }
+        })
+        $.each(lst_blank, function (i, item_blank) {
+            const phone = item_blank.PhoneNumber;
+            const id_blank = item_blank.Id;
+            let sex, age;
+            $.ajax({
+                type: "GET",
+                url: "/Form/GetInfoAboutBlank",
+                async: false,
+                data: { q_id: Sex_id, b_id: id_blank },
+                success: function (data) {
+                    sex = data.AnswerIndex == 1 ? "мужской" : "женский";
+                }
+            })
+            $.ajax({
+                type: "GET",
+                url: "/Form/GetInfoAboutBlank",
+                async: false,
+                data: { q_id: Age_id, b_id: id_blank },
+                success: function (data) {
+                    age = data.Text;
+                }
+            })
+            lst_sync_info.push({ Phone: phone, Sex: sex, Age: age });
+        })
+    }
+</script>

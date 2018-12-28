@@ -374,13 +374,16 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\DataBaseController.cs" />
+    <Compile Include="Controllers\PhoneController.cs" />
     <Compile Include="Hubs\ChatHub.cs" />
     <Compile Include="Hubs\AppHub.cs" />
     <Compile Include="Models\ChatUser.cs" />
     <Compile Include="Models\DB\Diap.cs" />
     <Compile Include="Models\DB\listRange.cs" />
     <Compile Include="Models\NumberAppContext.cs" />
+    <Compile Include="Models\Number\FormNumber.cs" />
     <Compile Include="Models\Number\GOR.cs" />
+    <Compile Include="Models\Number\PT.cs" />
     <Compile Include="Models\Number\OB.cs" />
     <Compile Include="Models\Number\FO.cs" />
     <Compile Include="Models\Opros.cs" />
@@ -403,7 +406,15 @@
     <Content Include="Content\css\form_formView_style.css" />
     <Content Include="Content\css\home_project.css" />
     <Content Include="Content\css\home_test_style.css" />
+    <Content Include="Content\css\phone_databaseview.css" />
+    <Content Include="Content\css\tableexport.css" />
+    <Content Include="Content\css\tableexport.min.css" />
     <Content Include="Content\daterangepicker.css" />
+    <Content Include="Content\images\gear_setting.png" />
+    <Content Include="Content\images\icsv.png" />
+    <Content Include="Content\images\itxt.png" />
+    <Content Include="Content\images\ixls.png" />
+    <Content Include="Content\images\ixlsx.png" />
     <Content Include="Content\images\pencel.png" />
     <Content Include="Content\images\ui-icons_444444_256x240.png" />
     <Content Include="Content\images\ui-icons_555555_256x240.png" />
@@ -515,6 +526,10 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\csv.svg" />
+    <Content Include="Content\images\txt.svg" />
+    <Content Include="Content\images\xls.svg" />
+    <Content Include="Content\images\xlsx.svg" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile2.pubxml" />
@@ -624,6 +639,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\pdfmake.min.js" />
+    <Content Include="Scripts\phone_databaseview.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\script.js" />
@@ -728,6 +744,10 @@
     <Content Include="Views\Home\SuccessOpros.cshtml" />
     <Content Include="Views\Home\OprosYaroslavl.cshtml" />
     <Content Include="Views\Home\OprosNarkNas.cshtml" />
+    <Content Include="Views\Phone\DataBaseView.cshtml" />
+    <Content Include="Views\Phone\PrimaryTableView.cshtml" />
+    <Content Include="Views\Phone\SyncWithBlanksView.cshtml" />
+    <Content Include="Views\Phone\GeneratorView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
