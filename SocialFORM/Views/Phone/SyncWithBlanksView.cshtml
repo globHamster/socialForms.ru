@@ -1,25 +1,37 @@
 ﻿<div>
-    <select name="list_Project_sync" onchange="LoadQuestionFromProject($(this).find('option:selected').val())">
-        <option value="" selected disabled>Выберите проект</option>
-    </select>
-    <div style="width:400px; display:grid ;grid-template-columns: repeat(8, 1fr);margin: 5px; background:#81c784; border-radius:10px;padding:5px;">
-        <div style="grid-column: span 5;">Населенный пункт</div><div style="grid-column:span 3;">
+    <div style="display:grid; grid-template-columns:repeat(10, 1fr); background: #008dd2;padding:10px;border-radius: 10px;">
+        <div style="grid-column:span 2;font-family:'Century Gothic';font-weight:900;color:#fff;">Список проектов</div>
+        <div style="grid-column: span 8;">
+            <select style="height:100%;" name="list_Project_sync" onchange="LoadQuestionFromProject($(this).find('option:selected').val())">
+                <option value="" selected disabled>Выберите проект</option>
+            </select>
+        </div>
+    </div>
+        
+    
+    <div style="width:100%; display:grid ;grid-template-columns: repeat(8, 1fr);margin: 5px 0px; background:#81c784; border-radius:10px;padding:15px;">
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Городской округ</div><div style="grid-column:span 5;">
+            <select name="list_Q_GOR">
+                <option value="" selected disabled>Выберите вопрос</option>
+            </select>
+        </div>
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Населенный пункт</div><div style="grid-column:span 5;">
             <select name="list_Q_NP">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
-        <div style="grid-column: span 5;">Пол</div><div style="grid-column: span 3;">
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Пол</div><div style="grid-column: span 5;">
             <select name="list_Q_Sex">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
-        <div style="grid-column: span 5;">Возраст</div><div style="grid-column: span 3;">
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Возраст</div><div style="grid-column: span 5;">
             <select name="list_Q_Age">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
     </div>
-    <div class="search_btn" style="width:150px; padding:5px;" onclick="SyncBlank()">Синхронизировать</div>
+    <div class="search_btn" style="width:150px; padding:5px;border-radius:10px;font-family:'Century Gothic';font-weight:900;" onclick="SyncBlank()">Синхронизировать</div>
 </div>
 <script>
 
@@ -33,9 +45,18 @@
     })
 
     function LoadQuestionFromProject(code_p) {
+        $('select[name=list_Q_GOR]').find('option:not(:disabled)').remove();
+        $('select[name=list_Q_GOR]').find('option:disabled').prop("selected", true);
+        $('select[name=list_Q_NP]').find('option:not(:disabled)').remove();
+        $('select[name=list_Q_NP]').find('option:disabled').prop("selected", true);
+        $('select[name=list_Q_Sex]').find('option:not(:disabled)').remove();
+        $('select[name=list_Q_Sex]').find('option:disabled').prop("selected", true);
+        $('select[name=list_Q_Age]').find('option:not(:disabled)').remove();
+        $('select[name=list_Q_Age]').find('option:disabled').prop("selected", true);
         $.get("/Group/getGroup", { id_p: code_p })
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
+                    $('select[name=list_Q_GOR]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                     $('select[name=list_Q_NP]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                     $('select[name=list_Q_Sex]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                     $('select[name=list_Q_Age]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
@@ -46,43 +67,35 @@
 
     function SyncBlank() {
         const project_id = $('select[name=list_Project_sync]').find('option:selected').val();
-        const NP_id = $('select[name=list_Q_NP]').find('option:selected').val();
-        const Sex_id = $('select[name=list_Q_Sex]').find('option:selected').val();
-        const Age_id = $('select[name=list_Q_Age]').find('option:selected').val();
+        let NP_id = $('select[name=list_Q_NP]').find('option:selected').val();
+        let Sex_id = $('select[name=list_Q_Sex]').find('option:selected').val();
+        let Age_id = $('select[name=list_Q_Age]').find('option:selected').val();
+        const GOR_id = $('select[name=list_Q_GOR]').find('option:selected').val();
+        if (GOR_id == '') {
+            alert("Не выбран вопрос содержащий код GOR");
+            return;
+        }
+        if (NP_id == '') {
+            NP_id = 0;
+        }
+        if (Sex_id == '') {
+            Sex_id = 0;
+        }
+        if (Age_id == '') {
+            Age_id = 0;
+        }
         let lst_blank;
         let lst_sync_info = [];
-        $.ajax({
-            type: "GET",
-            url: "/Form/getBlanks",
-            async: false,
-            data: { id_project: project_id },
-            success: function (server_data) {
-                lst_blank = server_data;
-            }
-        })
-        $.each(lst_blank, function (i, item_blank) {
-            const phone = item_blank.PhoneNumber;
-            const id_blank = item_blank.Id;
-            let sex, age;
-            $.ajax({
-                type: "GET",
-                url: "/Form/GetInfoAboutBlank",
-                async: false,
-                data: { q_id: Sex_id, b_id: id_blank },
-                success: function (data) {
-                    sex = data.AnswerIndex == 1 ? "мужской" : "женский";
+        $.get("/Phone/SyncBlankWithDB", { p_id: project_id, gor_id: GOR_id, s_id: Sex_id, a_id: Age_id, np_id: NP_id })
+            .success(function (server_data) {
+                if (server_data == null) {
+                    alert("Вызвано исключение при сохранения списка номеров");
+                    return;
                 }
+                console.log(">>> ", server_data);
             })
-            $.ajax({
-                type: "GET",
-                url: "/Form/GetInfoAboutBlank",
-                async: false,
-                data: { q_id: Age_id, b_id: id_blank },
-                success: function (data) {
-                    age = data.Text;
-                }
+            .error(function () {
+                alert("Ошибка синхронизации");
             })
-            lst_sync_info.push({ Phone: phone, Sex: sex, Age: age });
-        })
     }
 </script>

@@ -1732,9 +1732,12 @@ function LoadSettingsSingle(panel, q_data) {
         '<div class="StyleButton AddBlocking" style="background-color: #81c874;">&#10010; Блок</div>' +
         '<div class="StyleButton ClearBlocking" style="background-color: #f44336;">Удалить все</div>' +
         '<div class="BlockingListDiv"></div>' +
-        '</div>'
+        '</div>'+
+        '<div name="btn_lst_gor" style="width:auto;display:flex;justify-content:center;align-items:center;background:#81c784;border-radius:10px;border:1px solid black;margin-top:5px;font-weight:900;" onclick="LoadListGenerate($(this))"><div>GOR</div></div>'
+        
 
     );
+
     if (q_data != undefined) {
         if (q_data.IsKvot) {
             block.find('.QuotaDiv').find('.QOn').removeClass('QOn');
@@ -2011,5 +2014,98 @@ function ReplaceIndexAnswer(block, index) {
             $(this).find("input[name=IndexAnswer]").val((index + count));
             count++;
         }
+    })
+}
+
+function LoadListGenerate(cont) {
+    if ($('div[name=panel_of_generater]').length > 0) {
+        $('div[name=panel_of_generater]').slideUp(200);
+        setTimeout(function () { $('div[name=panel_of_generater]').remove() }, 200);
+    } else {
+        cont.after('<div name="panel_of_generater" class="panel_of_generater" style="display: none; width:100%;height:auto;padding:10px;">' +
+            '<div style="display:grid;grid-template-columns:repeat(2, 1fr);">'+
+            '<div name="list_of_FO" style="grid-column: span 1;"><select onchange="LoadListGenerateOB($(this))" style="width:100%;">' +
+            '<option value="" selected disabled>Выберите из списка</option>' +
+            '</select></div>' +
+            '<div name="list_of_OB" style="grid-column: span 1;"><select onchange="LoadListGenerateGOR($(this))" style="width:100%;">' +
+            '<option value="" selected disabled>Выберите из списка</option>' +
+            '</select></div>' +
+            '</div>'+
+            '<fieldset name="set_of_GOR">' +
+            '<legend style="color:#fff;font-weight:900;">Список городских округов</legend>'+
+            '</fieldset>'+
+            '</div>'
+        )
+        $.get("/Phone/getListFO")
+            .success(function (server_data) {
+                var container_FO = $('div[name=list_of_FO]').find('select');
+                $.each(server_data, function (i, item) {
+                    container_FO.append('<option value="' + item.KodFO + '">' + item.NameFO + '</option>');
+                })
+                $('div[name=panel_of_generater]').slideDown(200);
+            })
+        
+        
+    }
+}
+
+function LoadListGenerateOB(cont) {
+    var parent_container = cont.parents(".panel_of_generater");
+    var container_OB = parent_container.find("div[name=list_of_OB]");
+    container_OB.find('select').find('option:not(:disabled)').remove();
+    container_OB.find('select').find('option:disabled').prop('selected', true);
+    $('div[name=grid_set_of_GOR]').remove();
+    $('div[name=panel_of_btn_GOR]').remove();
+    $.get("/Phone/getListOB", { code: cont.find("option:selected").val() })
+        .success(function (server_data) {
+            var select_cont = container_OB.find('select');
+            $.each(server_data, function (i, item) {
+                select_cont.append("<option value='" + item.KodOB + "'>" + item.NameOB + "</option>");
+            })
+        })
+}
+
+function LoadListGenerateGOR(cont) {
+    var parent_container = cont.parents(".panel_of_generater");
+    var container_GOR = parent_container.find('fieldset[name=set_of_GOR]');
+    $('div[name=grid_set_of_GOR]').remove();
+    $('div[name=panel_of_btn_GOR]').remove();
+    $.get("/Phone/getListGOR", { codeFO: parent_container.find('div[name=list_of_FO]').find('option:selected').val(), codeOB: parent_container.find('div[name=list_of_OB]').find('option:selected').val() })
+        .success(function (server_data) {
+            var code = "<div name='grid_set_of_GOR' style='display:grid;grid-template-columns: repeat(9, 1fr);margin-bottom:15px;'>"
+            $.each(server_data, function (i, item) {
+                code += "<div style='grid-column: span 3;background: #81c784;margin:5px;padding:5px;box-shadow:5px 5px 5px black;font-weight:900;'><input type='checkbox' style='margin-right:5px;'/><span id='"+item.KodGOR+"'>" + item.NameGOR + "</span></div>";
+            })
+            code += "</div>";
+            container_GOR.append(code);
+            container_GOR.after("<div style='display:inline-flex;' name='panel_of_btn_GOR'>" +
+                "<div name='btn_of_generate_set' style='width:auto;border-radius:10px;background:#81c784;padding:5px;' onclick='GenerateAnswer()'>Сгенерировать</div>" +
+                "<div style='width:5px;'></div>"+
+                "<div name='btn_select_all' style='width:auto;border-radius:10px;background:#81c784;padding:5px;' onclick='SelectAllGOR()'>Выбрать все</div>" +
+                "</div>"
+            )
+        })
+}
+
+function SelectAllGOR() {
+    $('div[name=grid_set_of_GOR]').find('input').prop('checked', true);
+}
+
+function GenerateAnswer() {
+    if ($('.AnswerBlock').find('.AnswerItem').length > 0) {
+        alert("Очитстите список");
+        return;
+    }
+    $(".QuestionBlock").find(".SaveChangeButton").addClass("NewChangeQuestion");
+    var answer_block = $('.AnswerBlock');
+    $('div[name=grid_set_of_GOR]').find('input:checked').each(function () {
+        console.log({ name: $(this).next().text(), GOR: $(this).next().attr('id'), Index: Number($(this).next().attr('id').replace(/\D+/g, "")) });
+        answer_block.append('<div class="AnswerItem NewItem" id=0><div style="margin-right: 15px"><input type="radio" disabled/>' +
+            '</div><div class="IndexAnswer">' + (Number($(this).next().attr('id').replace(/\D+/g, ""))) + ') </div><div style="width: 80%;" class="TextAnswer TextNewItem">' + $(this).next().text()+'</div>' +
+            '<div class="FreeArea" style="display: inline-flex; width: 20%; height: 100%;"><input type="checkbox" name="FreeAreaCheckbox" />Свободное поле</div>' +
+            '<div class="DeleteAnswerItem">&#10006;</div><div style="width: 5px;"></div>' +
+            '<div class="EditAnswer">&#9000;</div>' +
+            '<div class="ChangeIndex">ID</div>' +
+            '<input type="hidden" name="IndexAnswer" value="' + (Number($(this).next().attr('id').replace(/\D+/g, ""))) + '"></div>');
     })
 }

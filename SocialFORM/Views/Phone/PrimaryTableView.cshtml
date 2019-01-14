@@ -121,6 +121,8 @@
             box-shadow: 3px 3px 5px black;
         }
 </style>
+<input type="file" id="file_for_import"/>
+<input type="button" value="Load..." onclick="ImportOurNumbers()"/>
 <div>
     <input type="hidden" name="page_numb_status" value="1" />
     <div style="display: inline-flex;padding:5px;background:#81c784;width:100%;border-radius: 10px 10px 0 0;">
@@ -143,28 +145,42 @@
             <div name='panel_setting_load'>
                 <div style='grid-column: span 8; height: 20px;'>Только не обзвоненые</div><div style='grid-column: span 2; height: 20px;'>
                     <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
-                        <input type='checkbox' name='not_connect' id="setting_1" checked/>
+                        <input type='checkbox' name='not_connect' id="setting_1" checked />
                         <label for="setting_1"></label>
                     </div>
                 </div>
                 <div style='grid-column: span 8; height: 20px; align-items:center;'>Только занятые</div><div style='grid-column: span 2; height: 20px;'>
                     <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
-                        <input type='checkbox' name='number_busy' id="setting_2" checked/>
+                        <input type='checkbox' name='number_busy' id="setting_2" checked />
                         <label for="setting_2"></label>
                     </div>
                 </div>
                 <div style='grid-column: span 8; height: 20px; align-items:center;'>Только нет ответа</div><div style='grid-column: span 2; height: 20px;'>
                     <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
-                        <input type='checkbox' name='not_answer' id="setting_3" checked/>
+                        <input type='checkbox' name='not_answer' id="setting_3" checked />
                         <label for="setting_3"></label>
                     </div>
                 </div>
                 <div style='grid-column: span 8; height: 20px; align-items:center;'>Только с соединением</div><div style='grid-column: span 2; height: 20px;'>
                     <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
-                        <input type='checkbox' name='line_connect' id="setting_4" checked/>
+                        <input type='checkbox' name='line_connect' id="setting_4" checked />
                         <label for="setting_4"></label>
                     </div>
                 </div>
+
+                <div style='grid-column: span 8; height: 40px; align-items:center;'>Только не найденые линии</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='not_found_line' id="setting_7" checked />
+                        <label for="setting_7"></label>
+                    </div>
+                </div>
+                <div style='grid-column: span 8; height: 20px; align-items:center;'>Только для перезвона</div><div style='grid-column: span 2; height: 20px;'>
+                    <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='recall' id="setting_8" checked />
+                        <label for="setting_8"></label>
+                    </div>
+                </div>
+
                 <div style='grid-column: span 8; height: 20px; align-items:center;'>Только станционарные</div><div style='grid-column: span 2; height: 20px;'>
                     <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
                         <input type='checkbox' name='only_stations' id="setting_5" onchange="CheckTypeNumber($(this))" />
@@ -173,7 +189,7 @@
                 </div>
                 <div style='grid-column: span 8; height: 20px; align-items:center;'>Только мобильные</div><div style='grid-column: span 2; height: 20px;'>
                     <div style="width:100%;height:100%;justify-content:center;align-items:center;display:flex;">
-                        <input type='checkbox' name='only_mobiles' id="setting_6" onchange="CheckTypeNumber($(this))"/>
+                        <input type='checkbox' name='only_mobiles' id="setting_6" onchange="CheckTypeNumber($(this))" />
                         <label for="setting_6"></label>
                     </div>
                 </div>
@@ -251,8 +267,12 @@
         const is_number_busy = panel_settings.find('input[name=number_busy]').is(':checked');
         const is_not_answer = panel_settings.find('input[name=not_answer]').is(':checked');
         const is_line_connect = panel_settings.find('input[name=line_connect]').is(':checked');
+        const is_line_not_found = panel_settings.find('input[name=not_found_line]').is(':checked');
+        const is_recall = panel_settings.find('input[name=recall]').is(':checked');
+
         const is_only_stations = panel_settings.find('input[name=only_stations]').is(':checked');
         const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
+       
         let lst_setting = [];
         lst_setting.push(is_not_connect);
         lst_setting.push(is_number_busy);
@@ -260,6 +280,8 @@
         lst_setting.push(is_line_connect);
         lst_setting.push(is_only_stations);
         lst_setting.push(is_only_mobiles);
+        lst_setting.push(is_line_not_found);
+        lst_setting.push(is_recall);
         $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString() })
             .success(function (server_data) {
                 status_number_list = server_data.clone();
@@ -311,6 +333,9 @@
         const is_number_busy = panel_settings.find('input[name=number_busy]').is(':checked');
         const is_not_answer = panel_settings.find('input[name=not_answer]').is(':checked');
         const is_line_connect = panel_settings.find('input[name=line_connect]').is(':checked');
+        const is_line_not_found = panel_settings.find('input[name=not_found_line]').is(':checked');
+        const is_recall = panel_settings.find('input[name=recall]').is(':checked');
+
         const is_only_stations = panel_settings.find('input[name=only_stations]').is(':checked');
         const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
         let lst_setting = [];
@@ -320,6 +345,8 @@
         lst_setting.push(is_line_connect);
         lst_setting.push(is_only_stations);
         lst_setting.push(is_only_mobiles);
+        lst_setting.push(is_line_not_found);
+        lst_setting.push(is_recall);
         $.post("/Phone/ImportNumberToOktell", { FO: FO, OB: OB, GOR: GOR, id_table: Number(id_table), settings: lst_setting.toString() })
             .success(function () {
                 alert("Номера загружены");
@@ -375,6 +402,40 @@
                 $('input[name=only_stations]').trigger("click");
             }
             return;
+        }
+    }
+
+    function ImportOurNumbers() {
+        var FO = $('select[name=list_FO_]').find('option:selected').val();
+        var OB = $('select[name=list_OB_]').find('option:selected').val();
+        var GOR = $('select[name=list_GOR_]').find('option:selected').val();
+        if (FO == '' || OB == '' || GOR == '') {
+            alert("Не все данные");
+            return;
+        }
+        var file = document.getElementById('file_for_import').files;
+        if (file.length == 0) {
+            alert("File empty");
+        } else {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+                data.append("file", file[0]);
+                data.append("name", "New York");
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Phone/ImportOurNumbers?FO="+FO+"&OB="+OB+"&GOR="+GOR,
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function () {
+                        alert("Success");
+                    },
+                    error: function () {
+                        alert("Error");
+                    }
+                })
+            }
         }
     }
 </script>

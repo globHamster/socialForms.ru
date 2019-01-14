@@ -8,6 +8,10 @@
         transition: .1s linear;
         box-shadow: 3px 3px 5px black;
     }
+    div[name=save_info]:hover{
+        transform: scale(1.1,1.1);
+        transition: 0.1s linear;
+    }
 </style>
 <input type="file" name="TestImport" style="display:none;" />
 <div name="panel_filter" style="border-radius: 10px 10px 0 0;background:#81c784;width:100%;padding:5px;">
@@ -44,6 +48,14 @@
             <option value="0" selected>Все</option>
             <option value="Мужской">Мужской</option>
             <option value="Женский">Женский</option>
+        </select>
+    </div>
+    <div name="type_phone">
+        Тип номера
+        <select>
+            <option value="" selected>Все</option>
+            <option value="0">Станционарный</option>
+            <option value="1">Мобильный</option>
         </select>
     </div>
     <div name="second_filter_btn" style="border-radius:10px;" class="search_btn" onclick="CheckFiltredItem()">Фильтр</div>
@@ -141,8 +153,9 @@
                     "<div name='rename_Age' class='col1_grid'>Возрост</div><div name='text_rename_Age' class='col2_grid'><input type='text' value='" + server_data.Age + "'/></div>" +
                     "<div name='rename_Address' class='col1_grid'>Адрес</div><div name='text_rename_Address' class='col2_grid'><input type='text' value='" + server_data.Address + "'/></div>" +
                     "<div name='rename_Education' class='col1_grid'>Образование</div><div name='text_rename_Education' class='col2_grid'><input type='text' value='" + server_data.Education + "'/></div>" +
+                    "<div name='rename_Type' class='col1_grid'>Тип телефона</div><div name='text_rename_Type' class='col2_grid'><select><option value='0' " + (server_data.Type == 0 ? "selected" : "") + ">Станционарный</option><option value='1' " + (server_data.Type == 1? "selected" : "")+">Мобильный</option></select></div>"+
                     "</div>" +
-                    "<div style='width:100px;height:30px;background:#F00;' onclick='SaveChangeFormNumb()'></div>" +
+                    "<div style='width:120px;height:30px;background:#008dd2;border-radius:10px;display:flex;justify-content:center;align-items:center;color:#fff;font-width:600;' name='save_info' onclick='SaveChangeFormNumb()'><div>Сохранить</div></div>" +
                     "</div>" +
                     "</div>");
             })
@@ -162,7 +175,8 @@
             Sex: container.find('div[name=text_rename_Sex]').find('input').val() != "" ? container.find('div[name=text_rename_Sex]').find('input').val() : " ",
             Age: container.find('div[name=text_rename_Age]').find('input').val() != "" ? Number(container.find('div[name=text_rename_Age]').find('input').val()) : " ",
             Address: container.find('div[name=text_rename_Address]').find('input').val() != "" ? container.find('div[name=text_rename_Address]').find('input').val() : " ",
-            Education: container.find('div[name=text_rename_Education]').find('input').val() != "" ? container.find('div[name=text_rename_Education]').find('input').val() : " "
+            Education: container.find('div[name=text_rename_Education]').find('input').val() != "" ? container.find('div[name=text_rename_Education]').find('input').val() : " ",
+            Type: Number(container.find('div[name=text_rename_Type]').find('select').find('option:selected').val())
         };
         $.post("/Phone/SetFormNumber", { _fn: query })
             .success(function (code) {
@@ -267,6 +281,7 @@
         let _sex = $('div[name=second_panel_filter]').find('div[name=filter_Sex]').find('option:selected').val();
         let _age_from = $('div[name=second_panel_filter]').find('input[name=text_age_from]').val();
         let _age_to = $('div[name=second_panel_filter]').find('input[name=text_age_to]').val();
+        let _type_phone = $('div[name=second_panel_filter]').find('div[name=type_phone]').find('option:selected').val();
         if (isNaN(Number(_age_from)) || _age_from == '') { _age_from = Number(0); }
         else { _age_from = Number(_age_from) }
         if (isNaN(Number(_age_to)) || _age_to == '') { _age_to = Number(150); }
@@ -298,6 +313,14 @@
                 limit_mass--;
                 i--;
                 continue;
+            }
+            if (_type_phone != '') {
+                if (form_number_massive[i].Type != _type_phone) {
+                    form_number_massive.splice(i, 1);
+                    limit_mass--;
+                    i--;
+                    continue;
+                }
             }
         }
         $('div.TablePhone').find('.SortUp').removeClass('SortUp');

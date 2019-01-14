@@ -199,5 +199,20 @@ namespace SocialFORM.Controllers
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
         }
+
+        [HttpGet]
+        public JsonResult GetListInfoBlank(int q_id)
+        {
+            List<BlankModel> lst_tmp = db2.SetBlankModels.Where(u => u.QuestionID == q_id).ToList();
+            if (lst_tmp != null)
+            {
+                return Json(lst_tmp, JsonRequestBehavior.AllowGet);
+            } else
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        
     }
 }

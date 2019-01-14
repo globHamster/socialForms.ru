@@ -1,7 +1,9 @@
 ﻿using LumenWorks.Framework.IO.Csv;
 using Newtonsoft.Json.Linq;
 using SocialFORM.Models;
+using SocialFORM.Models.Form;
 using SocialFORM.Models.Number;
+using SocialFORM.Models.Question;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -22,6 +24,8 @@ namespace SocialFORM.Controllers
     {
         NumberAppContext db = new NumberAppContext();
         PhoneContext mysql_db = new PhoneContext();
+        ApplicationContext form_db = new ApplicationContext();
+        QuestionContext q_db = new QuestionContext();
         // GET: Phone
         public ActionResult Index()
         {
@@ -154,6 +158,13 @@ namespace SocialFORM.Controllers
                     if (KodGOR != "")
                     {
                         tmp_list = tmp_list.Where(u => u.GOR == KodGOR).ToList();
+                    }
+                }
+                foreach(var item in tmp_list)
+                {
+                    if (item.Age > 1000)
+                    {
+                        item.Age = DateTime.Now.Year - item.Age;
                     }
                 }
                 var jsonResult = Json(tmp_list, JsonRequestBehavior.AllowGet);
@@ -492,7 +503,17 @@ namespace SocialFORM.Controllers
 
                 if (lst_setting[3])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "connect").ToList());
+                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "connect" || u.Status == "1" || u.Status== "завершено").ToList());
+                }
+
+                if (lst_setting[6])
+                {
+                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "линия не найдена").ToList());
+                }
+
+                if (lst_setting[7])
+                {
+                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "перезвонить").ToList());
                 }
 
                 return Json(tmp_lst_PT, JsonRequestBehavior.AllowGet);
@@ -558,14 +579,25 @@ namespace SocialFORM.Controllers
 
                 if (lst_setting[3])
                 {
-                    tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "connect").ToList());
+                    tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u=>u.Status == "connect" || u.Status == "1" || u.Status == "завершено").ToList());
+                }
+
+                if (lst_setting[6])
+                {
+                    tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "линия не найдена").ToList());
+                }
+
+                if (lst_setting[7])
+                {
+                    tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "перезвонить").ToList());
                 }
 
                 tmp_lst_PT = tmp_lst_PT_;
             }
-
+            System.Diagnostics.Debug.WriteLine("In here");
             if (tmp_lst_PT != null && tmp_lst_PT.Count() >= 1)
             {
+                System.Diagnostics.Debug.WriteLine("In here2");
                 //List<TmpClass> tmp_lst_numb_phone = new List<TmpClass>();
                 int count = 1;
                 try
@@ -642,6 +674,234 @@ namespace SocialFORM.Controllers
             }
 
             System.Diagnostics.Debug.WriteLine("Count >>> " + lst_to_load.Count + " " + name);
+        }
+
+        [HttpPost]
+        public void ImportOurNumbers(string FO, string OB, string GOR)
+        {
+            try
+            {
+                var fileContent = Request.Files[0];
+                if (fileContent != null && fileContent.ContentLength > 0)
+                {
+
+                    Stream stream = fileContent.InputStream;
+                    DataTable csvTable = new DataTable();
+                    StreamReader streamReader = new StreamReader(stream, Encoding.GetEncoding(1251));
+                    String str;
+                    List<PT> lst_phone = new List<PT>();
+                    int count = 1;
+                    do
+                    {
+                        str = streamReader.ReadLine();
+                        if (str != null)
+                        {
+                            List<string> tmp_str = str.Split(';').ToList();
+                            PT tmp = new PT();
+                           
+                            if (tmp_str[0] == null || tmp_str[0] == "")
+                            {
+                                break;
+                            }
+                            
+                            tmp.FO = FO;
+                            tmp.OB = OB;
+                            tmp.GOR = GOR;
+                            if (tmp_str[1] != "")
+                            {
+                               
+                                tmp.Phone = tmp_str[1];
+                                if (tmp.Phone.ElementAt(0) != '8')
+                                {
+                                    tmp.Phone = tmp.Phone.Remove(0, 1).Insert(0, "8");
+                                }
+                                if (db.SetPTs.FirstOrDefault(u => u.Phone == tmp.Phone) != null)
+                                {
+                                    continue;
+                                }
+                            }
+                            else continue;
+                            
+                            tmp.Status = tmp_str[2];
+                            if (tmp.Phone.CompareTo("89000000000") == -1)
+                            {
+                                tmp.Type = 0;
+                            }
+                            else
+                            {
+                                tmp.Type = 1;
+                            }
+                            lst_phone.Add(tmp);
+                            count++;
+                            System.Diagnostics.Debug.WriteLine("In HERE");
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                    } while (true);
+                    int iter = 0;
+                    int count_lst = lst_phone.Count();
+                    while (iter < count_lst)
+                    {
+                        if (lst_phone.Where(u => u.Phone == lst_phone[iter].Phone).Count() > 1)
+                        {
+                            List<PT> tmp_lst = lst_phone.Where(u => u.Phone == lst_phone[iter].Phone).ToList();
+                            tmp_lst.Remove(tmp_lst.First());
+                            foreach (var rem_item in tmp_lst)
+                            {
+                                lst_phone.Remove(rem_item);
+                            }
+                            count_lst = lst_phone.Count();
+                        }
+                        iter++;
+                    }
+                    System.Diagnostics.Debug.WriteLine("Count >>> " + lst_phone.Count());
+                    db.SetPTs.AddRange(lst_phone);
+                    db.SaveChanges();
+
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> SyncBlankWithDB(int p_id, int gor_id ,int s_id = 0, int a_id = 0, int np_id = 0)
+        {
+            List<ResultModel> lst_blank = await form_db.SetResultModels.Where(u => u.ProjectID == p_id).ToListAsync();
+            List<AnswerModel> lst_answer = await q_db.SetAnswers.Where(u => u.QuestionID == s_id).ToListAsync();
+            List<BlankModel> lst_answer_gor = await form_db.SetBlankModels.Where(u => u.QuestionID == gor_id).ToListAsync();
+            List<BlankModel> lst_sex = new List<BlankModel>();
+            if (s_id != 0) {
+                lst_sex = await form_db.SetBlankModels.Where(u => u.QuestionID == s_id).ToListAsync();
+            }
+            List<BlankModel> lst_age = new List<BlankModel>();
+            if (a_id != 0)
+            {
+                lst_age = await form_db.SetBlankModels.Where(u => u.QuestionID == a_id).ToListAsync();
+            }
+            List<BlankModel> lst_np = new List<BlankModel>();
+            if (np_id != 0)
+            {
+                lst_np = await form_db.SetBlankModels.Where(u => u.QuestionID == np_id).ToListAsync();
+            }
+            List<FormNumber> lst_form_numbers = new List<FormNumber>();
+            List<FormNumber> skiping_numbers = new List<FormNumber>();
+            string FO = "";
+            string OB = "";
+            foreach(var item in lst_blank)
+            {
+                PT tmp = await db.SetPTs.FirstOrDefaultAsync(u => u.Phone == item.PhoneNumber);
+                if (tmp != null)
+                {
+                    FO = tmp.FO;
+                    OB = tmp.OB;
+                    break;
+                }
+            }
+            foreach(var item in lst_blank) {
+                PT tmp = await db.SetPTs.FirstOrDefaultAsync(u => u.Phone == item.PhoneNumber);
+                if (lst_form_numbers.FirstOrDefault(u=>u.Phone == item.PhoneNumber) != null)
+                {
+                    continue;
+                }
+                if (tmp != null)
+                {
+                    FormNumber tmp_form_number = new FormNumber();
+                    tmp_form_number.FO = tmp.FO;
+                    if (FO == "")
+                    {
+                        FO = tmp.FO;
+                    }
+                    tmp_form_number.OB = tmp.OB;
+                    if (OB == "")
+                    {
+                        OB = tmp.OB;
+                    }
+                    tmp_form_number.GOR = tmp.GOR;
+                    tmp_form_number.Phone = tmp.Phone;
+                    if (s_id != 0)
+                    {
+                        tmp_form_number.Sex = lst_answer.First(u => u.Index == lst_sex.First(x => x.BlankID == item.Id).AnswerIndex).AnswerText;
+                    }
+                    if (a_id != 0)
+                    {
+                        tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age.First(u => u.BlankID == item.Id).Text);
+                    }
+                    tmp_form_number.Type = tmp.Type;
+                    if (np_id != 0)
+                    {
+                        tmp_form_number.NP = lst_np.First(u => u.BlankID == item.Id).Text;
+                    }
+                    lst_form_numbers.Add(tmp_form_number);
+                } else
+                {
+                    FormNumber skip_tmp_form_number = new FormNumber();
+                    int GOR_index = lst_answer_gor.First(u => u.BlankID == item.Id).AnswerIndex;
+                    string GOR = "GOR" + GOR_index;
+                    skip_tmp_form_number.FO = FO;
+                    skip_tmp_form_number.OB = OB;
+                    skip_tmp_form_number.GOR = GOR;
+                    skip_tmp_form_number.Phone = item.PhoneNumber;
+                    if (s_id != 0)
+                    {
+                        skip_tmp_form_number.Sex = lst_answer.First(u => u.Index == lst_sex.First(x => x.BlankID == item.Id).AnswerIndex).AnswerText;
+                    }
+                    if (a_id != 0)
+                    {
+                        skip_tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age.First(u => u.BlankID == item.Id).Text);
+                    }
+                    if (np_id != 0) {
+                        skip_tmp_form_number.NP = lst_np.First(u => u.BlankID == item.Id).Text;
+                    }
+                    skip_tmp_form_number.Type = item.PhoneNumber.CompareTo("89000000000") == -1 ? 0 : 1;
+                    skiping_numbers.Add(skip_tmp_form_number);
+                }
+            }
+            lst_form_numbers.AddRange(skiping_numbers);
+            int count_lst_form_numbers = lst_form_numbers.Count();
+            int iter = 0;
+            try
+            {
+                do
+                {
+                    FormNumber tmp = await db.SetFormNumbers.FirstOrDefaultAsync(u => u.Phone == lst_form_numbers[iter].Phone);
+                    if (tmp != null)
+                    {
+                        lst_form_numbers.Remove(lst_form_numbers[iter]);
+                        count_lst_form_numbers--;
+                    }
+                    else
+                    {
+                        iter++;
+                    }
+                } while (iter <= count_lst_form_numbers);
+            }catch(Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.InnerException);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                System.Diagnostics.Debug.WriteLine(e.Data);
+            }
+            try
+            {
+                db.SetFormNumbers.AddRange(lst_form_numbers);
+                await db.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.InnerException);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+            return Json(lst_form_numbers, JsonRequestBehavior.AllowGet);
         }
     }
 }
