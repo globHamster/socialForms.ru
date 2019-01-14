@@ -112,17 +112,20 @@
             height: 14px;
             background-color: #008dd2;
         }
-        div[name=free_table_mysql] > div:hover{
-            background: #008dd2;
-            color: #fff;
-            cursor: pointer;
-            transform: scale(1.1,1.1);
-            transition: .1s linear;
-            box-shadow: 3px 3px 5px black;
-        }
+
+    div[name=free_table_mysql] > div:hover {
+        background: #008dd2;
+        color: #fff;
+        cursor: pointer;
+        transform: scale(1.1,1.1);
+        transition: .1s linear;
+        box-shadow: 3px 3px 5px black;
+    }
 </style>
-<input type="file" id="file_for_import"/>
-<input type="button" value="Load..." onclick="ImportOurNumbers()"/>
+<div style="display:inline-flex;width:100%;">
+    <div><input type="file" id="file_for_import" /></div>
+    <div><input type="button" value="Load..." onclick="ImportOurNumbers()" /></div>
+</div>
 <div>
     <input type="hidden" name="page_numb_status" value="1" />
     <div style="display: inline-flex;padding:5px;background:#81c784;width:100%;border-radius: 10px 10px 0 0;">
@@ -272,7 +275,7 @@
 
         const is_only_stations = panel_settings.find('input[name=only_stations]').is(':checked');
         const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
-       
+
         let lst_setting = [];
         lst_setting.push(is_not_connect);
         lst_setting.push(is_number_busy);
@@ -285,7 +288,7 @@
         $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString() })
             .success(function (server_data) {
                 status_number_list = server_data.clone();
-                $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length  : 0);
+                $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length : 0);
                 BuildListStatus(1);
                 $('div[name=div_limit_page]').text(Math.ceil(status_number_list.length / 30));
                 $('div[name=div_numb_page]').text(1);
@@ -384,7 +387,7 @@
         var cont = $('.btn_ToOktell');
         $('div[name=free_table_mysql]').remove();
         if ($('div[name=panel_setting_load]').css("display") === 'grid') {
-            $('div[name=panel_setting_load]').css("display","none");
+            $('div[name=panel_setting_load]').css("display", "none");
         } else {
             $('div[name=panel_setting_load]').css("display", "grid");
         }
@@ -424,7 +427,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "/Phone/ImportOurNumbers?FO="+FO+"&OB="+OB+"&GOR="+GOR,
+                    url: "/Phone/ImportOurNumbers?FO=" + FO + "&OB=" + OB + "&GOR=" + GOR,
                     contentType: false,
                     processData: false,
                     data: data,
