@@ -532,7 +532,7 @@ namespace SocialFORM.Controllers
                             int max_cont_row = 0;
                             foreach (var item_row in listTableRow[(int)item.QuestionID])
                             {
-                                if (item_row.IndexRow != null)
+                                if (item_row.IndexRow != null && item_row.IndexRow != 0)
                                 {
                                     int tmp_max = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == item_row.IndexRow).Count();
                                     if (max_cont_row < tmp_max)
@@ -1643,15 +1643,12 @@ namespace SocialFORM.Controllers
             }
             return Json(info, JsonRequestBehavior.AllowGet);
         }
-        //
-
-
+        
         public ActionResult Options()
         {
             return PartialView();
         }
-
-        //
+        
         //DataBase
         public ActionResult DataBeseAll()
         {
@@ -1789,10 +1786,8 @@ namespace SocialFORM.Controllers
         {
             return Json(db2.SetProjectModels.ToList(), JsonRequestBehavior.AllowGet);
         }
-
-        //
+        
         //Таблица Статистика PATH 1
-        //
         public string GetDataStat(int id, int idop, string sd, string ed, string st, string et)
         {
             List<ProjectViewModel> res = new List<ProjectViewModel>();
@@ -1836,9 +1831,7 @@ namespace SocialFORM.Controllers
             return JsonConvert.SerializeObject(res);
         }
 
-        //
         //Таблица Статистика PATH 2
-        //
         public string GetDataStatResult(int id, int idop, string sd, string ed, string st, string et)
         {
             List<StatResViewModel> StatRes = new List<StatResViewModel>();
