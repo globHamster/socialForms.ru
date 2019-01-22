@@ -8,12 +8,16 @@
         transition: .1s linear;
         box-shadow: 3px 3px 5px black;
     }
-    div[name=save_info]:hover{
+    div[name=save_info]:hover,
+    div[name=btn_close_panel]:hover {
         transform: scale(1.1,1.1);
         transition: 0.1s linear;
     }
 </style>
-<input type="file" name="TestImport" style="display:none;" />
+<div style="display:inline-flex;width:100%;">
+    <div><input type="file" id="file_with_years" /></div>
+    <div><input type="button" value="Load..." onclick="ImportNumbersWithYears()" /></div>
+</div>
 <div name="panel_filter" style="border-radius: 10px 10px 0 0;background:#81c784;width:100%;padding:5px;">
     <select name="ListFO" onchange="ChangeFO($(this).find('option:selected').val())">
         <option value="" disabled selected>Выберите из списка ...</option>
@@ -35,7 +39,7 @@
         <div class="search_btn" style="border-radius:10px;" onclick="FormImportToOktell($(this))">в Oktell</div>
     </div>
 </div>
-<div name="second_panel_filter" style="display: none;">
+<div name="second_panel_filter" style="display: none;background:#81c784;width:100%;padding:5px;">
     <div name="filter_NP" hidden>
         <select>
             <option value="0" selected>Выберите из списка ...</option>
@@ -58,9 +62,24 @@
             <option value="1">Мобильный</option>
         </select>
     </div>
-    <div name="second_filter_btn" style="border-radius:10px;" class="search_btn" onclick="CheckFiltredItem()">Фильтр</div>
-    <div name="reset_filter_btn" style="border-radius:10px;" class="search_btn" onclick="ResetMassive()">Сброс</div>
+    <div name="type_np">
+        Тип поселения
+        <select>
+            <option value="" selected>Все</option>
+            <option value="0">Город</option>
+            <option value="1">Село</option>
+        </select>
+    </div>
+    <div>
+        <div name="second_filter_btn" style="border-radius:10px;" class="search_btn" onclick="CheckFiltredItem()">Фильтр</div>
+        <div style="height:5px;"></div>
+        <div name="reset_filter_btn" style="border-radius:10px;" class="search_btn" onclick="ResetMassive()">Сброс</div>
+    </div>
 </div>
+<div name="panel_find_number" style="width:100%;background:#81c784;display:inline-flex;padding:10px;border-radius: 0 0 10px 10px;">
+    <input type="text" placeholder="Номер телефона" name="input_number_phone"/>
+    <div class="search_btn" style="border-radius:10px;" onclick="FindNumberInList()">Найти</div>
+</div> 
 <div class="TablePhone">
     <div class="TableCont">
         <div class='item_form_numb'>
@@ -70,6 +89,7 @@
             <div name='Sex' class="size" onclick="SortToSex($(this))">Пол</div>
             <div name='Age' class="size" onclick="SortToAge($(this))">Возраст</div>
             <div name='Address' class="size">Адрес</div>
+            <div name="TypeNP" class="size">Тип поселения</div>
         </div>
     </div>
     <div class="TableCont">
@@ -85,9 +105,7 @@
         </div>
     </div>
 </div>
-
 <script>
-
     let form_number_massive, backup_form_number_massive;
     let is_filtred = false;
     let lst_form_numb = [];
@@ -131,6 +149,7 @@
                 "<div name='Sex'>" + mass[i].Sex + "</div>" +
                 "<div name='Age'>" + mass[i].Age + "</div>" +
                 "<div name='Address'>" + mass[i].Address + "</div>" +
+                "<div name='TypeNP'>"+(mass[i].TypeNP == false ? "город" : "село/деревня")+"</div>"+
                 "</div>")
         }
     }
@@ -154,12 +173,19 @@
                     "<div name='rename_Address' class='col1_grid'>Адрес</div><div name='text_rename_Address' class='col2_grid'><input type='text' value='" + server_data.Address + "'/></div>" +
                     "<div name='rename_Education' class='col1_grid'>Образование</div><div name='text_rename_Education' class='col2_grid'><input type='text' value='" + server_data.Education + "'/></div>" +
                     "<div name='rename_Type' class='col1_grid'>Тип телефона</div><div name='text_rename_Type' class='col2_grid'><select><option value='0' " + (server_data.Type == 0 ? "selected" : "") + ">Станционарный</option><option value='1' " + (server_data.Type == 1? "selected" : "")+">Мобильный</option></select></div>"+
+                    "<div name='rename_TypeNP' class='col1_grid'>Тип поселения</div><div name='text_rename_TypeNP' class='col2_grid'><select><option value='0' " + (server_data.TypeNP == 0 ? "selected" : "") + ">Город</option><option value='1' " + (server_data.TypeNP == 1? "selected" : "")+">Село/Деревня/Поселок</option></select></div>"+
                     "</div>" +
                     "<div style='width:120px;height:30px;background:#008dd2;border-radius:10px;display:flex;justify-content:center;align-items:center;color:#fff;font-width:600;' name='save_info' onclick='SaveChangeFormNumb()'><div>Сохранить</div></div>" +
                     "</div>" +
                     "</div>");
             })
+    }
 
+    function find(array, value) {
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].Phone == value) return i;
+        }
+        return -1;
     }
 
     function SaveChangeFormNumb() {
@@ -176,14 +202,21 @@
             Age: container.find('div[name=text_rename_Age]').find('input').val() != "" ? Number(container.find('div[name=text_rename_Age]').find('input').val()) : " ",
             Address: container.find('div[name=text_rename_Address]').find('input').val() != "" ? container.find('div[name=text_rename_Address]').find('input').val() : " ",
             Education: container.find('div[name=text_rename_Education]').find('input').val() != "" ? container.find('div[name=text_rename_Education]').find('input').val() : " ",
-            Type: Number(container.find('div[name=text_rename_Type]').find('select').find('option:selected').val())
+            Type: Number(container.find('div[name=text_rename_Type]').find('select').find('option:selected').val()),
+            TypeNP: Number(container.find('div[name=text_rename_TypeNP]').find('select').find('option:selected').val()) == 0 ? false : true 
         };
+        console.log(query);
         $.post("/Phone/SetFormNumber", { _fn: query })
             .success(function (code) {
                 if (code == 200) {
                     $('body').find('div.block_panel_editer').remove()
                     form_number_massive[iter_update] = query;
+                    let index_arr = find(backup_form_number_massive, form_number_massive[iter_update].Phone);
+                    if (index_arr >= 0) {
+                        backup_form_number_massive[index_arr] = query;
+                    }
                     var paging_number = Number($('div[name=paging_number]').attr('id'));
+                    
                     WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
                 }
                 if (code == 0) {
@@ -282,6 +315,7 @@
         let _age_from = $('div[name=second_panel_filter]').find('input[name=text_age_from]').val();
         let _age_to = $('div[name=second_panel_filter]').find('input[name=text_age_to]').val();
         let _type_phone = $('div[name=second_panel_filter]').find('div[name=type_phone]').find('option:selected').val();
+        let _type_np = $('div[name=second_panel_filter]').find('div[name=type_np]').find('option:selected').val();
         if (isNaN(Number(_age_from)) || _age_from == '') { _age_from = Number(0); }
         else { _age_from = Number(_age_from) }
         if (isNaN(Number(_age_to)) || _age_to == '') { _age_to = Number(150); }
@@ -316,6 +350,14 @@
             }
             if (_type_phone != '') {
                 if (form_number_massive[i].Type != _type_phone) {
+                    form_number_massive.splice(i, 1);
+                    limit_mass--;
+                    i--;
+                    continue;
+                }
+            }
+            if (_type_np != '') {
+                if (form_number_massive[i].TypeNP != _type_np) {
                     form_number_massive.splice(i, 1);
                     limit_mass--;
                     i--;
@@ -540,7 +582,7 @@
                     $('div.NotLoader').removeClass('NotLoader');
                     $('body').append("<div class='wall_of_background' style='width:100%;height:100%;display:flex;justify-content:center;align-items:center;background: rgba(100,100,100,0.5); position: fixed;top:0;left:0;'>" +
                         "<div style='width:80%;height:80%;border: 3px inset #008dd2;background-color:#fff;padding: 5px 10px;'>" +
-                        "<div style='width:30px;height:30px;background-color:red;position:relative;top:-20px;left:calc(100% - 5px);border-radius:15px;' onclick='$(this).parents(\".wall_of_background\").remove()'>X</div>" +
+                        "<div name='btn_close_panel' style='width:30px;height:30px;background-color:red;position:relative;top:-20px;left:calc(100% - 5px);border-radius:15px;display:flex;justify-content:center;align-items:center;font-weight:900;color:#fff;cursor:pointer;' onclick='$(this).parents(\".wall_of_background\").remove()'>X</div>" +
                         "<div class='panel_info_numbers slide_panel' style='width:100%;height:95%;overflow-y:auto;padding: 0px 5px;'></div>" +
                         "</div>" +
                         "</div>")
@@ -551,7 +593,7 @@
         } else {
             $('body').append("<div class='wall_of_background' style='width:100%;height:100%;display:flex;justify-content:center;align-items:center;background: rgba(100,100,100,0.5); position: fixed;top:0;left:0;'>" +
                 "<div style='width:80%;height:80%;border: 3px inset #008dd2;background-color:#fff;padding: 5px 10px;'>" +
-                "<div style='width:30px;height:30px;background-color:red;position:relative;top:-20px;left:calc(100% - 5px);border-radius:15px;' onclick='$(this).parents(\".wall_of_background\").remove()'>X</div>" +
+                "<div name='btn_close_panel' style='width:30px;height:30px;background-color:red;position:relative;top:-20px;left:calc(100% - 5px);border-radius:15px;display:flex;justify-content:center;align-items:center;font-weight:900;color:#fff;cursor:pointer;' onclick='$(this).parents(\".wall_of_background\").remove()'><div>X</div></div>" +
                 "<div class='panel_info_numbers slide_panel' style='width:100%;height:95%;overflow-y:auto;padding: 0px 5px;'></div>" +
                 "</div>" +
                 "</div>")
@@ -648,5 +690,58 @@
             .success(function () {
                 alert("Success");
             })
+    }
+
+    function FindNumberInList() {
+        if (form_number_massive == undefined || backup_form_number_massive == undefined) {
+            alert("Список номеров пуст");
+            return;
+        }
+        form_number_massive = backup_form_number_massive.clone();
+        let number = $('div[name=panel_find_number]').find('input').val();
+        
+        let tmp_form_number_massive = [];
+        $.each(form_number_massive, function (i, item) {
+            if (item.Phone.indexOf(number) >= 0) {
+                tmp_form_number_massive.push(item);
+            }
+        })
+        form_number_massive = tmp_form_number_massive.clone();
+        $('div[name=paging_number]').attr('id', 1);
+        $('div[name=paging]').find('input').val(1);
+        var paging_number = Number(1);
+
+        WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
+        $('div[name=second_panel_filter]').css("display", "inline-flex");
+        
+        console.log("length form : " + form_number_massive.length);
+        console.log("length tmp : " + tmp_form_number_massive.length);
+    }
+
+    function ImportNumbersWithYears() {
+        
+        var file = document.getElementById('file_with_years').files;
+        if (file.length == 0) {
+            alert("File empty");
+        } else {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+                data.append("file", file[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Phone/ImportNumberWithYears",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function () {
+                        alert("Success");
+                    },
+                    error: function () {
+                        alert("Error");
+                    }
+                })
+            }
+        }
     }
 </script>

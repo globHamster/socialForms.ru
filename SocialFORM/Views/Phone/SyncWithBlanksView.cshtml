@@ -8,7 +8,6 @@
         </div>
     </div>
         
-    
     <div style="width:100%; display:grid ;grid-template-columns: repeat(8, 1fr);margin: 5px 0px; background:#81c784; border-radius:10px;padding:15px;">
         <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Городской округ</div><div style="grid-column:span 5;">
             <select name="list_Q_GOR">
@@ -30,6 +29,12 @@
         <div style="height:2px;width:100%;background:#fff;grid-column:span 8;margin-bottom:5px;" />
         <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Возраст</div><div style="grid-column: span 5;">
             <select name="list_Q_Age">
+                <option value="" selected disabled>Выберите вопрос</option>
+            </select>
+        </div>
+        <div style="height:2px;width:100%;background:#fff;grid-column:span 8;margin-bottom:5px;" />
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Тип поселения</div><div style="grid-column: span 5;">
+            <select name="list_Q_Type_NP">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
@@ -56,6 +61,8 @@
         $('select[name=list_Q_Sex]').find('option:disabled').prop("selected", true);
         $('select[name=list_Q_Age]').find('option:not(:disabled)').remove();
         $('select[name=list_Q_Age]').find('option:disabled').prop("selected", true);
+        $('select[name=list_Q_Type_NP]').find('option:not(:disabled)').remove();
+        $('select[name=list_Q_Type_NP]').find('option:disabled').prop("selected", true);
         $.get("/Group/getGroup", { id_p: code_p })
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
@@ -63,6 +70,7 @@
                     $('select[name=list_Q_NP]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                     $('select[name=list_Q_Sex]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                     $('select[name=list_Q_Age]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
+                    $('select[name=list_Q_Type_NP]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                 })
 
             })
@@ -73,6 +81,7 @@
         let NP_id = $('select[name=list_Q_NP]').find('option:selected').val();
         let Sex_id = $('select[name=list_Q_Sex]').find('option:selected').val();
         let Age_id = $('select[name=list_Q_Age]').find('option:selected').val();
+        let TypeNP_id = $('select[name=list_Q_Type_NP]').find('option:selected').val()
         const GOR_id = $('select[name=list_Q_GOR]').find('option:selected').val();
         if (GOR_id == '') {
             alert("Не выбран вопрос содержащий код GOR");
@@ -86,6 +95,9 @@
         }
         if (Age_id == '') {
             Age_id = 0;
+        }
+        if (TypeNP_id == '') {
+            TypeNP_id = 0;
         }
         let lst_blank;
         let lst_sync_info = [];

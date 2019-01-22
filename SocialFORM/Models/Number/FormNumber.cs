@@ -22,5 +22,6 @@ namespace SocialFORM.Models.Number
         public string Address { get; set; }
         public string Education { get; set; }
         public int Type { get; set; }
+        public bool TypeNP { get; set; }
     }
 }

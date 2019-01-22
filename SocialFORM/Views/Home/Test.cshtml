@@ -46,13 +46,14 @@
             var id = Number($('table.TableOfNumbers').find('.IsCheckedTR').attr('id'))
             $.post("/Phone/SynchNumbers", { id_table: id })
                 .success(function () {
-                    $.post("/Home/ClearTable", { id: id })
-                        .success(function () {
+                    alert("Success!!!");
+                    //$.post("/Home/ClearTable", { id: id })
+                    //    .success(function () {
                             $('table.TableOfNumbers').find("tr[id=" + id + "]").find("td:not(:eq(0)):not(:eq(0))").each(function () {
                                 $(this).empty();
                             })
-                        })
-                        .error(function (err) { alert(err); })
+                        //})
+                        //.error(function (err) { alert(err); })
                 })
         } else {
             alert("Выберите таблицу");
