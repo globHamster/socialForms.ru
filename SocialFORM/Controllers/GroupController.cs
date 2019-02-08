@@ -170,13 +170,13 @@ namespace SocialFORM.Controllers
                 {
                     string fileName = System.IO.Path.GetFileName(upload.FileName);
                     System.Diagnostics.Debug.WriteLine("File name : " + fileName);
-                    upload.SaveAs(Server.MapPath("~/Content/" + fileName));
-                    path_file = Server.MapPath("~/Content/" + fileName);
+                    upload.SaveAs(Server.MapPath("../Content/" + fileName));
+                    path_file = Server.MapPath("../Content/" + fileName);
                     using (QuestionContext q_context = new QuestionContext())
                     {
                         Models.Question.File file_db = new Models.Question.File();
                         file_db.FileName = fileName;
-                        file_db.PathFile = Server.MapPath("~/Content/" + fileName);
+                        file_db.PathFile = Server.MapPath("../Content/" + fileName);
                         q_context.GetFiles.Add(file_db);
                         q_context.SaveChanges();
                     }

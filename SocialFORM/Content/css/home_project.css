@@ -77,6 +77,20 @@
     color: #fff;
 }
 
+.AudioDown_all {
+    display: flex;
+    justify-content: center;
+    align-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 30px;
+    height: 30px;
+    background-color: #008dd2;
+    border-left: 2px solid #b0bec5;
+    cursor: pointer;
+    color: #fff;
+}
+
 .NameProjectDiv {
     display: flex;
     justify-content: center;

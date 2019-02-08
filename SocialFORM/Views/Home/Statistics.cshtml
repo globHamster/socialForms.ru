@@ -151,13 +151,18 @@
     <table id="jqgStat"></table>
     <div id="jpagerStat"></div>
 </div>
+<div class="info" style="border:solid 1px #ff0000; padding:0px 15px;">
+    <p><b>1..N</b> - Время с начала первой акеты до конца поледней анкеты в данном диапазоне</p>
+    <p>Все данные расчитываются без учета <b>Учеников</b> </p>
+
+</div>
 <div class="res2">
 
 </div>
-<div class="res3">
+@*<div class="res3">
     Итог:
     @ViewData["Test"]
-</div>
+</div>*@
 <script type="text/javascript">
     //
     //Запрос на список проекта
@@ -174,20 +179,25 @@
     //
     //Запрос на список Операторов
     //
-    $.get("/Home/Statistics_operator")
-        .success(function (server_data) {
-            var server_data_tmp;
-            server_data_tmp = server_data.sort(function (a, b) {
-                return a.FamilyView.localeCompare(b.FamilyView);
-            });
-            $.each(server_data_tmp, function (i, data) {
-                var code = '<option value="' + data.IdView + '">' + data.FamilyView + ' ' + data.NameView + '</option>';
-                $('select.select_operator').append(code);
+    $('.select_project').change(function () {
+        var idproj = document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value;
+        $('.select_operator').find('option').remove();
+        var code = '<option selected value="-1">Все</option>';
+        $('select.select_operator').append(code);
+        $.get("/Home/Statistics_operator?idp=" + idproj)
+            .success(function (server_data) {
+                var server_data_tmp;
+                server_data_tmp = server_data.sort(function (a, b) {
+                    return a.FamilyView.localeCompare(b.FamilyView);
+                });
+                $.each(server_data_tmp, function (i, data) {
+                    var code = '<option value="' + data.IdView + '">' + data.FamilyView + ' ' + data.NameView + '</option>';
+                    $('select.select_operator').append(code);
+                })
+                console.info("Успешная выгрузка листа операторов ---- ", server_data);
             })
-            console.info("Успешная выгрузка листа операторов ---- ", server_data);
-        })
-        .error(function (err) { console.error("Ошибка выгрузка данных ... /Home/Statistics_operator", err) })
-
+            .error(function (err) { console.error("Ошибка выгрузка данных ... /Home/Statistics_operator", err) })
+    })
     //
     //Календрь
     //

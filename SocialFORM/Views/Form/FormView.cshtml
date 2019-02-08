@@ -16,12 +16,10 @@
             <tr>
                 <td colspan="3">
                     <div class="view_form">
-
                     </div>
                     <div class="wrong_choise">Выберите вариант ответа</div>
                     <div class="answer_panel">
                         <table width="100%" class="answer_table"></table>
-
                     </div>
             </tr>
             <tr>
@@ -46,6 +44,7 @@
     </div>
     <div class="NewButton">Заново</div>
 </div>
+<script src="~/Scripts/device.js"></script>
 <script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
     var type_q;
@@ -268,6 +267,7 @@
     function getStart() {
         if (index >= massiv_question_id.length) {
             $(".show_result").load("/Form/showResult");
+            stopRecording();
         } else {
             $('body,html').animate({ scrollTop: 0 }, 500);
             if (index == 1) {
@@ -1312,6 +1312,8 @@
     $('.ButtonAGAIN').one("click", function () {
         begin_time = undefined;
         end_time = undefined;
+        //if (device.android()) 
+        stopRecording();
         $('.PreLoader').show();
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'));
     })
@@ -1328,6 +1330,8 @@
     $('.NewButton').click(function () {
         begin_time = undefined;
         end_time = undefined;
+        //if (device.android()) 
+        stopRecording();
         $(this).parent().remove();
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'));
     })

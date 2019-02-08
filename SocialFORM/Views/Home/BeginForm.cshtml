@@ -81,7 +81,7 @@
         $('button.begin_form').one("click", function () {
             $('.PreLoader').show();
             $("#Tables").load("/Form/FormView?id_p=" + @ViewBag.ProjectID);
-            
+            startRecording();
         })
     })
     

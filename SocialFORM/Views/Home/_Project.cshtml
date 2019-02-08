@@ -1,7 +1,22 @@
 ﻿@model PagedList.IPagedList<SocialFORM.Models.Project.ProjectModel>
 @using PagedList.Mvc;
 <link rel="stylesheet" href="~/Content/css/home_project.css" />
+<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
+<style>
+    .slow .toggle-group {
+        transition: left 0.7s;
+        -webkit-transition: left 0.7s;
+    }
+    .btn {
+        padding: 3.5px 12px !important; 
+    }
+    .toggle.btn {
+        min-width: 59px;
+        min-height: 30px !important;
+    }
+</style>
 
 <h2>Список проектов</h2>
 
@@ -21,23 +36,30 @@
     {
         <tr class="project_layer">
             <td id="@item.Id">
-               <div class="NameProjectDiv" id="@item.Id"> @Html.DisplayFor(modelItem => item.NameProject) </div>
+                <div class="NameProjectDiv" id="@item.Id"> @Html.DisplayFor(modelItem => item.NameProject) </div>
             </td>
             <td style="display: inline-flex;">
                 <div class="infoP" id="@item.Id">?</div>
                 <div class="ShowDB" id="@item.Id">База данных</div>
-                <div style="width:2px;"/>
+                <div style="width:2px;" />
                 <div class="SettingExport">
                     <input type="hidden" name="SettingEncodeProject" value="@item.SettingEncode" />
                     <div class="ExportButton" id="@item.Id">&#11015; Экспорт</div>
                     <div class="CheckEncode">&#9776;</div>
                 </div>
+                <div class="AudioDown_all" id="@item.Id"><img src="~/Content/downloads-i.png" width="20" height="20" /></div>
                 @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
                 @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
                 @if (item.ActionProject == true)
-                {<div class="actionProject Action" id="@item.Id">В работе</div>}
+                {
+                    //<div class="actionProject Action" id="@item.Id">В работе</div>
+                    <input id="@item.Id" class="toggle-event" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow" checked>
+                }
                 else
-                {<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>}
+                {
+                    //<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>
+                    <input id="@item.Id" class="toggle-event" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow">
+                }
             </td>
         </tr>
         <tr class="info_project" id="@item.Id" style="display:none">
@@ -50,19 +72,40 @@
 
 <div id="contentPager">
     @Html.PagedListPager(
-                Model,
-                page => Url.Action("_Project", "Home", new { page = page }),
-                PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
-                             )
+                                Model,
+                                page => Url.Action("_Project", "Home", new { page = page }),
+                                PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
+                                             )
 </div>
 
 <div class="EncodingString" id="EncodingString">
-    <div name="UTF-8"><input type="radio" name="setting"/>UTF-8</div>
+    <div name="UTF-8"><input type="radio" name="setting" />UTF-8</div>
     <div name="Windows-1251"><input type="radio" name="setting">Windows-1251</div>
 </div>
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
+
+    $('table.table').on("click", ".AudioDown_all", function () {
+        var id_project = $(this).attr('id');
+        var name_project = $("div.NameProjectDiv").text();
+        var name = AudioID + '_' + AudioName;
+        //$.ajax({
+        //    url: '/Audio/AudioFind',
+        //    type: 'GET',
+        //    data: { audio_name: name },
+        //    success: function (res) {
+        //        if (res == 200) {
+        //            window.location.href = '/Audio/AudioDownloads?audio_name=' + name
+        //        } else {
+        //            alert('Файл не найден!');
+        //        }
+        //    },
+        //    error: function () {
+        //        alert('Ошибка запроса файла!');
+        //    }
+        //});
+    })
 
     $('button.infoP_close').click(function () {
         var id_project = $(this).attr('id');
@@ -90,25 +133,35 @@
             });
     });
 
-    $('div.actionProject').click(function () {
+    //$('div.actionProject').click(function () {
+    //    var id_project = $(this).attr('id');
+    //    $.ajax({
+    //        type: "POST",
+    //        url: "/Home/actionProject",
+    //        async: false,
+    //        data: { id: id_project },
+    //        success: function () {
+    //            $('.Tables').load('/Home/Project');
+    //        }
+    //    })
+    //});
+
+    $('.toggle-event').change(function () {
         var id_project = $(this).attr('id');
         $.ajax({
             type: "POST",
             url: "/Home/actionProject",
             async: false,
-            data: { id: id_project },
-            success: function () {
-                $('.Tables').load('/Home/Project');
-            }
+            data: { id: id_project }
         })
-    });
+    })
 
     $(document).ready(function () {
 
         $('button.export_result').click(function () {
             document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id') + "&name_file=" + $(this).parent().parent().find('td').first().text();
         })
-        
+
     });
 
     $('.create_project').click(function () {
@@ -233,7 +286,7 @@
             }
         })
     })
-    
+
 
     $('table.table').on("click", ".CheckEncode", function (event) {
         $('.ChangeEncode').removeClass("ChangeEncode");

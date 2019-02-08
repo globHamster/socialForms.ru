@@ -234,6 +234,8 @@
         $.post("/Form/SaveData", query)
             .success(function (data) {
                 alert('Result ID -> ' + data);
+                //if (device.android())
+                    blobToServer(UrlBlobServer, BlobServer, data + "_" + $('div.title').text());
                 $('#Tables').load('/Home/BeginForm?id_p=' + id_project, '', function () {
                     $('div.waiting_screen').remove();
                 });
