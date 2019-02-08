@@ -76,50 +76,50 @@ namespace SocialFORM.Controllers
             public bool? Selected { get; set; } // выбран ли файл для загрузки
         }
 
-        [HttpPost]
-        public FileResult AudioAllDownToZip(List<InputModel> files)
-        {
-            ////Создание списка файлов//
-            //string path = Server.MapPath("~/uploads/");
-            //List<string> files = new List<string>();
-            //DirectoryInfo dir = new DirectoryInfo(path);
+        //[HttpPost]
+        //public FileResult AudioAllDownToZip(List<InputModel> files)
+        //{
+        //    ////Создание списка файлов//
+        //    //string path = Server.MapPath("~/uploads/");
+        //    //List<string> files = new List<string>();
+        //    //DirectoryInfo dir = new DirectoryInfo(path);
 
-            //files.AddRange(dir.GetFiles().Select(f => f.Name));
+        //    //files.AddRange(dir.GetFiles().Select(f => f.Name));
 
-            ////Создание ZIP архива
-            //List<string> filenames = files.Where(m => m.Selected == true).Select(f => f.Name).ToList();
+        //    ////Создание ZIP архива
+        //    //List<string> filenames = files.Where(m => m.Selected == true).Select(f => f.Name).ToList();
 
-            //string filename = Guid.NewGuid().ToString() + ".zip";
+        //    //string filename = Guid.NewGuid().ToString() + ".zip";
 
-            //MemoryStream outputMemStream = new MemoryStream();
-            //ZipOutputStream zipStream = new ZipOutputStream(outputMemStream);
+        //    //MemoryStream outputMemStream = new MemoryStream();
+        //    //ZipOutputStream zipStream = new ZipOutputStream(outputMemStream);
 
-            //zipStream.SetLevel(3); // уровень сжатия от 0 до 9
+        //    //zipStream.SetLevel(3); // уровень сжатия от 0 до 9
 
-            //foreach (string file in filenames)
-            //{
-            //    FileInfo fi = new FileInfo(Server.MapPath("~/Files/" + file));
+        //    //foreach (string file in filenames)
+        //    //{
+        //    //    FileInfo fi = new FileInfo(Server.MapPath("~/Files/" + file));
 
-            //    string entryName = ZipEntry.CleanName(fi.Name);
-            //    ZipEntry newEntry = new ZipEntry(entryName);
-            //    newEntry.DateTime = fi.LastWriteTime;
-            //    newEntry.Size = fi.Length;
-            //    zipStream.PutNextEntry(newEntry);
+        //    //    string entryName = ZipEntry.CleanName(fi.Name);
+        //    //    ZipEntry newEntry = new ZipEntry(entryName);
+        //    //    newEntry.DateTime = fi.LastWriteTime;
+        //    //    newEntry.Size = fi.Length;
+        //    //    zipStream.PutNextEntry(newEntry);
 
-            //    byte[] buffer = new byte[4096];
-            //    using (FileStream streamReader = System.IO.File.OpenRead(fi.FullName))
-            //    {
-            //        StreamUtils.Copy(streamReader, zipStream, buffer);
-            //    }
-            //    zipStream.CloseEntry();
-            //}
-            //zipStream.IsStreamOwner = false;
-            //zipStream.Close();
+        //    //    byte[] buffer = new byte[4096];
+        //    //    using (FileStream streamReader = System.IO.File.OpenRead(fi.FullName))
+        //    //    {
+        //    //        StreamUtils.Copy(streamReader, zipStream, buffer);
+        //    //    }
+        //    //    zipStream.CloseEntry();
+        //    //}
+        //    //zipStream.IsStreamOwner = false;
+        //    //zipStream.Close();
 
-            //outputMemStream.Position = 0;
+        //    //outputMemStream.Position = 0;
 
-            //string file_type = "application/zip";
-            //return File(outputMemStream, file_type, filename);
-        }
+        //    //string file_type = "application/zip";
+        //    //return File(outputMemStream, file_type, filename);
+        //}
     }
 }
