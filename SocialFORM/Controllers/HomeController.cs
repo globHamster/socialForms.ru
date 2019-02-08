@@ -792,7 +792,7 @@ namespace SocialFORM.Controllers
                                 int max_cont_row = 0;
                                 foreach (var item_row in listTableRow[(int)group_item.QuestionID])
                                 {
-                                    if (item_row.IndexRow != null)
+                                    if (item_row.IndexRow != null && item_row.IndexRow != 0)
                                     {
                                         int tmp_max = listTableRow[(int)group_item.QuestionID].Where(u => u.IndexRow == item_row.IndexRow).Count();
                                         if (max_cont_row < tmp_max)

@@ -1,6 +1,4 @@
-﻿using LumenWorks.Framework.IO.Csv;
-using Newtonsoft.Json.Linq;
-using SocialFORM.Models;
+﻿using SocialFORM.Models;
 using SocialFORM.Models.Form;
 using SocialFORM.Models.Number;
 using SocialFORM.Models.Question;
@@ -13,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using System.Web.UI;
@@ -89,9 +86,9 @@ namespace SocialFORM.Controllers
                             if (tmp_str[6] != "")
                             {
                                 tmp.Phone = tmp_str[6];
-                                if (tmp.Phone.ElementAt(0) != '8')
+                                if (tmp.Phone.ElementAt(0) != '7')
                                 {
-                                    tmp.Phone = tmp.Phone.Remove(0, 1).Insert(0, "8");
+                                    tmp.Phone = tmp.Phone.Remove(0, 1).Insert(0, "7");
                                 }
                                 if (db.SetFormNumbers.FirstOrDefault(u => u.Phone == tmp.Phone) != null)
                                 {
@@ -427,10 +424,12 @@ namespace SocialFORM.Controllers
                     tmp.FO = KodFO;
                     tmp.OB = KodOB;
                     tmp.GOR = KodGOR;
-                    tmp.Phone = "8" + numb.ToString();
+                    tmp.Phone = "7" + numb.ToString();
                     if (db.SetPTs.FirstOrDefault(u => u.Phone == tmp.Phone) != null) continue;
                     tmp.Status = "0";
-                    tmp.Type = Int64.Parse(tmp.Phone) < 89000000000 ? 0 : 1;
+                    tmp.Type = Int64.Parse(tmp.Phone) < 79000000000 ? 0 : 1;
+                    tmp.isActual = false;
+                    tmp.TimeCall = new DateTime(2000, 1, 1);
                     lst_numb_with_status.Add(tmp);
                 }
             }
@@ -444,6 +443,11 @@ namespace SocialFORM.Controllers
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                System.Diagnostics.Debug.WriteLine(e.HResult);
+                System.Diagnostics.Debug.WriteLine(e.InnerException);
+                System.Diagnostics.Debug.WriteLine(e.Source);
             }
         }
 
@@ -455,8 +459,9 @@ namespace SocialFORM.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetNumberStatus(string FO, string OB, string GOR, string settings)
+        public JsonResult GetNumberStatus(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers)
         {
+            
             List<bool> lst_setting = new List<bool>();
             foreach (var item in settings.Split(','))
             {
@@ -525,6 +530,47 @@ namespace SocialFORM.Controllers
                     tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "connect").ToList());
                 }
                 lst_PT = tmp_lst_PT;
+                switch (type_select)
+                {
+                    case 0:
+                    case 1:
+                        lst_PT = lst_PT.Where(u => u.isActual == (type_select == 0 ? false: true)).ToList();
+                        break;
+                    default:
+                        break;
+
+                }
+
+                List<string> time_arg_tmp = mass_time?.Split('|').ToList() ?? null;
+                if (time_arg_tmp !=null) 
+                {
+                    System.Diagnostics.Debug.WriteLine("Time not null");
+                    if (iterval>0)
+                    {
+                        DateTime time_tmp_ = DateTime.Parse(time_arg_tmp[0]);
+                        System.Diagnostics.Debug.WriteLine("Time of interval >>> " + time_tmp_.ToLocalTime());
+                        if (invers == true)
+                        {
+                            lst_PT = lst_PT.Where(u => u.TimeCall < time_tmp_).ToList();
+                        } else
+                        {
+                            lst_PT = lst_PT.Where(u => u.TimeCall >= time_tmp_).ToList();
+                        }
+                    } else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Not interval");
+                        List<PT> lst_tmp_list_time = new List<PT>();
+                        foreach (var item in time_arg_tmp)
+                        {
+                            DateTime time_tmp_ = DateTime.Parse(item);
+                            lst_tmp_list_time.AddRange(lst_PT.Where(u => u.TimeCall == time_tmp_).ToList());
+                        }
+                        lst_PT = lst_tmp_list_time;
+                    }
+                } else
+                {
+                    System.Diagnostics.Debug.WriteLine("Warn!! Time is null");
+                }
                 //return Json(tmp_lst_PT, JsonRequestBehavior.AllowGet);
             }
             var jsonResult = Json(lst_PT, JsonRequestBehavior.AllowGet);
@@ -533,7 +579,7 @@ namespace SocialFORM.Controllers
         }
 
         [HttpPost]
-        public void ImportNumberToOktell(string FO, string OB, string GOR, int id_table, string settings)
+        public void ImportNumberToOktell(string FO, string OB, string GOR, int id_table, string settings, short type_load, List<string> time, short type_select)
         {
             List<bool> lst_setting = new List<bool>();
             foreach (var item in settings.Split(','))
@@ -609,6 +655,18 @@ namespace SocialFORM.Controllers
                     }
 
                     tmp_lst_PT = tmp_lst_PT_;
+                    tmp_lst_PT_ = new List<PT>();
+                    tmp_lst_PT_.Clear();
+                    foreach(var item in time)
+                    {
+                        DateTime time_tmp = DateTime.Parse(item);
+                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.TimeCall == time_tmp).ToList());
+                    }
+                    tmp_lst_PT = tmp_lst_PT_;
+                    if (type_select != 2)
+                    {
+                        tmp_lst_PT = tmp_lst_PT.Where(u => u.isActual == (type_select == 0 ? false : true)).ToList();
+                    }
                 }
             } catch (Exception e)
             {
@@ -625,6 +683,16 @@ namespace SocialFORM.Controllers
                 {
                     tmp_lst_PT = tmp_lst_PT.GetRange(0, 5000);
                 }
+                if (lst_setting[9])
+                {
+                    Random RDM = new Random();
+                    for (int i = 0; i < tmp_lst_PT.Count; i++)
+                    {
+                        PT tmp_element = tmp_lst_PT[0];
+                        tmp_lst_PT.RemoveAt(0);
+                        tmp_lst_PT.Insert(RDM.Next(tmp_lst_PT.Count()), tmp_element);
+                    }
+                }
                 try
                 {
                     foreach (var item in tmp_lst_PT)
@@ -632,6 +700,12 @@ namespace SocialFORM.Controllers
                         TmpClass tmp_arg = new TmpClass();
                         tmp_arg.Number = item.Phone;
                         tmp_arg.Status = item.Status;
+                        if (type_load == 1) {
+                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='1' WHERE Phone='" + item.Phone + "'");
+                        } else
+                        {
+                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='0' WHERE Phone='" + item.Phone + "'");
+                        }
                         mysql_db.Database.ExecuteSqlCommand("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + item.Phone + "','0')");
                     }
                     mysql_db.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_table + ".csv\" WHERE Id=" + id_table);
@@ -666,7 +740,7 @@ namespace SocialFORM.Controllers
 
         private void SyncNumbSThread(object _sync_lst)
         {
-            System.Diagnostics.Debug.WriteLine("Вторичный поток запущен ...");
+            
             List<TmpClass> sync_status_lst = (List<TmpClass>)_sync_lst;
             string Number = String.Empty;
 
@@ -691,11 +765,23 @@ namespace SocialFORM.Controllers
                 string OB = db.SetPTs.First(u => u.Phone == Number).OB;
               
                 List<PT> pt_lst = db.SetPTs.Where(u => u.FO == FO && u.OB == OB).ToList();
+                DateTime dateTime = DateTime.Parse(DateTime.Now.ToLongDateString());
                 foreach (var item in sync_status_lst)
                 {
-                    if (pt_lst.FirstOrDefault(u => u.Phone == item.Number) != null)
+                    PT item_from_PTs = pt_lst.FirstOrDefault(u => u.Phone == item.Number);
+                    if (item_from_PTs != null)
                     {
-                        db.Database.ExecuteSqlCommand("UPDATE dbo.PTs SET Status='" + item.Status + "' WHERE Phone='" + item.Number + "'");
+                        if (item_from_PTs.Status=="завершено") {
+                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + item.Number + "'");
+                        }
+                        else if (item_from_PTs.Status == "connect" & (item.Status == "0" || item.Status=="занято" || item.Status=="нет ответа" || item.Status=="линия не найдена" || item.Status=="перезвонить"))
+                        {
+                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + item.Number + "'");
+                        } 
+                        else
+                        {
+                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs SET Status='" + item.Status + "', TimeCall='" + dateTime + "' WHERE Phone='" + item.Number + "'");
+                        }
                     }
                 }
             }
@@ -766,9 +852,9 @@ namespace SocialFORM.Controllers
                             {
 
                                 tmp.Phone = tmp_str[1];
-                                if (tmp.Phone.ElementAt(0) != '8')
+                                if (tmp.Phone.ElementAt(0) != '7')
                                 {
-                                    tmp.Phone = tmp.Phone.Remove(0, 1).Insert(0, "8");
+                                    tmp.Phone = tmp.Phone.Remove(0, 1).Insert(0, "7");
                                 }
                                 if (db.SetPTs.FirstOrDefault(u => u.Phone == tmp.Phone) != null)
                                 {
@@ -778,7 +864,7 @@ namespace SocialFORM.Controllers
                             else continue;
 
                             tmp.Status = tmp_str[2];
-                            if (tmp.Phone.CompareTo("89000000000") == -1)
+                            if (tmp.Phone.CompareTo("79000000000") == -1)
                             {
                                 tmp.Type = 0;
                             }
@@ -786,6 +872,8 @@ namespace SocialFORM.Controllers
                             {
                                 tmp.Type = 1;
                             }
+                            tmp.isActual = false;
+                            tmp.TimeCall = new DateTime(2000, 1, 1);
                             lst_phone.Add(tmp);
                             count++;
                         }
@@ -811,7 +899,7 @@ namespace SocialFORM.Controllers
                         }
                         iter++;
                     }
-                    System.Diagnostics.Debug.WriteLine("Count >>> " + lst_phone.Count());
+                    
                     db.SetPTs.AddRange(lst_phone);
                     db.SaveChanges();
                 }
@@ -1051,5 +1139,6 @@ namespace SocialFORM.Controllers
             }
             return Json(lst_form_numbers, JsonRequestBehavior.AllowGet);
         }
+
     }
 }

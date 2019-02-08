@@ -18,19 +18,26 @@
     }
 
     div.Header_Column_1 {
-        grid-column: span 4;
+        grid-column: span 2;
         text-align: center;
         vertical-align: middle;
     }
 
     div.Header_Column_2 {
-        grid-column: span 3;
+        grid-column: span 2;
         text-align: center;
         vertical-align: middle;
         border-left: 3px solid white;
     }
 
     div.Header_Column_3 {
+        grid-column: span 3;
+        text-align: center;
+        vertical-align: middle;
+        border-left: 3px solid white;
+    }
+
+    div.Header_Column_4 {
         grid-column: span 3;
         text-align: center;
         vertical-align: middle;
@@ -77,9 +84,10 @@
     }
 
     div[name=panel_setting_load] {
-        width: 200px;
+        width: 500px;
         height: auto;
         display: none;
+        left: 330px;
         position: absolute;
         border: 1px solid #008dd2;
         z-index: 10;
@@ -120,6 +128,14 @@
         transform: scale(1.1,1.1);
         transition: .1s linear;
         box-shadow: 3px 3px 5px black;
+    }
+
+    div.CheckLimitTime {
+        border: 3px inset #aaa;
+    }
+
+    div.CheckLimitTimeInvers {
+        border: 3px inset #e51c23;
     }
 </style>
 <div style="display:inline-flex;width:100%;">
@@ -202,6 +218,43 @@
                         <label for="setting_6"></label>
                     </div>
                 </div>
+                <div style='grid-column: span 8; height: 20px; align-items:center;background:#008dd2;color:#fff;font-weight:600;padding-left:3px;'>Перемешать номера</div>
+                <div style='grid-column: span 2; height: 20px;background:#008dd2;display:flex;justify-content:center;align-items:center;'>
+                    <div style="justify-content:center;align-items:center;display:flex;">
+                        <input type='checkbox' name='shuffle_numbers' id="setting_10" />
+                        <label style="background:#fff;margin-bottom:0px;" for="setting_10"></label>
+                    </div>
+                </div>
+                <div style="grid-column: span 10;background:black;height:2px;"></div>
+                <div style='grid-column: span 10;height:auto;margin: 5px 0;'>
+
+                    <div name="panel_of_time_interval" style="display:inline-flex; align-items:center;justify-content:center;width:100%;">
+                        <div class="search_btn" style="border-radius: 10px 0 0 10px; background: #008dd2;" onclick="CheckLimitTime($(this))" id="1">1 год</div>
+                        <div class="search_btn" style="background: #008dd2;" onclick="CheckLimitTime($(this))" id="2">1 месяц</div>
+                        <div class="search_btn" style="background: #008dd2;" onclick="CheckLimitTime($(this))" id="3">1 неделя</div>
+                        <div class="search_btn" style="border-radius: 0 10px 10px 0; background: #008dd2;" onclick="CheckLimitTime($(this))" id="4">1 день</div>
+                    </div>
+
+                </div>
+                <div name="panel_of_time_call" style="width:100%;height:auto;display:grid; grid-template-columns: repeat(10, 1fr);grid-column: span 10;">
+
+                </div>
+                <div style="grid-column: span 10;background:black;height:2px;"></div>
+                <div name="panel_of_type_load" style="display:grid;grid-template-columns: repeat(10, 1fr);grid-column: span 10;">
+                    <div style="grid-column: span 1;"><input type="radio" name="type_load" id="1" /></div><div style="grid-column: span 9;">Номера для актуализации</div>
+                    <div style="grid-column: span 1;"><input type="radio" name="type_load" id="0" /></div><div style="grid-column: span 9;">Номера для обзвона</div>
+                </div>
+                <div style="grid-column: span 10;background:black;height:2px;"></div>
+                <div name="panel_of_type_selection" style="display:grid;grid-template-columns: repeat(10, 1fr);grid-column: span 10;">
+                    <div id="1" style="grid-column: span 1;">
+                        <input type='checkbox' id="actualization" checked />
+                        <label for="actualization"></label>
+                    </div><div style="grid-column: span 9;">Только с типом "актуализация"</div>
+                    <div id="0" style="grid-column: span 1;">
+                        <input type='checkbox' id="call" checked />
+                        <label for="call"></label>
+                    </div><div style="grid-column: span 9;">Только с типом "обзвон"</div>
+                </div>
             </div>
 
         </div>
@@ -214,6 +267,7 @@
         <div class="Header_Column_1"><p>Телефон</p></div>
         <div class="Header_Column_2"><p>Статус</p></div>
         <div class="Header_Column_3"><p>Тип</p></div>
+        <div class="Header_Column_4"><p>Время звонка</p></div>
     </div>
     <div name="text_name_status" class="table_status_numb">
     </div>
@@ -230,6 +284,54 @@
     let status_number_list = [];
     Array.prototype.clone = function () {
         return this.slice(0);
+    }
+
+    function CheckLimitTime(elemt) {
+        if (elemt.hasClass("CheckLimitTime")) {
+            elemt.removeClass("CheckLimitTime").addClass("CheckLimitTimeInvers");
+            DisableTimeSelection();
+        } else if (elemt.hasClass("CheckLimitTimeInvers")) {
+            elemt.removeClass("CheckLimitTimeInvers");
+            DisableTimeSelection();
+        }
+        else {
+            elemt.parent().find(".CheckLimitTime").removeClass("CheckLimitTime");
+            elemt.parent().find(".CheckLimitTimeInvers").removeClass("CheckLimitTimeInvers");
+            elemt.addClass("CheckLimitTime");
+            DisableTimeSelection();
+        }
+
+        //let time = new Date(Date.now());
+        //switch (Number(elemt.attr('id'))) {
+        //    case 1:
+        //        let new_year = time.getFullYear() - 1;
+        //        time.setFullYear(new_year);
+        //        break;
+        //    case 2:
+        //        let new_month = time.getMonth() - 1;
+        //        time.setMonth(new_month);
+        //        break;
+        //    case 3:
+        //        let new_week = time.getDate() - 7;
+        //        time.setDate(new_week);
+        //        break;
+        //    case 4:
+        //        let new_date = time.getDate() - 1;
+        //        time.setDate(new_date);
+        //        break;
+        //    default:
+        //        break;
+        //}
+        //let number_time = Date.parse(time);
+        //console.log("Time >> " + number_time + " > " + Date.parse(time));
+    }
+
+    function DisableTimeSelection() {
+        $('div[name=panel_of_time_call]').find('input').each(function () {
+            if ($(this).is(":checked")) {
+                $(this).trigger("click");
+            }
+        })
     }
 
     $(function () {
@@ -255,7 +357,6 @@
                 })
             })
     }
-
     function ChangeListGOR(codeFO, codeOB) {
         $('select[name=list_GOR_]').find('option:not(:disabled)').remove();
         $('select[name=list_GOR_]').find('option:disabled').prop("selected", true);
@@ -283,6 +384,21 @@
 
         const is_only_stations = panel_settings.find('input[name=only_stations]').is(':checked');
         const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
+        let type_selection = undefined;
+        if ($('div[name=panel_of_type_selection]').find('input:checked').length != 0) {
+
+            $('div[name=panel_of_type_selection]').find('input:checked').each(function () {
+                if (type_selection == undefined) {
+                    type_selection = Number($(this).parent().attr('id'));
+                } else {
+                    type_selection = 2;
+                }
+            })
+        } else {
+            $('.PreLoader').hide();
+            alert("Не выбран тип номера");
+            return;
+        }
 
         let lst_setting = [];
         lst_setting.push(is_not_connect);
@@ -294,20 +410,75 @@
         lst_setting.push(is_line_not_found);
         lst_setting.push(is_recall);
         lst_setting.push(is_actual);
-        $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString() })
-            .success(function (server_data) {
-                status_number_list = server_data.clone();
-                $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length : 0);
-                BuildListStatus(1);
-                $('div[name=div_limit_page]').text(Math.ceil(status_number_list.length / 30));
-                $('div[name=div_numb_page]').text(1);
-                $('input[name=page_numb_status]').val(1);
-                $('.PreLoader').hide();
+        let container_interval = $('div[name=panel_of_time_interval]');
+        if (container_interval.find('.CheckLimitTime').length != 0 || container_interval.find('.CheckLimitTimeInvers').length != 0) {
+            let elemt = container_interval.find('.CheckLimitTime').length != 0 ? container_interval.find('.CheckLimitTime') : container_interval.find('.CheckLimitTimeInvers');
+            let type_invers = container_interval.find('.CheckLimitTime').length != 0 ? false : true;
+            let time = new Date(Date.now());
+            switch (Number(elemt.attr('id'))) {
+                case 1:
+                    let new_year = time.getFullYear() - 1;
+                    time.setFullYear(new_year);
+                    break;
+                case 2:
+                    let new_month = time.getMonth() - 1;
+                    time.setMonth(new_month);
+                    break;
+                case 3:
+                    let new_week = time.getDate() - 7;
+                    time.setDate(new_week);
+                    break;
+                case 4:
+                    let new_date = time.getDate() - 1;
+                    time.setDate(new_date);
+                    break;
+                default:
+                    break;
+            }
+            let mas_time = time.toLocaleString();
+
+            $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: mas_time, iterval: 1, invers: type_invers })
+                .success(function (server_data) {
+                    status_number_list = server_data.clone();
+                    $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length : 0);
+                    BuildListStatus(1);
+                    $('div[name=div_limit_page]').text(Math.ceil(status_number_list.length / 30));
+                    $('div[name=div_numb_page]').text(1);
+                    $('input[name=page_numb_status]').val(1);
+                    $('.PreLoader').hide();
+                })
+                .error(function () {
+                    $('.PreLoader').hide();
+                    alert("Ошибка выгрузки листа");
+                })
+        } else {
+            console.log("In here");
+            let mass_time_ = [];
+            $('div[name=panel_of_time_call]').find('input:checked').each(function () {
+                mass_time_.push(new Date(Number($(this).attr('id'))).toLocaleString());
             })
-            .error(function () {
-                $('.PreLoader').hide();
-                alert("Ошибка выгрузки листа");
-            })
+            let string_mass_time = mass_time_.length == 0 ? undefined : mass_time_.join('|');
+            console.log(string_mass_time);
+            $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: string_mass_time, iterval:0 })
+                .success(function (server_data) {
+                    status_number_list = server_data.clone();
+                    $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length : 0);
+                    BuildListStatus(1);
+                    $('div[name=div_limit_page]').text(Math.ceil(status_number_list.length / 30));
+                    $('div[name=div_numb_page]').text(1);
+                    $('input[name=page_numb_status]').val(1);
+                    $('.PreLoader').hide();
+                })
+                .error(function () {
+                    $('.PreLoader').hide();
+                    alert("Ошибка выгрузки листа");
+                })
+        }
+    }
+
+    function DisableInterval() {
+        $('div[name=panel_of_time_interval]').find('.CheckLimitTime').removeClass('CheckLimitTime');
+        $('div[name=panel_of_time_interval]').find('.CheckLimitTimeInvers').removeClass('CheckLimitTimeInvers');
     }
 
     function BuildListStatus(page_iter) {
@@ -316,15 +487,28 @@
         const massive_length = status_number_list.length;
         const page_length = Math.ceil(massive_length / 30);
         const limit_iter = (page_iter * 30) > massive_length ? massive_length : (page_iter * 30);
+        let massive_time_call = {};
+        $.each(status_number_list, function (i, item) {
+            massive_time_call[Number((item.TimeCall).replace(/\D/g, ''))] = (new Date(Number((item.TimeCall).replace(/\D/g, '')))).toLocaleString();
+        })
+        let arg_panel_time_call = $('div[name=panel_of_time_call]');
+        arg_panel_time_call.empty();
+        $.each(massive_time_call, function (i, item) {
+            arg_panel_time_call.append('<div style="grid-column: span 2;"><input type="checkbox" id="' + i + '" /><label onclick="DisableInterval()" for="' + i + '"></label></div><div style="grid-column: span 8;">' + item + '</div>');
+        })
         for (var i = (page_iter * 30) - 30; i < limit_iter; i++) {
+
             if (i % 2 == 0) {
                 container.append("<div class='Header_Column_1 FirstBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 FirstBlock'>" + status_number_list[i].Status +
-                    "</div><div class='Header_Column_3 FirstBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>");
+                    "</div><div class='Header_Column_3 FirstBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
+                    "<div class='Header_Column_4 FirstBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
             } else {
                 container.append("<div class='Header_Column_1 SecondBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 SecondBlock'>" + status_number_list[i].Status +
-                    "</div><div class='Header_Column_3 SecondBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>");
+                    "</div><div class='Header_Column_3 SecondBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
+                    "<div class='Header_Column_4 SecondBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
             }
         }
+        console.log(massive_time_call);
     }
 
     function GoPageNext() {
@@ -356,6 +540,9 @@
 
         const is_only_stations = panel_settings.find('input[name=only_stations]').is(':checked');
         const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
+
+        const is_shuffle = panel_settings.find('input[name=shuffle_numbers]').is(':checked');
+
         let lst_setting = [];
         lst_setting.push(is_not_connect);
         lst_setting.push(is_number_busy);
@@ -366,13 +553,42 @@
         lst_setting.push(is_line_not_found);
         lst_setting.push(is_recall);
         lst_setting.push(is_actual);
-        $.post("/Phone/ImportNumberToOktell", { FO: FO, OB: OB, GOR: GOR, id_table: Number(id_table), settings: lst_setting.toString() })
-            .success(function () {
-                alert("Номера загружены");
+        lst_setting.push(is_shuffle);
+        let type_selection = undefined;
+        if ($('div[name=panel_of_type_selection]').find('input:checked').length != 0) {
+
+            $('div[name=panel_of_type_selection]').find('input:checked').each(function () {
+                if (type_selection == undefined) {
+                    type_selection = Number($(this).parent().attr('id'));
+                } else {
+                    type_selection = 2;
+                }
             })
-            .error(function () {
-                alert("Ошибка загрузка номеров");
-            })
+        } else {
+            $('.PreLoader').hide();
+            alert("Не выбран тип номера");
+            return;
+        }
+        if ($('div[name=panel_of_time_call]').find('input:checked').length != 0) {
+            let mass_ticks = [];
+            $('div[name=panel_of_time_call]').find('input:checked').each(function () {
+                mass_ticks.push(new Date(Number($(this).attr('id'))).toLocaleString());
+            });
+            let type_of_load = $('div[name=panel_of_type_load]').find('input:checked').attr('id');
+            if (type_of_load == undefined) {
+                alert("Тип загрузки не выбран!")
+                return;
+            }
+            $.post("/Phone/ImportNumberToOktell", { FO: FO, OB: OB, GOR: GOR, id_table: Number(id_table), settings: lst_setting.toString(), type_load: type_of_load, time: mass_ticks, type_select: type_selection })
+                .success(function () {
+                    alert("Номера загружены");
+                })
+                .error(function () {
+                    alert("Ошибка загрузка номеров");
+                })
+        } else {
+            alert("No checked");
+        }
     }
 
     function GetNameFreeTable() {

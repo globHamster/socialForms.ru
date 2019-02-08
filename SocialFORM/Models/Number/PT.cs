@@ -17,5 +17,7 @@ namespace SocialFORM.Models.Number
         public string Phone { get; set; }
         public string Status { get; set; }
         public int Type { get; set; }
+        public bool isActual { get; set; }
+        public DateTime TimeCall { get; set; }
     }
 }

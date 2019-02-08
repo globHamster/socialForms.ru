@@ -9,10 +9,13 @@
             grid-column: span 2;
         }
         div[name=ColumnOfSD]{
-            grid-column: span 4;
+            grid-column: span 3;
         }
         div[name=ColumnOfED]{
-            grid-column: span 4;
+            grid-column: span 3;
+        }
+        div[name=ColumnOfValue]{
+            grid-column: span 2;
         }
         div[name=ColumnOfDelete]{
             grid-column: span 2;
@@ -63,12 +66,22 @@
         <div class="search_btn" onclick="ButtonAdd()" style="border-radius:10px;">Добавить</div>
     </div>
     <div style="padding:5px;">
-        <p style="font-weight:900;font-size:14px;margin-bottom:0px;">Список диапазонов</p>
+        <div style="width:100%;display:grid;grid-template-columns: repeat(12, 1fr);margin-bottom:2px;">
+            <div style="grid-column: span 8;">
+                <p style="font-weight: 900; font-size: 14px;margin-bottom:0px;">Список диапозонов</p>
+            </div>
+            <div style="grid-column: span 4;display: grid; grid-template-columns: repeat(10, 1fr);border-bottom: 2px solid #008dd2;">
+                <div style="grid-column: span 6;"><p style="font-weight: 600; font-size:14px;margin-bottom:0px;">Количество номеров</p></div>
+                <div name="common_count_numbers" style="grid-column: span 4;color:#e51c23;font-weight:900;">0</div>
+            </div>
+        </div>
+        
         <div class="numD"></div>
         <div name="TableOfDiap">
             <div name="ColumnOfCount" style="background:#008dd2;color:#fff;display:flex;justify-content:center;align-items:center;font-weight:900;"><div>Номер</div></div>
             <div name="ColumnOfSD" style="background:#008dd2;color:#fff;display:flex;justify-content:center;align-items:center;border-left:2px solid white;font-weight:900;"><div>Начало диапозона</div></div>
             <div name="ColumnOfED" style="background:#008dd2;color:#fff;display:flex;justify-content:center;align-items:center;border-left:2px solid white;font-weight:900;"><div>Конец диапозона</div></div>
+            <div name="ColumnOfValue" style="background:#008dd2;color:#fff;display:flex;justify-content:center;align-items:center;border-left:2px solid white;font-weight:900;"><div>Количество</div></div>
             <div name="ColumnOfDelete"></div>
         </div>
     </div>
@@ -83,9 +96,9 @@
 
     $(function () {
         $('div#txt_1').load("/Home/Test");
-        $("#kod").mask("999");
-        $("#sd").mask("9999999");
-        $("#ed").mask("9999999");
+        //$("#kod").mask("999");
+        //$("#sd").mask("9999999");
+        //$("#ed").mask("9999999");
 
         $.get("/Phone/getListFO")
             .success(function (server_data) {
@@ -128,14 +141,14 @@
     let listRange = [];
 
     function ButtonAdd() {
-
+        let common_count = Number($('div[name=common_count_numbers]').text());
         var name = $('#named').val();
         var kod = $('#kod').val();
         var sd = $('#sd').val();
         var ed = $('#ed').val();
-        if (kod.length != 3) { alert("Неверный код") }
-        if (sd.length != 7) { alert("Неверный начальный диапазон") }
-        if (ed.length != 7) { alert("Неверный конечный диапазон") }
+        //if (kod.length != 3) { alert("Неверный код") }
+        //if (sd.length != 7) { alert("Неверный начальный диапазон") }
+        //if (ed.length != 7) { alert("Неверный конечный диапазон") }
 
         var item = {
             kod: kod,
@@ -144,17 +157,20 @@
         }
 
         if (('8' + kod + sd).length != 11 || ('8' + kod + ed).length != 11) {
-            alert('Неверно!');
+            alert('Не правильная длина номера!');
         } else if (Number(item.sd) > Number(item.ed)) {
             alert("Неверно задан диапазон");
         }
         else {
+            common_count += Number(item.ed) - Number(item.sd)+1;
+            $('div[name=common_count_numbers]').text(common_count);
             listRange.push(item);
             let countDip = $('div.element_diap').length > 0 ? Number($('div.element_diap').last().find("div").text()) + 1 : 1;
 
             $('div[name=TableOfDiap]:last').after('<div name="TableOfDiap"><div name="ColumnOfCount" class="element_diap" style="height:25px;display:flex;justify-content:center;align-items:center;border-bottom:1px solid black;"><div>' + countDip +
                 '</div></div><div name="ColumnOfSD" style="display:flex;justify-content:center;align-items:center;border-left:2px solid black;border-bottom:1px solid black;"><div>' + item.kod + item.sd +
                 '</div></div><div name="ColumnOfED" style="display:flex;justify-content:center;align-items:center;border-left:2px solid black;border-bottom:1px solid black;"><div>' + item.kod + item.ed +
+                '</div></div><div name="ColumnOfValue" style="display:flex;justify-content:center;align-items:center;border-left:2px solid black;border-bottom:1px solid black;" id="' + (Number(item.ed) - Number(item.sd)+1)+'"><div>' + (Number(item.ed) - Number(item.sd)+1) +
                 '</div></div><div name="ColumnOfDelete" style="display:flex;justify-content:center;align-items:center;"><div style="width:20px;height:20px;border-radius:20px;background:red;" onclick="RemoveDiap($(this))"></div></div></div>');
             document.getElementById('sd').value = "";
             document.getElementById('ed').value = "";
@@ -186,6 +202,11 @@
     }
 
     function RemoveDiap(btn_remove) {
+        let common_count = Number($('div[name=common_count_numbers]').text());
+        let count_numbers = Number(btn_remove.parents("div[name=TableOfDiap]").find('div[name=ColumnOfValue]').attr('id'));
+        console.log(common_count + " -- " + count_numbers);
+
+        $('div[name=common_count_numbers]').text(common_count - count_numbers);
         btn_remove.parents("div[name=TableOfDiap]").remove();
     }
 </script>
