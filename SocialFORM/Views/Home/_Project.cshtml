@@ -47,7 +47,7 @@
                     <div class="ExportButton" id="@item.Id">&#11015; Экспорт</div>
                     <div class="CheckEncode">&#9776;</div>
                 </div>
-                <div class="AudioDown_all" id="@item.Id"><img src="~/Content/downloads-i.png" width="20" height="20" /></div>
+                <div class="AudioDown_all" id="@item.Id"><img src="../Content/downloads-i.png" width="20" height="20" /></div>
                 @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
                 @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
                 @if (item.ActionProject == true)

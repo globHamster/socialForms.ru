@@ -352,6 +352,62 @@ namespace SocialFORM.Controllers
             return Json(db.SetAnswerAll.Where(u => u.QuestionID == question_id).ToList(), JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult GetAnswerList(string id_lst_q)
+        {
+            List<string> lst_id = id_lst_q.Split(',').ToList();
+            List<AnswerModel> lst_answer_ = new List<AnswerModel>();
+
+            foreach(var item in lst_id)
+            {
+                int iter = int.Parse(item);
+                lst_answer_.AddRange(db.SetAnswers.Where(u => u.QuestionID == iter).ToList());
+            }
+
+            return Json(lst_answer_, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetAnswerAllList(string id_lst_q)
+        {
+            List<string> lst_id = id_lst_q.Split(',').ToList();
+            List<AnswerAll> lst_answer_all = new List<AnswerAll>();
+
+            foreach(var item in lst_id)
+            {
+                int iter = int.Parse(item);
+                lst_answer_all.AddRange(db.SetAnswerAll.Where(u=>u.QuestionID == iter).ToList());
+            }
+
+            return Json(lst_answer_all, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetTableRowAll(string id_lst_q)
+        {
+            try
+            {
+                List<string> lst_id = id_lst_q.Split(',').ToList();
+                List<TableRow> lst_row_all = new List<TableRow>();
+
+                foreach (var item in lst_id)
+                {
+                    int iter = int.Parse(item);
+                    System.Diagnostics.Debug.WriteLine("item >>> " + iter);
+                    if (db.SetQuestions.FirstOrDefault(u => u.Id == iter).TypeQuestion == Models.Question.Type.Table)
+                    {
+                        lst_row_all.AddRange(db.SetTableRows.Where(u => u.TableID == iter).ToList());
+                    }
+                }
+
+                return Json(lst_row_all, JsonRequestBehavior.AllowGet);
+            } catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         //Удалить указателя на ответ
         [HttpPost]
         public void deleteAnswerAll(int id_answer)
@@ -412,9 +468,9 @@ namespace SocialFORM.Controllers
 
         //Получение списка вопросов относящихся к проекту
         [HttpGet]
-        public async Task<JsonResult> getListQuestion(int id_p) // Асинхронный метод вывода листа с вопросами
+        public JsonResult getListQuestion(int id_p) // Асинхронный метод вывода листа с вопросами
         {
-            return Json(await db.SetQuestions.Where(u=>u.ProjectID == id_p).ToListAsync(), JsonRequestBehavior.AllowGet);
+            return Json(db.SetQuestions.Where(u=>u.ProjectID == id_p).ToList(), JsonRequestBehavior.AllowGet);
         }
 
         //Получение списка базовых ответов

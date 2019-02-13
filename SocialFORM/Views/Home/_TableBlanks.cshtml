@@ -7,8 +7,8 @@
         align-content: space-between;
         align-items: center;
         flex-direction: column;
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         background-color: #008dd2;
         padding: 5px;
         border-radius: 25px;
@@ -20,8 +20,8 @@
         align-content: space-between;
         align-items: center;
         flex-direction: column;
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         background-color: #008dd2;
         padding: 5px;
         border-radius: 25px;
@@ -33,8 +33,8 @@
         align-content: space-between;
         align-items: center;
         flex-direction: column;
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         background-color: #008dd2;
         padding: 5px;
         border-radius: 25px;
@@ -53,8 +53,8 @@
         align-content: space-between;
         align-items: center;
         flex-direction: column;
-        width: 29px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         background-color: #f44336;
         padding: 5px;
         border-radius: 25px;
@@ -71,6 +71,11 @@
         box-shadow: 0px 0px black;
         transition: 0.1s linear;
     }
+
+    .ScaledAllText{
+        transform: scale(1.2,1.2);
+        transition: .5s linear;
+    }
 </style>
 <div class="table_blanks" style="overflow:auto" id="@Model.First().ProjectID">
     <table class="export_table">
@@ -79,21 +84,21 @@
                 <th>Audio</th>
                 <th style="width: 50em;">GEO</th>
                 <th>Номер бланка</th>
-                <th>ФИО</th>
-                <th>Номер телефона</th>
-                <th>Начало Анкеты</th>
-                <th>Завершение Анкеты</th>
+                <th style="white-space:nowrap">ФИО</th>
+                <th style="white-space:nowrap;">Номер телефона</th>
+                <th style="white-space:nowrap;">Начало Анкеты</th>
+                <th style="white-space:nowrap;">Завершение Анкеты</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
-                <tr id="@item.Id" name="@item.Id" class="answer_row">
+                <tr id="@item.Id" name="@item.Id" class="answer_row" style="height: 20px;">
                     <td style="border: 0px; align-self: center; width: 50em;">
-                        <div style="width: 100%; display:inline-flex; flex-direction: column; justify-content:center; align-content: space-between; align-items: center;">
+                        <div style="width: 100%; display:inline-flex; flex-direction: row; justify-content:center; align-content: space-between; align-items: center;">
                             <div class="AUDIOBattonPlau">
                                 <div style="display: none" name="AudioPlayID">@item.BlankID</div>
-                                <img src="~/Content/play-i.png" width="20" height="20" />
+                                <img src="~/Content/play-i.png" width="10" height="10" />
                             </div>
                             <div class="AUDIOBattonDown">
                                 <div style="display: none" name="AudioDownID">@item.BlankID</div>
@@ -103,7 +108,7 @@
                         </div>
                     </td>
                     <td style="border: 0px; align-self: center; width: 50em;">
-                        <div style="width: 100%; display:inline-flex; flex-direction: column; justify-content:center; align-content: space-between; align-items: center;">
+                        <div style="width: 100%; display:inline-flex; flex-direction: row; justify-content:center; align-content: space-between; align-items: center;">
                             <div class="GEOButton">
                                 <div style="display: none" name="CootdWidth">@item.CoordWidth</div>
                                 <div style="display: none" name="CootdHeight">@item.CoordHeight</div>
@@ -115,10 +120,10 @@
                         </div>
                     </td>
                     <td><input type="hidden" name="UserID" value="@item.UserID" /> @item.BlankID</td>
-                    <td>@item.UserName</td>
-                    <td>@item.PhoneNumber</td>
-                    <td class="startDATE">@item.Data</td>
-                    <td>@item.Time</td>
+                    <td style="white-space:nowrap">@item.UserName</td>
+                    <td style="white-space:nowrap">@item.PhoneNumber</td>
+                    <td class="startDATE" style="white-space:nowrap">@item.Data</td>
+                    <td style="white-space:nowrap">@item.Time</td>
                 </tr>
 
             }
@@ -137,251 +142,349 @@
 <script src="~/Scripts/tableexport.js" type="text/javascript"></script>
 <script type="text/javascript">
 
-    var list_base_answer = [];
     var list_schoolDay = [];
-    var id_list_base_answer = [];
-    $.ajax({
-        type: "GET",
-        url: "/Question/getListAnswerBase",
-        async: false,
-        data: {},
-        success: function (list) {
-            $.each(list, function (i, item) {
-                id_list_base_answer.push(item.Id);
-                list_base_answer.push(item);
-            })
-        }
+    let awayting_status = 0;
+
+    //Массивы для формирования таблицы результатов
+    let tmp_lst_group_iter = {};
+    let tmp_lst_group_item = {};
+    let send_lst_q = [];
+    let tmp_lst_answer_model = {};
+    let tmp_lst_answer_all_model = {};
+    let set_of_answer_to_q = {};
+    let tmp_lst_row = {};
+    let tmp_lst_question = {};
+    let list_question = {};
+
+    $(function () {
+        Init();
     })
-    //
-    //Лист учебных дней
-    //
-    $.ajax({
-        type: "GET",
-        url: "/Question/getSchoolDay",
-        async: false,
-        data: {},
-        success: function (list) {
-            $.each(list, function (i, item) {
-                list_schoolDay.push(item.split('#'));
+
+    function Init() {
+
+        $.get("/Question/getSchoolDay")
+            .success(function (_server_data) {
+                $.each(_server_data, function (i, item) {
+                    list_schoolDay.push(item.split('#'));
+                })
+                awayting_status++;
             })
+
+        $.get("/Question/getListQuestion", { id_p: Number($('div.table_blanks').attr('id')) })
+            .success(function (server_data) {
+                list_question = server_data;
+                awayting_status++;
+            })
+
+        $.get("/Group/getGroup", { id_p: $('div.table_blanks').attr('id') })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item_group) {
+                    if (item_group.Group == null) {
+                        tmp_lst_group_iter[item_group.IndexQuestion] = item_group;
+                        tmp_lst_group_item[item_group.QuestionID] = item_group.GroupName;
+                        send_lst_q.push(item_group.QuestionID);
+                    }
+                })
+
+                awayting_status++;
+
+                $.get("/Question/GetAnswerList", { id_lst_q: send_lst_q.join(',') })
+                    .success(function (_server_data) {
+                        $.each(_server_data, function (i, item) {
+                            tmp_lst_answer_model[item.Id] = item;
+                        })
+                        awayting_status++;
+                    })
+
+                $.get("/Question/GetAnswerAllList", { id_lst_q: send_lst_q.join(',') })
+                    .success(function (_server_data) {
+                        $.each(_server_data, function (i, item) {
+                            if (set_of_answer_to_q[item.QuestionID] == undefined || set_of_answer_to_q[item.QuestionID] == null) {
+                                set_of_answer_to_q[item.QuestionID] = [item.AnswerKey];
+                            } else {
+                                set_of_answer_to_q[item.QuestionID].push(item.AnswerKey);
+                            }
+                            tmp_lst_answer_all_model[item.AnswerKey] = item;
+                        })
+                        awayting_status++;
+                    })
+
+                $.get("/Question/GetTableRowAll", { id_lst_q: send_lst_q.join(',') })
+                    .success(function (_server_data) {
+                        $.each(_server_data, function (i, item) {
+                            if (tmp_lst_row[item.TableID] == undefined || tmp_lst_row[item.TableID] == null) {
+                                tmp_lst_row[item.TableID] = [item];
+                            } else {
+                                tmp_lst_row[item.TableID].push(item);
+                            }
+                        })
+                        awayting_status++;
+                    })
+
+            })
+    }
+
+    function WaitingLoad() {
+        if (awayting_status >= 6) {
+            CreateColumn();
+            return;
+        } else {
+            setTimeout(WaitingLoad, 2000);
+            return;
         }
-    })
+    }
+
+    setTimeout(function () {
+        WaitingLoad();
+    }, 2000)
+
     //Создание шапки таблицы результатов ответов
-    $.ajax({
-        type: "GET",
-        url: "/Question/getListQuestion",
-        async: false,
-        data: { id_p: $('div.table_blanks').attr('id') },
-        success: function (list_question) {
-            var code = '';
-            $.each(list_question, function (i, item) {
-                switch (item.TypeQuestion) {
-                    case 1:
-                        //Проверка на вхождение ответа с полем "Другое"
-                        var has_area_other = false;
-                        $.ajax({
-                            type: "GET",
-                            url: "/Question/getAnswer",
-                            async: false,
-                            data: { id_question: item.Id },
-                            success: function (items_answer) {
-                                $.each(items_answer, function (i, data) {
-                                    if (data.isFreeArea) has_area_other = true;
-                                })
-                            }
-                        })
-                        //
-                        code += '<th class="question_colum" id="' + item.Id + '" name="single">Вопрос ' + item.Id + '</th>';
-                        if (has_area_other) code += '<th class="question_colum other" id="' + item.Id + '" name="single">Вопрос ' + item.Id + '_др</th>';
-                        $('tr.name_colum').append(code);
-                        code = '';
-                        break;
-                    case 2:
-                        var count_answer = 0;
-
-                        $.ajax({
-                            type: "GET",
-                            url: "/Question/getAnswerAllCount",
-                            async: false,
-                            data: { question_id: item.Id },
-                            success: function (count) {
-                                count_answer = count;
-                            }
-                        });
-
-                        for (var i = 1; i <= count_answer; i++) {
-                            code += '<th class="question_colum" id="' + item.Id + '" name="multiple">Вопрос ' + item.Id + '_' + i + '</th>';
-                        }
-                        //Проверка на вхождение ответа с полем "Другое"
-                        var change_count = 1;
-                        $.ajax({
-                            type: "GET",
-                            url: "/Question/getAnswer",
-                            async: false,
-                            data: { id_question: item.Id },
-                            success: function (items_answer) {
-                                $.each(items_answer, function (i, data) {
-
-                                    if (data.isFreeArea) {
-                                        code += '<th class="question_colum other" id="' + item.Id + '" name="multiple">Вопрос ' + item.Id + '_' + change_count + '_др</th>';
-                                        change_count++;
-                                    }
-                                })
-                            }
-                        })
-                        $('tr.name_colum').append(code);
-
-                        code = '';
-                        break;
-                    case 3:
-                        $.ajax({
-                            type: "GET",
-                            url: "/Question/getAnswerAllCount",
-                            async: false,
-                            data: { question_id: item.Id },
-                            success: function (count) {
-                                if (Number(count) > 1) {
-                                    for (var i = 1; i <= count; i++)
-                                        code += '<th class="question_colum" id="' + item.Id + '" name="free">Вопрос ' + item.Id + '_' + i + '</th>';
-                                    $('tr.name_colum').append(code);
-                                    code = '';
-                                } else {
-                                    code += '<th class="question_colum" id="' + item.Id + '" name="free">Вопрос ' + item.Id + '</th>';
-                                    $('tr.name_colum').append(code);
-                                    code = '';
-                                }
-
-                            }
-                        })
-                        break;
-                    case 4:
-                        $.ajax({
-                            type: "GET",
-                            url: "/Question/getTableRowCount",
-                            async: false,
-                            data: { id_q: item.Id },
-                            success: function (count) {
-                                for (var i = 1; i <= count; i++) {
-                                    code += '<th class="question_colum" id="' + item.Id + '" name="table">Вопрос ' + item.Id + '_' + i + '</th>';
-                                }
-                                $('tr.name_colum').append(code);
-                                code = '';
-                            }
-                        })
-                        break;
-                    case 5:
-                        break;
-                    case 6:
-                        var has_area_other = false;
-                        //
-                        code += '<th class="question_colum" id="' + item.Id + '" name="filter">Вопрос ' + item.Id + '</th>';
-                        code += '<th class="question_colum other" id="' + item.Id + '" name="filter">Вопрос ' + item.Id + '_др</th>';
-                        $('tr.name_colum').append(code);
-                        code = '';
-                    default:
-                        break;
-                }
-
-            })
-            $('.PreLoader').hide();
-        }
-    })
-
-    //Формировка таблицы с результатами ответов
-    $('tr.answer_row').each(function () {
-        var UserID = $(this).find('input[name=UserID]').val();
-        var startDATE = $(this).find('.startDATE').text().split(' ');
-        var tmp_this = $(this);
-        $.each(list_schoolDay, function (i, item) {
-            //  var tmp = item.Date.toString();
-            // var string = tmp.split(' ');
-            console.info(item[0], UserID, item[1], startDATE[0])
-            if (item[0] == UserID && item[1] == startDATE[0]) {
-                tmp_this.css("background-color", "grey");
-            }
-        })
-        var result_list = [];
-        var id_result_list = [];
-
-        $.ajax({
-            type: "GET",
-            url: "/Home/TableResultBlank",
-            async: false,
-            data: { id_blank: $(this).attr('id') },
-            success: function (data) {
-                $.each(data, function (i, item) {
-                    result_list.push(item);
-                    id_result_list.push(item.QuestionID);
-                });
-            }
-        })
+    function CreateColumn() {
         var code = '';
-        var element_answer = $(this);
-        $('th.question_colum').each(function () {
-            var index = id_result_list.indexOf(Number($(this).attr('id')));
-            var is_other = $(this).hasClass('other');
-            if ($(this).hasClass('other'))
-                element_answer.append('<td class="other" id="' + $(this).attr('id') + '"></td>');
-            else
-                element_answer.append('<td class="normal" id="' + $(this).attr('id') + '" name="' + $(this).attr('name') + '"></td>');
-        });
-        var index_td = 0;
-        var last_multi_question;
-        $.each(result_list, function (i, item) {
-            var type_q = element_answer.find('td.normal[id=' + item.QuestionID + ']').attr('name');
-            switch (type_q) {
-                case 'single':
-                    if (item.AnswerID == 404) break;
-                    element_answer.find('td.normal[id=' + item.QuestionID + ']').text(item.AnswerIndex);
-                    if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').text(item.Text);
-                    break;
-                case 'multiple':
-                    if (item.AnswerID == 404) break;
-                    var elem = element_answer.find('td.normal[id=' + item.QuestionID + ']');
-                    var is_find = true;
-                    if (last_multi_question != item.QuestionID) index_td = 0;
-                    last_multi_question = item.QuestionID;
-                    elem[index_td].append(item.AnswerIndex);
+        console.log("1 >> ", tmp_lst_group_iter);
+        console.log("2 >> ", tmp_lst_group_item);
+        console.log("3 >> ", send_lst_q);
+        console.log("4 >> ", tmp_lst_answer_model);
+        console.log("5 >> ", tmp_lst_answer_all_model);
+        console.log("6 >> ", set_of_answer_to_q);
+        console.log("7 >> ", tmp_lst_row);
+        console.log("8 >> ", tmp_lst_question);
+        console.log("9 >> ", list_question);
 
-                    if (item.Text != null) {
-                        element_answer.find('td.other[id=' + item.QuestionID + ']').each(function () {
-                            if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false; }
+        $.each(list_question, function (i, item) {
+            tmp_lst_question[item.Id] = item;
+        })
+
+        list_question = {};
+
+        $.each(send_lst_q, function (i, item) {
+            list_question[i] = tmp_lst_question[item];
+            list_question[i].TextQuestion = tmp_lst_group_item[item];
+        })
+
+        
+
+        $.each(list_question, function (i, item) {
+            switch (item.TypeQuestion) {
+                case 1: {
+                    //Проверка на вхождение ответа с полем "Другое"
+                    let has_area_other = false;
+                    $.each(set_of_answer_to_q[item.Id], function (i, item) {
+                        if (tmp_lst_answer_all_model[item].AnswerType == 1 && tmp_lst_answer_model[item].isFreeArea == true) has_area_other = true;
+                    })
+                    code += '<th class="question_colum" id="' + item.Id + '" name="single">' + item.TextQuestion + '</th>';
+                    if (has_area_other) code += '<th class="question_colum other" id="' + item.Id + '" name="single">' + item.TextQuestion + '_др</th>';
+                    $('tr.name_colum').append(code);
+                    code = '';
+                }
+                    break;
+                case 2: {
+                    let count_answer = 0;
+                    if (item.LimitCount == 0 || item.LimitCount == null) {
+                        count_answer = set_of_answer_to_q[item.Id].length;
+                        $.each(set_of_answer_to_q[item.Id], function (i, _item) {
+                            if (tmp_lst_answer_all_model[_item].AnswerType == 2) { count_answer--; }
+                        })
+                    } else {
+                        count_answer = Number(item.LimitCount);
+                    }
+
+                    
+
+                    for (var i = 1; i <= count_answer; i++) {
+                        code += '<th class="question_colum" id="' + item.Id + '" name="multiple">' + item.TextQuestion + '_' + i + '</th>';
+                    }
+                    //Проверка на вхождение ответа с полем "Другое"
+                    let change_count = 1;
+                    let id_question_column = item.Id;
+                    let text_question = item.TextQuestion;
+                    $.each(set_of_answer_to_q[item.Id], function (i, item) {
+                        if (Number(tmp_lst_answer_all_model[item].AnswerType) == 1 && tmp_lst_answer_model[item].isFreeArea == true) {
+                            code += '<th class="question_colum other" id="' + id_question_column + '" name="multiple">' + text_question + '_' + change_count + '_др</th>';
+                            change_count++;
+                        }
+
+                    })
+                    $('tr.name_colum').append(code);
+                    code = '';
+                }
+                    break;
+                case 3: {
+
+                    let count_answer = set_of_answer_to_q[item.Id];
+                    let id_question_column = item.Id;
+                    console.log("Count free answer >>> ", count_answer);
+
+                    if (set_of_answer_to_q[item.Id].length > 1) {
+                        for (let i = 1; i <= set_of_answer_to_q[item.Id].length; i++) {
+                            code += '<th class="question_colum" id="' + id_question_column + '" name="free">' + item.TextQuestion + '_' + i + '</th>';
+                        }
+                        $('tr.name_colum').append(code);
+                        code = '';
+                    } else {
+                        code += '<th class="question_colum" id="' + id_question_column + '" name="free">' + item.TextQuestion + '</th>';
+                        $('tr.name_colum').append(code);
+                        code = '';
+                    }
+                }
+                    break;
+                case 4: {
+
+                    let tmp_lst_set_row = {};
+                    let id_question_column = item.Id;
+                    let count_row = 0;
+                    let zero_index_count = 0;
+                    let is_have_own_index = item.Bind == null ? false : true;
+                    
+                    $.each(tmp_lst_row[item.Id], function (i, item) {
+                        if (tmp_lst_set_row[item.IndexRow] == undefined || tmp_lst_set_row[item.IndexRow] == null) {
+                            tmp_lst_set_row[item.IndexRow] = [item];
+                        } else {
+                            tmp_lst_set_row[item.IndexRow].push(item);
+                        }
+                    })
+
+                    if (is_have_own_index == true) {
+                        $.each(tmp_lst_set_row, function (i, item) {
+                            if (i == 0) {
+                                zero_index_count = item.length;
+                            } else {
+                                if (count_row < item.length) count_row = item.length;
+                            }
+                        })
+                    } else {
+                        $.each(tmp_lst_set_row, function (i, _data) {
+                            count_row++;
                         });
                     }
-                    is_find = true;
-                    index_td++;
+                    console.log("Own index >> ", count_row);
+                    for (var i = 1; i <= (count_row + zero_index_count); i++) {
+                        code += '<th class="question_colum" id="' + id_question_column + '" name="table">' + item.TextQuestion + '_' + i + '</th>';
+                    }
+                    $('tr.name_colum').append(code);
+                    code = '';
+                }
                     break;
-                case 'free':
-                    if (item.AnswerID == 404) break;
-                    var is_find = true;
-                    element_answer.find('td.normal[id=' + item.QuestionID + ']').each(function () {
-                        if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false; }
-                    });
+                case 5:
                     break;
-                case 'table':
-                    if (item.AnswerID == 404) break;
-
-                    var is_find = true;
-                    element_answer.find('td.normal[id=' + item.QuestionID + ']').each(function () {
-                        if ($(this).text() == '' && is_find) { $(this).text(item.AnswerIndex); is_find = false; }
-                    })
-                    is_find = true;
-                    break;
-                case 'filter':
-                    if (item.AnswerID == 404) break;
-
-                    element_answer.find('td.normal[id=' + item.QuestionID + ']').text(item.AnswerIndex);
-                    if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').text(item.Text);
-                    break;
+                case 6:
+                    var has_area_other = false;
+                    //
+                    code += '<th class="question_colum" id="' + item.Id + '" name="filter">' + item.TextQuestion + '</th>';
+                    code += '<th class="question_colum other" id="' + item.Id + '" name="filter">' + item.TypeQuestion + '_др</th>';
+                    $('tr.name_colum').append(code);
+                    code = '';
                 default:
                     break;
             }
+
         })
+        ShowResultTable();
+        $('.PreLoader').hide();
+    }
+    //})
 
-        $('td[name=free]').css('color', 'red');
-        $('td.other').css('color', 'blue');
+    //Формировка таблицы с результатами ответов
+    function ShowResultTable() {
+        $('tr.answer_row').each(function () {
+            var UserID = $(this).find('input[name=UserID]').val();
+            var startDATE = $(this).find('.startDATE').text().split(' ');
+            var tmp_this = $(this);
+            $.each(list_schoolDay, function (i, item) {
+                //  var tmp = item.Date.toString();
+                // var string = tmp.split(' ');
 
-    });
+                if (item[0] == UserID && item[1] == startDATE[0]) {
+                    tmp_this.css("background-color", "grey");
+                }
+            })
+            //var result_list = [];
+            //var id_result_list = [];
+            let tr_element = $(this);
+            $.get("/Home/TableResultBlank", { id_blank: $(this).attr('id') })
+                .success(function (_server_data) {
+                    let result_list = [];
+                    let id_result_list = [];
+                    $.each(_server_data, function (i, item) {
+                        result_list.push(item);
+                        id_result_list.push(item.QuestionID);
+                    });
+
+                    let code = '';
+                    let element_answer = tr_element;
+                    $('th.question_colum').each(function () {
+                        let index = id_result_list.indexOf(Number($(this).attr('id')));
+                        let is_other = $(this).hasClass('other');
+                        if ($(this).hasClass('other'))
+                            element_answer.append('<td class="other" id="' + $(this).attr('id') + '"></td>');
+                        else
+                            element_answer.append('<td class="normal" id="' + $(this).attr('id') + '" name="' + $(this).attr('name') + '"></td>');
+                    });
+                    let index_td = 0;
+                    let last_multi_question;
+                    $.each(result_list, function (i, item) {
+                        let type_q = element_answer.find('td.normal[id=' + item.QuestionID + ']').attr('name');
+                        switch (type_q) {
+                            case 'single': {
+                                if (item.AnswerID == 404) break;
+                                element_answer.find('td.normal[id=' + item.QuestionID + ']').text(item.AnswerIndex);
+                                if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').html("<p class='text_td' onclick='ShowAllText($(this))'>" + item.Text + "</p>");
+                               // if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').text(item.Text);
+                            }
+                                break;
+                            case 'multiple': {
+                                if (item.AnswerID == 404) break;
+                                let elem = element_answer.find('td.normal[id=' + item.QuestionID + ']');
+                                let is_find = true;
+                                if (last_multi_question != item.QuestionID) index_td = 0;
+                                last_multi_question = item.QuestionID;
+                                elem[index_td].append(item.AnswerIndex);
+
+                                if (item.Text != null) {
+                                    element_answer.find('td.other[id=' + item.QuestionID + ']').each(function () {
+                                        if ($(this).text() == '' && is_find) { $(this).html("<p class='text_td' onclick='ShowAllText($(this))'>" + item.Text + "</p>"); is_find = false; }
+                                        //if ($(this).text() == '' && is_find) { $(this).text(item.Text); is_find = false; }
+                                    });
+                                }
+                                is_find = true;
+                                index_td++;
+                            }
+                                break;
+                            case 'free': {
+                                if (item.AnswerID == 404) break;
+                                let is_find = true;
+                                element_answer.find('td.normal[id=' + item.QuestionID + ']').each(function () {
+                                    if ($(this).text() == '' && is_find) { $(this).html("<p class='text_td' onclick='ShowAllText($(this))'>" + item.Text + "</p>"); is_find = false; }
+                                });
+                            }
+                                break;
+                            case 'table': {
+                                if (item.AnswerID == 404) break;
+
+                                let is_find = true;
+                                element_answer.find('td.normal[id=' + item.QuestionID + ']').each(function () {
+                                    if ($(this).text() == '' && is_find) { $(this).text(item.AnswerIndex); is_find = false; }
+                                })
+                                is_find = true;
+                            }
+                                break;
+                            case 'filter': {
+                                if (item.AnswerID == 404) break;
+
+                                element_answer.find('td.normal[id=' + item.QuestionID + ']').text(item.AnswerIndex);
+                                if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').html("<p class='text_td' onclick='ShowAllText($(this))'>" + item.Text + "</p>");
+                            }
+                                break;
+                            default:
+                                break;
+                        }
+                    })
+                    $('td[name=free]').css('color', 'red');
+                    $('td.other').css('color', 'blue');
+                })
+        });
+       
+    }
 
     function remove(arr, indexes) {
         var arrayOfIndexes = [].slice.call(arguments, 1);
@@ -530,4 +633,22 @@
                 preset: 'islands#blueCircleDotIcon'
             }));
     })
+
+    function ShowAllText(elemnt) {
+        if ($('div[name=DivBlockFull]').length > 0) {
+            $('div[name=DivBlockFull]').parent().find('p').show();
+            $('div[name=DivBlockFull]').remove();
+        }
+        elemnt.parent().css("padding", "0px");
+        elemnt.after("<div onclick='DeleteDivBlock($(this))' name='DivBlockFull' style='width: 100%; height: 100%;position:relative;display:flex;justify-content:center;align-items:center;'>"+
+            "<div class='ShowAllText' style='width:auto;height:auto;border:1px solid black;position: absolute;background:#008dd2; color:#fff;display:flex;justify-content:center;align-items:center;'><div>"
+            + elemnt.text() + "</div></div></div > ");
+        elemnt.hide();
+        $('div.ShowAllText').animate({ width: "250px", height: "75px", left: "-75px" }, 100, function () { });
+    }
+
+    function DeleteDivBlock(elemnt) {
+        elemnt.parent().find('p').show();
+        elemnt.remove();
+    }
 </script>

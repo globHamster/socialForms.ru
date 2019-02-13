@@ -19,9 +19,12 @@
 
     tr.name_colum th {
         border: 1px solid black;
-        background-color: rgba(135, 206, 235, 0.7);
+        background: #008dd2;
+        font-size: 12px;
         text-align: center;
-        min-width: 100px;
+        color: #fff;
+        font-weight:100;
+        padding: 0 5px;
     }
 
     div.table_blanks {
@@ -30,22 +33,41 @@
         padding: 15px;
     }
 
+
+    p.text_td {
+        min-width: 50px;
+        max-width: 250px;
+        white-space: nowrap; /* Отменяем перенос текста */
+        overflow: hidden; /* Обрезаем содержимое */
+        padding: 5px; /* Поля */
+        text-overflow: ellipsis;
+    }
+
+   
         div.table_blanks td {
-            min-width: 100px;
-            max-width: 200px;
+            /*min-width: 100px;
+            max-width: 200px;*/
             width: auto;
             border: 1px solid black;
             text-align: center;
+            font-size: 12px;
+            min-width: 50px;
+            
         }
 
-    table.into {
-        width: 100%;
-        height: 100%;
-        min-height: 43px;
-        max-height: 100px;
-        margin: 0px;
-        table-layout: fixed;
-    }
+            div.table_blanks td:hover {
+                background: #f0f0f0; /* Цвет фона */
+                white-space: normal;
+            }
+
+            table.into {
+                width: 100%;
+                height: 100%;
+                min-height: 43px;
+                max-height: 100px;
+                margin: 0px;
+                table-layout: fixed;
+            }
 
     .col_answer {
         width: 100px;
@@ -74,8 +96,6 @@
 </style>
 
 <div class="title">@ViewBag.ProjectName</div>
-<button class="clear_blanks" style="margin: 10px;">Очистить базу</button>
-<button class="export_button" style="margin: 10px;">Экспорт</button>
 <div id="table_blanks_new">
         @Html.Partial("_TableBlanks", Model)
 </div>
