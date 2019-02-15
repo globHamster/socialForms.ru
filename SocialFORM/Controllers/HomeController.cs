@@ -313,6 +313,7 @@ namespace SocialFORM.Controllers
             System.Diagnostics.Debug.WriteLine("Adding new project in table ..." + name_project);
             ProjectModel tmp = new ProjectModel();
             tmp.NameProject = name_project;
+            tmp.ActionProject = false;
             tmp.SettingEncode = "UTF-8";
             db4.SetProjectModels.Add(tmp);
             db4.SaveChanges();

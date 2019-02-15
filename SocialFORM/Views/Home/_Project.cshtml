@@ -9,29 +9,57 @@
         transition: left 0.7s;
         -webkit-transition: left 0.7s;
     }
+
     .btn {
-        padding: 3.5px 12px !important; 
+        padding: 3.5px 12px !important;
     }
+
     .toggle.btn {
         min-width: 59px;
         min-height: 30px !important;
     }
+
+    .btn_create_project {
+        width: 100px;
+        padding: 3px;
+        background-color: #fff;
+        color: #008dd2;
+        top: 0px;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+        .btn_create_project:hover {
+            background-color: #eee;
+        }
 </style>
 
 <h2>Список проектов</h2>
-
-<p>
-</p>
+<div name="PanelOfCreateProject">
+    <div style="display:inline-flex;justify-content:center;align-items:center;width:140px;height:30px;background:#008dd2;padding:1px;" onclick="ShowPanelCreateProject($(this))" name="ButtonOfCreateProject">
+        <div style="font-size:20px;font-weight:600;color:#CCFF90;margin-right:5px;">&#10010;</div>
+        <div style="font-size:11px;font-weight:600;color:#fff;">НОВЫЙ ПРОЕКТ</div>
+    </div>
+    <div style="position:relative;">
+        <div name="FieldOfCreateProject" style="width:300px;height:75px;display:none;background:#008dd2;position:relative;grid-template-columns: repeat(10, 1fr); padding: 5px;z-index:9999;">
+            <div style="grid-column: span 3;color: #fff;">Имя</div>
+            <div style="grid-column: span 7;"><input type="text" style="width:100%;" name="NameOfNewProject"></div>
+            <div style="grid-column: span 10;position:relative;height:30px;">
+                <div class="btn_create_project" style="right:103px;" onclick="CreateNewProject($(this))">
+                    <div>создать</div>
+                </div>
+                <div class="btn_create_project" style="right:0px;" onclick="HidePanelOfCreateProject($(this).parents('div[name=FieldOfCreateProject]'))">
+                    <div>отмена</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <table class="table">
-    <tr>
-        <th>
-
-            <span class="create_project" style="cursor: pointer;">Имя проекта </span><button class="create_project_button">Создать проект</button>
-        </th>
-        <th></th>
-    </tr>
-
-
     @foreach (var item in Model)
     {
         <tr class="project_layer">
@@ -85,6 +113,33 @@
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
+
+    function ShowPanelCreateProject(elemnt) {
+        elemnt.hide();
+        elemnt.parents('div[name=PanelOfCreateProject]').find('div[name=FieldOfCreateProject]').css({ "display": "grid" });
+    }
+
+    function CreateNewProject(elemnt) {
+        let name_project = elemnt.parents('div[name=FieldOfCreateProject]').find('input[name=NameOfNewProject]').val();
+        $.get('/Home/AddProject', { name_project: name_project })
+            .success(function (data) {
+                var code = '<tr class="project_layer">' +
+                    '<td id="' + data.Id + '">' +
+                    '<div class="NameProjectDiv" id="' + data.Id + '">' + data.NameProject + '</div>' +
+                    '</td>' +
+                    '</tr>' 
+                    
+                $('.table').append(code);
+                HidePanelOfCreateProject(elemnt.parents('div[name=FieldOfCreateProject]'))
+            })
+            .error(function () { alert('Не удалось добавить проект') });
+    }
+
+    function HidePanelOfCreateProject(elemnt) {
+        elemnt.hide();
+        elemnt.find('input[name=NameOfNewProject]').val("");
+        elemnt.parents('div[name=PanelOfCreateProject]').find('div[name=ButtonOfCreateProject]').css({ "display": "inline-flex" });
+    }
 
     $('table.table').on("click", ".AudioDown_all", function () {
         var id_project = $(this).attr('id');
@@ -162,40 +217,6 @@
             document.location.href = "/Home/ExportToEXCEL?id_p=" + $(this).attr('id') + "&name_file=" + $(this).parent().parent().find('td').first().text();
         })
 
-    });
-
-    $('.create_project').click(function () {
-        var code = '<input type="text" class="name_project" style="display: none;"/>'
-        $(this).after(code);
-        $('.create_project_button').fadeOut('slow');
-        $('.create_project').fadeOut('slow', function () {
-            $('.name_project').fadeIn('slow');
-        });
-    });
-    $('.table').on('keyup', '.name_project', function (event) {
-        if (event.keyCode == 13) {
-            var name_p;
-            name_p = $(this).val();
-            $(this).fadeOut('slow').remove();
-            $('.create_project').text(name_p).fadeIn('slow').css('margin-right', '15px');
-            $('.create_project_button').fadeIn('slow');
-        }
-    });
-
-    $('.create_project_button').click(function () {
-        $.get('/Home/AddProject', { name_project: $('.create_project').text() })
-            .success(function (data) {
-                var code = '<tr class="project_layer">' +
-                    '<td id="' + data.Id + '" >' + $('.create_project').text() +
-                    '</td><td>' +
-                    '<a href="/Home/Edit?id="' + data.Id + '>Изменить</a>' +
-                    '<a href="/Home/Details?id="' + data.Id + '>База данных</a>' +
-                    '<a href="/Home/Copi?id="' + data.Id + '>Копировать</a>' +
-                    '<a href="/Home/Delete?id="' + data.Id + '>Удалить</a>' +
-                    '</td ></tr >';
-                $('.table').append(code);
-            })
-            .error(function () { alert('Не удалось добавить проект') });
     });
 
     $('.show_blanks').click(function () {

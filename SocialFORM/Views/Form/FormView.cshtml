@@ -526,7 +526,8 @@
                     //    goNext();
                 }
                 break;
-            case 2:
+            case 2: {
+                console.log("Vulti8 question");
                 if ($("input[name=group]:checkbox:checked").length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
                     $('div.limit_checked_div').remove();
@@ -550,6 +551,7 @@
                     getStart();
                     //    goNext();
                 }
+            }
                 break;
             case 3:
                 if ($("input:text").val().length == 0) {
@@ -1098,15 +1100,10 @@
             if (tmp.find('input[name=group]').is(':checked')) {
                 $('.answer_table input[name=group]').prop('disabled', true).prop('checked', false);
                 tmp.find('input[name=group]').prop('disabled', false).prop('checked', true);
-                $('textarea.text_free_area').css('position', 'fixed').animate({ left: '+=100', opacity: 0 }, 1000);
+                $('textarea.text_free_area').remove();
             } else {
                 $('.answer_table input[name=group]').prop('disabled', false);
                 tmp.find('input[name=group]').prop('checked', false);
-                $('textarea.text_free_area').css({
-                    'position': 'relative',
-                    'opacity': 1,
-                    'left': 'auto'
-                }).hide();
             }
         }
     }

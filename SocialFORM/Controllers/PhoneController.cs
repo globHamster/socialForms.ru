@@ -603,15 +603,17 @@ namespace SocialFORM.Controllers
                     }
                 }
             }
-
+            string name_type = "(станц + моб)";
             if (lst_setting[4])
             {
                 tmp_lst_PT = tmp_lst_PT.Where(u => u.Type == 0).ToList();
+                name_type = "(станц)";
             }
 
             if (lst_setting[5])
             {
                 tmp_lst_PT = tmp_lst_PT.Where(u => u.Type == 1).ToList();
+                name_type = "(моб)";
             }
             try
             {
@@ -708,7 +710,7 @@ namespace SocialFORM.Controllers
                         }
                         mysql_db.Database.ExecuteSqlCommand("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + item.Phone + "','0')");
                     }
-                    mysql_db.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_table + ".csv\" WHERE Id=" + id_table);
+                    mysql_db.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_table + " "+name_type+".csv\" WHERE Id=" + id_table);
                 }
                 catch (Exception e)
                 {

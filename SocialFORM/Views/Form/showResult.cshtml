@@ -119,26 +119,14 @@
     $("#phone_number").mask("9(999) 999-9999");
 
     $('.save_data').click(function () {
+        $(this).prop("disabled", true);
         var string_answer = [];
-        //$('body').append('<div class="waiting_screen"><p>Идет сохранение</p></div>');
-        //$('div.waiting_screen').css({
-        //    'position': 'fixed',
-        //    'left': 0,
-        //    'top': 0,
-        //    'width': '100%',
-        //    'height': '100%',
-        //    'background-color': 'rgba(200, 200, 200, 0.7)'
-        //}).find('p').css({
-        //    'position': 'absolute',
-        //    'top': '40%',
-        //    'left': '40%',
-        //    'font-size': '70px'
-        //});
         if ($('input[name=phone_number]').val().length == 0) {
             $('input[name=phone_number]').blur();
             $('input[name=phone_number]').addClass('error_input_phone');
             $('input[name=phone_number]').after('<span class="error_input_phone">Введите номер телефона</span>');
             $('div.waiting_screen').remove();
+            $('.save_data').prop("disabled", false);
             return;
         }
         
@@ -259,6 +247,7 @@
                 //});
             })
             .error(function () {
+                $('.save_data').prop("disabled", false);
                 alert("Error");
                 $('div.waiting_screen').remove();
             })

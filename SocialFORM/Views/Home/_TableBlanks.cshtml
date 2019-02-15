@@ -72,7 +72,7 @@
         transition: 0.1s linear;
     }
 
-    .ScaledAllText{
+    .ScaledAllText {
         transform: scale(1.2,1.2);
         transition: .5s linear;
     }
@@ -262,7 +262,7 @@
             list_question[i].TextQuestion = tmp_lst_group_item[item];
         })
 
-        
+
 
         $.each(list_question, function (i, item) {
             switch (item.TypeQuestion) {
@@ -289,7 +289,7 @@
                         count_answer = Number(item.LimitCount);
                     }
 
-                    
+
 
                     for (var i = 1; i <= count_answer; i++) {
                         code += '<th class="question_colum" id="' + item.Id + '" name="multiple">' + item.TextQuestion + '_' + i + '</th>';
@@ -335,7 +335,7 @@
                     let count_row = 0;
                     let zero_index_count = 0;
                     let is_have_own_index = item.Bind == null ? false : true;
-                    
+
                     $.each(tmp_lst_row[item.Id], function (i, item) {
                         if (tmp_lst_set_row[item.IndexRow] == undefined || tmp_lst_set_row[item.IndexRow] == null) {
                             tmp_lst_set_row[item.IndexRow] = [item];
@@ -429,7 +429,7 @@
                                 if (item.AnswerID == 404) break;
                                 element_answer.find('td.normal[id=' + item.QuestionID + ']').text(item.AnswerIndex);
                                 if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').html("<p class='text_td' onclick='ShowAllText($(this))'>" + item.Text + "</p>");
-                               // if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').text(item.Text);
+                                // if (item.Text != null) element_answer.find('td.other[id=' + item.QuestionID + ']').text(item.Text);
                             }
                                 break;
                             case 'multiple': {
@@ -483,7 +483,7 @@
                     $('td.other').css('color', 'blue');
                 })
         });
-       
+
     }
 
     function remove(arr, indexes) {
@@ -640,7 +640,7 @@
             $('div[name=DivBlockFull]').remove();
         }
         elemnt.parent().css("padding", "0px");
-        elemnt.after("<div onclick='DeleteDivBlock($(this))' name='DivBlockFull' style='width: 100%; height: 100%;position:relative;display:flex;justify-content:center;align-items:center;'>"+
+        elemnt.after("<div onclick='DeleteDivBlock($(this))' name='DivBlockFull' style='width: 100%; height: 100%;position:relative;display:flex;justify-content:center;align-items:center;'>" +
             "<div class='ShowAllText' style='width:auto;height:auto;border:1px solid black;position: absolute;background:#008dd2; color:#fff;display:flex;justify-content:center;align-items:center;'><div>"
             + elemnt.text() + "</div></div></div > ");
         elemnt.hide();
