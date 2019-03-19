@@ -680,16 +680,6 @@
     <Content Include="Scripts\tableform_script.js" />
     <Content Include="Scripts\util.js" />
     <Content Include="Scripts\vfs_fonts.js" />
-    <Content Include="uploads\10_Тест_Анкета.wav" />
-    <Content Include="uploads\11_Тест_Анкета.wav" />
-    <Content Include="uploads\12_Тест_Анкета.wav" />
-    <Content Include="uploads\13_Тест_Анкета.wav" />
-    <Content Include="uploads\14_Тест_Анкета.wav" />
-    <Content Include="uploads\24_Тест_Анкета.wav" />
-    <Content Include="uploads\25_Тест_Анкета.wav" />
-    <Content Include="uploads\26_Тест_Анкета.wav" />
-    <Content Include="uploads\8_Тест_Анкета.wav" />
-    <Content Include="uploads\9_Тест_Анкета.wav" />
     <Content Include="Views\Form\FormView.cshtml" />
     <Content Include="Views\Form\showResult.cshtml" />
     <Content Include="Views\Group\FreeForm.cshtml" />
@@ -791,6 +781,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="uploads\" />
     <Folder Include="Views\Audio\" />
     <Folder Include="Views\DataBase\" />
     <Folder Include="Views\Home\Users\" />

@@ -52,10 +52,10 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
+        //Функция загрузки номеров с информацией во вторичную базу (Временно отключено из view)
         [HttpPost]
         public void TestImport(string table)
         {
-            Dictionary<string, int> callback = new Dictionary<string, int>();
             try
             {
                 var fileContent = Request.Files[0];
@@ -68,7 +68,6 @@ namespace SocialFORM.Controllers
                     StreamReader streamReader = new StreamReader(stream, Encoding.GetEncoding(1251));
                     String str;
                     List<FormNumber> lst_phone = new List<FormNumber>();
-                    int count = 1;
                     do
                     {
                         str = streamReader.ReadLine();
@@ -111,8 +110,9 @@ namespace SocialFORM.Controllers
                             }
                             tmp.Address = tmp_str[5];
                             tmp.Education = "";
+                            tmp.Type = tmp.Phone.ElementAt(1) == '9' ? 1 : 0;
+                            tmp.TypeNP = false;
                             lst_phone.Add(tmp);
-                            count++;
                         }
                         else
                         {
@@ -136,7 +136,6 @@ namespace SocialFORM.Controllers
                         }
                         iter++;
                     }
-                    System.Diagnostics.Debug.WriteLine("Count >>> " + lst_phone.Count());
                     db.SetFormNumbers.AddRange(lst_phone);
                     db.SaveChanges();
 
@@ -817,7 +816,7 @@ namespace SocialFORM.Controllers
             }
             List<string> tt_ = lst_db_phone_pt.Select(u => u.Phone).Intersect(tmp).ToList();
             List<string> cmd_phone_lst = new List<string>();
-            if (type_load == "завершено")
+            if (type_load == "завершено" || type_load == "all")
             {
                 tt_.ForEach(u =>
                 {
@@ -1019,7 +1018,9 @@ namespace SocialFORM.Controllers
 
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                System.Diagnostics.Debug.WriteLine(e.Source);
             }
         }
 
@@ -1129,7 +1130,7 @@ namespace SocialFORM.Controllers
                     {
                         skip_tmp_form_number.TypeNP = lst_typeNP.First(u => u.BlankID == item.Id).AnswerIndex == 1 ? false : true;
                     }
-                    skip_tmp_form_number.Type = item.PhoneNumber.CompareTo("89000000000") == -1 ? 0 : 1;
+                    skip_tmp_form_number.Type = item.PhoneNumber.CompareTo("79000000000") == -1 ? 0 : 1;
                     skiping_numbers.Add(skip_tmp_form_number);
                 }
             }
@@ -1182,6 +1183,8 @@ namespace SocialFORM.Controllers
                     tmp.Phone = item.Phone;
                     tmp.Status = "завершено";
                     tmp.Type = item.Type;
+                    tmp.isActual = false;
+                    tmp.TimeCall = DateTime.Parse(DateTime.Now.ToLongDateString());
                     db.SetPTs.Add(tmp);
                     await db.SaveChangesAsync();
                 }

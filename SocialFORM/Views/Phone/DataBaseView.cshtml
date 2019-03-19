@@ -23,10 +23,10 @@
         transition: .1s linear;
     }
 </style>
-<div style="padding:5px;background-color:#66bb6a;">
+@*<div style="padding:5px;background-color:#66bb6a;">
     <div><input type="file" id="backup_file_number" /></div>
     <div><input type="button" value="Load..." onclick="LoadBackupFile()" /></div>
-</div>
+</div>*@
 
 <div name="panel_filter" style="border-radius: 10px 10px 0 0;background:#81c784;width:100%;padding:5px;">
     <select name="ListFO" onchange="ChangeFO($(this).find('option:selected').val())">
@@ -177,8 +177,8 @@
                     "<div name='rename_VGOR' class='col1_grid'>Внутигородской район</div><div name='text_rename_VGOR' class='col2_grid'><input type='text' value='" + server_data.VGOR + "'/></div>" +
                     "<div name='rename_Sex' class='col1_grid'>Пол</div><div name='text_rename_Sex' class='col2_grid'>" +
                     "<select>" +
-                    "<option value='0'>Мужской</option>" +
-                    "<option value='1'>Женский</option>"+
+                    "<option value='0' " + (server_data.Sex == 0 ? "selected" : "") + ">Мужской</option>" +
+                    "<option value='1' " + (server_data.Sex == 1 ? "selected" : "") + ">Женский</option>" +
                     "</select>" +
                     "</div>"+
                     "<div name='rename_Age' class='col1_grid'>Возрост</div><div name='text_rename_Age' class='col2_grid'><input type='text' value='" + server_data.Age + "'/></div>" +
@@ -723,7 +723,7 @@
             name_GOR = "empty";
             name_OB = "empty";
         }
-        if (type_load == 3) {
+        if (type_load == 3 || type_load == 1) {
             let result = confirm("В этом случае все выбронные номера пометятся как \"connect\"\nВы уверены?");
             if (result == false) {
                 return;
