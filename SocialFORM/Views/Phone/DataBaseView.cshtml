@@ -1,6 +1,6 @@
 ﻿<link href="~/Content/css/phone_databaseview.css" rel="stylesheet" />
 <style>
-    div[name=form_free_table_mysql] > div:hover {
+    div[name=form_free_table_mysql] > div[name=item_table_el]:hover {
         background: #008dd2;
         color: #fff;
         cursor: pointer;
@@ -13,11 +13,21 @@
         transform: scale(1.1,1.1);
         transition: 0.1s linear;
     }
+    div.elem_of_setting{
+        cursor: pointer;
+    }
+    div.elem_of_setting:hover {
+        background: #008dd2;
+        color:#fff;
+        font-weight:600;
+        transition: .1s linear;
+    }
 </style>
-<div style="display:inline-flex;width:100%;">
-    <div><input type="file" id="file_with_years" /></div>
-    <div><input type="button" value="Load..." onclick="ImportNumbersWithYears()" /></div>
+<div style="padding:5px;background-color:#66bb6a;">
+    <div><input type="file" id="backup_file_number" /></div>
+    <div><input type="button" value="Load..." onclick="LoadBackupFile()" /></div>
 </div>
+
 <div name="panel_filter" style="border-radius: 10px 10px 0 0;background:#81c784;width:100%;padding:5px;">
     <select name="ListFO" onchange="ChangeFO($(this).find('option:selected').val())">
         <option value="" disabled selected>Выберите из списка ...</option>
@@ -49,9 +59,9 @@
     <div name="filter_Sex">
         Пол
         <select>
-            <option value="0" selected>Все</option>
-            <option value="Мужской">Мужской</option>
-            <option value="Женский">Женский</option>
+            <option value="-1" selected>Все</option>
+            <option value="0">Мужской</option>
+            <option value="1">Женский</option>
         </select>
     </div>
     <div name="type_phone">
@@ -76,10 +86,14 @@
         <div name="reset_filter_btn" style="border-radius:10px;" class="search_btn" onclick="ResetMassive()">Сброс</div>
     </div>
 </div>
-<div name="panel_find_number" style="width:100%;background:#81c784;display:inline-flex;padding:10px;border-radius: 0 0 10px 10px;">
+<div name="panel_find_number" style="width:100%;background:#81c784;display:inline-flex;padding:5px;">
     <input type="text" placeholder="Номер телефона" name="input_number_phone"/>
     <div class="search_btn" style="border-radius:10px;" onclick="FindNumberInList()">Найти</div>
 </div> 
+<div style="width:100%;background-color:#008dd2;display:grid;grid-template-columns: repeat(10, 1fr);">
+    <div style="color:#fff;grid-column: span 2;padding:3px;font-size:13px;font-weight:600;">Общее количество</div>
+    <div name="common_count_array" style="width:80%;color:#fff;grid-column: span 8;padding:3px;font-size:14px;font-weight:600;"></div>
+</div>
 <div class="TablePhone">
     <div class="TableCont">
         <div class='item_form_numb'>
@@ -107,7 +121,6 @@
 </div>
 <script>
     let form_number_massive, backup_form_number_massive;
-    let is_filtred = false;
     let lst_form_numb = [];
 
     $(function () {
@@ -119,12 +132,6 @@
                     })
                 }
             })
-
-        //$.get("/Phone/GetInfoNumber")
-        //    .success(function (server_data) {
-        //        lst_form_numb = server_data;
-        //        $('div.NotLoader').removeClass('NotLoader');
-        //    })
     })
 
     function GetFilePhone() {
@@ -133,7 +140,7 @@
         var KodGOR = $('select[name=ListGOR]').find('option:selected').val();
         document.location.href = "/Phone/ImportFile?FO=" + KodFO + "&OB=" + KodOB + "&GOR=" + KodGOR;
     }
-
+    //Функция отрисовки листа с номерами
     function WriteTable(container, mass, page_iter) {
         container.find('.item_form_numb').remove()
         var length_lst = mass.length;
@@ -146,14 +153,14 @@
                 "<div name='NP'>" + mass[i].NP + "</div>" +
                 "<div name='VGOR'>" + mass[i].VGOR + "</div>" +
                 "<div name='Phone'>" + mass[i].Phone + "</div>" +
-                "<div name='Sex'>" + mass[i].Sex + "</div>" +
+                "<div name='Sex'>" + (mass[i].Sex == false ? "М" : "Ж") + "</div>" +
                 "<div name='Age'>" + mass[i].Age + "</div>" +
                 "<div name='Address'>" + mass[i].Address + "</div>" +
                 "<div name='TypeNP'>"+(mass[i].TypeNP == false ? "город" : "село/деревня")+"</div>"+
                 "</div>")
         }
     }
-
+    //Загрузка панели редактора информации по номеру
     function LoadEditer(numb_phone, iter) {
         $.get("/Phone/GetFormNumber", { numb: numb_phone })
             .success(function (server_data) {
@@ -168,7 +175,12 @@
                     "<div class='editer_form_numb'>" +
                     "<div name='rename_NP' class='col1_grid'>Населенный пункт</div><div name='text_rename_NP' class='col2_grid'><input type='text' value='" + server_data.NP + "'/></div>" +
                     "<div name='rename_VGOR' class='col1_grid'>Внутигородской район</div><div name='text_rename_VGOR' class='col2_grid'><input type='text' value='" + server_data.VGOR + "'/></div>" +
-                    "<div name='rename_Sex' class='col1_grid'>Пол</div><div name='text_rename_Sex' class='col2_grid'><input type='text' value='" + server_data.Sex + "'/></div>" +
+                    "<div name='rename_Sex' class='col1_grid'>Пол</div><div name='text_rename_Sex' class='col2_grid'>" +
+                    "<select>" +
+                    "<option value='0'>Мужской</option>" +
+                    "<option value='1'>Женский</option>"+
+                    "</select>" +
+                    "</div>"+
                     "<div name='rename_Age' class='col1_grid'>Возрост</div><div name='text_rename_Age' class='col2_grid'><input type='text' value='" + server_data.Age + "'/></div>" +
                     "<div name='rename_Address' class='col1_grid'>Адрес</div><div name='text_rename_Address' class='col2_grid'><input type='text' value='" + server_data.Address + "'/></div>" +
                     "<div name='rename_Education' class='col1_grid'>Образование</div><div name='text_rename_Education' class='col2_grid'><input type='text' value='" + server_data.Education + "'/></div>" +
@@ -188,6 +200,7 @@
         return -1;
     }
 
+    //Сохранение новой информации по номеру
     function SaveChangeFormNumb() {
         var container = $('body').find('div.panel_editer');
         var iter_update = Number(container.find('input[name=hidden_iter]').val());
@@ -198,17 +211,18 @@
             NP: container.find('div[name=text_rename_NP]').find('input').val() != "" ? container.find('div[name=text_rename_NP]').find('input').val() : " ",
             VGOR: container.find('div[name=text_rename_VGOR]').find('input').val() != "" ? container.find('div[name=text_rename_VGOR]').find('input').val() : " ",
             Phone: container.find('input[name=hidden_Phone]').val(),
-            Sex: container.find('div[name=text_rename_Sex]').find('input').val() != "" ? container.find('div[name=text_rename_Sex]').find('input').val() : " ",
+            Sex: container.find('div[name=text_rename_Sex]').find('option:selected').val() == 0 ? false : true,
             Age: container.find('div[name=text_rename_Age]').find('input').val() != "" ? Number(container.find('div[name=text_rename_Age]').find('input').val()) : " ",
             Address: container.find('div[name=text_rename_Address]').find('input').val() != "" ? container.find('div[name=text_rename_Address]').find('input').val() : " ",
             Education: container.find('div[name=text_rename_Education]').find('input').val() != "" ? container.find('div[name=text_rename_Education]').find('input').val() : " ",
             Type: Number(container.find('div[name=text_rename_Type]').find('select').find('option:selected').val()),
             TypeNP: Number(container.find('div[name=text_rename_TypeNP]').find('select').find('option:selected').val()) == 0 ? false : true 
         };
-        console.log(query);
         $.post("/Phone/SetFormNumber", { _fn: query })
             .success(function (code) {
                 if (code == 200) {
+                    let year_now = new Date(Date.now()).getFullYear();
+                    query.Age = year_now - query.Age;
                     $('body').find('div.block_panel_editer').remove()
                     form_number_massive[iter_update] = query;
                     let index_arr = find(backup_form_number_massive, form_number_massive[iter_update].Phone);
@@ -216,7 +230,6 @@
                         backup_form_number_massive[index_arr] = query;
                     }
                     var paging_number = Number($('div[name=paging_number]').attr('id'));
-                    
                     WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
                 }
                 if (code == 0) {
@@ -228,6 +241,7 @@
             })
     }
 
+    //Смена листа с номерами
     function ChangePage(page_numb) {
         page_numb = jQuery.isNumeric(page_numb) ? page_numb : 1;
         var page_length = Math.ceil(form_number_massive.length / 30);
@@ -242,6 +256,7 @@
         WriteTable($('div[name=content_table]'), form_number_massive, page_numb);
     }
 
+    //Загрузка и перерисовка списка областей
     function ChangeFO(code) {
         $('select[name=ListOB]').find('option:not(:disabled)').remove();
         $('select[name=ListOB]').find('option:disabled').prop('selected', true);
@@ -257,6 +272,7 @@
             })
     }
 
+    //Загрузка и перерисовка списка городских округов
     function ChangeOB(codeFO, codeOB) {
         $('select[name=ListGOR]').find('option:not(:disabled)').remove();
         $('select[name=ListGOR]').find('option:disabled').prop('selected', true);
@@ -270,6 +286,7 @@
             })
     }
 
+    //Загрузка номеров из базы
     function BeginSearch() {
         var KodFO = $('select[name=ListFO]').find('option:selected').val();
         var KodOB = $('select[name=ListOB]').find('option:selected').val();
@@ -282,6 +299,7 @@
                 form_number_massive = server_data.clone();
                 backup_form_number_massive = server_data.clone();
                 WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
+                $('div[name=common_count_array]').text(form_number_massive.length);
                 $('div[name=second_panel_filter]').css("display", "inline-flex");
                 var lst_NP = {};
                 var lst_VGOR = {};
@@ -303,10 +321,7 @@
             })
     }
 
-    function FilterSearch() {
-        is_filtred = true;
-    }
-
+    //Отфильтровать номера по параметрам
     function CheckFiltredItem() {
         form_number_massive = backup_form_number_massive.clone();
         let _filter_NP = $('div[name=second_panel_filter]').find('div[name=filter_NP]').find('option:selected').val();
@@ -336,7 +351,7 @@
                 i--;
                 continue;
             }
-            if (_sex != 0 && String(form_number_massive[i].Sex).toLowerCase() != _sex.toLowerCase()) {
+            if (_sex != -1 && form_number_massive[i].Sex != (_sex == 0 ? false : true)) {
                 form_number_massive.splice(i, 1);
                 limit_mass--;
                 i--;
@@ -370,6 +385,7 @@
         $('div[name=paging_number]').attr('id', 1);
         $('div[name=paging]').find('input').val(1);
         WriteTable($('div[name=content_table]'), form_number_massive, 1);
+        $('div[name=common_count_array]').text(form_number_massive.length);
     }
 
     function ResetMassive() {
@@ -437,6 +453,7 @@
     }
     //END BLOCK
 
+    //Сортирова по населенному пункту
     function SortToNP(container) {
         if (container.parents('.TablePhone').find('.phone_form').length == 0) {
             return;
@@ -464,7 +481,7 @@
             return;
         }
     }
-
+    //Сортировка по полу
     function SortToSex(container) {
         if (container.parents('.TablePhone').find('.phone_form').length == 0) {
             return;
@@ -474,25 +491,25 @@
         if (!container.hasClass('SortUp') && !container.hasClass('SortDown')) {
             container.parent().find('.SortUp').removeClass('SortUp');
             container.parent().find('.SortDown').removeClass('SortDown');
-            form_number_massive = form_number_massive.sort(sortUP_String("Sex"));
+            form_number_massive = form_number_massive.sort(sortUP_Number("Sex"));
             WriteTable($('div[name=content_table]'), form_number_massive, 1);
             container.addClass('SortUp');
             return;
         }
         if (container.hasClass('SortUp')) {
-            form_number_massive = form_number_massive.sort(sortDOWN_String("Sex"));
+            form_number_massive = form_number_massive.sort(sortDOWN_Number("Sex"));
             WriteTable($('div[name=content_table]'), form_number_massive, 1);
             container.removeClass('SortUp').addClass('SortDown');
             return;
         }
         if (container.hasClass('SortDown')) {
-            form_number_massive = form_number_massive.sort(sortUP_String("Sex"));
+            form_number_massive = form_number_massive.sort(sortUP_Number("Sex"));
             WriteTable($('div[name=content_table]'), form_number_massive, 1);
             container.removeClass('SortDown').addClass('SortUp');
             return;
         }
     }
-
+    //Сортировка по возрасту
     function SortToAge(container) {
         if (container.parents('.TablePhone').find('.phone_form').length == 0) {
             return;
@@ -521,7 +538,7 @@
         }
 
     }
-
+    //Сортировка по номерам телефонов
     function SortToPhone(container) {
         if (container.parents('.TablePhone').find('.phone_form').length == 0) {
             return;
@@ -549,7 +566,7 @@
             return;
         }
     }
-
+    //Переход на следующий лист
     function Page_Move_Next() {
         var page = Number($('div[name=paging_number]').attr('id')) + 1;
         var page_length = Math.ceil(form_number_massive.length / 30);
@@ -560,7 +577,7 @@
         $('div[name=paging]').find('input').val(page);
         WriteTable($('div[name=content_table]'), form_number_massive, page);
     }
-
+    //Переход на предыдущий лист
     function Page_Move_Previos() {
         var page = Number($('div[name=paging_number]').attr('id')) - 1;
         var page_length = Math.ceil(form_number_massive.length / 30);
@@ -571,7 +588,7 @@
         $('div[name=paging]').find('input').val(page);
         WriteTable($('div[name=content_table]'), form_number_massive, page);
     }
-
+    //Загрузка общего количества номеров в базе по разделам
     function GetInfoNumber(div_cont) {
         if (lst_form_numb.length == 0) {
             div_cont.text("LOAD...");
@@ -643,14 +660,14 @@
             $(this).slideUp(300);
         })
     }
-
+    //Выгрузка номеров в CSV файл
     function ImportToCSV() {
         var KodFO = $('select[name=ListFO]').find('option:selected').val();
         var KodOB = $('select[name=ListOB]').find('option:selected').val();
         var KodGOR = $('select[name=ListGOR]').find('option:selected').val();
         window.location.href = "/Phone/ImportFileCSV?FO=" + KodFO + "&OB=" + KodOB + "&GOR=" + KodGOR;
     }
-
+    //Загрузка номеров в Oktell
     function FormImportToOktell(cont) {
         if ($('div[name=form_free_table_mysql]').length != 0) {
             $('div[name=form_free_table_mysql]').remove();
@@ -658,11 +675,10 @@
             cont.after("<div style='width:200px;height:auto;display: block;position: absolute ; border: 1px solid #008dd2;z-index:10;margin: 0px 3px;background: #fff;' name='form_free_table_mysql'></div>");
             $.get("/Phone/GetFreeNameTable")
                 .success(function (server_data) {
-
                     var panel_free_table = $('div[name=form_free_table_mysql]');
                     $.each(server_data, function (i, item) {
                         if (item == "" || item == null) {
-                            panel_free_table.append("<div id='" + (i + 1) + "' onclick='TestFunction($(this))'>Табллица " + (i + 1) + "</div>")
+                            panel_free_table.append("<div style='text-align:center;padding:2px;' name='item_table_el' id='" + (i + 1) + "' onclick='TestFunction($(this))'>Таблица " + (i + 1) + "</div>")
                         }
                     })
                 })
@@ -670,28 +686,63 @@
     }
 
     function TestFunction(cont) {
-        const name_FO = $('select[name=ListFO]').find('option:selected').val() != "" ? $('select[name=ListFO]').find('option:selected').text() : null;
-        const name_OB = $('select[name=ListOB]').find('option:selected').val() != "" ? $('select[name=ListOB]').find('option:selected').text() : null;
-        const name_GOR = $('select[name=ListGOR]').find('option:selected').val() != "" ? $('select[name=ListGOR]').find('option:selected').text() : null;
-        cont.parent().remove();
+        let parent_cont = cont.parent();
+        let id_cont = cont.attr('id');
+        if (cont.hasClass('OpenSetting')) {
+            parent_cont.find('div[name=setting_for_load]').slideUp(200);
+            cont.removeClass('OpenSetting');
+        } else {
+            parent_cont.find('div[name=setting_for_load]').remove();
+            cont.addClass('OpenSetting');
+            cont.after("<div name='setting_for_load' style='width:100%;background-color:#cfd8dc;display:none;'>" +
+                "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(1," + id_cont + ");'>Все номера</div>" +
+                "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(2,"+id_cont+");'>[connect]</div>" +
+                "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(3,"+id_cont+");'>[завершено]</div>" +
+                "</div>");
+            parent_cont.find('div[name=setting_for_load]').slideDown(200);
+        }
+    }
+    function FuncLoadNumberOktell(type_load, cont) {
+        let name_FO = $('select[name=ListFO]').find('option:selected').val() != "" ? $('select[name=ListFO]').find('option:selected').text() : null;
+        let name_OB = $('select[name=ListOB]').find('option:selected').val() != "" ? $('select[name=ListOB]').find('option:selected').text() : null;
+        let name_GOR = $('select[name=ListGOR]').find('option:selected').val() != "" ? $('select[name=ListGOR]').find('option:selected').text() : null;
         let name_table;
         if (name_GOR != null) {
             name_table = name_GOR;
+            name_GOR = $('select[name=ListGOR]').find('option:selected').val();
+            name_OB = $('select[name=ListOB]').find('option:selected').val();
+            name_FO = $('select[name=ListFO]').find('option:selected').val();
         } else if (name_OB != null) {
             name_table = name_OB;
+            name_OB = $('select[name=ListOB]').find('option:selected').val();
+            name_FO = $('select[name=ListFO]').find('option:selected').val();
+            name_GOR = "empty";
         } else if (name_FO != null) {
             name_table = name_FO;
+            name_FO = $('select[name=ListFO]').find('option:selected').val();
+            name_GOR = "empty";
+            name_OB = "empty";
+        }
+        if (type_load == 3) {
+            let result = confirm("В этом случае все выбронные номера пометятся как \"connect\"\nВы уверены?");
+            if (result == false) {
+                return;
+            }
         }
         let massive_to_load_oktell = [];
         $.each(form_number_massive, function (i, item) {
             massive_to_load_oktell.push(item.Phone);
         })
-        $.post("/Phone/TestFuncTest", { name: name_table, id_table: cont.attr('id'), tmp: massive_to_load_oktell })
+        $('div[name=form_free_table_mysql]').remove();
+        $('.PreLoader').show();
+        $.post("/Phone/TestFuncTest", { name_FO: name_FO, name_OB: name_OB, name_GOR: name_GOR, type: type_load, name: name_table, id_table: cont, tmp: massive_to_load_oktell })
             .success(function () {
+                $('.PreLoader').hide();
                 alert("Success");
             })
     }
 
+    //Поиск номера в списке
     function FindNumberInList() {
         if (form_number_massive == undefined || backup_form_number_massive == undefined) {
             alert("Список номеров пуст");
@@ -713,14 +764,10 @@
 
         WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
         $('div[name=second_panel_filter]').css("display", "inline-flex");
-        
-        console.log("length form : " + form_number_massive.length);
-        console.log("length tmp : " + tmp_form_number_massive.length);
     }
 
-    function ImportNumbersWithYears() {
-        
-        var file = document.getElementById('file_with_years').files;
+    function LoadBackupFile() {
+        var file = document.getElementById('backup_file_number').files;
         if (file.length == 0) {
             alert("File empty");
         } else {
@@ -730,7 +777,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "/Phone/ImportNumberWithYears",
+                    url: "/Phone/LoadBackup",
                     contentType: false,
                     processData: false,
                     data: data,

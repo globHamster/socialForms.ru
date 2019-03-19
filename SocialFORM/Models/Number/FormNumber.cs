@@ -17,7 +17,7 @@ namespace SocialFORM.Models.Number
         public string VGOR { get; set; }
         [Key]
         public string Phone { get; set; }
-        public string Sex { get; set; }
+        public bool Sex { get; set; }
         public int? Age { get; set; }
         public string Address { get; set; }
         public string Education { get; set; }

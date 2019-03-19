@@ -43,9 +43,11 @@
 
     function ClearTable() {
         if ($('table.TableOfNumbers').find('.IsCheckedTR').length != 0) {
+            $('.PreLoader').show();
             var id = Number($('table.TableOfNumbers').find('.IsCheckedTR').attr('id'))
             $.post("/Phone/SynchNumbers", { id_table: id })
                 .success(function () {
+                    $('.PreLoader').hide();
                     alert("Success!!!");
                     //$.post("/Home/ClearTable", { id: id })
                     //    .success(function () {
