@@ -992,7 +992,7 @@ namespace SocialFORM.Controllers
                             ulong.TryParse(tmp_str[1], out phone_sex);
                             if (phone_sex != 0)
                             {
-                                phone_sex += 10000000000;
+
                                 hashTypeSex.Add(phone_sex.ToString(), type_sex);
                             }
 
