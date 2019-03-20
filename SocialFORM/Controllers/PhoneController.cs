@@ -31,22 +31,22 @@ namespace SocialFORM.Controllers
         {
             return View();
         }
-
+        //Представление вторичной базы
         public ActionResult DataBaseView()
         {
             return PartialView();
         }
-
+        //Представление первичной базы
         public ActionResult PrimaryTableView()
         {
             return PartialView();
         }
-
+        //Представление синхронизации информации с номером
         public ActionResult SyncWithBlanksView()
         {
             return PartialView();
         }
-
+        //Представление генератора номеров
         public ActionResult GeneratorView()
         {
             return PartialView();
@@ -183,6 +183,7 @@ namespace SocialFORM.Controllers
 
         }
 
+        //Выгрузка листа с кодом FO
         [HttpGet]
         public JsonResult getListFO()
         {
@@ -198,6 +199,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Выгрузка листа с кодом OB
         [HttpGet]
         public JsonResult getListOB(string code)
         {
@@ -212,6 +214,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Выгрузка листа с кодом GOR
         [HttpGet]
         public JsonResult getListGOR(string codeFO, string codeOB)
         {
@@ -225,7 +228,7 @@ namespace SocialFORM.Controllers
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
         }
-
+        //Выгрузка листа номеров в формате EXCEL из вторичной базы
         [HttpGet]
         public void ImportFile(string FO, string OB, string GOR)
         {
@@ -294,7 +297,7 @@ namespace SocialFORM.Controllers
             Response.End();
 
         }
-
+        //Выгрузка листа номеров в фомате CSV из вторичной базы
         [HttpGet]
         public void ImportFileCSV(string FO, string OB, string GOR)
         {
@@ -460,7 +463,7 @@ namespace SocialFORM.Controllers
             public string Number { get; set; }
             public string Status { get; set; }
         }
-
+        //Получение номеров для первичной базы в соответствии с настройками
         [HttpGet]
         public JsonResult GetNumberStatus(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers)
         {
@@ -583,7 +586,7 @@ namespace SocialFORM.Controllers
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
-
+        //Загрузка номеров в сценарий через первичную базу
         [HttpPost]
         public void ImportNumberToOktell(string FO, string OB, string GOR, int id_table, string settings, short type_load, List<string> time, short type_select)
         {
@@ -730,14 +733,14 @@ namespace SocialFORM.Controllers
                 }
             }
         }
-
+        //Получение списка свободных таблиц сценриев
         [HttpGet]
         public JsonResult GetFreeNameTable()
         {
             List<string> tmp = mysql_db.Database.SqlQuery<string>("SELECT Name FROM name_table").ToList();
             return Json(tmp, JsonRequestBehavior.AllowGet);
         }
-
+        //Функция очистки сценария 
         [HttpPost]
         public void SynchNumbers(int id_table)
         {
@@ -965,6 +968,7 @@ namespace SocialFORM.Controllers
             return el;
         }
 
+        //Загрузка пола в соответствии с номером
         [HttpPost]
         public void LoadBackup()
         {
@@ -1024,6 +1028,7 @@ namespace SocialFORM.Controllers
             }
         }
 
+        //Сбор информации по номеру из базы анкет
         [HttpGet]
         public async Task<JsonResult> SyncBlankWithDB(int p_id, int gor_id, int s_id = 0, int a_id = 0, int np_id = 0, int typeNP_id = 0)
         {
