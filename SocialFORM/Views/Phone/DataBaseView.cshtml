@@ -394,6 +394,7 @@
         $('div[name=paging_number]').attr('id', 1);
         $('div[name=paging]').find('input').val(1);
         form_number_massive = backup_form_number_massive.clone();
+        $('div[name=common_count_array]').text(form_number_massive.length);
         WriteTable($('div[name=content_table]'), form_number_massive, 1);
     }
 

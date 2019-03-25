@@ -448,12 +448,7 @@ namespace SocialFORM.Controllers
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.StackTrace);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                System.Diagnostics.Debug.WriteLine(e.Data);
-                System.Diagnostics.Debug.WriteLine(e.HResult);
-                System.Diagnostics.Debug.WriteLine(e.InnerException);
-                System.Diagnostics.Debug.WriteLine(e.Source);
+                Response.AppendToLog(e.StackTrace);
             }
         }
 
@@ -467,24 +462,25 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public JsonResult GetNumberStatus(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers)
         {
-
             List<bool> lst_setting = new List<bool>();
             foreach (var item in settings.Split(','))
             {
                 lst_setting.Add(item == "false" ? false : true);
             }
-            List<PT> lst_PT = db.SetPTs.ToList();
-            if (FO != "")
+            List<PT> lst_PT;
+
+            if (GOR != "")
             {
-                lst_PT = lst_PT.Where(u => u.FO == FO).ToList();
-                if (OB != "")
-                {
-                    lst_PT = lst_PT.Where(u => u.OB == OB).ToList();
-                    if (GOR != "")
-                    {
-                        lst_PT = lst_PT.Where(u => u.GOR == GOR).ToList();
-                    }
-                }
+                lst_PT = db.SetPTs.Where(u => u.FO == FO && u.OB == OB && u.GOR == GOR).ToList();
+            } else if ( OB != "")
+            {
+                lst_PT = db.SetPTs.Where(u => u.FO == FO && u.OB == OB).ToList();
+            } else if (FO != "")
+            {
+                lst_PT = db.SetPTs.Where(u => u.FO == FO).ToList();
+            } else
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
             }
 
             if (lst_setting[4])
@@ -501,41 +497,41 @@ namespace SocialFORM.Controllers
             {
                 List<PT> tmp_lst_PT = new List<PT>();
 
-                if (lst_setting[0])
+                if (!lst_setting[0])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "0").ToList());
+                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "0")).ToList();
                 }
 
-                if (lst_setting[1])
+                if (!lst_setting[1])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "занято").ToList());
+                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "занято")).ToList();
                 }
 
-                if (lst_setting[2])
+                if (!lst_setting[2])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "нет ответа").ToList());
+                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "нет ответа")).ToList();
                 }
 
-                if (lst_setting[3])
+                if (!lst_setting[3])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "1" || u.Status == "завершено").ToList());
+                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "1" || u.Status == "завершено")).ToList();
                 }
 
-                if (lst_setting[6])
+                if (!lst_setting[6])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "линия не найдена").ToList());
+                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "линия не найдена")).ToList();
                 }
 
-                if (lst_setting[7])
+                if (!lst_setting[7])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "перезвонить").ToList());
+                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "перезвонить")).ToList();
                 }
 
-                if (lst_setting[8])
+                if (!lst_setting[8])
                 {
-                    tmp_lst_PT.AddRange(lst_PT.Where(u => u.Status == "connect").ToList());
+                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "connect")).ToList();
                 }
-                lst_PT = tmp_lst_PT;
+
                 switch (type_select)
                 {
                     case 0:
@@ -544,17 +540,14 @@ namespace SocialFORM.Controllers
                         break;
                     default:
                         break;
-
                 }
 
                 List<string> time_arg_tmp = mass_time?.Split('|').ToList() ?? null;
                 if (time_arg_tmp != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("Time not null");
                     if (iterval > 0)
                     {
                         DateTime time_tmp_ = DateTime.Parse(time_arg_tmp[0]);
-                        System.Diagnostics.Debug.WriteLine("Time of interval >>> " + time_tmp_.ToLocalTime());
                         if (invers == true)
                         {
                             lst_PT = lst_PT.Where(u => u.TimeCall < time_tmp_).ToList();
@@ -566,21 +559,15 @@ namespace SocialFORM.Controllers
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("Not interval");
                         List<PT> lst_tmp_list_time = new List<PT>();
-                        foreach (var item in time_arg_tmp)
+                        time_arg_tmp.ForEach(u =>
                         {
-                            DateTime time_tmp_ = DateTime.Parse(item);
-                            lst_tmp_list_time.AddRange(lst_PT.Where(u => u.TimeCall == time_tmp_).ToList());
-                        }
+                            DateTime time_tmp_ = DateTime.Parse(u);
+                            lst_tmp_list_time.AddRange(lst_PT.Where(t => t.TimeCall == time_tmp_));
+                        });
                         lst_PT = lst_tmp_list_time;
                     }
                 }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("Warn!! Time is null");
-                }
-                //return Json(tmp_lst_PT, JsonRequestBehavior.AllowGet);
             }
             var jsonResult = Json(lst_PT, JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
@@ -707,21 +694,28 @@ namespace SocialFORM.Controllers
                 }
                 try
                 {
-                    foreach (var item in tmp_lst_PT)
+                    List<string> cmd_str_mysql = new List<string>();
+                    List<string> cmd_str_mssql = new List<string>();
+                    tmp_lst_PT.ForEach(u =>
                     {
                         TmpClass tmp_arg = new TmpClass();
-                        tmp_arg.Number = item.Phone;
-                        tmp_arg.Status = item.Status;
+                        tmp_arg.Number = u.Phone;
+                        tmp_arg.Status = u.Status;
                         if (type_load == 1)
                         {
-                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='1' WHERE Phone='" + item.Phone + "'");
+                            //db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='1' WHERE Phone='" + u.Phone + "'");
+                            cmd_str_mssql.Add("UPDATE dbo.PTs Set isActual='1' WHERE Phone='" + u.Phone + "'");
                         }
                         else
                         {
-                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='0' WHERE Phone='" + item.Phone + "'");
+                            //db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='0' WHERE Phone='" + u.Phone + "'");
+                            cmd_str_mssql.Add("UPDATE dbo.PTs Set isActual='0' WHERE Phone='" + u.Phone + "'");
                         }
-                        mysql_db.Database.ExecuteSqlCommand("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + item.Phone + "','0')");
-                    }
+                        //mysql_db.Database.ExecuteSqlCommand("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + u.Phone + "','0')");
+                        cmd_str_mysql.Add("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + u.Phone + "','0')");
+                    });
+                    db.Database.ExecuteSqlCommand(String.Join(";", cmd_str_mssql));
+                    mysql_db.Database.ExecuteSqlCommand(String.Join(";", cmd_str_mysql));
                     mysql_db.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_table + " " + name_type + ".csv\" WHERE Id=" + id_table);
                 }
                 catch (Exception e)
@@ -845,7 +839,7 @@ namespace SocialFORM.Controllers
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                    Response.AppendToLog(e.StackTrace);
                 }
             }
         }
@@ -949,16 +943,14 @@ namespace SocialFORM.Controllers
                         }
                         catch (Exception e)
                         {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
+                            Response.AppendToLog(e.StackTrace);
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
-                System.Diagnostics.Debug.WriteLine(e.Data.ToString());
-                System.Diagnostics.Debug.WriteLine(e.Message.ToString());
+                Response.AppendToLog(e.StackTrace);
             }
         }
 
@@ -1022,9 +1014,7 @@ namespace SocialFORM.Controllers
 
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.StackTrace);
-                System.Diagnostics.Debug.WriteLine(e.Data);
-                System.Diagnostics.Debug.WriteLine(e.Source);
+                Response.AppendToLog(e.StackTrace);
             }
         }
 
@@ -1161,11 +1151,7 @@ namespace SocialFORM.Controllers
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                System.Diagnostics.Debug.WriteLine(e.InnerException);
-                System.Diagnostics.Debug.WriteLine(e.StackTrace);
-                System.Diagnostics.Debug.WriteLine(e.Data);
-                System.Diagnostics.Debug.WriteLine(e.Data);
+                Response.AppendToLog(e.StackTrace);
             }
 
             foreach (var item in lst_form_numbers)
@@ -1202,10 +1188,7 @@ namespace SocialFORM.Controllers
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                System.Diagnostics.Debug.WriteLine(e.InnerException);
-                System.Diagnostics.Debug.WriteLine(e.StackTrace);
-                System.Diagnostics.Debug.WriteLine(e.Data);
+                Response.AppendToLog(e.StackTrace);
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
             return Json(lst_form_numbers, JsonRequestBehavior.AllowGet);

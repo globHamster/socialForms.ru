@@ -526,6 +526,7 @@
         $('div[name=div_numb_page]').text(Number(numb_page) - 1);
     }
     function ToOktell(id_table) {
+        $('.PreLoader').show();
         var FO = $('select[name=list_FO_]').find('option:selected').val();
         var OB = $('select[name=list_OB_]').find('option:selected').val();
         var GOR = $('select[name=list_GOR_]').find('option:selected').val();
@@ -581,9 +582,11 @@
             }
             $.post("/Phone/ImportNumberToOktell", { FO: FO, OB: OB, GOR: GOR, id_table: Number(id_table), settings: lst_setting.toString(), type_load: type_of_load, time: mass_ticks, type_select: type_selection })
                 .success(function () {
+                    $('.PreLoader').hide();
                     alert("Номера загружены");
                 })
                 .error(function () {
+                    $('.PreLoader').hide();
                     alert("Ошибка загрузка номеров");
                 })
         } else {
