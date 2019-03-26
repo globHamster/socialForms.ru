@@ -419,36 +419,76 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void PushNumbersStatus(string KodFO, string KodOB, string KodGOR, List<string> mas_numb)
         {
-            List<PT> lst_numb_with_status = new List<PT>();
-            foreach (var item in mas_numb)
+            List<string> db_phone_lst = db.SetPTs.Select(u => u.Phone).ToList();
+            DateTime default_date = new DateTime(2000, 1, 1);
+            Dictionary<string, PT> dict_phone = new Dictionary<string, PT>();
+            mas_numb.ForEach(u =>
             {
-                long start_diap = Int64.Parse(item.Split('-')[0]);
-                long end_diap = Int64.Parse(item.Split('-')[1]);
+                string[] diap = u.Split('-');
+                long start_diap = Int64.Parse(diap[0]);
+                long end_diap = Int64.Parse(diap[1]);
                 for (long numb = start_diap; numb <= end_diap; numb++)
                 {
-                    PT tmp = new PT();
-                    tmp.FO = KodFO;
-                    tmp.OB = KodOB;
-                    tmp.GOR = KodGOR;
-                    tmp.Phone = "7" + numb.ToString();
-                    if (db.SetPTs.FirstOrDefault(u => u.Phone == tmp.Phone) != null) continue;
-                    tmp.Status = "0";
-                    tmp.Type = Int64.Parse(tmp.Phone) < 79000000000 ? 0 : 1;
-                    tmp.isActual = false;
-                    tmp.TimeCall = new DateTime(2000, 1, 1);
-                    lst_numb_with_status.Add(tmp);
+                    string tmp_phone = "7" + numb.ToString();
+                    if (!dict_phone.ContainsKey(tmp_phone))
+                    {
+                        dict_phone.Add(tmp_phone, new PT() { FO = KodFO,
+                            OB = KodOB,
+                            GOR = KodGOR,
+                            Phone = tmp_phone,
+                            Status = "0",
+                            Type = (Int64.Parse(tmp_phone) < 79000000000 ? 0 : 1),
+                            isActual = false,
+                            TimeCall = default_date });
+                    }
                 }
-            }
-            try
+            });            
+            List<string> lst_only_phone = dict_phone.Keys.ToList();
+            lst_only_phone = lst_only_phone.Except(lst_only_phone.Intersect(db_phone_lst)).ToList();
+            DataTable dtPhone = new DataTable();
+            DataColumn dcNameFO = new DataColumn("FO", System.Type.GetType("System.String"));
+            DataColumn dcNameOB = new DataColumn("OB", System.Type.GetType("System.String"));
+            DataColumn dcNameGOR = new DataColumn("GOR", System.Type.GetType("System.String"));
+            DataColumn dcPhone = new DataColumn("Phone", System.Type.GetType("System.String"));
+            DataColumn dcStatus = new DataColumn("Status", System.Type.GetType("System.String"));
+            DataColumn dcType = new DataColumn("Type", System.Type.GetType("System.Int32"));
+            DataColumn dcIsAction = new DataColumn("isAction", System.Type.GetType("System.Boolean"));
+            DataColumn dcTimeCall = new DataColumn("TimeCall", System.Type.GetType("System.DateTime"));
+            dtPhone.PrimaryKey = new DataColumn[] { dtPhone.Columns["Phone"] };
+            dtPhone.Columns.Add(dcNameFO);
+            dtPhone.Columns.Add(dcNameOB);
+            dtPhone.Columns.Add(dcNameGOR);
+            dtPhone.Columns.Add(dcPhone);
+            dtPhone.Columns.Add(dcStatus);
+            dtPhone.Columns.Add(dcType);
+            dtPhone.Columns.Add(dcIsAction);
+            dtPhone.Columns.Add(dcTimeCall);
+            lst_only_phone.ForEach(u =>
             {
-                db.Configuration.AutoDetectChangesEnabled = false;
-                db.SetPTs.AddRange(lst_numb_with_status);
-                db.SaveChanges();
-                db.Configuration.AutoDetectChangesEnabled = true;
-            }
-            catch (Exception e)
+                dtPhone.Rows.Add(new object[] { dict_phone[u].FO,
+                    dict_phone[u].OB,
+                    dict_phone[u].GOR,
+                    dict_phone[u].Phone,
+                    dict_phone[u].Status,
+                    dict_phone[u].Type,
+                    dict_phone[u].isActual,
+                    dict_phone[u].TimeCall });
+            });
+
+            //using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=192.168.0.4, 55501 ;Network Library=DBMSSOCN;Initial Catalog=BD_IFsocialforms_Number;User ID=sa;Password=7oDK35jqS;",
+            //    SqlBulkCopyOptions.TableLock))
+            using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=192.168.0.4, 55501 ;Network Library=DBMSSOCN;Initial Catalog=NumberTest;User ID=sa;Password=7oDK35jqS;",
+                            SqlBulkCopyOptions.TableLock))
             {
-                Response.AppendToLog(e.StackTrace);
+                bulkCopy.DestinationTableName = "dbo.PTs";
+                try
+                {
+                    bulkCopy.WriteToServer(dtPhone);
+                }
+                catch (Exception e)
+                {
+                    Response.AppendToLog(e.StackTrace);
+                }
             }
         }
 
@@ -472,13 +512,16 @@ namespace SocialFORM.Controllers
             if (GOR != "")
             {
                 lst_PT = db.SetPTs.Where(u => u.FO == FO && u.OB == OB && u.GOR == GOR).ToList();
-            } else if ( OB != "")
+            }
+            else if (OB != "")
             {
                 lst_PT = db.SetPTs.Where(u => u.FO == FO && u.OB == OB).ToList();
-            } else if (FO != "")
+            }
+            else if (FO != "")
             {
                 lst_PT = db.SetPTs.Where(u => u.FO == FO).ToList();
-            } else
+            }
+            else
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
             }

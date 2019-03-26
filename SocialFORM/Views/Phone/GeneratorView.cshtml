@@ -178,6 +178,7 @@
     };
 
     function ButtonPush() {
+        $(".PreLoader").show();
         var FOSelObj = document.getElementById('SFO');
         var OBSelObj = document.getElementById('SOB');
         var GORSelObj = document.getElementById('SGOR');
@@ -191,12 +192,18 @@
         });
         if (currentFO == "" || currentOB == "" || currentGOR == "") {
             alert("Ошибка!");
+            $(".PreLoader").hide();
         }
         else {
             var number_status = { KodFO: currentFO, KodOB: currentOB, KodGOR: currentGOR, mas_numb: lst_number };
             $.post("/Phone/PushNumbersStatus", number_status)
                 .success(function () {
+                    $(".PreLoader").hide();
                     alert("Success");
+                })
+                .error(function () {
+                    $(".PreLoader").hide();
+                    alert("ERROR");
                 })
         }
     }
