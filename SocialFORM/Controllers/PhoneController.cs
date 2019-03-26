@@ -475,10 +475,8 @@ namespace SocialFORM.Controllers
                     dict_phone[u].TimeCall });
             });
 
-            //using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=192.168.0.4, 55501 ;Network Library=DBMSSOCN;Initial Catalog=BD_IFsocialforms_Number;User ID=sa;Password=7oDK35jqS;",
-            //    SqlBulkCopyOptions.TableLock))
-            using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=192.168.0.4, 55501 ;Network Library=DBMSSOCN;Initial Catalog=NumberTest;User ID=sa;Password=7oDK35jqS;",
-                            SqlBulkCopyOptions.TableLock))
+            using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=192.168.0.4, 55501 ;Network Library=DBMSSOCN;Initial Catalog=BD_IFsocialforms_Number;User ID=sa;Password=7oDK35jqS;",
+                SqlBulkCopyOptions.TableLock))
             {
                 bulkCopy.DestinationTableName = "dbo.PTs";
                 try
