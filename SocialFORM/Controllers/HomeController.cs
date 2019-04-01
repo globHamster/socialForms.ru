@@ -30,7 +30,7 @@ namespace SocialFORM.Controllers
     {
         ApplicationContext db = new ApplicationContext();
         ProjectContext db2 = new ProjectContext();
-
+        public static int RoleID ;
         public ActionResult Index()
         {
             return View();
@@ -68,13 +68,19 @@ namespace SocialFORM.Controllers
                 FoolView = DataUsers.Fool,
                 EmailView = DataUsers.Email,
                 SchoolDayView = User.SchoolDay,
-                RoleView = Role.Name
+                RoleView = Role.Name,
+                RoleIdView = Role.Id
             }
             );
             ViewBag.operator_id = result.First().IdView;
             ViewData["Name"] = result.First().NameView;
             ViewData["Family"] = result.First().FamilyView;
             ViewData["Role"] = result.First().RoleView;
+            ViewData["RoleID"] = result.First().RoleIdView;
+            System.Web.HttpContext.Current.Application.Lock();
+            System.Web.HttpContext.Current.Application["RoleID"] = result.First().RoleIdView; 
+            System.Web.HttpContext.Current.Application.UnLock();
+            RoleID = result.First().RoleIdView;
             //
             // Проверка учебного дня
             //
@@ -125,10 +131,22 @@ namespace SocialFORM.Controllers
         //[Authorize(Roles = "Admin")]
         public ActionResult Project(int? page)
         {
-            tmp_listProject = db4.SetProjectModels.ToList();
-            listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            System.Web.HttpContext.Current.Application.Lock();
+            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            System.Web.HttpContext.Current.Application.UnLock();
+            if (RoleID != 3)
+            {
+                tmp_listProject = db4.SetProjectModels.ToList();
+                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            }
+            else
+            {
+                tmp_listProject = db4.SetProjectModels.Where(u => u.CostumerProject == true).ToList();
+                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            }
             int pageSize = 10;
             int pageNumber = (page ?? 1);
+
             return PartialView("_Project", listProject.ToPagedList(pageNumber, pageSize));
         }
 
@@ -136,8 +154,16 @@ namespace SocialFORM.Controllers
         //[Authorize(Roles = "Admin")]
         public ActionResult _Project(int? page)
         {
-            tmp_listProject = db4.SetProjectModels.ToList();
-            listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            System.Web.HttpContext.Current.Application.Lock();
+            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            System.Web.HttpContext.Current.Application.UnLock();
+            if (RoleID != 3) {
+                tmp_listProject = db4.SetProjectModels.ToList();
+                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            } else {
+                tmp_listProject = db4.SetProjectModels.Where(u => u.CostumerProject == true).ToList();
+                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
+            }
             int pageSize = 10;
             int pageNumber = (page ?? 1);
             return PartialView("_Project", listProject.ToPagedList(pageNumber, pageSize));
@@ -147,6 +173,9 @@ namespace SocialFORM.Controllers
         //[Authorize(Roles = "Operator")]
         public ActionResult ProjectOperator()
         {
+            System.Web.HttpContext.Current.Application.Lock();
+            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            System.Web.HttpContext.Current.Application.UnLock();
             return PartialView(db4.SetProjectModels.Where(u => u.ActionProject == true));
         }
 
@@ -344,6 +373,9 @@ namespace SocialFORM.Controllers
             tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
             int pageSize = 15;
             int pageNumber = (page ?? 1);
+            System.Web.HttpContext.Current.Application.Lock();
+            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            System.Web.HttpContext.Current.Application.UnLock();
             return PartialView(tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
             //return PartialView(tmp);
         }
@@ -361,6 +393,9 @@ namespace SocialFORM.Controllers
             tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_pr).ToList();
             int pageSize = 15;
             int pageNumber = (page ?? 1);
+            System.Web.HttpContext.Current.Application.Lock();
+            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            System.Web.HttpContext.Current.Application.UnLock();
             return PartialView("_TableBlanks", tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
         }
 
@@ -880,6 +915,15 @@ namespace SocialFORM.Controllers
             ProjectModel projectModel = db2.SetProjectModels.Where(u => u.Id == id).FirstOrDefault();
             if (projectModel.ActionProject == true) { projectModel.ActionProject = false; }
             else { projectModel.ActionProject = true; }
+            db2.SaveChanges();
+        }
+
+        [HttpPost]
+        public void costumerProject(int id)
+        {
+            ProjectModel projectModel = db2.SetProjectModels.Where(u => u.Id == id).FirstOrDefault();
+            if (projectModel.CostumerProject == true) { projectModel.CostumerProject = false; }
+            else { projectModel.CostumerProject = true; }
             db2.SaveChanges();
         }
 
@@ -1654,7 +1698,12 @@ namespace SocialFORM.Controllers
         {
             return PartialView();
         }
-        
+
+        public ActionResult InstructionCostumer()
+        {
+            return PartialView();
+        }
+
         //DataBase
         public ActionResult DataBeseAll()
         {
@@ -2798,5 +2847,6 @@ namespace SocialFORM.Controllers
                 db2.SaveChanges();
             }
         }
+
     }
 }

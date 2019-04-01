@@ -1,8 +1,12 @@
 ﻿@model PagedList.IPagedList<SocialFORM.Models.Project.ProjectModel>
 @using PagedList.Mvc;
+
 <link rel="stylesheet" href="~/Content/css/home_project.css" />
+
 <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+<script src="~/Content/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
+@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>*@
 
 <style>
     .slow .toggle-group {
@@ -60,56 +64,120 @@
     </div>
 </div>
 <table class="table">
-    @foreach (var item in Model)
-    {
-        <tr class="project_layer">
-            <td id="@item.Id">
-                <div class="NameProjectDiv" id="@item.Id"> @Html.DisplayFor(modelItem => item.NameProject) </div>
-            </td>
-            <td style="display: inline-flex;">
-                <div class="infoP" id="@item.Id">?</div>
-                <div class="ShowDB" id="@item.Id">База данных</div>
-                <div style="width:2px;" />
-                <div class="SettingExport">
-                    <input type="hidden" name="SettingEncodeProject" value="@item.SettingEncode" />
-                    <div class="ExportButton" id="@item.Id">&#11015; Экспорт</div>
-                    <div class="CheckEncode">&#9776;</div>
-                </div>
-                <div class="AudioDown_all" id="@item.Id"><img src="../Content/downloads-i.png" width="20" height="20" /></div>
-                @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
-                @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
-                @if (item.ActionProject == true)
-                {
-                    //<div class="actionProject Action" id="@item.Id">В работе</div>
-                    <input id="@item.Id" class="toggle-event" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow" checked>
-                }
-                else
-                {
-                    //<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>
-                    <input id="@item.Id" class="toggle-event" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow">
-                }
-            </td>
-        </tr>
-        <tr class="info_project" id="@item.Id" style="display:none">
-            <td><button class="infoP_close" id="@item.Id">X</button></td>
-            <td class="str_infoP" id="@item.Id"></td>
-        </tr>
-    }
+    @{
+        int RoleId = (Int32)ViewData["RoleIdForProject"];
+        if (RoleId != 3)
+        {
+            <tr>
+                <th>
 
+                    <span class="create_project" style="cursor: pointer;">Имя проекта </span><button class="create_project_button">Создать проект</button>
+                </th>
+                <th></th>
+            </tr>
+
+
+            foreach (var item in Model)
+            {
+                <tr class="project_layer">
+                    <td id="@item.Id">
+                        <div class="NameProjectDiv" id="@item.Id"> @Html.DisplayFor(modelItem => item.NameProject) </div>
+                    </td>
+                    <td style="display: inline-flex;">
+                        <div class="infoP" id="@item.Id">?</div>
+                        <div class="ShowDB" id="@item.Id">База данных</div>
+                        <div style="width:2px;" />
+                        <div class="SettingExport">
+                            <input type="hidden" name="SettingEncodeProject" value="@item.SettingEncode" />
+                            <div class="ExportButton" id="@item.Id">&#11015; Экспорт</div>
+                            <div class="CheckEncode">&#9776;</div>
+                        </div>
+                        <div class="AudioDown_all" id="@item.Id"><img src="~/Content/downloads-i.png" width="20" height="20" /></div>
+                        @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
+                        @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
+                        @if (item.ActionProject == true)
+                        {
+                            //<div class="actionProject Action" id="@item.Id">В работе</div>
+                            <input id="@item.Id" class="toggle-event toggle-action" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow" checked>
+                        }
+                        else
+                        {
+                            //<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>
+                            <input id="@item.Id" class="toggle-event toggle-action" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow">
+                        }
+                        @if (item.CostumerProject == true)
+                        {
+                            //<div class="actionProject Action" id="@item.Id">В работе</div>
+                            <input id="@item.Id" class="toggle-event toggle-costumer" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow" checked>
+                        }
+                        else
+                        {
+                            //<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>
+                            <input id="@item.Id" class="toggle-event toggle-costumer" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow">
+                        }
+                    </td>
+                </tr>
+                <tr class="info_project" id="@item.Id" style="display:none">
+                    <td><button class="infoP_close" id="@item.Id">X</button></td>
+                    <td class="str_infoP" id="@item.Id"></td>
+                </tr>
+            }
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <tr class="project_layer">
+                    <td id="@item.Id">
+                        <div class="NameProjectDiv" style="pointer-events: none;cursor: default;"> @Html.DisplayFor(modelItem => item.NameProject) </div>
+                    </td>
+                    <td style="display: inline-flex;">
+                        <div class="ShowDB" id="@item.Id">База данных</div>
+                        <div style="width:2px;" />
+                        <div class="SettingExport">
+                            <input type="hidden" name="SettingEncodeProject" value="@item.SettingEncode" />
+                            <div class="ExportButton" id="@item.Id">&#11015; Экспорт</div>
+                            <div class="CheckEncode">&#9776;</div>
+                        </div>
+                        <div class="AudioDown_all" id="@item.Id"><img src="~/Content/downloads-i.png" width="20" height="20" /></div>
+                    </td>
+                </tr>
+            }
+        }
+    }
 </table>
 
 <div id="contentPager">
     @Html.PagedListPager(
-                                Model,
-                                page => Url.Action("_Project", "Home", new { page = page }),
-                                PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
-                                             )
+                     Model,
+                     page => Url.Action("_Project", "Home", new { page = page }),
+                     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
+                     )
 </div>
 
 <div class="EncodingString" id="EncodingString">
     <div name="UTF-8"><input type="radio" name="setting" />UTF-8</div>
     <div name="Windows-1251"><input type="radio" name="setting">Windows-1251</div>
 </div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Информация по архиву</h4>
+            </div>
+            <div class="modal-body">
+                <!-- /.ZIP информация  -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.модальное окно-Содержание -->
+    </div><!-- /.модальное окно-диалог -->
+</div><!-- /.модальное окно -->
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
@@ -142,25 +210,19 @@
     }
 
     $('table.table').on("click", ".AudioDown_all", function () {
+
         var id_project = $(this).attr('id');
-        var name_project = $("div.NameProjectDiv").text();
-        var name = AudioID + '_' + AudioName;
-        //$.ajax({
-        //    url: '/Audio/AudioFind',
-        //    type: 'GET',
-        //    data: { audio_name: name },
-        //    success: function (res) {
-        //        if (res == 200) {
-        //            window.location.href = '/Audio/AudioDownloads?audio_name=' + name
-        //        } else {
-        //            alert('Файл не найден!');
-        //        }
-        //    },
-        //    error: function () {
-        //        alert('Ошибка запроса файла!');
-        //    }
-        //});
-    })
+        window.location.href = '/Audio/AudioAllDownToZip?id_project=' + id_project;
+        @*var ZipInfo = '@ViewData["ZipInfo"]';
+        var str = ZipInfo.split(';')
+        alert(str[0]);
+        alert(str[1]);*@
+        @*var code = '<h3>Имя проекта: <i>' + str[0] + '</i><h3><p> Количество аудио записей: <i>' + str[1]+'<i></p>';
+        $("div.modal-body").empty();
+        $("div.modal-body").append(code);
+      //  $("#myModal").modal('show');*@
+    });
+
 
     $('button.infoP_close').click(function () {
         var id_project = $(this).attr('id');
@@ -195,19 +257,33 @@
     //        url: "/Home/actionProject",
     //        async: false,
     //        data: { id: id_project },
-    //        success: function () {
-    //            $('.Tables').load('/Home/Project');
-    //        }
+
     //    })
     //});
 
-    $('.toggle-event').change(function () {
+    $('.toggle-action').change(function () {
         var id_project = $(this).attr('id');
         $.ajax({
             type: "POST",
             url: "/Home/actionProject",
             async: false,
-            data: { id: id_project }
+            data: { id: id_project },
+            success: function () {
+                $('.Tables').load('/Home/Project');
+            }
+        })
+    })
+
+    $('input.toggle-costumer').change(function () {
+        var id_project = $(this).attr('id');
+        $.ajax({
+            type: "POST",
+            url: "/Home/costumerProject",
+            async: false,
+            data: { id: id_project },
+            success: function () {
+                $('.Tables').load('/Home/Project');
+            }
         })
     })
 

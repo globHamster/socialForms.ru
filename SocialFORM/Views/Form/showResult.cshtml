@@ -240,11 +240,11 @@
                     "</div > " +
                     "</div>");
                 //if (device.android())
-               
                     //blobToServer(UrlBlobServer, BlobServer, data + "_" + $('div.title').text());
-                //$('#Tables').load('/Home/BeginForm?id_p=' + id_project, '', function () {
-                //    $('div.waiting_screen').remove();
-                //});
+                $.post("http://localhost:7777", "SaveRecord#" + data + "_" + $('div.title').text());
+                $('#Tables').load('/Home/BeginForm?id_p=' + id_project, '', function () {
+                    $('div.waiting_screen').remove();
+                });
             })
             .error(function () {
                 $('.save_data').prop("disabled", false);

@@ -96,8 +96,17 @@
 </style>
 
 <div class="title">@ViewBag.ProjectName</div>
+@{
+    int RoleId = (Int32)ViewData["RoleIdForProject"];
+    if (RoleId != 3)
+    {
+        <button class="clear_blanks" style="margin: 10px;">Очистить базу</button>
+        <button class="export_button" style="margin: 10px;">Экспорт</button>
+    }
+}
+
 <div id="table_blanks_new">
-        @Html.Partial("_TableBlanks", Model)
+    @Html.Partial("_TableBlanks", Model)
 </div>
 
 
