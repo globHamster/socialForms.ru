@@ -8,25 +8,29 @@
         transition: .1s linear;
         box-shadow: 3px 3px 5px black;
     }
+
     div[name=save_info]:hover,
     div[name=btn_close_panel]:hover {
         transform: scale(1.1,1.1);
         transition: 0.1s linear;
     }
-    div.elem_of_setting{
+
+    div.elem_of_setting {
         cursor: pointer;
     }
-    div.elem_of_setting:hover {
-        background: #008dd2;
-        color:#fff;
-        font-weight:600;
-        transition: .1s linear;
-    }
+
+        div.elem_of_setting:hover {
+            background: #008dd2;
+            color: #fff;
+            font-weight: 600;
+            transition: .1s linear;
+        }
 </style>
 @*<div style="padding:5px;background-color:#66bb6a;">
-    <div><input type="file" id="backup_file_number" /></div>
-    <div><input type="button" value="Load..." onclick="LoadBackupFile()" /></div>
-</div>*@
+        <div><input type="file" id="backup_file_number" /></div>
+        <div><input type="button" value="Load..." onclick="LoadBackupFile()" /></div>
+    </div>*@
+<input type="file" name="TestImport" />
 
 <div name="panel_filter" style="border-radius: 10px 10px 0 0;background:#81c784;width:100%;padding:5px;">
     <select name="ListFO" onchange="ChangeFO($(this).find('option:selected').val())">
@@ -87,9 +91,9 @@
     </div>
 </div>
 <div name="panel_find_number" style="width:100%;background:#81c784;display:inline-flex;padding:5px;">
-    <input type="text" placeholder="Номер телефона" name="input_number_phone"/>
+    <input type="text" placeholder="Номер телефона" name="input_number_phone" />
     <div class="search_btn" style="border-radius:10px;" onclick="FindNumberInList()">Найти</div>
-</div> 
+</div>
 <div style="width:100%;background-color:#008dd2;display:grid;grid-template-columns: repeat(10, 1fr);">
     <div style="color:#fff;grid-column: span 2;padding:3px;font-size:13px;font-weight:600;">Общее количество</div>
     <div name="common_count_array" style="width:80%;color:#fff;grid-column: span 8;padding:3px;font-size:14px;font-weight:600;"></div>
@@ -156,7 +160,7 @@
                 "<div name='Sex'>" + (mass[i].Sex == false ? "М" : "Ж") + "</div>" +
                 "<div name='Age'>" + mass[i].Age + "</div>" +
                 "<div name='Address'>" + mass[i].Address + "</div>" +
-                "<div name='TypeNP'>"+(mass[i].TypeNP == false ? "город" : "село/деревня")+"</div>"+
+                "<div name='TypeNP'>" + (mass[i].TypeNP == false ? "город" : "село/деревня") + "</div>" +
                 "</div>")
         }
     }
@@ -180,12 +184,12 @@
                     "<option value='0' " + (server_data.Sex == 0 ? "selected" : "") + ">Мужской</option>" +
                     "<option value='1' " + (server_data.Sex == 1 ? "selected" : "") + ">Женский</option>" +
                     "</select>" +
-                    "</div>"+
+                    "</div>" +
                     "<div name='rename_Age' class='col1_grid'>Возрост</div><div name='text_rename_Age' class='col2_grid'><input type='text' value='" + server_data.Age + "'/></div>" +
                     "<div name='rename_Address' class='col1_grid'>Адрес</div><div name='text_rename_Address' class='col2_grid'><input type='text' value='" + server_data.Address + "'/></div>" +
                     "<div name='rename_Education' class='col1_grid'>Образование</div><div name='text_rename_Education' class='col2_grid'><input type='text' value='" + server_data.Education + "'/></div>" +
-                    "<div name='rename_Type' class='col1_grid'>Тип телефона</div><div name='text_rename_Type' class='col2_grid'><select><option value='0' " + (server_data.Type == 0 ? "selected" : "") + ">Станционарный</option><option value='1' " + (server_data.Type == 1? "selected" : "")+">Мобильный</option></select></div>"+
-                    "<div name='rename_TypeNP' class='col1_grid'>Тип поселения</div><div name='text_rename_TypeNP' class='col2_grid'><select><option value='0' " + (server_data.TypeNP == 0 ? "selected" : "") + ">Город</option><option value='1' " + (server_data.TypeNP == 1? "selected" : "")+">Село/Деревня/Поселок</option></select></div>"+
+                    "<div name='rename_Type' class='col1_grid'>Тип телефона</div><div name='text_rename_Type' class='col2_grid'><select><option value='0' " + (server_data.Type == 0 ? "selected" : "") + ">Станционарный</option><option value='1' " + (server_data.Type == 1 ? "selected" : "") + ">Мобильный</option></select></div>" +
+                    "<div name='rename_TypeNP' class='col1_grid'>Тип поселения</div><div name='text_rename_TypeNP' class='col2_grid'><select><option value='0' " + (server_data.TypeNP == 0 ? "selected" : "") + ">Город</option><option value='1' " + (server_data.TypeNP == 1 ? "selected" : "") + ">Село/Деревня/Поселок</option></select></div>" +
                     "</div>" +
                     "<div style='width:120px;height:30px;background:#008dd2;border-radius:10px;display:flex;justify-content:center;align-items:center;color:#fff;font-width:600;' name='save_info' onclick='SaveChangeFormNumb()'><div>Сохранить</div></div>" +
                     "</div>" +
@@ -216,7 +220,7 @@
             Address: container.find('div[name=text_rename_Address]').find('input').val() != "" ? container.find('div[name=text_rename_Address]').find('input').val() : " ",
             Education: container.find('div[name=text_rename_Education]').find('input').val() != "" ? container.find('div[name=text_rename_Education]').find('input').val() : " ",
             Type: Number(container.find('div[name=text_rename_Type]').find('select').find('option:selected').val()),
-            TypeNP: Number(container.find('div[name=text_rename_TypeNP]').find('select').find('option:selected').val()) == 0 ? false : true 
+            TypeNP: Number(container.find('div[name=text_rename_TypeNP]').find('select').find('option:selected').val()) == 0 ? false : true
         };
         $.post("/Phone/SetFormNumber", { _fn: query })
             .success(function (code) {
@@ -697,8 +701,8 @@
             cont.addClass('OpenSetting');
             cont.after("<div name='setting_for_load' style='width:100%;background-color:#cfd8dc;display:none;'>" +
                 "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(1," + id_cont + ");'>Все номера</div>" +
-                "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(2,"+id_cont+");'>[connect]</div>" +
-                "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(3,"+id_cont+");'>[завершено]</div>" +
+                "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(2," + id_cont + ");'>[connect]</div>" +
+                "<div class='elem_of_setting' style='text-align:center;' onclick='FuncLoadNumberOktell(3," + id_cont + ");'>[завершено]</div>" +
                 "</div>");
             parent_cont.find('div[name=setting_for_load]').slideDown(200);
         }
@@ -751,7 +755,7 @@
         }
         form_number_massive = backup_form_number_massive.clone();
         let number = $('div[name=panel_find_number]').find('input').val();
-        
+
         let tmp_form_number_massive = [];
         $.each(form_number_massive, function (i, item) {
             if (item.Phone.indexOf(number) >= 0) {

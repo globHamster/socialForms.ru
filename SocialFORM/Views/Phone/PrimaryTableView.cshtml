@@ -282,6 +282,8 @@
 
 <script>
     let status_number_list = [];
+    let data_send_phone;
+    let locker = false;
     Array.prototype.clone = function () {
         return this.slice(0);
     }
@@ -386,7 +388,6 @@
         const is_only_mobiles = panel_settings.find('input[name=only_mobiles]').is(':checked');
         let type_selection = undefined;
         if ($('div[name=panel_of_type_selection]').find('input:checked').length != 0) {
-
             $('div[name=panel_of_type_selection]').find('input:checked').each(function () {
                 if (type_selection == undefined) {
                     type_selection = Number($(this).parent().attr('id'));
@@ -436,38 +437,83 @@
                     break;
             }
             let mas_time = time.toLocaleString();
-
-            $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: mas_time, iterval: 1, invers: type_invers })
+            data_send_phone = { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: mas_time, iterval: 1, invers: type_invers, page: 0 }
+            $.get("/Phone/GetNumberStatus", data_send_phone)
                 .success(function (server_data) {
                     status_number_list = server_data.clone();
-                    $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length : 0);
                     BuildListStatus(1);
-                    $('div[name=div_limit_page]').text(Math.ceil(status_number_list.length / 30));
+
+                    $.get("/Phone/GetCountPhone", data_send_phone)
+                        .success(function (count_data) {
+                            $('div[name=count_numbers]').text(count_data);
+                            $('div[name=div_limit_page]').text(Math.ceil(count_data / 30));
+                        })
+                        .error(function () {
+                            alert("ERROR");
+                        })
+                    $.get("/Phone/GetTimeCallPhone", data_send_phone)
+                        .success(function (timecall_data) {
+                            let massive_time_call = {};
+                            $.each(timecall_data, function (i, item) {
+                                massive_time_call[Number((item).replace(/\D/g, ''))] = (new Date(Number((item).replace(/\D/g, '')))).toLocaleString();
+                            })
+                            let arg_panel_time_call = $('div[name=panel_of_time_call]');
+                            arg_panel_time_call.empty();
+                            $.each(massive_time_call, function (i, item) {
+                                arg_panel_time_call.append('<div style="grid-column: span 2;"><input type="checkbox" id="' + i + '" /><label onclick="DisableInterval()" for="' + i + '"></label></div><div style="grid-column: span 8;">' + item + '</div>');
+                            })
+                        })
+                        .error(function () {
+                            alert("ERROR");
+                        })
                     $('div[name=div_numb_page]').text(1);
                     $('input[name=page_numb_status]').val(1);
-                    $('.PreLoader').hide();
+                   
                 })
                 .error(function () {
                     $('.PreLoader').hide();
                     alert("Ошибка выгрузки листа");
                 })
+
+
         } else {
-            console.log("In here");
             let mass_time_ = [];
             $('div[name=panel_of_time_call]').find('input:checked').each(function () {
                 mass_time_.push(new Date(Number($(this).attr('id'))).toLocaleString());
             })
             let string_mass_time = mass_time_.length == 0 ? undefined : mass_time_.join('|');
-            console.log(string_mass_time);
-            $.get("/Phone/GetNumberStatus", { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: string_mass_time, iterval:0 })
+            data_send_phone = { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: string_mass_time, iterval: 0, page: 0 };
+            $.get("/Phone/GetNumberStatus", data_send_phone)
                 .success(function (server_data) {
                     status_number_list = server_data.clone();
-                    $('div[name=count_numbers]').text(status_number_list.length != 0 ? status_number_list.length : 0);
                     BuildListStatus(1);
-                    $('div[name=div_limit_page]').text(Math.ceil(status_number_list.length / 30));
+
+                    $.get("/Phone/GetCountPhone", data_send_phone)
+                        .success(function (count_data) {
+                            $('div[name=count_numbers]').text(count_data);
+                            $('div[name=div_limit_page]').text(Math.ceil(count_data / 30));
+                        })
+                        .error(function () {
+                            alert("ERROR");
+                        })
+                    $.get("/Phone/GetTimeCallPhone", data_send_phone)
+                        .success(function (timecall_data) {
+                            let massive_time_call = {};
+                            $.each(timecall_data, function (i, item) {
+                                massive_time_call[Number((item).replace(/\D/g, ''))] = (new Date(Number((item).replace(/\D/g, '')))).toLocaleString();
+                            })
+                            let arg_panel_time_call = $('div[name=panel_of_time_call]');
+                            arg_panel_time_call.empty();
+                            $.each(massive_time_call, function (i, item) {
+                                arg_panel_time_call.append('<div style="grid-column: span 2;"><input type="checkbox" id="' + i + '" /><label onclick="DisableInterval()" for="' + i + '"></label></div><div style="grid-column: span 8;">' + item + '</div>');
+                            })
+                        })
+                        .error(function () {
+                            alert("ERROR");
+                        })
                     $('div[name=div_numb_page]').text(1);
                     $('input[name=page_numb_status]').val(1);
-                    $('.PreLoader').hide();
+                   
                 })
                 .error(function () {
                     $('.PreLoader').hide();
@@ -484,46 +530,44 @@
     function BuildListStatus(page_iter) {
         var container = $('div[name=text_name_status]');
         container.empty();
-        const massive_length = status_number_list.length;
-        const page_length = Math.ceil(massive_length / 30);
-        const limit_iter = (page_iter * 30) > massive_length ? massive_length : (page_iter * 30);
-        let massive_time_call = {};
-        $.each(status_number_list, function (i, item) {
-            massive_time_call[Number((item.TimeCall).replace(/\D/g, ''))] = (new Date(Number((item.TimeCall).replace(/\D/g, '')))).toLocaleString();
-        })
-        let arg_panel_time_call = $('div[name=panel_of_time_call]');
-        arg_panel_time_call.empty();
-        $.each(massive_time_call, function (i, item) {
-            arg_panel_time_call.append('<div style="grid-column: span 2;"><input type="checkbox" id="' + i + '" /><label onclick="DisableInterval()" for="' + i + '"></label></div><div style="grid-column: span 8;">' + item + '</div>');
-        })
-        for (var i = (page_iter * 30) - 30; i < limit_iter; i++) {
+        data_send_phone.page = page_iter - 1;
+        $.get("/Phone/GetNumberStatus", data_send_phone)
+            .success(function (server_data) {
+                status_number_list = server_data.clone();
+                for (var i = 0; i < status_number_list.length; i++) {
 
-            if (i % 2 == 0) {
-                container.append("<div class='Header_Column_1 FirstBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 FirstBlock'>" + status_number_list[i].Status +
-                    "</div><div class='Header_Column_3 FirstBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
-                    "<div class='Header_Column_4 FirstBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
-            } else {
-                container.append("<div class='Header_Column_1 SecondBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 SecondBlock'>" + status_number_list[i].Status +
-                    "</div><div class='Header_Column_3 SecondBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
-                    "<div class='Header_Column_4 SecondBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
-            }
-        }
-        console.log(massive_time_call);
+                    if (i % 2 == 0) {
+                        container.append("<div class='Header_Column_1 FirstBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 FirstBlock'>" + status_number_list[i].Status +
+                            "</div><div class='Header_Column_3 FirstBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
+                            "<div class='Header_Column_4 FirstBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
+                    } else {
+                        container.append("<div class='Header_Column_1 SecondBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 SecondBlock'>" + status_number_list[i].Status +
+                            "</div><div class='Header_Column_3 SecondBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
+                            "<div class='Header_Column_4 SecondBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
+                    }
+                }
+                $('.PreLoader').hide();
+            })
+
     }
 
     function GoPageNext() {
         var numb_page = $('input[name=page_numb_status]').val();
-        if (Number(numb_page) >= Math.ceil(status_number_list.length / 30)) return;
+        if (Number(numb_page) >= Number($('div[name=div_limit_page]').text())) return; 
+        $('.PreLoader').show();
         $('input[name=page_numb_status]').val(Number(numb_page) + 1);
         BuildListStatus(Number(numb_page) + 1);
         $('div[name=div_numb_page]').text(Number(numb_page) + 1);
+       
     }
     function GoPagePrev() {
         var numb_page = $('input[name=page_numb_status]').val();
         if (Number(numb_page) <= 1) return;
+        $('.PreLoader').show();
         $('input[name=page_numb_status]').val(Number(numb_page) - 1);
         BuildListStatus(Number(numb_page) - 1);
         $('div[name=div_numb_page]').text(Number(numb_page) - 1);
+        
     }
     function ToOktell(id_table) {
         $('.PreLoader').show();

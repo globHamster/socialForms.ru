@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using System.Web.UI;
@@ -64,10 +65,11 @@ namespace SocialFORM.Controllers
                     string name_file = fileContent.FileName;
 
                     Stream stream = fileContent.InputStream;
-                    DataTable csvTable = new DataTable();
                     StreamReader streamReader = new StreamReader(stream, Encoding.GetEncoding(1251));
                     String str;
-                    List<FormNumber> lst_phone = new List<FormNumber>();
+                    Dictionary<string, FormNumber> lst_phone = new Dictionary<string, FormNumber>();
+                    Dictionary<string, PT> db_phone_PT = db.SetPTs.ToDictionary(u => u.Phone, u => u);
+                    Dictionary<string, FormNumber> all_phone_FN = db.SetFormNumbers.ToDictionary(u => u.Phone, u => u);
                     do
                     {
                         str = streamReader.ReadLine();
@@ -91,60 +93,92 @@ namespace SocialFORM.Controllers
                                 {
                                     tmp.Phone = tmp.Phone.Remove(0, 1).Insert(0, "7");
                                 }
-                                if (db.SetFormNumbers.FirstOrDefault(u => u.Phone == tmp.Phone) != null)
-                                {
-                                    continue;
-                                }
                             }
                             else continue;
                             short tmp_file_sex = 0;
                             short.TryParse(tmp_str[7], out tmp_file_sex);
                             tmp.Sex = tmp_file_sex == 0 ? false : true;
-                            try
+                            if (tmp_str[9] != "")
                             {
-                                tmp.Age = Int32.Parse(tmp_str[8]);
+                                try
+                                {
+                                    tmp.Age = Int32.Parse(tmp_str[9]);
+                                }
+                                catch (FormatException e)
+                                {
+                                    tmp.Age = 0;
+                                }
                             }
-                            catch (FormatException e)
+                            else
                             {
-                                tmp.Age = 0;
+                                try
+                                {
+                                    tmp.Age = Int32.Parse(tmp_str[8]);
+                                }
+                                catch (FormatException e)
+                                {
+                                    tmp.Age = 0;
+                                }
                             }
+
                             tmp.Address = tmp_str[5];
                             tmp.Education = "";
                             tmp.Type = tmp.Phone.ElementAt(1) == '9' ? 1 : 0;
                             tmp.TypeNP = false;
-                            lst_phone.Add(tmp);
+                            if (!lst_phone.ContainsKey(tmp.Phone)) { lst_phone.Add(tmp.Phone, tmp); }
                         }
                         else
                         {
                             break;
                         }
-
                     } while (true);
-                    int iter = 0;
-                    int count_lst = lst_phone.Count();
-                    while (iter < count_lst)
-                    {
-                        if (lst_phone.Where(u => u.Phone == lst_phone[iter].Phone).Count() > 1)
-                        {
-                            List<FormNumber> tmp_lst = lst_phone.Where(u => u.Phone == lst_phone[iter].Phone).ToList();
-                            tmp_lst.Remove(tmp_lst.First());
-                            foreach (var rem_item in tmp_lst)
-                            {
-                                lst_phone.Remove(rem_item);
-                            }
-                            count_lst = lst_phone.Count();
-                        }
-                        iter++;
-                    }
-                    db.SetFormNumbers.AddRange(lst_phone);
-                    db.SaveChanges();
 
+                    List<string> lst_only_phone = lst_phone.Keys.ToList();
+                    lst_only_phone.ForEach(u =>
+                    {
+                        if (!all_phone_FN.ContainsKey(u))
+                        {
+                            db.Database.ExecuteSqlCommand("INSERT INTO dbo.FormNumbers (FO, OB, GOR, NP, VGOR, Phone, Sex, Age, Address, Education, Type, TypeNP) VALUES({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11})",
+                                lst_phone[u].FO,
+                                lst_phone[u].OB,
+                                lst_phone[u].GOR,
+                                lst_phone[u].NP,
+                                lst_phone[u].VGOR,
+                                lst_phone[u].Phone,
+                                lst_phone[u].Sex,
+                                lst_phone[u].Age,
+                                lst_phone[u].Address,
+                                lst_phone[u].Education,
+                                lst_phone[u].Type,
+                                lst_phone[u].TypeNP);
+                        }
+                        if (!db_phone_PT.ContainsKey(u))
+                        {
+                            db.Database.ExecuteSqlCommand("INSERT INTO dbo.PTs (FO, OB, GOR, Phone, Status, Type, isActual, TimeCall) VALUES ({0},{1},{2},{3},{4},{5},{6},{7})",
+                                lst_phone[u].FO,
+                                lst_phone[u].OB,
+                                lst_phone[u].GOR,
+                                u,
+                                "connect",
+                                lst_phone[u].Type,
+                                false,
+                                new DateTime(2000, 1, 1).ToString());
+                        }
+                    });
                 }
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                System.Diagnostics.Debug.WriteLine(e.Source);
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
+            finally
+            {
+                GC.Collect();
+            }
+
         }
 
         [HttpGet]
@@ -416,6 +450,7 @@ namespace SocialFORM.Controllers
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
+        //Загрузка номеров из генератора
         [HttpPost]
         public void PushNumbersStatus(string KodFO, string KodOB, string KodGOR, List<string> mas_numb)
         {
@@ -432,17 +467,20 @@ namespace SocialFORM.Controllers
                     string tmp_phone = "7" + numb.ToString();
                     if (!dict_phone.ContainsKey(tmp_phone))
                     {
-                        dict_phone.Add(tmp_phone, new PT() { FO = KodFO,
+                        dict_phone.Add(tmp_phone, new PT()
+                        {
+                            FO = KodFO,
                             OB = KodOB,
                             GOR = KodGOR,
                             Phone = tmp_phone,
                             Status = "0",
                             Type = (Int64.Parse(tmp_phone) < 79000000000 ? 0 : 1),
                             isActual = false,
-                            TimeCall = default_date });
+                            TimeCall = default_date
+                        });
                     }
                 }
-            });            
+            });
             List<string> lst_only_phone = dict_phone.Keys.ToList();
             lst_only_phone = lst_only_phone.Except(lst_only_phone.Intersect(db_phone_lst)).ToList();
             DataTable dtPhone = new DataTable();
@@ -498,122 +536,619 @@ namespace SocialFORM.Controllers
         }
         //Получение номеров для первичной базы в соответствии с настройками
         [HttpGet]
-        public JsonResult GetNumberStatus(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers)
+        public JsonResult GetNumberStatus(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers, int page)
         {
             List<bool> lst_setting = new List<bool>();
+            string cmd_string = "";
             foreach (var item in settings.Split(','))
             {
                 lst_setting.Add(item == "false" ? false : true);
             }
-            List<PT> lst_PT;
 
             if (GOR != "")
             {
-                lst_PT = db.SetPTs.Where(u => u.FO == FO && u.OB == OB && u.GOR == GOR).ToList();
+                cmd_string += $"(FO='{FO}') AND (OB='{OB}') AND (GOR='{GOR}')";
             }
             else if (OB != "")
             {
-                lst_PT = db.SetPTs.Where(u => u.FO == FO && u.OB == OB).ToList();
+                cmd_string += $"(FO='{FO}') AND (OB='{OB}')";
             }
             else if (FO != "")
             {
-                lst_PT = db.SetPTs.Where(u => u.FO == FO).ToList();
+                cmd_string += $"(FO='{FO}')";
             }
             else
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
 
+            List<string> tmp_cmd_string = new List<string>();
             if (lst_setting[4])
             {
-                lst_PT = lst_PT.Where(u => u.Type == 0).ToList();
+                if (lst_setting[5]) { cmd_string += " AND ((Type='0')"; }
+                else { cmd_string += " AND (Type='0')"; }
             }
 
             if (lst_setting[5])
             {
-                lst_PT = lst_PT.Where(u => u.Type == 1).ToList();
+                if (lst_setting[4]) { cmd_string += " OR (Type='1'))"; }
+                else { cmd_string += " AND (Type='1')"; }
             }
 
-            if (lst_setting != null)
+            byte count_setting = 0;
+            bool prev_setting = false;
+            lst_setting.ForEach(u =>
             {
-                List<PT> tmp_lst_PT = new List<PT>();
+                if (u) count_setting++;
+            });
 
-                if (!lst_setting[0])
+            if (count_setting != 0)
+            {
+                if (count_setting == 1) { cmd_string += " AND "; }
+                if (count_setting > 1) { cmd_string += " AND ("; }
+            }
+            if (lst_setting[0])
+            {
+                cmd_string += " (Status='0') ";
+                prev_setting = true;
+            }
+
+            if (lst_setting[1])
+            {
+                if (prev_setting)
                 {
-                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "0")).ToList();
+                    cmd_string += " OR (Status='занято')";
                 }
-
-                if (!lst_setting[1])
+                else
                 {
-                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "занято")).ToList();
+                    cmd_string += "(Status='занято')";
+                    prev_setting = true;
                 }
+            }
 
-                if (!lst_setting[2])
+            if (lst_setting[2]){
+                if (prev_setting)
                 {
-                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "нет ответа")).ToList();
+                    cmd_string += " OR (Status='нет ответа')";
+                } else
+                {
+                    cmd_string += "(Status='нет ответа')";
+                    prev_setting = true;
                 }
+            }
 
-                if (!lst_setting[3])
+            if (lst_setting[3])
+            {
+                if (prev_setting)
                 {
-                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "1" || u.Status == "завершено")).ToList();
+                    cmd_string += " OR (Status='1') OR (Status='завершено')";
+                } else
+                {
+                    cmd_string += "(Status='1') OR (Status='завершено')";
+                    prev_setting = true;
                 }
+            }
 
-                if (!lst_setting[6])
+            if (lst_setting[6])
+            {
+                if (prev_setting)
                 {
-                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "линия не найдена")).ToList();
+                    cmd_string += " OR (Status='линия не найдена')";
+                } else
+                {
+                    cmd_string += "(Status='линия не найдена')";
+                    prev_setting = true;
                 }
+            }
 
-                if (!lst_setting[7])
+            if (lst_setting[7])
+            {
+                if (prev_setting)
                 {
-                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "перезвонить")).ToList();
+                    cmd_string += " OR (Status='перезвонить')";
+                } else
+                {
+                    cmd_string += "(Status='перезвонить')";
+                    prev_setting = true;
                 }
+            }
 
-                if (!lst_setting[8])
+            if (lst_setting[8])
+            {
+                if (prev_setting)
                 {
-                    lst_PT = lst_PT.Except(lst_PT.Where(u => u.Status == "connect")).ToList();
+                    cmd_string += " OR (Status='connect')";
+                } else
+                {
+                    cmd_string += "(Status='connect')";
                 }
+            }
 
-                switch (type_select)
-                {
-                    case 0:
-                    case 1:
-                        lst_PT = lst_PT.Where(u => u.isActual == (type_select == 0 ? false : true)).ToList();
-                        break;
-                    default:
-                        break;
-                }
+            if (count_setting > 1)
+            {
+                cmd_string += ")"; 
+            }
 
-                List<string> time_arg_tmp = mass_time?.Split('|').ToList() ?? null;
-                if (time_arg_tmp != null)
-                {
-                    if (iterval > 0)
+            switch (type_select)
+            {
+                case 0:
+                case 1:
                     {
-                        DateTime time_tmp_ = DateTime.Parse(time_arg_tmp[0]);
-                        if (invers == true)
-                        {
-                            lst_PT = lst_PT.Where(u => u.TimeCall < time_tmp_).ToList();
-                        }
-                        else
-                        {
-                            lst_PT = lst_PT.Where(u => u.TimeCall >= time_tmp_).ToList();
-                        }
+                        cmd_string += $" AND (isActual={type_select})";
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            List<string> time_arg_tmp = mass_time?.Split('|').ToList() ?? null;
+            if (time_arg_tmp != null)
+            {
+                if (iterval > 0)
+                {
+                    DateTime time_tmp_ = DateTime.Parse(time_arg_tmp[0]);
+                    if (invers == true)
+                    {
+                        cmd_string += $" AND (TimeCall<'{time_tmp_}')";
                     }
                     else
                     {
-                        List<PT> lst_tmp_list_time = new List<PT>();
-                        time_arg_tmp.ForEach(u =>
-                        {
-                            DateTime time_tmp_ = DateTime.Parse(u);
-                            lst_tmp_list_time.AddRange(lst_PT.Where(t => t.TimeCall == time_tmp_));
-                        });
-                        lst_PT = lst_tmp_list_time;
+                        cmd_string += $" AND (TimeCall>'{time_tmp_}')";
                     }
                 }
+                else
+                {
+                    if (time_arg_tmp.Count() >= 1)
+                    {
+                        DateTime time_tmp_;
+                        if (time_arg_tmp.Count() == 1)
+                        {
+                            time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(0));
+                            cmd_string += $" AND (TimeCall='{time_tmp_}')";
+                        } else
+                        {
+                            cmd_string += " AND (";
+                            for(short i = 0; i<time_arg_tmp.Count()-1; i++)
+                            {
+                                time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(i));
+                                cmd_string += $"(TimeCall='{time_tmp_}') OR ";
+                            }
+                            time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(time_arg_tmp.Count()-1));
+                            cmd_string += $"(TimeCall='{time_tmp_}'))";
+                        }
+                    }
+
+                }
             }
-            var jsonResult = Json(lst_PT, JsonRequestBehavior.AllowGet);
-            jsonResult.MaxJsonLength = int.MaxValue;
+            var jsonResult = Json(db.Database.SqlQuery<PT>("WITH tmp_data AS("+
+                                                           "SELECT ROW_NUMBER() OVER(ORDER BY Phone) AS row_id, FO, OB, GOR, Phone, Status, Type, isActual, TimeCall FROM[BD_IFsocialforms_Number].[dbo].[PTs] WHERE" + cmd_string+
+                                                           ") SELECT FO, OB, GOR, Phone, Status, Type, isActual, TimeCall FROM tmp_data"+
+                                                           $" WHERE row_id BETWEEN {(page*30)+1} AND {(30*(page+1))}"), JsonRequestBehavior.AllowGet);
+            //jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
+
+        [HttpGet]
+        public ulong GetCountPhone(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers, int page)
+        {
+            List<bool> lst_setting = new List<bool>();
+            string cmd_string = "";
+            foreach (var item in settings.Split(','))
+            {
+                lst_setting.Add(item == "false" ? false : true);
+            }
+
+            if (GOR != "")
+            {
+                cmd_string += $"(FO='{FO}') AND (OB='{OB}') AND (GOR='{GOR}')";
+            }
+            else if (OB != "")
+            {
+                cmd_string += $"(FO='{FO}') AND (OB='{OB}')";
+            }
+            else if (FO != "")
+            {
+                cmd_string += $"(FO='{FO}')";
+            }
+            else
+            {
+                return 0;
+            }
+
+            List<string> tmp_cmd_string = new List<string>();
+            if (lst_setting[4])
+            {
+                if (lst_setting[5]) { cmd_string += " AND ((Type='0')"; }
+                else { cmd_string += " AND (Type='0')"; }
+            }
+
+            if (lst_setting[5])
+            {
+                if (lst_setting[4]) { cmd_string += " OR (Type='1'))"; }
+                else { cmd_string += " AND (Type='1')"; }
+            }
+
+            byte count_setting = 0;
+            bool prev_setting = false;
+            lst_setting.ForEach(u =>
+            {
+                if (u) count_setting++;
+            });
+            if (count_setting != 0)
+            {
+                if (count_setting == 1) { cmd_string += " AND "; }
+                if (count_setting > 1) { cmd_string += " AND ("; }
+            }
+            if (lst_setting[0])
+            {
+                cmd_string += " (Status='0') ";
+                prev_setting = true;
+            }
+
+            if (lst_setting[1])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='занято')";
+                }
+                else
+                {
+                    cmd_string += "(Status='занято')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[2])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='нет ответа')";
+                }
+                else
+                {
+                    cmd_string += "(Status='нет ответа')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[3])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='1') OR (Status='завершено')";
+                }
+                else
+                {
+                    cmd_string += "(Status='1') OR (Status='завершено')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[6])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='линия не найдена')";
+                }
+                else
+                {
+                    cmd_string += "(Status='линия не найдена')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[7])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='перезвонить')";
+                }
+                else
+                {
+                    cmd_string += "(Status='перезвонить')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[8])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='connect')";
+                }
+                else
+                {
+                    cmd_string += "(Status='connect')";
+                }
+            }
+
+            if (count_setting > 1)
+            {
+                cmd_string += ")";
+            }
+
+            switch (type_select)
+            {
+                case 0:
+                case 1:
+                    {
+                        cmd_string += $" AND (isActual={type_select})";
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            List<string> time_arg_tmp = mass_time?.Split('|').ToList() ?? null;
+            if (time_arg_tmp != null)
+            {
+                if (iterval > 0)
+                {
+                    DateTime time_tmp_ = DateTime.Parse(time_arg_tmp[0]);
+                    if (invers == true)
+                    {
+                        cmd_string += $" AND (TimeCall<'{time_tmp_}')";
+                    }
+                    else
+                    {
+                        cmd_string += $" AND (TimeCall>'{time_tmp_}')";
+                    }
+                }
+                else
+                {
+                    if (time_arg_tmp.Count() >= 1)
+                    {
+                        DateTime time_tmp_;
+                        if (time_arg_tmp.Count() == 1)
+                        {
+                            time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(0));
+                            cmd_string += $" AND (TimeCall='{time_tmp_}')";
+                        }
+                        else
+                        {
+                            cmd_string += " AND (";
+                            for (short i = 0; i < time_arg_tmp.Count() - 1; i++)
+                            {
+                                time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(i));
+                                cmd_string += $"(TimeCall='{time_tmp_}') OR ";
+                            }
+                            time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(time_arg_tmp.Count() - 1));
+                            cmd_string += $"(TimeCall='{time_tmp_}'))";
+                        }
+                    }
+
+                }
+            }
+            string count_phone;
+            try
+            {
+                using (SqlConnection sql_c = new SqlConnection(db.Database.Connection.ConnectionString))
+                {
+                    sql_c.Open();
+                    SqlCommand com = new SqlCommand("SELECT COUNT(Phone) FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string, sql_c);
+                    count_phone = com.ExecuteScalar().ToString();
+                    System.Diagnostics.Debug.WriteLine("Count : " + count_phone);
+                    sql_c.Close();
+                    return ulong.Parse(count_phone);
+                }
+            } catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                return 0;
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetTimeCallPhone(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers, int page)
+        {
+            List<bool> lst_setting = new List<bool>();
+            string cmd_string = "";
+            foreach (var item in settings.Split(','))
+            {
+                lst_setting.Add(item == "false" ? false : true);
+            }
+
+            if (GOR != "")
+            {
+                cmd_string += $"(FO='{FO}') AND (OB='{OB}') AND (GOR='{GOR}')";
+            }
+            else if (OB != "")
+            {
+                cmd_string += $"(FO='{FO}') AND (OB='{OB}')";
+            }
+            else if (FO != "")
+            {
+                cmd_string += $"(FO='{FO}')";
+            }
+       
+            List<string> tmp_cmd_string = new List<string>();
+            if (lst_setting[4])
+            {
+                if (lst_setting[5]) { cmd_string += " AND ((Type='0')"; }
+                else { cmd_string += " AND (Type='0')"; }
+            }
+
+            if (lst_setting[5])
+            {
+                if (lst_setting[4]) { cmd_string += " OR (Type='1'))"; }
+                else { cmd_string += " AND (Type='1')"; }
+            }
+
+            byte count_setting = 0;
+            bool prev_setting = false;
+            lst_setting.ForEach(u =>
+            {
+                if (u) count_setting++;
+            });
+            if (count_setting != 0)
+            {
+                if (count_setting == 1) { cmd_string += " AND "; }
+                if (count_setting > 1) { cmd_string += " AND ("; }
+            }
+            if (lst_setting[0])
+            {
+                cmd_string += " (Status='0') ";
+                prev_setting = true;
+            }
+
+            if (lst_setting[1])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='занято')";
+                }
+                else
+                {
+                    cmd_string += "(Status='занято')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[2])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='нет ответа')";
+                }
+                else
+                {
+                    cmd_string += "(Status='нет ответа')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[3])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='1') OR (Status='завершено')";
+                }
+                else
+                {
+                    cmd_string += "(Status='1') OR (Status='завершено')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[6])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='линия не найдена')";
+                }
+                else
+                {
+                    cmd_string += "(Status='линия не найдена')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[7])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='перезвонить')";
+                }
+                else
+                {
+                    cmd_string += "(Status='перезвонить')";
+                    prev_setting = true;
+                }
+            }
+
+            if (lst_setting[8])
+            {
+                if (prev_setting)
+                {
+                    cmd_string += " OR (Status='connect')";
+                }
+                else
+                {
+                    cmd_string += "(Status='connect')";
+                }
+            }
+
+            if (count_setting > 1)
+            {
+                cmd_string += ")";
+            }
+
+            switch (type_select)
+            {
+                case 0:
+                case 1:
+                    {
+                        cmd_string += $" AND (isActual={type_select})";
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            List<string> time_arg_tmp = mass_time?.Split('|').ToList() ?? null;
+            if (time_arg_tmp != null)
+            {
+                if (iterval > 0)
+                {
+                    DateTime time_tmp_ = DateTime.Parse(time_arg_tmp[0]);
+                    if (invers == true)
+                    {
+                        cmd_string += $" AND (TimeCall<'{time_tmp_}')";
+                    }
+                    else
+                    {
+                        cmd_string += $" AND (TimeCall>'{time_tmp_}')";
+                    }
+                }
+                else
+                {
+                    if (time_arg_tmp.Count() >= 1)
+                    {
+                        DateTime time_tmp_;
+                        if (time_arg_tmp.Count() == 1)
+                        {
+                            time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(0));
+                            cmd_string += $" AND (TimeCall='{time_tmp_}')";
+                        }
+                        else
+                        {
+                            cmd_string += " AND (";
+                            for (short i = 0; i < time_arg_tmp.Count() - 1; i++)
+                            {
+                                time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(i));
+                                cmd_string += $"(TimeCall='{time_tmp_}') OR ";
+                            }
+                            time_tmp_ = DateTime.Parse(time_arg_tmp.ElementAt(time_arg_tmp.Count() - 1));
+                            cmd_string += $"(TimeCall='{time_tmp_}'))";
+                        }
+                    }
+
+                }
+            }
+            try
+            {
+                //var time_call_lst = db.Database.SqlQuery<DateTime>("SELECT TimeCall FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string);
+                //List<DateTime> time_call_lst = new List<DateTime>();
+                
+                //foreach (var item in db.Database.SqlQuery<DateTime>("WITH data AS ( SELECT TimeCall FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string +
+                //                                                    ") SELECT TimeCall FROM data GROUP BY TimeCall"))
+                //{
+                //    System.Diagnostics.Debug.WriteLine("Item : " + item.ToLongDateString());
+                //}
+                //JsonResult jsonResult = Json(time_call_lst, JsonRequestBehavior.AllowGet);
+                //jsonResult.MaxJsonLength = Int32.MaxValue;
+                return Json(db.Database.SqlQuery<DateTime>("WITH data AS ( SELECT TimeCall FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string +
+                                                                    ") SELECT TimeCall FROM data GROUP BY TimeCall"), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         //Загрузка номеров в сценарий через первичную базу
         [HttpPost]
         public void ImportNumberToOktell(string FO, string OB, string GOR, int id_table, string settings, short type_load, List<string> time, short type_select)
@@ -784,8 +1319,6 @@ namespace SocialFORM.Controllers
             mysql_db.Database.ExecuteSqlCommand("UPDATE name_table SET Name=null WHERE Id=" + id_table);
             mysql_db.Database.ExecuteSqlCommand("TRUNCATE TABLE table" + id_table);
             SyncNumbSThread(sync_status_lst);
-            //Thread mThread = new Thread(new ParameterizedThreadStart(SyncNumbSThread));
-            //mThread.Start(sync_status_lst);
         }
 
         //Функция синхронизации номеров с первичной базой
@@ -896,7 +1429,7 @@ namespace SocialFORM.Controllers
                 {
 
                     Stream stream = fileContent.InputStream;
-                    DataTable csvTable = new DataTable();
+
                     StreamReader streamReader = new StreamReader(stream, Encoding.GetEncoding(1251));
                     String str;
                     List<PT> lst_phone = new List<PT>();
@@ -949,8 +1482,6 @@ namespace SocialFORM.Controllers
                           return u;
                       }).ToList();
 
-                    lst_phone = lst_phone.Where(u => u.Phone.Length == 11).ToList();
-
                     DataTable dtPhone = new DataTable();
                     DataColumn dcNameFO = new DataColumn("FO", System.Type.GetType("System.String"));
                     DataColumn dcNameOB = new DataColumn("OB", System.Type.GetType("System.String"));
@@ -985,6 +1516,10 @@ namespace SocialFORM.Controllers
                         catch (Exception e)
                         {
                             Response.AppendToLog(e.StackTrace);
+                            System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                            System.Diagnostics.Debug.WriteLine(e.Message);
+                            System.Diagnostics.Debug.WriteLine(e.Source);
+                            System.Diagnostics.Debug.WriteLine(e.Source);
                         }
                     }
                 }
