@@ -10,6 +10,7 @@ namespace SocialFORM.Models.Project
         public int Id { get; set; }
         public string NameProject { get; set; }
         public bool? ActionProject { get; set; }
+        public bool? CostumerProject { get; set; }
         public string SettingEncode { get; set; }
     }
 }

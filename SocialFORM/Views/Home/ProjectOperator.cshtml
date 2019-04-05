@@ -3,7 +3,7 @@
 
 @Styles.Render("~/Content/loading.css")
 <style>
-    @@media screen and (max-width: 768px){
+    @@media screen and (max-width: 768px) {
         .project_layer {
             height: 80px;
             font-family: 'Century Gothic';
@@ -15,17 +15,37 @@
 
 
 <table class="table">
-    
-    @foreach (var item in Model)
-    {
-        <tr class="project_layer">
-            <td id="@item.Id">
-                @Html.DisplayFor(modelItem => item.NameProject)
-            </td>
-           
-        </tr>
-    }
 
+    @{
+        int RoleId = (Int32)ViewData["RoleIdForProject"];
+        if (RoleId != 3)
+        {
+            foreach (var item in Model)
+            {
+                <tr class="project_layer">
+                    <td id="@item.Id">
+                        @Html.DisplayFor(modelItem => item.NameProject)
+                    </td>
+
+                </tr>
+            }
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                if (item.CostumerProject == true)
+                {
+                    <tr class="project_layer">
+                        <td id="@item.Id">
+                            @Html.DisplayFor(modelItem => item.NameProject)
+                        </td>
+
+                    </tr>
+                }
+            }
+        }
+    }
 </table>
 
 
@@ -33,22 +53,22 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-   
+
 
         $(".table").on("click", "td", function () {
-            
+
             $("#Tables").load("/Home/BeginForm?id_p=" + $(this).attr('id'), '', function () { $('.loading').hide(); });
-           
-           
-            
+
+
+
             //location.href = "/Group/Manager?id_project=" + id;
         });
-        
+
         //$(".table").on("click", "button", function () {
         //    alert("ewrqweq");
         //    $("#Tables").load("/Form/SingleFormView?id_q=1");
         //});
-        
+
 
     });
     $(".table").on('mouseenter', '.project_layer', function () {

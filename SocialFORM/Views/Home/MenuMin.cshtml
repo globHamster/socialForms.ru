@@ -27,6 +27,16 @@
                         </li>
                     }
                 }
+                @if (User.IsInRole("Customer"))
+                {
+                    foreach (var it in items.Where(a => a.RoleId == 3))
+                    {
+                        <li>
+                            @Ajax.ActionLink(@it.Header, @it.Url, new AjaxOptions { UpdateTargetId = "Tables" })
+                            @BuildMenu(data, it.Id)
+                        </li>
+                    }
+                }
             </ul>
         }
 }

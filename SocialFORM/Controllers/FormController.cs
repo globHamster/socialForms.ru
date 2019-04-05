@@ -164,6 +164,11 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
+        public ActionResult showResultCostumer()
+        {
+            return PartialView();
+        }
+
         [HttpPost]
         public void DeleteBlankResult(int id_res)
         {
