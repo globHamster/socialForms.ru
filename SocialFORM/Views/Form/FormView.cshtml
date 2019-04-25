@@ -265,6 +265,7 @@
 
     //Блок отрисовки анкеты
     function getStart() {
+        console.log("base >>>", list_base_answer);
         if (index >= massiv_question_id.length) {
             var RoleId = $("span.RoleID").attr("id");
             if (RoleId != 3) {
@@ -301,6 +302,7 @@
             }
 
             id_q = massiv_question_id[index];
+            console.log("ITEM QUESTION >>> ", list_question[id_q]);
             type_q = list_question[id_q].TypeQuestion;
             var is_rotate = list_question[id_q].IsRotate;
             $('.view_form').html(list_question[id_q].TextQuestion);
@@ -316,7 +318,7 @@
                             var array_base_anwer = [];
                             $.each(list_id_answer_all, function (i, item) {
                                 if (item.QuestionID == id_q) {
-                                    if (item.AnswerType == 1)
+                                    if (item.AnswerType == 1) 
                                         array_answer.push(item);
                                     else
                                         array_base_anwer.push(item);
@@ -351,13 +353,21 @@
                         var array_base_anwer = [];
                         $.each(list_id_answer_all, function (i, item) {
                             if (item.QuestionID == id_q) {
-                                if (item.AnswerType == 1)
-                                    array_answer.push(item);
+                                if (item.AnswerType == 1) {
+                                    if (!(list_answer[item.AnswerKey].AnswerText.toLowerCase() == "другое")) {
+                                        array_answer.push(item);
+                                    } else {
+                                        array_base_anwer.push(item);
+                                    }
+                                }
                                 else
                                     array_base_anwer.push(item);
                             }
                         });
-                        if (is_rotate) { array_answer.rand(); } // Осуществляет перетасовку ответов в случайном порядке
+                        if (is_rotate) {
+                            console.log("here " + array_answer.length);
+                            array_answer.rand();
+                        } // Осуществляет перетасовку ответов в случайном порядке
                         array_answer = array_answer.concat(array_base_anwer);
                         $.each(array_answer, function (i, item) {
                             if (item.QuestionID == id_q) {

@@ -46,9 +46,10 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public int AudioFind(string audio_name)
         {
+            System.Diagnostics.Debug.WriteLine(audio_name);
             try
             {
-                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), audio_name + ".wav")))
+                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), audio_name + ".mp3")))
                 {
                     return 200;
                 }
@@ -66,12 +67,13 @@ namespace SocialFORM.Controllers
         public FileResult AudioDownloads(string audio_name)
         {
             // Путь к файлу
-            string file_path = Path.Combine(Server.MapPath("~\\uploads"), audio_name + ".wav");
+            string file_path = Path.Combine(Server.MapPath("~\\uploads"), audio_name + ".mp3");
             // Тип файла - content-type
-            string file_type = "audio/wav";
+            string file_type = "audio/mp3";
             // Имя файла - необязательно
-            string file_name = audio_name + ".wav";
-            return File(file_path, file_type, file_name);
+            string file_name = audio_name + ".mp3";
+            var file = File(file_path, file_type, file_name);
+            return file;
         }
 
         public class InputModel
@@ -92,7 +94,7 @@ namespace SocialFORM.Controllers
             ////Создание списка файлов//
             for (int i = 1; i <= count; i++)
             {
-                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), i.ToString() + "_" + name_project + ".wav")))
+                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), i.ToString() + "_" + name_project + ".mp3")))
                 {
                     inputModelsFiles.Add(new InputModel { Name = i + "_" + name_project + ".wav", Selected = true });
                     System.Diagnostics.Debug.WriteLine("i === >>>>" + i + "  state === >>>>" + true);

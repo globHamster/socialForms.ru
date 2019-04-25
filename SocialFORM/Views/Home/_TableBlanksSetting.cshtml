@@ -82,8 +82,7 @@
         height: 50px;
         background-color: #008dd2;
     }
-
-    .ChangeColor {
+    .ChangeColor{
         background-color: #bbbbbb;
     }
 
@@ -134,7 +133,7 @@
         display: grid !important;
     }
 
-    div[name=btn_date_blank]:hover{
+    div[name=btn_date_blank]:hover {
         transform: scale(1.1,1.1);
         box-shadow: 5px 5px black;
         transition: 0.1s linear;
@@ -147,12 +146,12 @@
     }
 </style>
 <div name="PanelSettingResult" style="display: -webkit-inline-box;">
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-left: 15px; ">
-        <div>
-    <select name="ListUserId">
+    <div style="display:flex; justify-content: center; align-items: center; flex-direction: column; margin-left: 15px;">
+    <div>
+    <select name="ListUserId" >
         <option value="0">Все</option>
     </select>
-            </div>
+        </div>
         </div>
     <div style="padding-top: 10px; padding-left: 10px;">
         <div name="btn_date_blank" style="display:flex;padding:5px 15px;border-radius:15px;background-color:#008dd2;border: 2px solid white;color:white;font-weight:600;"
@@ -165,13 +164,14 @@
             </div>
         </div>
     </div>
-    <div style="padding-top: 10px; padding-left: 10px;">
+    <div style="padding-top: 10px; padding-left:10px;">
     <div name="btn_filter_blank" style="display:flex; padding: 5px 15px; background-color: #008dd2; border: 2px solid white; color: #fff; border-radius:15px; font-weight:600;" onclick="ClickFunctionTest()">
-        <div>Фильтр</div>
+        <div>ФИЛЬТР</div>
     </div>
-        </div>
-
+    </div>
 </div>
+<input type="hidden" name="user_id" value="@ViewBag.UserId"/>
+<input type="hidden" name="date_blank" value="@ViewBag.Date" />
 <div class="table_blanks" style="overflow:auto" id="@Model.First().ProjectID">
     <table class="export_table">
         <thead>
@@ -240,7 +240,7 @@
 <div id="contentPager">
     @Html.PagedListPager(
                                             Model,
-                                            page => Url.Action("_TableBlanks", "Home", new { id_project = ViewBag.Id_Project_Next, page = page }),
+                                            page => Url.Action("_TableBlanksSetting", "Home", new { id_project = ViewBag.Id_Project_Next, page = page, UserId = ViewBag.UserID, date = ViewBag.Date }),
                                             PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "table_blanks_new" })
                                             )
 </div>
@@ -289,16 +289,25 @@
         $.get("/Home/GetListOperatorInProject", { p_id: Number($('div.table_blanks').attr('id')) })
             .success(function (server_data) {
                 var select_lst = $('select[name=ListUserId]');
+                var user_id = $('input[name=user_id]').val();
+                var date_blank = $('input[name=date_blank]').val();
+                $('input[name=DateInput]').val(date_blank);
                 $.each(server_data, function (i, item) {
-                    select_lst.append("<option value='" + item.UserId + "'>" + item.Family + " " + item.Name + "</option>");
+                    select_lst.append("<option value='" + item.UserId + "'" + (item.UserId == user_id ? "selected": "") + ">" + item.Family + " " + item.Name + "</option>");
                 })
             })
 
         $.get("/Home/GetListDateInProject", { p_id: Number($('div.table_blanks').attr('id')) })
             .success(function (server_data) {
                 var check_panel_date = $('div[name=panel_setting_load]');
+                var date_blank = $('input[name=date_blank]').val();
+                let hashDate = {};
+
+                $.each(date_blank.split('|'), function (i, item) {
+                    hashDate[item] = true;
+                })
                 $.each(server_data, function (i, item) {
-                    check_panel_date.append("<div style='grid-column: span 2;'><input type='checkbox' id='check" + item + "' name='" + item + "'/> <label for='check" + item + "'></label>" +
+                    check_panel_date.append("<div style='grid-column: span 2;'><input type='checkbox' id='check" + item + "' name='" + item + "' " + (hashDate[item] ? "checked" : "") + "/> <label for='check" + item + "'></label>" +
                         "</div><div style='grid-column: span 8;'>" + item + "</div>");
                 });
             });
@@ -694,7 +703,8 @@
 
     $('div.table_blanks').on("click", ".AUDIOBattonPlau", function () {
         var AudioID = $(this).find("div[name=AudioPlayID]").text();
-        var AudioName = $("div.title").text();
+        var AudioName = String($("div.title").text());
+        console.log(AudioName);
         var name = AudioID + '_' + AudioName;
         $.ajax({
             url: '/Audio/AudioFind',
@@ -786,3 +796,4 @@
         elemnt.remove();
     }
 </script>
+

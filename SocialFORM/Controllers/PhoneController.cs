@@ -1127,16 +1127,6 @@ namespace SocialFORM.Controllers
             }
             try
             {
-                //var time_call_lst = db.Database.SqlQuery<DateTime>("SELECT TimeCall FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string);
-                //List<DateTime> time_call_lst = new List<DateTime>();
-                
-                //foreach (var item in db.Database.SqlQuery<DateTime>("WITH data AS ( SELECT TimeCall FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string +
-                //                                                    ") SELECT TimeCall FROM data GROUP BY TimeCall"))
-                //{
-                //    System.Diagnostics.Debug.WriteLine("Item : " + item.ToLongDateString());
-                //}
-                //JsonResult jsonResult = Json(time_call_lst, JsonRequestBehavior.AllowGet);
-                //jsonResult.MaxJsonLength = Int32.MaxValue;
                 return Json(db.Database.SqlQuery<DateTime>("WITH data AS ( SELECT TimeCall FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string +
                                                                     ") SELECT TimeCall FROM data GROUP BY TimeCall"), JsonRequestBehavior.AllowGet);
             }

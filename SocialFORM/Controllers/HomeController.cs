@@ -371,6 +371,7 @@ namespace SocialFORM.Controllers
                 ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_project).NameProject;
             }
             tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
+            tmp_tableBlanks.Reverse();
             int pageSize = 15;
             int pageNumber = (page ?? 1);
             System.Web.HttpContext.Current.Application.Lock();
@@ -379,7 +380,78 @@ namespace SocialFORM.Controllers
             return PartialView(tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
             //return PartialView(tmp);
         }
+        [HttpGet]
+        public ActionResult TableBlanksSetting(int id_project, int? page, int UserId, string date)
+        {
+            List<string> lst_date = new List<string>();
+            date.Split('|').ToList().ForEach(u =>
+            {
+                if (u != "")
+                {
+                    lst_date.Add(u);
+                }
+            });
+            try
+            {
+                ViewBag.Id_Project_Next = id_project;
+                using (ProjectContext project_db = new ProjectContext())
+                {
+                    ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_project).NameProject;
+                }
+                if (UserId == 0)
+                {
+                    if (lst_date.Count < 1)
+                        tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
+                    else
+                    {
+                        tmp_tableBlanks = new List<ResultModel>();
+                        lst_date.ForEach(u =>
+                        {
+                            DateTime btime = DateTime.Parse(u);
+                            DateTime etime = DateTime.Parse(u);
+                            etime = etime.AddDays(1);
+                            tmp_tableBlanks.AddRange(db.SetResultModels.Where(t => t.ProjectID == id_project && (t.Data > btime && t.Data < etime)));
+                        });                        
+                    }
+                }
+                else
+                {
+                    if (lst_date.Count < 1)
+                        tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_project && u.UserID == UserId).ToList();
+                    else
+                    {
+                        tmp_tableBlanks = new List<ResultModel>();
+                        lst_date.ForEach(u =>
+                        {
+                            DateTime btime = DateTime.Parse(u);
+                            DateTime etime = DateTime.Parse(u);
+                            etime = etime.AddDays(1);
+                            tmp_tableBlanks.AddRange(db.SetResultModels.Where(t => t.ProjectID == id_project && t.UserID == UserId && (t.Data > btime && t.Data < etime)));
+                        });
+                        
+                    }
+                }
+                if (tmp_tableBlanks != null && tmp_tableBlanks.Count > 0) tmp_tableBlanks.Reverse();
 
+                ViewBag.UserID = UserId;
+                ViewBag.Date = date;
+                int pageSize = 15;
+                int pageNumber = (page ?? 1);
+                System.Web.HttpContext.Current.Application.Lock();
+                ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+                System.Web.HttpContext.Current.Application.UnLock();
+                return PartialView(tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
+            } catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                System.Diagnostics.Debug.WriteLine(e.Source);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                return PartialView(tmp_tableBlanks);
+            }
+            
+            //return PartialView(tmp);
+        }
         //Отрисовка блока с результатами (ПО ПАНЕЛИ)
         [HttpGet]
         public ActionResult _TableBlanks(string id_project, int? page)
@@ -391,12 +463,74 @@ namespace SocialFORM.Controllers
                 ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_pr).NameProject;
             }
             tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_pr).ToList();
+            tmp_tableBlanks.Reverse();
             int pageSize = 15;
             int pageNumber = (page ?? 1);
             System.Web.HttpContext.Current.Application.Lock();
             ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
             System.Web.HttpContext.Current.Application.UnLock();
             return PartialView("_TableBlanks", tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
+        }
+        [HttpGet]
+        public ActionResult _TableBlanksSetting(string id_project, int? page, int UserId, string date)
+        {
+            List<string> lst_date = new List<string>();
+            date.Split('|').ToList().ForEach(u =>
+            {
+                if (u != "")
+                {
+                    lst_date.Add(u);
+                }
+            });
+            ViewBag.Id_Project_Next = id_project;
+            int id_pr = Convert.ToInt32(id_project);
+            using (ProjectContext project_db = new ProjectContext())
+            {
+                ViewBag.ProjectName = project_db.SetProjectModels.First(u => u.Id == id_pr).NameProject;
+            }
+            if (UserId == 0)
+            {
+                if (lst_date.Count < 1)
+                    tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_pr).ToList();
+                else
+                {
+                    tmp_tableBlanks = new List<ResultModel>();
+                    lst_date.ForEach(u =>
+                    {
+                        DateTime btime = DateTime.Parse(u);
+                        DateTime etime = DateTime.Parse(u);
+                        etime = etime.AddDays(1);
+                        tmp_tableBlanks.AddRange(db.SetResultModels.Where(t => t.ProjectID == id_pr && (t.Data > btime && t.Data < etime)));
+                    });
+                }
+            }
+            else
+            {
+                if (lst_date.Count < 1)
+                    tmp_tableBlanks = db.SetResultModels.Where(u => u.ProjectID == id_pr && u.UserID == UserId).ToList();
+                else
+                {
+                    tmp_tableBlanks = new List<ResultModel>();
+                    lst_date.ForEach(u =>
+                    {
+                        DateTime btime = DateTime.Parse(u);
+                        DateTime etime = DateTime.Parse(u);
+                        etime = etime.AddDays(1);
+                        tmp_tableBlanks.AddRange(db.SetResultModels.Where(t => t.ProjectID == id_pr && t.UserID == UserId && (t.Data > btime && t.Data < etime)));
+                    });
+
+                }
+            }
+            if (tmp_tableBlanks != null && tmp_tableBlanks.Count > 0) tmp_tableBlanks.Reverse();
+
+            ViewBag.UserID = UserId;
+            ViewBag.Date = date;
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            System.Web.HttpContext.Current.Application.Lock();
+            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            System.Web.HttpContext.Current.Application.UnLock();
+            return PartialView("_TableBlanksSetting", tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
         }
 
         [HttpGet]
@@ -2479,8 +2613,7 @@ namespace SocialFORM.Controllers
         {
             public string Tables_in_phone { get; set; }
         }
-
-
+        
         [HttpGet]
         public JsonResult GetListTable()
         {
@@ -2848,5 +2981,25 @@ namespace SocialFORM.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult GetListOperatorInProject(int p_id)
+        {
+            List<DataUser> lst_data_user = new List<DataUser>();
+            db.SetResultModels.Where(u => u.ProjectID == p_id).Select(u => u.UserID).Distinct().ToList().ForEach(u => {
+                lst_data_user.Add(db.SetDataUsers.First(t => t.UserId == u));
+            });
+            return Json(lst_data_user, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetListDateInProject(int p_id)
+        {
+            List<string> lst_date_blank = new List<string>();
+            db.SetResultModels.Where(u => u.ProjectID == p_id).Select(u => u.Data).ToList().ForEach(u =>
+                {
+                    lst_date_blank.Add(u.ToShortDateString());
+                });
+            return Json(lst_date_blank.Distinct(), JsonRequestBehavior.AllowGet);
+        }
     }
 }
