@@ -621,10 +621,10 @@ namespace SocialFORM.Controllers
             {
                 if (prev_setting)
                 {
-                    cmd_string += " OR (Status='1') OR (Status='завершено')";
+                    cmd_string += " OR ((Status='1') OR (Status='завершено'))";
                 } else
                 {
-                    cmd_string += "(Status='1') OR (Status='завершено')";
+                    cmd_string += "((Status='1') OR (Status='завершено'))";
                     prev_setting = true;
                 }
             }
@@ -720,6 +720,7 @@ namespace SocialFORM.Controllers
 
                 }
             }
+
             var jsonResult = Json(db.Database.SqlQuery<PT>("WITH tmp_data AS("+
                                                            "SELECT ROW_NUMBER() OVER(ORDER BY Phone) AS row_id, FO, OB, GOR, Phone, Status, Type, isActual, TimeCall FROM[BD_IFsocialforms_Number].[dbo].[PTs] WHERE" + cmd_string+
                                                            ") SELECT FO, OB, GOR, Phone, Status, Type, isActual, TimeCall FROM tmp_data"+
@@ -727,7 +728,7 @@ namespace SocialFORM.Controllers
             //jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
-
+        //Получение количество номеров для первичной базы в соответствии с настройками
         [HttpGet]
         public ulong GetCountPhone(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers, int page)
         {
@@ -815,11 +816,11 @@ namespace SocialFORM.Controllers
             {
                 if (prev_setting)
                 {
-                    cmd_string += " OR (Status='1') OR (Status='завершено')";
+                    cmd_string += " OR ((Status='1') OR (Status='завершено'))";
                 }
                 else
                 {
-                    cmd_string += "(Status='1') OR (Status='завершено')";
+                    cmd_string += "((Status='1') OR (Status='завершено'))";
                     prev_setting = true;
                 }
             }
@@ -927,7 +928,6 @@ namespace SocialFORM.Controllers
                     sql_c.Open();
                     SqlCommand com = new SqlCommand("SELECT COUNT(Phone) FROM [BD_IFsocialforms_Number].[dbo].[PTs] WHERE " + cmd_string, sql_c);
                     count_phone = com.ExecuteScalar().ToString();
-                    System.Diagnostics.Debug.WriteLine("Count : " + count_phone);
                     sql_c.Close();
                     return ulong.Parse(count_phone);
                 }
@@ -937,7 +937,7 @@ namespace SocialFORM.Controllers
                 return 0;
             }
         }
-
+        //Получение дат звонков для первичной базы в соответствии с настройками
         [HttpGet]
         public JsonResult GetTimeCallPhone(string FO, string OB, string GOR, string settings, short type_select, string mass_time, byte? iterval, bool? invers, int page)
         {
@@ -1021,11 +1021,11 @@ namespace SocialFORM.Controllers
             {
                 if (prev_setting)
                 {
-                    cmd_string += " OR (Status='1') OR (Status='завершено')";
+                    cmd_string += " OR ((Status='1') OR (Status='завершено'))";
                 }
                 else
                 {
-                    cmd_string += "(Status='1') OR (Status='завершено')";
+                    cmd_string += "((Status='1') OR (Status='завершено'))";
                     prev_setting = true;
                 }
             }
@@ -1149,18 +1149,19 @@ namespace SocialFORM.Controllers
                 lst_setting.Add(item == "false" ? false : true);
             }
             List<PT> tmp_lst_PT = new List<PT>();
+            string cmd_str_ = "SELECT TOP 10000 * FROM dbo.PTs WHERE ";
             string name_table = "";
             if (FO != "")
             {
-                tmp_lst_PT = db.SetPTs.Where(u => u.FO == FO).ToList();
+                cmd_str_ += $"(FO='{FO}')";
                 name_table = db.SetFO.First(u => u.KodFO == FO).NameFO;
                 if (OB != "")
                 {
-                    tmp_lst_PT = tmp_lst_PT.Where(u => u.OB == OB).ToList();
+                    cmd_str_ += $" AND (OB='{OB}')";
                     name_table = db.SetOB.First(u => u.KodFO == FO && u.KodOB == OB).NameOB;
                     if (GOR != "")
                     {
-                        tmp_lst_PT = tmp_lst_PT.Where(u => u.GOR == GOR).ToList();
+                        cmd_str_ += $" AND (GOR='{GOR}')";
                         name_table = db.SetGOR.First(u => u.KodFO == FO && u.KodOB == OB && u.KodGOR == GOR).NameGOR;
                     }
                 }
@@ -1168,13 +1169,13 @@ namespace SocialFORM.Controllers
             string name_type = "(станц + моб)";
             if (lst_setting[4])
             {
-                tmp_lst_PT = tmp_lst_PT.Where(u => u.Type == 0).ToList();
+                cmd_str_ += " AND (Type=0)";
                 name_type = "(станц)";
             }
 
             if (lst_setting[5])
             {
-                tmp_lst_PT = tmp_lst_PT.Where(u => u.Type == 1).ToList();
+                cmd_str_ += " AND (Type=1)";
                 name_type = "(моб)";
             }
             try
@@ -1182,104 +1183,143 @@ namespace SocialFORM.Controllers
                 if (lst_setting != null)
                 {
                     List<PT> tmp_lst_PT_ = new List<PT>();
+                    bool prev_status = false;
 
                     if (lst_setting[0])
                     {
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "0").ToList());
+                        cmd_str_ += " AND ((Status='0')";
+                        prev_status = true;
                     }
 
                     if (lst_setting[1])
                     {
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "занято").ToList());
+                        if (prev_status)
+                        {
+                            cmd_str_ += " OR (Status='занято')";
+                        } else
+                        {
+                            cmd_str_ += " AND ((Status='занято')";
+                            prev_status = true;
+                        }
                     }
 
                     if (lst_setting[2])
                     {
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "нет ответа").ToList());
+                        if (prev_status)
+                        {
+                            cmd_str_ += " OR (Status='нет ответа')";
+                        } else
+                        {
+                            cmd_str_ += " AND ((Status='нет ответа')";
+                            prev_status = true;
+                        }
                     }
 
                     if (lst_setting[3])
                     {
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "1" || u.Status == "завершено").ToList());
+                        if (prev_status)
+                        {
+                            cmd_str_ += " OR (Status='1') OR (Status='завершено')";
+                        } else
+                        {
+                            cmd_str_ += " AND (((Status='1') OR (Status='завершено'))";
+                            prev_status = true;
+                        }
                     }
 
                     if (lst_setting[6])
                     {
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "линия не найдена").ToList());
+                        if (prev_status)
+                        {
+                            cmd_str_ += " OR (Status='линия не найдена')";
+                        } else
+                        {
+                            cmd_str_ += " AND ((Status=линия не найдена')";
+                            prev_status = true;
+                        }
                     }
 
                     if (lst_setting[7])
                     {
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "перезвонить").ToList());
+                        if (prev_status)
+                        {
+                            cmd_str_ += " OR (Status='перезвонить')";
+                        } else
+                        {
+                            cmd_str_ += " AND ((Status='перезвонить')";
+                        }
                     }
 
                     if (lst_setting[8])
                     {
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.Status == "connect").ToList());
+                        if (prev_status)
+                        {
+                            cmd_str_ += " OR (Status='connect')";
+                        } else
+                        {
+                            cmd_str_ += " AND ((Status='connect')";
+                        }
+                    }
+                    cmd_str_ += ")";
+
+                    if (time.Count == 1)
+                    {
+                        cmd_str_ += $" AND (TimeCall='{DateTime.Parse(time.ElementAt(0)).ToString().Replace('.','-').Replace(',',' ')}')";
+                    } else if (time.Count > 1)
+                    {
+                        cmd_str_ += $" AND ((TimeCall='{DateTime.Parse(time.ElementAt(0)).ToString().Replace('.','-').Replace(',',' ')}')";
+                        foreach (var item in time.GetRange(1, time.Count()-1))
+                        {
+                            cmd_str_ += $" OR (TimeCall='{DateTime.Parse(item).ToString().Replace('.', '-').Replace(',', ' ')}')";
+                        }
+                        cmd_str_ += ")";
+                    }
+                    switch (type_select)
+                    {
+                        case 0:
+                            cmd_str_ += " AND (isActual='False')";
+                            break;
+                        case 1:
+                            cmd_str_ += " AND (isActual='True')";
+                            break;
+                        default:
+                            break;
                     }
 
-                    tmp_lst_PT = tmp_lst_PT_;
-                    tmp_lst_PT_ = new List<PT>();
-                    tmp_lst_PT_.Clear();
-                    foreach (var item in time)
+                    if (lst_setting[9])
                     {
-                        DateTime time_tmp = DateTime.Parse(item);
-                        tmp_lst_PT_.AddRange(tmp_lst_PT.Where(u => u.TimeCall == time_tmp).ToList());
-                    }
-                    tmp_lst_PT = tmp_lst_PT_;
-                    if (type_select != 2)
-                    {
-                        tmp_lst_PT = tmp_lst_PT.Where(u => u.isActual == (type_select == 0 ? false : true)).ToList();
+                        cmd_str_ += " ORDER BY NEWID()";
                     }
                 }
+                tmp_lst_PT = db.Database.SqlQuery<PT>(cmd_str_).ToList();
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(">>>>> " + e.StackTrace);
-                System.Diagnostics.Debug.WriteLine(">>>>> " + e.Message);
-                System.Diagnostics.Debug.WriteLine(">>>>> " + e.Source);
-                System.Diagnostics.Debug.WriteLine(">>>>> " + e.InnerException);
             }
 
             if (tmp_lst_PT != null && tmp_lst_PT.Count() >= 1)
             {
                 int count = 1;
-                if (tmp_lst_PT.Count() > 5000)
-                {
-                    tmp_lst_PT = tmp_lst_PT.GetRange(0, 5000);
-                }
-                if (lst_setting[9])
-                {
-                    Random RDM = new Random();
-                    for (int i = 0; i < tmp_lst_PT.Count; i++)
-                    {
-                        PT tmp_element = tmp_lst_PT[0];
-                        tmp_lst_PT.RemoveAt(0);
-                        tmp_lst_PT.Insert(RDM.Next(tmp_lst_PT.Count()), tmp_element);
-                    }
-                }
                 try
                 {
                     List<string> cmd_str_mysql = new List<string>();
                     List<string> cmd_str_mssql = new List<string>();
-                    tmp_lst_PT.ForEach(u =>
+                    for (int i=0; i<tmp_lst_PT.Count; i++)
                     {
                         TmpClass tmp_arg = new TmpClass();
-                        tmp_arg.Number = u.Phone;
-                        tmp_arg.Status = u.Status;
+                        tmp_arg.Number = tmp_lst_PT[i].Phone;
+                        tmp_arg.Status = tmp_lst_PT[i].Status;
                         if (type_load == 1)
                         {
-                            //db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='1' WHERE Phone='" + u.Phone + "'");
-                            cmd_str_mssql.Add("UPDATE dbo.PTs Set isActual='1' WHERE Phone='" + u.Phone + "'");
+                            cmd_str_mssql.Add("UPDATE dbo.PTs Set isActual='1' WHERE Phone='" + tmp_lst_PT[i].Phone + "'");
                         }
                         else
                         {
-                            //db.Database.ExecuteSqlCommand("UPDATE dbo.PTs Set isActual='0' WHERE Phone='" + u.Phone + "'");
-                            cmd_str_mssql.Add("UPDATE dbo.PTs Set isActual='0' WHERE Phone='" + u.Phone + "'");
+                            cmd_str_mssql.Add("UPDATE dbo.PTs Set isActual='0' WHERE Phone='" + tmp_lst_PT[i].Phone + "'");
                         }
-                        //mysql_db.Database.ExecuteSqlCommand("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + u.Phone + "','0')");
-                        cmd_str_mysql.Add("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + u.Phone + "','0')");
-                    });
+                        cmd_str_mysql.Add("INSERT INTO table" + id_table + " (Id, Number, Status) VALUES ('" + (count++) + "','" + tmp_lst_PT[i].Phone + "','0')");
+                    }
                     db.Database.ExecuteSqlCommand(String.Join(";", cmd_str_mssql));
                     mysql_db.Database.ExecuteSqlCommand(String.Join(";", cmd_str_mysql));
                     mysql_db.Database.ExecuteSqlCommand("UPDATE name_table SET Name=\"" + name_table + " " + name_type + ".csv\" WHERE Id=" + id_table);
@@ -1287,9 +1327,8 @@ namespace SocialFORM.Controllers
                 catch (Exception e)
                 {
                     System.Diagnostics.Debug.WriteLine(">>>>> " + e.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(">>>>> " + e.Data);
                     System.Diagnostics.Debug.WriteLine(">>>>> " + e.Message);
-                    System.Diagnostics.Debug.WriteLine(">>>>> " + e.Source);
-                    System.Diagnostics.Debug.WriteLine(">>>>> " + e.InnerException);
                 }
             }
         }
@@ -1315,35 +1354,28 @@ namespace SocialFORM.Controllers
         private void SyncNumbSThread(object _sync_lst)
         {
             List<TmpClass> sync_status_lst = (List<TmpClass>)_sync_lst;
-            List<PT> lst_tmp_phone_status = new List<PT>();
-            sync_status_lst.ForEach(u =>
-            {
-                PT tmp = db.SetPTs.FirstOrDefault(t => t.Phone == u.Number);
-                if (tmp != null)
-                    lst_tmp_phone_status.Add(tmp);
-            });
-            Dictionary<string, PT> db_PT_list_number = lst_tmp_phone_status.ToDictionary(u => u.Phone, u => u);
+            Dictionary<string, PT> db_PT_list_number = db.Database.SqlQuery<PT>("SELECT * FROM dbo.PTs WHERE (Phone='" + (String.Join("') OR (Phone='", sync_status_lst.Select(u => u.Number))) + "')").ToDictionary(u=>u.Phone, u=>u);
             DateTime dateTime = DateTime.Parse(DateTime.Now.ToLongDateString());
-            List<string> cmd_string_lst = new List<string>();
-            sync_status_lst.ForEach(el =>
+            Queue<string> cmd_string_lst = new Queue<string>();
+
+            for (int i= 0; i<sync_status_lst.Count(); i++)
             {
-                if (db_PT_list_number.ContainsKey(el.Number))
+                if (db_PT_list_number.ContainsKey(sync_status_lst[i].Number))
                 {
-                    PT item_from_PTs = db_PT_list_number[el.Number];
-                    if (item_from_PTs.Status == "завершено")
+                    if (db_PT_list_number[sync_status_lst[i].Number].Status == "завершено")
                     {
-                        cmd_string_lst.Add("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + el.Number + "'");
+                        cmd_string_lst.Enqueue("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + sync_status_lst[i].Number + "'");
                     }
-                    else if (item_from_PTs.Status == "connect" & (el.Status == "0" || el.Status == "занято" || el.Status == "нет ответа" || el.Status == "линия не найдена" || el.Status == "перезвонить"))
+                    else if (db_PT_list_number[sync_status_lst[i].Number].Status == "connect" & (sync_status_lst[i].Status == "0" || sync_status_lst[i].Status == "занято" || sync_status_lst[i].Status == "нет ответа" || sync_status_lst[i].Status == "линия не найдена" || sync_status_lst[i].Status == "перезвонить"))
                     {
-                        cmd_string_lst.Add("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + el.Number + "'");
+                        cmd_string_lst.Enqueue("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + sync_status_lst[i].Number + "'");
                     }
                     else
                     {
-                        cmd_string_lst.Add("UPDATE dbo.PTs SET Status='" + el.Status + "', TimeCall='" + dateTime + "' WHERE Phone='" + el.Number + "'");
+                        cmd_string_lst.Enqueue("UPDATE dbo.PTs SET Status='" + sync_status_lst[i].Status + "', TimeCall='" + dateTime + "' WHERE Phone='" + sync_status_lst[i].Number + "'");
                     }
                 }
-            });
+            }
             if (cmd_string_lst.Count > 1)
             {
                 db.Database.ExecuteSqlCommand(String.Join(";", cmd_string_lst));
