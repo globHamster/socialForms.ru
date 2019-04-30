@@ -437,12 +437,8 @@
                     break;
             }
             let mas_time = time.toLocaleString();
-            data_send_phone = { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: mas_time, iterval: 1, invers: type_invers, page: 0 }
-            $.get("/Phone/GetNumberStatus", data_send_phone)
-                .success(function (server_data) {
-                    status_number_list = server_data.clone();
+            data_send_phone = { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: mas_time, iterval: 1, invers: type_invers, page: 0 };
                     BuildListStatus(1);
-
                     $.get("/Phone/GetCountPhone", data_send_phone)
                         .success(function (count_data) {
                             $('div[name=count_numbers]').text(count_data);
@@ -468,14 +464,6 @@
                         })
                     $('div[name=div_numb_page]').text(1);
                     $('input[name=page_numb_status]').val(1);
-                   
-                })
-                .error(function () {
-                    $('.PreLoader').hide();
-                    alert("Ошибка выгрузки листа");
-                })
-
-
         } else {
             let mass_time_ = [];
             $('div[name=panel_of_time_call]').find('input:checked').each(function () {
@@ -483,9 +471,6 @@
             })
             let string_mass_time = mass_time_.length == 0 ? undefined : mass_time_.join('|');
             data_send_phone = { FO: str_FO, OB: str_OB, GOR: str_GOR, settings: lst_setting.toString(), type_select: type_selection, mass_time: string_mass_time, iterval: 0, page: 0 };
-            $.get("/Phone/GetNumberStatus", data_send_phone)
-                .success(function (server_data) {
-                    status_number_list = server_data.clone();
                     BuildListStatus(1);
 
                     $.get("/Phone/GetCountPhone", data_send_phone)
@@ -513,12 +498,6 @@
                         })
                     $('div[name=div_numb_page]').text(1);
                     $('input[name=page_numb_status]').val(1);
-                   
-                })
-                .error(function () {
-                    $('.PreLoader').hide();
-                    alert("Ошибка выгрузки листа");
-                })
         }
     }
 
@@ -531,24 +510,28 @@
         var container = $('div[name=text_name_status]');
         container.empty();
         data_send_phone.page = page_iter - 1;
+        var re = /(?:([\d]{1,}?))??(?:([\d]{1,3}?))??(?:([\d]{1,3}?))??(?:([\d]{2}))??([\d]{2})$/;
         $.get("/Phone/GetNumberStatus", data_send_phone)
             .success(function (server_data) {
                 status_number_list = server_data.clone();
                 for (var i = 0; i < status_number_list.length; i++) {
 
                     if (i % 2 == 0) {
-                        container.append("<div class='Header_Column_1 FirstBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 FirstBlock'>" + status_number_list[i].Status +
+                        container.append("<div class='Header_Column_1 FirstBlock'>" + status_number_list[i].Phone.replace(re, function (all, a, b, c, d, e) {
+                            return (a ? a + " " : "") + (b ? " (" + b + ") " : "") + (c ? c + "-" : "") + (d ? d + "-" : "") + e;
+                        }) + "</div><div class='Header_Column_2 FirstBlock'>" + status_number_list[i].Status +
                             "</div><div class='Header_Column_3 FirstBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
                             "<div class='Header_Column_4 FirstBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
                     } else {
-                        container.append("<div class='Header_Column_1 SecondBlock'>" + status_number_list[i].Phone + "</div><div class='Header_Column_2 SecondBlock'>" + status_number_list[i].Status +
+                        container.append("<div class='Header_Column_1 SecondBlock'>" + status_number_list[i].Phone.replace(re, function (all, a, b, c, d, e) {
+                            return (a ? a + " " : "") + (b ? " (" + b + ") " : "") + (c ? c + "-" : "") + (d ? d + "-" : "") + e;
+                        }) + "</div><div class='Header_Column_2 SecondBlock'>" + status_number_list[i].Status +
                             "</div><div class='Header_Column_3 SecondBlock'>" + (status_number_list[i].Type == 0 ? "Станционарный" : "Мобильный") + "</div>" +
                             "<div class='Header_Column_4 SecondBlock'>" + (new Date(Number((status_number_list[i].TimeCall).replace(/\D/g, '')))).toLocaleDateString() + "</div>");
                     }
                 }
                 $('.PreLoader').hide();
             })
-
     }
 
     function GoPageNext() {
@@ -621,6 +604,7 @@
             });
             let type_of_load = $('div[name=panel_of_type_load]').find('input:checked').attr('id');
             if (type_of_load == undefined) {
+                $('.PreLoader').hide();
                 alert("Тип загрузки не выбран!")
                 return;
             }
@@ -634,6 +618,7 @@
                     alert("Ошибка загрузка номеров");
                 })
         } else {
+            $('PreLoader').hide();
             alert("No checked");
         }
     }

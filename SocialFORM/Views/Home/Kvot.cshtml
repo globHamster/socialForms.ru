@@ -463,8 +463,16 @@
         var chain_str;
         if (new_id_num == 0) {
             var id_quota_q = container.find('div.QuotaDiv[id=' + new_id_num + ']:first').find('input.InfoQuestion:first').attr('id');
-            $.post('/Question/DeleteQuota', { id_p: $('input[name=project_id]').val(), id_q: id_quota_q });
-            console.log("Id QUEsTION >>> " + id_quota_q);
+            //$.post('/Question/DeleteQuota', { id_p: $('input[name=project_id]').val(), id_q: id_quota_q });
+            $.ajax({
+                type: "POST",
+                url: "/Question/DeleteQuota",
+                async: false,
+                data: { id_p: $('input[name=project_id]').val(), id_q: id_quota_q },
+                success: function () {
+                    console.log("success delete");
+                }
+            });
         }
         container.find('div.QuotaDiv[id=' + new_id_num + ']').each(function () {
             if ($(this).hasClass('QuotaLastName')) {

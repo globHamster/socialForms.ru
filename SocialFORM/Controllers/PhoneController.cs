@@ -481,6 +481,7 @@ namespace SocialFORM.Controllers
                     }
                 }
             });
+
             List<string> lst_only_phone = dict_phone.Keys.ToList();
             lst_only_phone = lst_only_phone.Except(lst_only_phone.Intersect(db_phone_lst)).ToList();
             DataTable dtPhone = new DataTable();
@@ -1364,7 +1365,13 @@ namespace SocialFORM.Controllers
                 {
                     if (db_PT_list_number[sync_status_lst[i].Number].Status == "завершено")
                     {
-                        cmd_string_lst.Enqueue("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + sync_status_lst[i].Number + "'");
+                        if (sync_status_lst[i].Status != "завершено") {
+                            cmd_string_lst.Enqueue("UPDATE dbo.PTs SET Status='connect' WHERE Phone='" + sync_status_lst[i].Number + "'");
+                        }
+                        else
+                        {
+                            cmd_string_lst.Enqueue("UPDATE dbo.PTs SET TimeCall='" + dateTime + "' WHERE Phone='" + sync_status_lst[i].Number + "'");
+                        }
                     }
                     else if (db_PT_list_number[sync_status_lst[i].Number].Status == "connect" & (sync_status_lst[i].Status == "0" || sync_status_lst[i].Status == "занято" || sync_status_lst[i].Status == "нет ответа" || sync_status_lst[i].Status == "линия не найдена" || sync_status_lst[i].Status == "перезвонить"))
                     {

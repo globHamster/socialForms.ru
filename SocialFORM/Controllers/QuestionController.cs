@@ -9,10 +9,7 @@ using SocialFORM.Models.Question;
 using SocialFORM.Models.Project;
 using SocialFORM.Models.Group;
 using SocialFORM.Models;
-using Newtonsoft.Json;
-using SocialFORM.Models.Utilite;
 using System.Data;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SocialFORM.Controllers
@@ -677,27 +674,35 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void SaveQuota(int id_p, List<string> list_quota)
         {
-            if (list_quota != null)
+            try
             {
-                foreach (var item in list_quota)
+                if (list_quota != null)
                 {
-                    var tmp_string = item.Split('=');
-                    string chain_string = tmp_string[0];
-                    QuotaModel tmp_quota = db.SetQuotaModels.FirstOrDefault(u => u.ChainString == chain_string);
-                    if (tmp_quota == null)
+                    foreach (var item in list_quota)
                     {
-                        tmp_quota = new QuotaModel();
-                        tmp_quota.ProjectID = id_p;
-                        tmp_quota.ChainString = tmp_string[0];
-                        tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
-                        db.SetQuotaModels.Add(tmp_quota);
+                        var tmp_string = item.Split('=');
+                        string chain_string = tmp_string[0];
+                        QuotaModel tmp_quota = db.SetQuotaModels.FirstOrDefault(u => u.ChainString == chain_string);
+                        if (tmp_quota == null)
+                        {
+                            //tmp_quota = new QuotaModel();
+                            //tmp_quota.ProjectID = id_p;
+                            //tmp_quota.ChainString = tmp_string[0];
+                            //tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
+                            db.SetQuotaModels.Add(new QuotaModel() { ProjectID=id_p, ChainString=tmp_string[0], QuotaCount= Int32.Parse(tmp_string[1]) });
+                        }
+                        else
+                        {
+                            tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
+                            db.Entry(tmp_quota).State = EntityState.Modified;
+                        }
                     }
-                    else
-                    {
-                        tmp_quota.QuotaCount = Int32.Parse(tmp_string[1]);
-                    }
+                    db.SaveChanges();
                 }
-                db.SaveChanges();
+            } 
+            catch (Exception e)
+            {
+                Response.AppendToLog(e.StackTrace);
             }
         }
 
@@ -765,9 +770,9 @@ namespace SocialFORM.Controllers
         }
 
         [HttpGet]
-        public JsonResult CheckQuotaCount(int id_quota)
+        public async Task<JsonResult> CheckQuotaCount(int id_quota)
         {
-            return Json(db.SetQuotaModels.FirstOrDefault(u => u.Id == id_quota), JsonRequestBehavior.AllowGet);
+            return Json(await db.SetQuotaModels.FirstOrDefaultAsync(u => u.Id == id_quota), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

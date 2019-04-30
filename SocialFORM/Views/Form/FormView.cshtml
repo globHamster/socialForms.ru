@@ -97,7 +97,7 @@
         q2 = $.get("/Question/getListTransition", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (data) {
                 list_transition = data;
-                console.info('Загрузка таблицы переходов успешна ---', list_transition);
+                //console.info('Загрузка таблицы переходов успешна ---', list_transition);
                 count_ajax++;
             })
             .error(function (err) { console.error('Ошибка загрузки таблицы переходов .../Question/getListTransition ', err); });
@@ -110,7 +110,7 @@
                     else
                         list_blocks[item.fromQuestion].push(item);
                 });
-                console.info('Загрузка таблицы блокировок успешна ---', list_blocks);
+                //console.info('Загрузка таблицы блокировок успешна ---', list_blocks);
                 count_ajax++;
             })
             .error(function (err) { console.error('Ошибка загрузки таблицы блокировок .../Question/getListBlocks ', err); });
@@ -120,7 +120,7 @@
                 $.each(server_data, function (i, item) {
                     list_question[item.Id] = item;
                 })
-                console.info("Успешная выгрузка данных ---", list_question);
+                //console.info("Успешная выгрузка данных ---", list_question);
                 count_ajax++;
             })
             .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListQuestion", err) });
@@ -190,7 +190,7 @@
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
                     list_file[item.QuestionID] = item;
-                    console.info("Path file ---- ", item.PathFile);
+                    //console.info("Path file ---- ", item.PathFile);
                     $.get("/Group/Load", { path: item.PathFile })
                         .success(function (server_file) {
                             list_text_file[item.QuestionID] = server_file;
@@ -219,7 +219,7 @@
 
         $.get("/Question/GetAllRange", { id_p: $('div[name=projectID]').attr('id') })
             .success(function (server_data) {
-                console.log("Успешна выгрузка диапозонов ===== ", server_data);
+                //console.log("Успешна выгрузка диапозонов ===== ", server_data);
                 $.each(server_data, function (i, item) {
                     if (list_range[item.BindQuestion] == undefined) {
                         list_range[item.BindQuestion] = [item];
@@ -228,7 +228,7 @@
                     }
 
                 })
-                console.log("Range massive === ", list_range);
+                //console.log("Range massive === ", list_range);
             })
 
         $.get("/Question/GetQuota", { id_p: $('div[name=projectID]').attr('id') })
@@ -238,7 +238,7 @@
                     item.IsActive = false;
                     list_quota[i] = item;
                 });
-                console.log("Успешна выгрузка квот ==== ", list_quota);
+                //console.log("Успешна выгрузка квот ==== ", list_quota);
             })
 
     }
@@ -265,7 +265,7 @@
 
     //Блок отрисовки анкеты
     function getStart() {
-        console.log("base >>>", list_base_answer);
+        //console.log("base >>>", list_base_answer);
         if (index >= massiv_question_id.length) {
             var RoleId = $("span.RoleID").attr("id");
             if (RoleId != 3) {
@@ -302,7 +302,7 @@
             }
 
             id_q = massiv_question_id[index];
-            console.log("ITEM QUESTION >>> ", list_question[id_q]);
+            //console.log("ITEM QUESTION >>> ", list_question[id_q]);
             type_q = list_question[id_q].TypeQuestion;
             var is_rotate = list_question[id_q].IsRotate;
             $('.view_form').html(list_question[id_q].TextQuestion);
@@ -960,6 +960,7 @@
             $('div.wrong_choise').hide();
             SaveResult();
             checkTransitionBack();
+            CheckQuotaBack();
             CheckGroup_Back();
             getStart();
         }
@@ -1302,7 +1303,6 @@
 
     function CheckQuotaBack() {
         var question_id = massiv_question_id[index];
-
         var res;
         if (list_question[question_id].IsKvot == true) {
             if (list_question[question_id].TypeQuestion == 3) {
@@ -1339,7 +1339,6 @@
                 }
             })
         }
-        console.log("Check Quota back >>>>> ", list_quota);
     }
 
     //Функция проверки счетчика квот
