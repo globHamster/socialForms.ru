@@ -1,9 +1,21 @@
 ﻿<div>
     <div style="display:grid; grid-template-columns:repeat(10, 1fr); background: #008dd2;padding:10px;border-radius: 10px;">
         <div style="grid-column:span 2;font-family:'Century Gothic';font-weight:900;color:#fff;">Список проектов</div>
-        <div style="grid-column: span 8;">
+        <div style="grid-column: span 8;margin-bottom:5px;">
             <select style="height:100%;" name="list_Project_sync" onchange="LoadQuestionFromProject($(this).find('option:selected').val())">
                 <option value="" selected disabled>Выберите проект</option>
+            </select>
+        </div>
+        <div style="grid-column:span 2;font-family:'Century Gothic';font-weight:900;color:#fff;">Фед. округ</div>
+        <div style="grid-column:span 8;margin-bottom:5px;">
+            <select style="height:100%;" name="list_FO_sync" onchange="ChangeFO_sync($(this).find('option:selected').val())">
+                <option value="" selected disabled>Выберите округ</option>
+            </select>
+        </div>
+        <div style="grid-column:span 2;font-family:'Century Gothic';font-weight:900;color:#fff;">Область</div>
+        <div style="grid-column:span 8;">
+            <select style="height:100%;" name="list_OB_sync">
+                <option value="" selected disabled>Выберите ообласть</option>
             </select>
         </div>
     </div>
@@ -50,7 +62,28 @@
                     $('select[name=list_Project_sync]').append("<option value='" + item.Id + "'>" + item.NameProject + "</option>");
                 })
             })
+
+        $.get("/Phone/getListFO")
+            .success(function (server_data) {
+                let select_FO = $('select[name=list_FO_sync]');
+                $.each(server_data, function (i, item) {
+                    select_FO.append('<option value="' + item.KodFO + '">' + item.NameFO + '</option>');
+                })
+            })
     })
+
+    function ChangeFO_sync(FO) {
+        $.get("/Phone/getListOB", { code: FO })
+            .success(function (server_data) {
+                let select_OB = $('select[name=list_OB_sync]');
+                select_OB.find("option:not(:eq(0))").remove();
+                select_OB.find('option').prop('selected', true);
+                $.each(server_data, function (i, item) {
+                    select_OB.append("<option value='" + item.KodOB + "'>" + item.NameOB + "</option>");
+                })
+
+            })
+    }
 
     function LoadQuestionFromProject(code_p) {
         $('select[name=list_Q_GOR]').find('option:not(:disabled)').remove();
@@ -77,12 +110,23 @@
     }
 
     function SyncBlank() {
+        $('.PreLoader').show();
         const project_id = $('select[name=list_Project_sync]').find('option:selected').val();
         let NP_id = $('select[name=list_Q_NP]').find('option:selected').val();
         let Sex_id = $('select[name=list_Q_Sex]').find('option:selected').val();
         let Age_id = $('select[name=list_Q_Age]').find('option:selected').val();
         let TypeNP_id = $('select[name=list_Q_Type_NP]').find('option:selected').val()
-        const GOR_id = $('select[name=list_Q_GOR]').find('option:selected').val();
+        let GOR_id = $('select[name=list_Q_GOR]').find('option:selected').val();
+        let FO_kod = $('select[name=list_FO_sync]').find('option:selected').val();
+        let OB_kod = $('select[name=list_OB_sync]').find('option:selected').val();
+        if (FO_kod == '') {
+            alert("Не выбран федеральный округ")
+            return;
+        }
+        if (OB_kod == '') {
+            alert("Не выбрана область");
+            return;
+        }
         if (GOR_id == '') {
             alert("Не выбран вопрос содержащий код GOR");
             return;
@@ -99,17 +143,19 @@
         if (TypeNP_id == '') {
             TypeNP_id = 0;
         }
-        let lst_blank;
-        let lst_sync_info = [];
-        $.get("/Phone/SyncBlankWithDB", { p_id: project_id, gor_id: GOR_id, s_id: Sex_id, a_id: Age_id, np_id: NP_id })
+
+        $.get("/Phone/SyncBlankWithDB", { FO_kod: FO_kod, OB_kod: OB_kod, p_id: project_id, gor_id: GOR_id, s_id: Sex_id, a_id: Age_id, np_id: NP_id, typeNP_id: TypeNP_id })
             .success(function (server_data) {
                 if (server_data == null) {
+                    $('.PreLoader').hide();
                     alert("Вызвано исключение при сохранения списка номеров");
-                    return;
+                } else {
+                    $('.PreLoader').hide();
+                    alert("Загружено " + server_data + " анкет");
                 }
-                console.log(">>> ", server_data);
             })
             .error(function () {
+                $('.PreLoader').hide();
                 alert("Ошибка синхронизации");
             })
     }

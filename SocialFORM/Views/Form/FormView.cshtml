@@ -266,6 +266,7 @@
     //Блок отрисовки анкеты
     function getStart() {
         //console.log("base >>>", list_base_answer);
+        console.log('active_group', active_group);
         if (index >= massiv_question_id.length) {
             var RoleId = $("span.RoleID").attr("id");
             if (RoleId != 3) {
@@ -532,7 +533,6 @@
                             }, 500).animate({ backgroundColor: 'white' }, 500);
                             break;
                         }
-
                     }
                     SaveResult();
                     CheckQuota();
@@ -559,14 +559,12 @@
                             }, 500).animate({ backgroundColor: 'white' }, 500);
                             break;
                         }
-
                     }
                     SaveResult();
                     CheckGroupGo();
                     index++;
                     CheckGroup();
                     getStart();
-                    //    goNext();
                 }
             }
                 break;
@@ -581,7 +579,6 @@
                     CheckQuota();
                     index++;
                     getStart();
-                    //goNext();
                 }
                 break;
             case 4:
@@ -594,7 +591,6 @@
                     index++;
                     CheckGroup();
                     getStart();
-                    //   goNext();
                 } else {
                     $('div.wrong_choise').fadeIn('slow');
                     //             $('div.limit_checked_div').remove();
@@ -645,7 +641,6 @@
                     else
                         mas.push($(this).attr('id'));
                     if ($(this).parent().find('input.is_free_area').prop('checked')) {
-
                         text_mass += $(this).attr('id') + '#' + $(this).parent().find('textarea.text_free_area').val() + ',';
                     }
                 });
@@ -694,13 +689,9 @@
 
     function TranslitIterarot(id_q, iter_all) {
         let id_base_answer;
-        console.log("ttt >>> ", iter_all);
         $.each(list_id_answer_all, function (i, item) {
             if (item.QuestionID == id_q) {
-                console.log("itemttt >> ", item);
                 if (item.Id == iter_all) {
-                    console.log("Find >>> ", item);
-
                     id_base_answer = item.AnswerKey;
                     return;
                 }
@@ -712,7 +703,6 @@
     //Проверка перехода при проходе вперед
     function checkTransitionGo() {
         var code_transition = find_transition_move(id_q, result[index]);
-        console.log(code_transition);
         if (code_transition >= 0) {
             if (Number(result[index]) > 0) {
                 if (result[index] == list_transition[code_transition].TriggerAnswer) {
@@ -728,8 +718,6 @@
                     index++;
                 }
             } else {
-                //console.log(result[index]);
-                console.log(TranslitIterarot(id_q, list_transition[code_transition].TriggerAnswer));
                 if (result[index] == list_base_answer[TranslitIterarot(id_q, list_transition[code_transition].TriggerAnswer)].BaseIndex) {
                     var jump_index;
                     list_transition[code_transition].ActiveTransition = true;
@@ -752,7 +740,6 @@
     function checkTransitionBack() {
         var code_transition = find_transition_back(massiv_question_id[index]);
         if (code_transition >= 0) {
-
             index = massiv_question_id.indexOf(list_transition[code_transition].fromQuestion);
             list_transition[code_transition].ActiveTransition = false;
         } else {
@@ -795,13 +782,10 @@
             }
                 break;
             case 4: {
-
                 var mas_tmp = result[index];
                 var mas_tmp_2 = list_question_bind_group[id_q];
-
                 if (mas_tmp_2 != undefined) {
                     $.each(mas_tmp_2, function (i, item) {
-
                         active_group[item] = false;
                     });
                     $.each(mas_tmp, function (i, item) {
@@ -815,6 +799,15 @@
                 break;
             default:
                 break;
+        }
+    }
+
+    //Сброс активных групп при переходе на вопрос связаный с ними
+    function ResetGroup() {
+        if (list_question_bind_group[massiv_question_id[index]] != null) {
+            $.each(list_question_bind_group[massiv_question_id[index]], function (i, item) {
+                active_group[item] = false;
+            })
         }
     }
 
@@ -954,7 +947,6 @@
 
     //Осуществление шага назад по анкете
     $('.previous').click(function () {
-        var arg;
         if (index > 0) {
             if (type_q == 2) $('div.limit_checked_div').remove();
             $('div.wrong_choise').hide();
@@ -962,6 +954,7 @@
             checkTransitionBack();
             CheckQuotaBack();
             CheckGroup_Back();
+            ResetGroup();
             getStart();
         }
     });
@@ -1021,7 +1014,6 @@
             if ($(this).hasClass('base_answer') && !$(this).find('input[name=group]').is(':disabled')) {
                 checkedAnswerBase($(this));
             }
-
         });
     });
 
@@ -1147,20 +1139,15 @@
     }
 
     function find_transition_move(id_question, list_result) {
-        console.log("Test >> ", list_result);
         for (var i = 0; i < list_transition.length; i++) {
             if (list_transition[i].fromQuestion == id_question) {
-                console.log("ID question ==== ", id_question);
                 for (var j = 0; j < list_result.length; j++) {
                     if (Number(list_result[j]) < 0) {
                         var is_find = false;
                         var item_find;
-
                         $.each(list_base_answer, function (index_, item) {
-
                             if (Number(item.BaseIndex) == Number(list_result[j])) {
                                 item_find = item;
-                                console.log("go here");
                                 is_find = true; return;
                             }
                         })
@@ -1190,7 +1177,6 @@
 
     function CheckLimitAnswer() {
         var limit_count = list_question[id_q].LimitCount;
-        console.log("limit count ", $('.answer_panel').find('input[name=group]:checked').length);
         if (limit_count > 0 && limit_count != null) {
             if ($('.answer_panel').find('input[name=group]:checked').length == limit_count) {
                 $('div.limit_checked_div').remove();
