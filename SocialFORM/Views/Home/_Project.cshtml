@@ -149,16 +149,18 @@
 
 <div id="contentPager">
     @Html.PagedListPager(
-                     Model,
-                     page => Url.Action("_Project", "Home", new { page = page }),
-                     PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
-                     )
+                                         Model,
+                                         page => Url.Action("_Project", "Home", new { page = page }),
+                                         PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
+                                         )
 </div>
 
 <div class="EncodingString" id="EncodingString">
     <div name="UTF-8"><input type="radio" name="setting" />UTF-8</div>
     <div name="Windows-1251"><input type="radio" name="setting">Windows-1251</div>
 </div>
+
+
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -195,8 +197,8 @@
                     '<td id="' + data.Id + '">' +
                     '<div class="NameProjectDiv" id="' + data.Id + '">' + data.NameProject + '</div>' +
                     '</td>' +
-                    '</tr>' 
-                    
+                    '</tr>'
+
                 $('.table').append(code);
                 HidePanelOfCreateProject(elemnt.parents('div[name=FieldOfCreateProject]'))
             })
@@ -209,10 +211,37 @@
         elemnt.parents('div[name=PanelOfCreateProject]').find('div[name=ButtonOfCreateProject]').css({ "display": "inline-flex" });
     }
 
+    let projectID_audio;
+    let userID_audio;
+    let date_audio;
+
+    function down_zip() {
+
+        if ($('input:checkbox[name=fio]').val() == "sh") {
+            userID_audio = document.getElementById("select_operator_audio").options[document.getElementById("select_operator_audio").options.selectedIndex].value;
+        } else {
+            userID_audio = 0;
+        }
+
+        if ($('input:checkbox[name=date]').val() == "sh") {
+            date_audio = document.getElementById("select_date_audio").options[document.getElementById("select_date_audio").options.selectedIndex].value;
+        } else {
+            date_audio = null;
+        }
+
+        window.location.href = '/Audio/AudioAllDownToZip?id_project=' + projectID_audio + '&id_user=' + userID_audio + '&date=' + date_audio;
+
+
+    }
+
     $('table.table').on("click", ".AudioDown_all", function () {
 
-        var id_project = $(this).attr('id');
-        window.location.href = '/Audio/AudioAllDownToZip?id_project=' + id_project;
+
+        document.getElementById('msg_audio').style.display = 'block';
+
+        //$('div.TextDivAudio').empty();
+        projectID_audio = $(this).attr('id');
+
         @*var ZipInfo = '@ViewData["ZipInfo"]';
         var str = ZipInfo.split(';')
         alert(str[0]);
@@ -222,6 +251,82 @@
         $("div.modal-body").append(code);
       //  $("#myModal").modal('show');*@
     });
+
+    $('input:radio[name=faudio1]').change(function () {
+        var ddd = $(this).val();
+        if (ddd == 'fa1') {
+            document.getElementById('Filter').style.display = 'block';
+        }
+        else {
+            document.getElementById('Filter').style.display = 'none';
+        }
+    });
+    $('input:checkbox[name=fio]').change(function () {
+        if ($(this).val() == "hid") {
+            document.getElementById('FilterFIO').style.display = 'block';
+            $('input:checkbox[name=fio]').val("sh");
+            //
+            //Запрос на список Операторов
+            //
+            var idproj = projectID_audio;
+            $('.select_operator_audio').find('option').remove();
+            var code = '<option selected value="-1">Все</option>';
+            $('select.select_operator_audio').append(code);
+            $.get("/Home/Statistics_operator?idp=" + idproj)
+                .success(function (server_data) {
+                    var server_data_tmp;
+                    server_data_tmp = server_data.sort(function (a, b) {
+                        return a.FamilyView.localeCompare(b.FamilyView);
+                    });
+                    $.each(server_data_tmp, function (i, data) {
+                        var code = '<option value="' + data.IdView + '">' + data.FamilyView + ' ' + data.NameView + '</option>';
+                        $('select.select_operator_audio').append(code);
+                    })
+                    console.info("Успешная выгрузка листа операторов ---- ", server_data);
+                })
+                .error(function (err) { console.error("Ошибка выгрузка данных ... /Home/Statistics_operator", err) })
+        }
+        else {
+            document.getElementById('FilterFIO').style.display = 'none';
+            $('input:checkbox[name=fio]').val("hid");
+            $('.select_operator').find('option').remove();
+            var code = '<option selected value="-1">Все</option>';
+            $('select.select_operator').append(code);
+        }
+    });
+    $('input:checkbox[name=date]').change(function () {
+        if ($(this).val() == "hid") {
+            document.getElementById('FilterDate').style.display = 'block';
+            $('input:checkbox[name=date]').val("sh");
+            ////
+            ////Запрос на список Операторов
+            ////
+            var idproj = projectID_audio;
+            $('.select_date_audio').find('option').remove();
+            var code = '<option selected value="-1">Все</option>';
+            $('select.select_date_audio').append(code);
+            $.get("/Home/Statistics_operator_date?idp=" + idproj)
+                .success(function (server_data) {
+                    $.each(server_data, function (i, data) {
+                        var code = '<option value="' + data + '">' + data + '</option>';
+                        $('select.select_date_audio').append(code);
+                    })
+                    console.info("Успешная выгрузка листа операторов ---- ", server_data);
+                })
+                .error(function (err) { console.error("Ошибка выгрузка данных ... /Home/Statistics_operator", err) })
+        }
+        else {
+            document.getElementById('FilterDate').style.display = 'none';
+            $('input:checkbox[name=date]').val("hid");
+            $('.select_date_audio').find('option').remove();
+            var code = '<option selected value="-1">Все</option>';
+            $('select.select_date_audio').append(code);
+        }
+    });
+
+
+
+
 
 
     $('button.infoP_close').click(function () {

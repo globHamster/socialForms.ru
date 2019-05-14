@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using SocialFORM.Models.Project;
 using System.Threading.Tasks;
 using SocialFORM.Models.Utilite;
+using System.IO;
 
 namespace SocialFORM.Controllers
 {
@@ -27,7 +28,7 @@ namespace SocialFORM.Controllers
         {
             using (ProjectContext db3 = new ProjectContext())
             {
-                ViewBag.Title = db3.SetProjectModels.First(u=>u.Id == id_p).NameProject;
+                ViewBag.Title = db3.SetProjectModels.First(u => u.Id == id_p).NameProject;
             }
             ViewBag.ProjectID = id_p;
             return PartialView();
@@ -169,12 +170,48 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
+
         [HttpPost]
         public void DeleteBlankResult(int id_res)
         {
+
             ResultModel tmp_result = db2.SetResultModels.FirstOrDefault(u => u.Id == id_res);
             if (tmp_result != null)
             {
+                string name_project = null;
+                int id_blank = 0;
+                using (ProjectContext dbp = new ProjectContext())
+                {
+                    name_project = dbp.SetProjectModels.FirstOrDefault(u => u.Id == tmp_result.ProjectID).NameProject;
+                    id_blank = db2.SetBlankModels.FirstOrDefault(u => u.Id == tmp_result.ProjectID).BlankID;
+                    string audio_name = id_blank.ToString() + name_project;
+
+                    List<BlankModel> tmp_list_b = db2.SetBlankModels.Where(u => u.Id == tmp_result.ProjectID).ToList();
+
+                    foreach (var str in tmp_list_b)
+                    {
+                        if (str.BlankID == id_blank)
+                        {
+                            if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + audio_name + ".mp3")))
+                            {
+                                System.IO.File.Delete(Path.Combine(Server.MapPath("~\\uploads\\"), audio_name + ".mp3"));
+                            }
+                        }
+
+                        if (str.BlankID > id_blank)
+                        {
+                            if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + audio_name + ".mp3")))
+                            {
+                                System.IO.File.Move(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + audio_name + ".mp3"), Path.Combine(Server.MapPath("~\\uploads\\"), (str.BlankID - 1).ToString() + audio_name + ".mp3"));
+                            }
+                        }
+
+                    }
+
+                }
+
+
+
                 List<BlankModel> tmp_list_blank = db2.SetBlankModels.Where(u => u.BlankID == tmp_result.Id).ToList();
                 if (tmp_list_blank.Count() > 0)
                 {
@@ -182,7 +219,7 @@ namespace SocialFORM.Controllers
                 }
                 List<ResultModel> tmp_change_list = db2.SetResultModels.Where(u => u.ProjectID == tmp_result.ProjectID && u.BlankID > tmp_result.BlankID).ToList();
                 int countBlankID = tmp_result.BlankID;
-                foreach(var item in tmp_change_list)
+                foreach (var item in tmp_change_list)
                 {
                     item.BlankID = countBlankID;
                     countBlankID++;
@@ -199,7 +236,8 @@ namespace SocialFORM.Controllers
             if (tmp != null)
             {
                 return Json(tmp, JsonRequestBehavior.AllowGet);
-            } else
+            }
+            else
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
@@ -212,12 +250,13 @@ namespace SocialFORM.Controllers
             if (lst_tmp != null)
             {
                 return Json(lst_tmp, JsonRequestBehavior.AllowGet);
-            } else
+            }
+            else
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
         }
 
-        
+
     }
 }

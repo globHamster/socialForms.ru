@@ -209,6 +209,7 @@
                                 <div style="display: none" name="CootdHeight">@item.CoordHeight</div>
                                 <img src="~/Content/map-marker-icon.png" width="20" height="20" />
                             </div>
+                            <div style="display: none" id="AudioDelID" name="AudioDelID">@item.BlankID</div>
                             @{
                                 int RoleId = (Int32)ViewData["RoleIdForProject"];
                                 if (RoleId != 3)
@@ -239,10 +240,10 @@
 </div>
 <div id="contentPager">
     @Html.PagedListPager(
-                                            Model,
-                                            page => Url.Action("_TableBlanks", "Home", new { id_project = ViewBag.Id_Project_Next, page = page }),
-                                            PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "table_blanks_new" })
-                                            )
+                                                    Model,
+                                                    page => Url.Action("_TableBlanks", "Home", new { id_project = ViewBag.Id_Project_Next, page = page }),
+                                                    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "table_blanks_new" })
+                                                    )
 </div>
 <script src="https://api-maps.yandex.ru/2.1/?load=package.standard&lang=ru-RU" type="text/javascript"></script>
 <script src="~/Scripts/FileSaver.js" type="text/javascript"></script>
@@ -649,6 +650,9 @@
         $(this).removeClass("Scaled").addClass('NotScaled');
         var elem = $(this);
         var id_result = $(this).attr('id');
+        var AudioID = $(this).find("div[name=AudioDelID]").text();
+        var AudioName = $("div.title").text();
+        var name = AudioID + '_' + AudioName;
         $.post("/Form/DeleteBlankResult", { id_res: id_result })
             .success(function () {
                 elem.parents('.answer_row').remove();
@@ -691,7 +695,7 @@
             }
         });
     })
-
+    let audio;
     $('div.table_blanks').on("click", ".AUDIOBattonPlau", function () {
         var AudioID = $(this).find("div[name=AudioPlayID]").text();
         var AudioName = $("div.title").text();
@@ -705,9 +709,26 @@
                     var delay_popup = 2000;
                     var msg_pop = document.getElementById('msg_pop');
                     setTimeout("document.getElementById('msg_pop').style.display='block';document.getElementById('msg_pop').className += 'fadeIn';", delay_popup);
-                    var code = '<p>' + name + '<p><audio src="/Audio/AudioDownloads?audio_name=' + name + '" controls preload="metadata"></audio>';
+                    var code = '<p>' + name + '<p><div class="media-wrapper"><audio id="player2" controls preload="auto"> <source src="/Audio/AudioDownloads?audio_name=' + name + '"  type="audio/mpeg"></audio></div>';
                     $("div.msg_pop").empty();
                     $("div.msg_pop").append(code);
+                    audio = document.getElementById("player2");
+                    function control() {
+                        document.addEventListener('keydown', function (e) {
+                            if (!audio.paused) audio.pause();
+                            if (e.which == 39) {
+                                audio.currentTime += 10;
+                            }
+                            if (e.which == 37) {
+                                audio.currentTime -= 10;
+                            }
+                        }, false);
+                        document.addEventListener('keyup', function (e) {
+                            if ((e.which == 39 || e.which == 37) && audio.paused) {
+                                audio.play();
+                            }
+                        }, false);
+                    }
                 } else {
                     alert('Файл не найден!');
                 }
