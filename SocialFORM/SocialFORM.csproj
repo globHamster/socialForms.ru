@@ -426,6 +426,7 @@
     <Content Include="Content\css\form_formView_style.css" />
     <Content Include="Content\css\home_project.css" />
     <Content Include="Content\css\home_test_style.css" />
+    <Content Include="Content\css\mainCSS.css" />
     <Content Include="Content\css\modal.css" />
     <Content Include="Content\css\phone_databaseview.css" />
     <Content Include="Content\css\stylesheet.css" />

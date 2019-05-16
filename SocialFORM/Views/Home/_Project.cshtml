@@ -42,7 +42,7 @@
         }
 </style>
 
-<h2>Список проектов</h2>
+<h2 class="H2List">Список проектов</h2>
 <div name="PanelOfCreateProject">
     <div style="display:inline-flex;justify-content:center;align-items:center;width:140px;height:30px;background:#008dd2;padding:1px;" onclick="ShowPanelCreateProject($(this))" name="ButtonOfCreateProject">
         <div style="font-size:20px;font-weight:600;color:#CCFF90;margin-right:5px;">&#10010;</div>
@@ -68,13 +68,13 @@
         int RoleId = (Int32)ViewData["RoleIdForProject"];
         if (RoleId != 3)
         {
-            <tr>
+            @*<tr>
                 <th>
 
                     <span class="create_project" style="cursor: pointer;">Имя проекта </span><button class="create_project_button">Создать проект</button>
                 </th>
                 <th></th>
-            </tr>
+            </tr>*@
 
 
             foreach (var item in Model)
@@ -93,8 +93,9 @@
                             <div class="CheckEncode">&#9776;</div>
                         </div>
                         <div class="AudioDown_all" id="@item.Id"><img src="~/Content/downloads-i.png" width="20" height="20" /></div>
-                        @Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
-                        @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |
+                        @*@Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
+        @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |*@
+                        <div style="width:5px;" />
                         @if (item.ActionProject == true)
                         {
                             //<div class="actionProject Action" id="@item.Id">В работе</div>
@@ -105,6 +106,8 @@
                             //<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>
                             <input id="@item.Id" class="toggle-event toggle-action" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow">
                         }
+                        <div style="width:5px;" />
+
                         @if (item.CostumerProject == true)
                         {
                             //<div class="actionProject Action" id="@item.Id">В работе</div>
@@ -181,6 +184,31 @@
     </div><!-- /.модальное окно-диалог -->
 </div><!-- /.модальное окно -->
 
+<div id="msg_audio" class="msg_audio" style="z-index: 999;">
+    <div class="TextDivAudio">
+        <label><input type="radio" class="inF inFA" name="faudio1" value="ALL" checked> Все</label>
+        <label><input type="radio" class="inF inFF" name="faudio1" value="fa1"> По Фильтру</label>
+
+        <div id="Filter">
+            <input type="checkbox" id="fio" name="fio" value="hid" onchange="changeFIO($(this))" /><label for="fio">FIO</label>
+            <div id="FilterFIO">
+                <select class="select_operator_audio" name="select_operator_audio" id="select_operator_audio"><option selected value="-1"> Все</option></select>
+            </div>
+            <input type="checkbox" id="date" name="date" value="hid" onchange="changeDATE($(this))"/><label for="date">Date</label>
+            <div id="FilterDate">
+                <select class="select_date_audio" name="select_date_audio" id="select_date_audio"><option selected value="-1"> Все</option></select>
+            </div>
+        </div>
+    </div>
+    <div class="butn_filte_audio">
+        <div class="cssRec" onclick="down_zip()">Скачать</div>
+        <div style="margin:0 10px;"></div>
+        <div class="cssRec" onclick="down_close()">Отмена</div>
+    </div>
+</div>
+
+
+
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
 
@@ -219,12 +247,14 @@
 
         if ($('input:checkbox[name=fio]').val() == "sh") {
             userID_audio = document.getElementById("select_operator_audio").options[document.getElementById("select_operator_audio").options.selectedIndex].value;
+            if (userID_audio == "-1") userID_audio = 0;
         } else {
             userID_audio = 0;
         }
 
         if ($('input:checkbox[name=date]').val() == "sh") {
             date_audio = document.getElementById("select_date_audio").options[document.getElementById("select_date_audio").options.selectedIndex].value;
+            if (date_audio == "-1") date_audio = null;
         } else {
             date_audio = null;
         }
@@ -239,17 +269,8 @@
 
         document.getElementById('msg_audio').style.display = 'block';
 
-        //$('div.TextDivAudio').empty();
         projectID_audio = $(this).attr('id');
 
-        @*var ZipInfo = '@ViewData["ZipInfo"]';
-        var str = ZipInfo.split(';')
-        alert(str[0]);
-        alert(str[1]);*@
-        @*var code = '<h3>Имя проекта: <i>' + str[0] + '</i><h3><p> Количество аудио записей: <i>' + str[1]+'<i></p>';
-        $("div.modal-body").empty();
-        $("div.modal-body").append(code);
-      //  $("#myModal").modal('show');*@
     });
 
     $('input:radio[name=faudio1]').change(function () {
@@ -261,8 +282,39 @@
             document.getElementById('Filter').style.display = 'none';
         }
     });
-    $('input:checkbox[name=fio]').change(function () {
-        if ($(this).val() == "hid") {
+
+
+    function down_close() {
+
+        if ($('input:checkbox[name=fio]').val() != "hid") {
+            document.getElementById('FilterFIO').style.display = 'none';
+            $('input:checkbox[name=fio]').val("hid");
+            $('.select_operator').find('option').remove();
+            var code = '<option selected value="-1">Все</option>';
+            $('select.select_operator').append(code);
+        }
+
+        if ($('input:checkbox[name=date]').val() != "hid") {
+            document.getElementById('FilterDate').style.display = 'none';
+            $('input:checkbox[name=date]').val("hid");
+            $('.select_date_audio').find('option').remove();
+            var code = '<option selected value="-1">Все</option>';
+            $('select.select_date_audio').append(code);
+        }
+
+        $('#fio').prop("checked", false);
+        $('#date').prop("checked", false);
+        $('.inFA').prop("checked", true);
+        $('.inFF').prop("checked", false);
+        document.getElementById('Filter').style.display = 'none';
+
+        document.getElementById('msg_audio').style.display = 'none';
+        return false;
+    }
+
+    function changeFIO(el) {
+        console.log("fio");
+        if (el.val() == "hid") {
             document.getElementById('FilterFIO').style.display = 'block';
             $('input:checkbox[name=fio]').val("sh");
             //
@@ -293,9 +345,11 @@
             var code = '<option selected value="-1">Все</option>';
             $('select.select_operator').append(code);
         }
-    });
-    $('input:checkbox[name=date]').change(function () {
-        if ($(this).val() == "hid") {
+    }
+
+
+    function changeDATE(el) {
+        if (el.val() == "hid") {
             document.getElementById('FilterDate').style.display = 'block';
             $('input:checkbox[name=date]').val("sh");
             ////
@@ -322,8 +376,7 @@
             var code = '<option selected value="-1">Все</option>';
             $('select.select_date_audio').append(code);
         }
-    });
-
+    }
 
 
 

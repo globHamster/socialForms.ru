@@ -147,12 +147,12 @@
 </style>
 <div name="PanelSettingResult" style="display: -webkit-inline-box;">
     <div style="display:flex; justify-content: center; align-items: center; flex-direction: column; margin-left: 15px;">
-    <div>
-    <select name="ListUserId" >
-        <option value="0">Все</option>
-    </select>
+        <div>
+            <select name="ListUserId">
+                <option value="0">Все</option>
+            </select>
         </div>
-        </div>
+    </div>
     <div style="padding-top: 10px; padding-left: 10px;">
         <div name="btn_date_blank" style="display:flex;padding:5px 15px;border-radius:15px;background-color:#008dd2;border: 2px solid white;color:white;font-weight:600;"
              onclick="
@@ -165,9 +165,18 @@
         </div>
     </div>
     <div style="padding-top: 10px; padding-left:10px;">
-    <div name="btn_filter_blank" style="display:flex; padding: 5px 15px; background-color: #008dd2; border: 2px solid white; color: #fff; border-radius:15px; font-weight:600;" onclick="ClickFunctionTest()">
-        <div>ФИЛЬТР</div>
+        <div name="btn_filter_blank" style="display:flex; padding: 5px 15px; background-color: #008dd2; border: 2px solid white; color: #fff; border-radius:15px; font-weight:600;" onclick="ClickFunctionTest()">
+            <div>ФИЛЬТР</div>
+        </div>
     </div>
+    <div style="padding-top: 10px; padding-left: 10px;">
+        <div name="btn_date_blank" style="display:flex;padding:5px 15px;border-radius:15px;background-color:#008dd2;border: 2px solid white;color:white;font-weight:600;">
+            <div class="AudioName"></div>
+        </div>
+    </div>
+
+    <div style="padding:3px;margin:5px 10px;border-radius:15px;background-color:#008dd2;border: 2px solid white;color:white;font-weight:600;">
+        <audio class="AudioHtml" id="player2" controls preload="auto" style="height: 30px;"></audio>
     </div>
 </div>
 <input type="hidden" name="user_id" value="@ViewBag.UserId"/>
@@ -701,10 +710,11 @@
         });
     })
 
+    let audio;
     $('div.table_blanks').on("click", ".AUDIOBattonPlau", function () {
+        console.log("Play");
         var AudioID = $(this).find("div[name=AudioPlayID]").text();
-        var AudioName = String($("div.title").text());
-        console.log(AudioName);
+        var AudioName = $("div.title").text();
         var name = AudioID + '_' + AudioName;
         $.ajax({
             url: '/Audio/AudioFind',
@@ -712,12 +722,16 @@
             data: { audio_name: name },
             success: function (res) {
                 if (res == 200) {
-                    var delay_popup = 2000;
-                    var msg_pop = document.getElementById('msg_pop');
-                    setTimeout("document.getElementById('msg_pop').style.display='block';document.getElementById('msg_pop').className += 'fadeIn';", delay_popup);
-                    var code = '<p>' + name + '<p><audio src="/Audio/AudioDownloads?audio_name=' + name + '" controls preload="metadata"></audio>';
-                    $("div.msg_pop").empty();
-                    $("div.msg_pop").append(code);
+                    var audio = document.getElementById('player2');
+                    var codeName = AudioID;
+                    var codeSRC = '<source src="/Audio/AudioDownloads?audio_name=' + name + '"  type="audio/mpeg">';
+                    $(".AudioName").empty();
+                    $(".AudioHtml").empty();
+                    $(".AudioName").append(codeName);
+                    $(".AudioHtml").append(codeSRC);
+                    audio.load();
+
+                    audio.play();
                 } else {
                     alert('Файл не найден!');
                 }

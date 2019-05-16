@@ -1,0 +1,370 @@
+﻿.NameProjectDiv {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    align-items: center !important;
+    font-weight: bold !important;
+}
+
+.ShowDB {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    align-items: center !important;
+    font-weight: bold !important;
+}
+
+.ExportButton {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    align-items: center !important;
+    font-weight: bold !important;
+}
+
+.btn-primary {
+    color: #ffffff !important;
+    background-color: #81c784 !important;
+    border-color: #81c784 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: bold !important;
+}
+
+.pagination > .active > a {
+    color: #ffffff !important;
+    background-color: #008dd2 !important;
+    border-color: #008dd2 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    align-items: center !important;
+}
+
+.pagination > li > a {
+    color: #008dd2 !important;
+    background-color: #ffffff !important;
+    border-color: #008dd2 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    align-items: center !important;
+}
+
+.H2List {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    align-items: center !important;
+    color: #ffffff !important;
+    background-color: #81c784 !important;
+    border: 2px solid;
+    border-color: #81c784 !important;
+    border-radius: 10px;
+    text-align: center;
+    padding: 5px;
+}
+
+.H3List {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    color: #ffffff !important;
+    background-color: #81c784 !important;
+    border-color: #81c784 !important;
+    border-radius: 10px;
+    text-align: center;
+    padding: 5px;
+    font-size: 18px;
+    width: 80%;
+    font-weight: bold !important;
+}
+
+.btn-default.active {
+    color: #ffffff !important;
+    background-color: #f44336;
+    border-color: #f44336;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    align-items: center !important;
+    font-weight: bold !important;
+}
+
+.select_project, .select_operator {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    color: #008dd2 !important;
+    font-weight: bold !important;
+    font-size: 16px;
+    font-weight: bold !important;
+    border: 2px solid #008dd2 !important;
+    border-radius: 5px !important;
+    background-color: #ffffff !important;
+    height: 34px !important;
+    padding: 5px !important;
+    line-height: 1 !important;
+    -webkit-appearance: none !important;
+    width: 100% !important;
+}
+
+    .select_operator:disabled {
+        color: #9a9797 !important;
+        background-color: #ffffff;
+        border: 2px solid #9a9797;
+    }
+
+.daterangepicker {
+    color: #008dd2 !important;
+    background-color: #ffffff !important;
+    border-color: #008dd2 !important;
+    border: 2px solid #008dd2 !important;
+    border-radius: 5px !important;
+}
+
+#reportrange {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    color: #008dd2 !important;
+    font-weight: bold !important;
+    font-size: 16px;
+    font-weight: bold !important;
+    border: 2px solid #008dd2 !important;
+    border-radius: 5px !important;
+    background-color: #ffffff !important;
+    height: 34px !important;
+    padding: 5px !important;
+    line-height: 1 !important;
+    -webkit-appearance: none !important;
+    width: 100% !important;
+}
+
+.drp-buttons {
+    color: #ffffff !important;
+    background-color: #008dd2 !important;
+    border: 2px solid #008dd2 !important;
+    border-radius: 2px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: bold !important;
+    font-size: 16px;
+}
+
+.hourselect, .minuteselect {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    color: #008dd2 !important;
+    font-weight: bold !important;
+    font-size: 16px;
+    font-weight: bold !important;
+    border: 2px solid #008dd2 !important;
+    border-radius: 5px !important;
+    background-color: #ffffff !important;
+    padding: 5px !important;
+    line-height: 1 !important;
+    -webkit-appearance: none !important;
+}
+
+.daterangepicker .calendar-table th {
+    font-size: 14px !important;
+    font-weight: bold !important;
+}
+
+.daterangepicker .drp-selected {
+    font-size: 14px !important;
+}
+
+.TextStat, .s_data, .data {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    color: #008dd2 !important;
+    font-weight: bold !important;
+    font-size: 16px;
+    height: 34px;
+    padding: 5px;
+    line-height: 1;
+    -webkit-appearance: none;
+    width: 268px;
+}
+
+.info {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: solid 2px #f44336;
+    text-align: center;
+}
+
+.headerExit, .listAudio {
+    color: #428bca !important;
+    font-weight: bold !important;
+}
+
+.name_operator, .textInfoMenu {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    color: #008dd2 !important;
+    font-weight: bold !important;
+    font-size: 16px;
+    height: 34px;
+    padding: 5px;
+    line-height: 1;
+    -webkit-appearance: none;
+    width: 268px;
+}
+
+.RoleID {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    color: #f44336 !important;
+    font-weight: bold !important;
+    font-size: 14px;
+    height: 34px;
+    padding: 5px;
+    line-height: 1;
+    -webkit-appearance: none;
+    width: 268px;
+}
+
+.ui-jqgrid {
+    border: 2px solid #008dd2 !important;
+    width: 100% !important;
+}
+
+.ui-jqgrid-view {
+    width: 100% !important;
+}
+
+.ui-jqgrid-htable, .ui-jqgrid-btable, .ui-jqgrid-bdiv, .ui-jqgrid-pager {
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 1px solid #008dd2;
+}
+
+
+.ui-widget-header {
+    background: #008dd2 !important;
+    width: 100% !important;
+    color: white !important;
+    font-size: 16px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+/*Текст шапки грида*/
+/*.ui-jqgrid-title {
+    font-size: 16px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}*/
+
+.ui-th-column {
+    border: 1px solid #008dd2 !important;
+    background: #008dd2 50% 50% repeat-x !important;
+    font-weight: bold !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+.ui-jqgrid-pager {
+    background: #2694e8 !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: bold !important;
+}
+
+.ui-state-default a {
+    color: #ffffff !important;
+}
+
+.ui-jqdialog {
+    width: 500px !important;
+    height: 400px !important;
+}
+
+.ui-pg-input, .ui-pg-selbox, .ui-search-input input {
+    border-radius: 5px;
+}
+
+.ui-widget-content:nth-child(2n+1) {
+    background: #98bf99 !important;
+}
+
+.ui-widget-content {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: bold !important;
+    text-align: center;
+}
+
+    .ui-widget-content td {
+        font-weight: bold !important;
+        text-align: center;
+    }
+
+    .ui-state-highlight, .ui-widget-content .ui-state-highlight {
+        border: 1px solid #f44336 !important;
+        background: #ec7970 url(images/ui-bg_highlight-soft_25_ffef8f_1x100.png) 50% top repeat-x !important;
+    }
+
+#alertmod_jqgStat, #alertmod_jqg {
+    display: none;
+}
+
+.project_layer td {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: bold !important;
+    text-align: center;
+}
+
+.view_form p {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    background-color: #fff !important;
+}
+
+.view_form {
+    background-color: #fff !important;
+    border: 2px solid #008dd2 !important;
+    border-radius: 5px !important;
+}
+
+.free_text, .text_free_area {
+    border-radius: 5px !important;
+    border: 2px solid #008dd2 !important;
+    padding: 0 5px !important;
+    margin: 0 10px !important;
+}
+
+#phone_number {
+    border-radius: 5px !important;
+    border: 2px solid #008dd2 !important;
+}
+
+.answer_table {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.save_data, button.begin_form, .all_again, button.next, button.previous {
+    border: 2px solid #008DD2;
+    background: #008dd2;
+    color: #fff;
+    border-radius: 5px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    text-align: center;
+}
+
+.phone_number span {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #008dd2;
+}
+.no_speck {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #f44336;
+}
+
+.tool_layer td input[type=checkbox]:checked + label:after {
+    outline: 1px solid #939598 !important;
+    border: 2px solid #fff !important;
+    width: 14px !important;
+    height: 14px !important;
+    background-color: #008dd2 !important;
+}
+
+
+.tool_layer td label[class=mul]:after {
+    content: '';
+    display: block;
+    height: 14px;
+    width: 14px;
+    outline: 1px solid #939598;
+    margin: 0 5px 0 0 !important;
+}
+
+.mul {
+    margin: 0 5px 0 0 !important;
+}
+
+button.begin_form {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}

@@ -157,10 +157,13 @@ namespace SocialFORM.Controllers
             System.Web.HttpContext.Current.Application.Lock();
             ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
             System.Web.HttpContext.Current.Application.UnLock();
-            if (RoleID != 3) {
+            if (RoleID != 3)
+            {
                 tmp_listProject = db4.SetProjectModels.ToList();
                 listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
-            } else {
+            }
+            else
+            {
                 tmp_listProject = db4.SetProjectModels.Where(u => u.CostumerProject == true).ToList();
                 listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
             }
@@ -475,7 +478,7 @@ namespace SocialFORM.Controllers
         public ActionResult _TableBlanksSetting(string id_project, int? page, int UserId, string date)
         {
             List<string> lst_date = new List<string>();
-            date.Split('|').ToList().ForEach(u =>
+            date?.Split('|').ToList().ForEach(u =>
             {
                 if (u != "")
                 {

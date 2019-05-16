@@ -183,16 +183,16 @@ namespace SocialFORM.Controllers
                 using (ProjectContext dbp = new ProjectContext())
                 {
                     name_project = dbp.SetProjectModels.FirstOrDefault(u => u.Id == tmp_result.ProjectID).NameProject;
-                    id_blank = db2.SetBlankModels.FirstOrDefault(u => u.Id == tmp_result.ProjectID).BlankID;
-                    string audio_name = id_blank.ToString() + name_project;
+                    id_blank = db2.SetResultModels.FirstOrDefault(u => u.Id == id_res).BlankID;
+                    string audio_name = id_blank.ToString() + "_" + name_project;
 
-                    List<BlankModel> tmp_list_b = db2.SetBlankModels.Where(u => u.Id == tmp_result.ProjectID).ToList();
+                    List<ResultModel> tmp_list_b = db2.SetResultModels.Where(u => u.ProjectID == tmp_result.ProjectID).ToList();
 
                     foreach (var str in tmp_list_b)
                     {
                         if (str.BlankID == id_blank)
                         {
-                            if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + audio_name + ".mp3")))
+                            if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), audio_name + ".mp3")))
                             {
                                 System.IO.File.Delete(Path.Combine(Server.MapPath("~\\uploads\\"), audio_name + ".mp3"));
                             }
@@ -200,9 +200,9 @@ namespace SocialFORM.Controllers
 
                         if (str.BlankID > id_blank)
                         {
-                            if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + audio_name + ".mp3")))
+                            if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + "_" + name_project + ".mp3")))
                             {
-                                System.IO.File.Move(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + audio_name + ".mp3"), Path.Combine(Server.MapPath("~\\uploads\\"), (str.BlankID - 1).ToString() + audio_name + ".mp3"));
+                                System.IO.File.Move(Path.Combine(Server.MapPath("~\\uploads\\"), str.BlankID.ToString() + "_" + name_project + ".mp3"), Path.Combine(Server.MapPath("~\\uploads\\"), (str.BlankID - 1).ToString() + "_" + name_project + ".mp3"));
                             }
                         }
 

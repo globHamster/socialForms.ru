@@ -74,6 +74,7 @@ namespace SocialFORM.Controllers
             // Имя файла - необязательно
             string file_name = audio_name + ".mp3";
             var file = File(file_path, file_type, file_name);
+            Response.AddHeader("accept-ranges:", " bytes");
             return file;
         }
 
