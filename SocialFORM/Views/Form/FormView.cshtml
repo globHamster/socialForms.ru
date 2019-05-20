@@ -44,6 +44,14 @@
     </div>
     <div class="NewButton">Заново</div>
 </div>
+
+<div class="TextStartRec">
+    <div class="TextDiv">
+        Дождитесь поступления звонка.
+    </div>
+    <div class="StartRec" onclick="CheckRec()">Начать</div>
+</div>
+
 <script src="~/Scripts/device.js"></script>
 <script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -254,6 +262,18 @@
         }
     }
 
+    let rec = false;
+
+    //Проверка записи
+    function CheckRec() {
+        if (rec == false) {
+            $('.TextStartRec').hide();
+            $.post("http://localhost:7777", "StartRecord#");
+            rec = true;
+        }
+    }
+
+
     //Ожидание выгрузки данных с сервера
     setTimeout(TestFunc(), 50);
 
@@ -372,13 +392,13 @@
                                 if (skip) { skip = false; return; }
                                 if (item.AnswerType == 1) {
                                     if (list_answer[item.AnswerKey].isFreeArea) {
-                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="checkbox" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden checked/></td></tr>')
+                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="checkbox" name="group" id="' + item.AnswerKey + '" hidden><label class="mul" for="' + item.AnswerKey + '"></label> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden checked/></td></tr>')
                                     } else {
-                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="checkbox" name="group" id="' + item.AnswerKey + '"> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden/></td></tr>')
+                                        $('.answer_table').append('<tr class="tool_layer"><td><input type="checkbox" name="group" id="' + item.AnswerKey + '" hidden><label class="mul" for="' + item.AnswerKey + '"></label> ' + list_answer[item.AnswerKey].AnswerText + '<input type="checkbox" class="is_free_area" hidden/></td></tr>')
                                     }
                                 }
                                 else
-                                    $('.answer_table').append('<tr class="tool_layer base_answer"><td><input type="checkbox" name="group" id="' + list_base_answer[item.AnswerKey].BaseIndex + '"> <label for="' + list_base_answer[item.AnswerKey].BaseIndex + '"><span></span></label><span class="no_speck">(НЕ ЗАЧИТЫВАТЬ)</span> ' + list_base_answer[item.AnswerKey].AnswerText + '</td></tr>')
+                                    $('.answer_table').append('<tr class="tool_layer base_answer"><td><input type="checkbox" name="group" id="' + list_base_answer[item.AnswerKey].BaseIndex + '" hidden> <label class="mul" for="' + list_base_answer[item.AnswerKey].BaseIndex + '"><span></span></label><span class="no_speck">(НЕ ЗАЧИТЫВАТЬ)</span> ' + list_base_answer[item.AnswerKey].AnswerText + '</td></tr>')
                             }
                         })
                         FindAnswer();
@@ -1040,6 +1060,7 @@
         end_time = undefined;
         $(this).remove();
         $('#Tables').load('/Form/FormView?id_p=' + $('div[name=projectID]').attr('id'), '', function () { $('div.waiting_screen').remove(); });
+        $.post("http://localhost:7777", "StopRecord#");
     })
 
     //Дополнительные функции

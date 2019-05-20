@@ -4,16 +4,16 @@
     ViewBag.Title = "Login";
 }
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Войти в личны кабинет</h4>
+
+    <div class="form-horizontal" style="margin-left:auto;margin-right:auto;display:block;">
+        <h2 class="H2List">Войти в личный кабинет</h2>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
-            <h4 class = "control-label col-md-2" >Логин :</h4>
+            <h4 class="control-label col-md-2 textLogin">Логин :</h4>
             <div class="col-md-10">
                 @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })
@@ -21,7 +21,7 @@
         </div>
 
         <div class="form-group">
-            <h4 class="control-label col-md-2">Пароль :</h4>
+            <h4 class="control-label col-md-2 textPass">Пароль :</h4>
             <div class="col-md-10">
                 @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
@@ -30,12 +30,36 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Войти" class="btn btn-default" />
+                <input type="submit" value="Войти" class="btn btn-default BtnLogin" />
             </div>
         </div>
     </div>
 }
 
+<style>
+    .textLogin, .textPass {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        color: #008dd2;
+    }
+
+    .form-control {
+        border-radius: 5px !important;
+        border: 2px solid #008dd2 !important;
+    }
+
+    .BtnLogin {
+        border: 2px solid #008DD2;
+        background: #008dd2;
+        color: #fff;
+        border-radius: 5px !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        text-align: center;
+    }
+</style>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }

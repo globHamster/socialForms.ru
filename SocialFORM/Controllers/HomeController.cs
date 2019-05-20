@@ -157,10 +157,13 @@ namespace SocialFORM.Controllers
             System.Web.HttpContext.Current.Application.Lock();
             ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
             System.Web.HttpContext.Current.Application.UnLock();
-            if (RoleID != 3) {
+            if (RoleID != 3)
+            {
                 tmp_listProject = db4.SetProjectModels.ToList();
                 listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
-            } else {
+            }
+            else
+            {
                 tmp_listProject = db4.SetProjectModels.Where(u => u.CostumerProject == true).ToList();
                 listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
             }
@@ -475,7 +478,7 @@ namespace SocialFORM.Controllers
         public ActionResult _TableBlanksSetting(string id_project, int? page, int UserId, string date)
         {
             List<string> lst_date = new List<string>();
-            date.Split('|').ToList().ForEach(u =>
+            date?.Split('|').ToList().ForEach(u =>
             {
                 if (u != "")
                 {
@@ -1103,6 +1106,20 @@ namespace SocialFORM.Controllers
             }
             return Json(res, JsonRequestBehavior.AllowGet);
         }
+
+        public JsonResult Statistics_operator_date(int idp)
+        {
+
+            List<ResultModel> projectModel = db.SetResultModels.Where(u => u.ProjectID == idp).ToList();
+            List<string> lst_data_blank = new List<string>();
+            projectModel.ForEach(u =>
+            {
+                lst_data_blank.Add(u.Data.ToShortDateString());
+            });
+            lst_data_blank = lst_data_blank.Distinct().ToList();
+            return Json(lst_data_blank, JsonRequestBehavior.AllowGet);
+        }
+
 
         [HttpGet]
         public JsonResult getResultListFilter(int id_project, int id_operator, string startTime, string endTime)

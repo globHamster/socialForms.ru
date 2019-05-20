@@ -13,7 +13,7 @@
 <script src="~/Scripts/jquery-ui.js" type="text/javascript"></script>
 <script src="~/Scripts/jquery.jqGrid.min.js" type="text/javascript"></script>
 <script src="~/Scripts/i18n/grid.locale-ru.js" type="text/javascript"></script>
-
+<h2 class="H2List">Статистика</h2>
 
 <style>
     body {
@@ -40,84 +40,92 @@
         height: auto !important;
     }
 </style>
-<div>
-    Выберите проект :
-    <select class="select_project" name="select_project" id="select_project">
-        <option selected value="-1">Все</option>
-    </select>
-    <p></p>
-    <p class="s_project" hidden></p>
-    <script>
-        $('.select_project').change(function () {
-            $('.res2').empty();
-            $('.select_operator').prop('disabled', false);
-            $('.div_data').prop('hidden', false);
-            if ($('.s_data').text() == '') {
-                var startData = '-1';
-                var endData = '-1';
-                var startTime = '-1';
-                var endTime = '-1';
-            }
-            else {
-                var string = $('#reportrange span').text().split('-');
-                var startDataTime = string[0].split('_');
-                var endDataTime = string[1].split('_');
-                var startData = startDataTime[0];
-                var endData = endDataTime[0];
-                var startTime = startDataTime[1];
-                var endTime = endDataTime[1];
-            }
-            $('.s_project').empty();
-            $('.s_project').append(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].text);
-            jqGRID(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value,
-                document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].value,
-                startData,
-                endData,
-                startTime,
-                endTime
-            );
-            console.log(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value);
-        });
-    </script>
-    Выберите оператора :
-    <select class="select_operator" name="select_operator" id="select_operator" disabled>
-        <option selected value="-1">Все</option>
-    </select>
-    <p></p>
-    <p class="s_operator" hidden></p>
-    <script>
-        $('.select_operator').change(function () {
-            $('.res2').empty();
-            if ($('.s_data').text() == '') {
-                var startData = '-1';
-                var endData = '-1';
-                var startTime = '-1';
-                var endTime = '-1';
-            }
-            else {
-                var string = $('#reportrange span').text().split('-');
-                var startDataTime = string[0].split('_');
-                var endDataTime = string[1].split('_');
-                var startData = startDataTime[0];
-                var endData = endDataTime[0];
-                var startTime = startDataTime[1];
-                var endTime = endDataTime[1];
-            }
-            $('.s_operator').empty();
-            $('.s_operator').append(document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].text);
-            jqGRID(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value,
-                document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].value,
-                startData,
-                endData,
-                startTime,
-                endTime
-            );
-            console.log(document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].value);
-        });
-    </script>
-    <div class="div_data" hidden>
-        Выберите дату и время :
-        <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%">
+<div class="row">
+    <div class="col-lg-6">
+        <span class="TextStat">Выберите проект :</span>
+        <div>
+            <select class="select_project" name="select_project" id="select_project">
+                <option selected value="-1">Все</option>
+            </select>
+            <p></p>
+            <p class="s_project" hidden></p>
+            <script>
+                $('.select_project').change(function () {
+                    $('.res2').empty();
+                    $('.select_operator').prop('disabled', false);
+                    $('.div_data').prop('hidden', false);
+                    if ($('.s_data').text() == '') {
+                        var startData = '-1';
+                        var endData = '-1';
+                        var startTime = '-1';
+                        var endTime = '-1';
+                    }
+                    else {
+                        var string = $('#reportrange span').text().split('-');
+                        var startDataTime = string[0].split('_');
+                        var endDataTime = string[1].split('_');
+                        var startData = startDataTime[0];
+                        var endData = endDataTime[0];
+                        var startTime = startDataTime[1];
+                        var endTime = endDataTime[1];
+                    }
+                    $('.s_project').empty();
+                    $('.s_project').append(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].text);
+                    jqGRID(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value,
+                        document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].value,
+                        startData,
+                        endData,
+                        startTime,
+                        endTime
+                    );
+                    console.log(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value);
+                });
+            </script>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <span class="TextStat">Выберите оператора :</span>
+        <div>
+            <select class="select_operator" name="select_operator" id="select_operator" disabled>
+                <option selected value="-1">Все</option>
+            </select>
+            <p></p>
+            <p class="s_operator" hidden></p>
+            <script>
+                $('.select_operator').change(function () {
+                    $('.res2').empty();
+                    if ($('.s_data').text() == '') {
+                        var startData = '-1';
+                        var endData = '-1';
+                        var startTime = '-1';
+                        var endTime = '-1';
+                    }
+                    else {
+                        var string = $('#reportrange span').text().split('-');
+                        var startDataTime = string[0].split('_');
+                        var endDataTime = string[1].split('_');
+                        var startData = startDataTime[0];
+                        var endData = endDataTime[0];
+                        var startTime = startDataTime[1];
+                        var endTime = endDataTime[1];
+                    }
+                    $('.s_operator').empty();
+                    $('.s_operator').append(document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].text);
+                    jqGRID(document.getElementById("select_project").options[document.getElementById("select_project").options.selectedIndex].value,
+                        document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].value,
+                        startData,
+                        endData,
+                        startTime,
+                        endTime
+                    );
+                    console.log(document.getElementById("select_operator").options[document.getElementById("select_operator").options.selectedIndex].value);
+                });
+            </script>
+        </div>
+    </div>
+    <div class="div_data" style="padding: 0 1.5%;" hidden>
+        <span class="TextStat">Выберите дату и время :</span>
+        <div id="reportrange" style="cursor: pointer;">
             <i class="fa fa-calendar"></i>&nbsp;
             <span class="data"></span> <i class="fa fa-caret-down"></i>
         </div>
@@ -151,7 +159,7 @@
     <table id="jqgStat"></table>
     <div id="jpagerStat"></div>
 </div>
-<div class="info" style="border:solid 1px #ff0000; padding:0px 15px;">
+<div class="info">
     <p><b>1..N</b> - Время с начала первой анкеты до конца последней анкеты в данном диапазоне</p>
     <p>Все данные рассчитываются без учета <b>Учеников</b> </p>
 
@@ -160,9 +168,9 @@
 
 </div>
 @*<div class="res3">
-    Итог:
-    @ViewData["Test"]
-</div>*@
+        Итог:
+        @ViewData["Test"]
+    </div>*@
 <script type="text/javascript">
     //
     //Запрос на список проекта
@@ -289,7 +297,6 @@
             ],
             rowNum: 25,
             rowList: [25, 50, 75],
-            width: 800,
             pager: '#jpagerStat',
             loadonce: true,
             sortname: 'Id',
@@ -329,23 +336,22 @@
             colNames: ['№', 'Дата', 'К.Анкет', 'К.Польз.', 'К.Анк.Час', 'Ср.Время', 'Мин.Длит', 'Макс.Длит', 'Сред.Откл', '1..N'],
             colModel: [
                 { name: 'IdView', index: 'IdView', width: 50, stype: 'text', key: true, editable: true },
-                { name: 'DataView', index: 'DataView', width: 150, sortable: true, editable: true, edittype: 'text' },
-                { name: 'CountProjectView', index: 'CountProjectView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'CountUserView', index: 'CountUserView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'CountHourView', index: 'CountHourView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'MediumTimeView', index: 'MediumTimeView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'MinLenghtView', index: 'MinLenghtView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'MaxLenghtView', index: 'MaxLenghtView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'MediumView', index: 'MediumView', width: 100, sortable: true, editable: true, edittype: 'text' },
+                { name: 'DataView', index: 'DataView', width: 80, sortable: true, editable: true, edittype: 'text' },
+                { name: 'CountProjectView', index: 'CountProjectView', width: 80, sortable: true, editable: true, edittype: 'text' },
+                { name: 'CountUserView', index: 'CountUserView', width: 80, sortable: true, editable: true, edittype: 'text' },
+                { name: 'CountHourView', index: 'CountHourView', width: 80, sortable: true, editable: true, edittype: 'text' },
+                { name: 'MediumTimeView', index: 'MediumTimeView', width: 80, sortable: true, editable: true, edittype: 'text' },
+                { name: 'MinLenghtView', index: 'MinLenghtView', width: 80, sortable: true, editable: true, edittype: 'text' },
+                { name: 'MaxLenghtView', index: 'MaxLenghtView', width: 80, sortable: true, editable: true, edittype: 'text' },
+                { name: 'MediumView', index: 'MediumView', width: 80, sortable: true, editable: true, edittype: 'text' },
                 //{ name: 'TimeUpView', index: 'TimeUpView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 //{ name: 'TimeOutView', index: 'TimeOutView', width: 100, sortable: true, editable: true, edittype: 'text' },
                 //{ name: 'TimeWorkView', index: 'TimeWorkView', width: 100, sortable: true, editable: true, edittype: 'text' },
-                { name: 'OneNView', index: 'OneNView', width: 100, sortable: true, editable: true, edittype: 'text' }
+                { name: 'OneNView', index: 'OneNView', width: 80, sortable: true, editable: true, edittype: 'text' }
                 //{ name: 'TimeAfkView', index: 'TimeAfkView', width: 100, sortable: true, editable: true, edittype: 'text' }
             ],
             rowNum: 25,
             rowList: [25, 50, 75],
-            width: 800,
             height: 300,
             pager: '#jpagerStatRes',
             loadonce: true,

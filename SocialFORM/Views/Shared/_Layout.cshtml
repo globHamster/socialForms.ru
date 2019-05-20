@@ -8,6 +8,7 @@
     <script src="~/scripts/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="../Content/bootstrap.css" />
     <link rel="stylesheet" href="../Content/Site.css" />
+    <link rel="stylesheet" href="~/Content/css/mainCSS.css" />
     <script src="../Scripts/bootstrap.js"></script>
     <script src="../Scripts/modernizr-2.6.2.js"></script>
     <script src="../Scripts/respond.js"></script>
@@ -88,10 +89,36 @@
                 transform: scale(1.2,1);
             }
         }
+
+        .headerMenuUl {
+            background-color: #008dd2;
+            color: white;
+            text-align: center;
+            font-size: 20px;
+            font-family: 'Courier New';
+            font-weight: 900;
+            border: 0px solid white;
+        }
+
+        .headerMenu {
+            background-color: #008dd2;
+        }
+
+        .headerMenuLi{
+            color: white !important;
+            font-size: 15px !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .headerMenuLink {
+            color: white !important;
+            font-size: 30px !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
     </style>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top headerMenu">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -99,14 +126,14 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("ifsocialForms.ru", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("IFSOCIALFORMS.ru", "Index", "Home", new { area = "" }, new { @class = "navbar-brand headerMenuLink" })
             </div>
-            <div class="navbar-collapse collapse">
+            <div class="navbar-collapse collapse headerMenuUl">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Домашняя страница", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Личный Кабинет", "_Index", "Home")</li>
-                    <li>@Html.ActionLink("О программе", "About", "Home")</li>
-                    <li>@Html.ActionLink("Контакт", "Contact", "Home")</li>
+                    <li>@Html.ActionLink("Домашняя страница", "Index", "Home", new { area = "" }, new { @class = "headerMenuLi" })</li>
+                    <li>@Html.ActionLink("Личный Кабинет", "_Index", "Home", new { area = "" }, new { @class = "headerMenuLi" })</li>
+                    <li>@Html.ActionLink("О программе", "About", "Home", new { area = "" }, new { @class = "headerMenuLi" })</li>
+                    <li>@Html.ActionLink("Контакт", "Contact", "Home", new { area = "" }, new { @class = "headerMenuLi" })</li>
                 </ul>
 
             </div>

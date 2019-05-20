@@ -49,7 +49,8 @@ namespace SocialFORM.Controllers
             System.Diagnostics.Debug.WriteLine(audio_name);
             try
             {
-                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), audio_name + ".mp3")))
+                System.Diagnostics.Debug.WriteLine(Path.Combine(Server.MapPath("~\\uploads\\"), audio_name + ".mp3").ToString());
+                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), audio_name + ".mp3")))
                 {
                     return 200;
                 }
@@ -73,6 +74,7 @@ namespace SocialFORM.Controllers
             // Имя файла - необязательно
             string file_name = audio_name + ".mp3";
             var file = File(file_path, file_type, file_name);
+            Response.AddHeader("accept-ranges:", " bytes");
             return file;
         }
 
@@ -83,29 +85,60 @@ namespace SocialFORM.Controllers
         }
 
         [HttpGet]
-        public FileResult AudioAllDownToZip(int id_project)
+        public FileResult AudioAllDownToZip(int id_project, int id_user, string date)
         {
+            System.Diagnostics.Debug.WriteLine("nameProject === >>>>" + id_project + "  count === >>>>" + id_user + "  " + date);
+
             ApplicationContext db = new ApplicationContext();
             ProjectContext db2 = new ProjectContext();
+
+
+
             int count = db.SetResultModels.Where(u => u.ProjectID == id_project).Count();
             string name_project = db2.SetProjectModels.Where(u => u.Id == id_project).First().NameProject;
             List<InputModel> inputModelsFiles = new List<InputModel>();
+
+            List<Models.Form.ResultModel> bd_tmp = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
+
+            if (id_user != 0) { bd_tmp = bd_tmp.Where(u => u.UserID == id_user).ToList(); }
+            if (date != "null")
+            {
+                DateTime StartDate = DateTime.Parse(date);
+                DateTime EndDate = DateTime.Parse(date);
+                EndDate = EndDate.AddDays(1);
+                bd_tmp = bd_tmp.Where(u => u.Data > StartDate && u.Data < EndDate).ToList();
+            }
+
             System.Diagnostics.Debug.WriteLine("nameProject === >>>>" + name_project + "  count === >>>>" + count);
             ////Создание списка файлов//
-            for (int i = 1; i <= count; i++)
+            foreach (var str in bd_tmp)
             {
-                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), i.ToString() + "_" + name_project + ".mp3")))
+                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), str.BlankID.ToString() + "_" + name_project + ".mp3")))
                 {
-                    inputModelsFiles.Add(new InputModel { Name = i + "_" + name_project + ".wav", Selected = true });
-                    System.Diagnostics.Debug.WriteLine("i === >>>>" + i + "  state === >>>>" + true);
+                    inputModelsFiles.Add(new InputModel { Name = str.BlankID + "_" + name_project + ".mp3", Selected = true });
+                    System.Diagnostics.Debug.WriteLine("i === >>>>" + str.BlankID + "  state === >>>>" + true);
                 }
-                else {
-                    System.Diagnostics.Debug.WriteLine("i === >>>>" + i + "  state === >>>>" + false);
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("i === >>>>" + str.BlankID + "  state === >>>>" + false);
                     continue;
                 }
             }
+
+            //for (int i = 1; i <= count; i++)
+            //{
+            //    if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), i.ToString() + "_" + name_project + ".mp3")))
+            //    {
+            //        inputModelsFiles.Add(new InputModel { Name = i + "_" + name_project + ".mp3", Selected = true });
+            //        System.Diagnostics.Debug.WriteLine("i === >>>>" + i + "  state === >>>>" + true);
+            //    }
+            //    else {
+            //        System.Diagnostics.Debug.WriteLine("i === >>>>" + i + "  state === >>>>" + false);
+            //        continue;
+            //    }
+            //}
             System.Diagnostics.Debug.WriteLine("countFiles === >>>>" + inputModelsFiles.Count());
-            
+
             //Создание ZIP архива
             List<string> filenames = inputModelsFiles.Where(m => m.Selected == true).Select(f => f.Name).ToList();
             System.Diagnostics.Debug.WriteLine("filenames === >>>>" + filenames.Count());
@@ -148,6 +181,23 @@ namespace SocialFORM.Controllers
 
             string file_type = "application/zip";
             return File(outputMemStream, file_type, filename);
+        }
+
+        [HttpPost]
+        public void DeleteAudioRemove(string audio_name)
+        {
+            ApplicationContext db = new ApplicationContext();
+            ProjectContext db2 = new ProjectContext();
+
+            if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads\\"), audio_name + ".mp3")))
+            {
+                System.IO.File.Delete(Path.Combine(Server.MapPath("~\\uploads\\"), audio_name + ".mp3"));
+                string[] tmp = audio_name.Split('_');
+
+                //System.IO.File.Move("oldfilename", "newfilename");
+
+            }
+
         }
     }
 }

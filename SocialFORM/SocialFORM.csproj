@@ -426,6 +426,7 @@
     <Content Include="Content\css\form_formView_style.css" />
     <Content Include="Content\css\home_project.css" />
     <Content Include="Content\css\home_test_style.css" />
+    <Content Include="Content\css\mainCSS.css" />
     <Content Include="Content\css\modal.css" />
     <Content Include="Content\css\phone_databaseview.css" />
     <Content Include="Content\css\stylesheet.css" />
@@ -459,9 +460,14 @@
     <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\jquery.contextmenu.css" />
+    <Content Include="Content\js\AudioPlayer.js" />
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\bootstrap2-toggle.js" />
+    <Content Include="Content\js\mediaelement-and-player.js" />
+    <Content Include="Content\js\mediaelement-and-player.min.js" />
+    <Content Include="Content\js\mediaelement.js" />
     <Content Include="Content\js\tether.min.js" />
+    <Content Include="Content\js\uppod-0.13.05.js" />
     <Content Include="Content\loading.css" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\Delete\DeleteController.cs" />
@@ -603,6 +609,7 @@
     <Content Include="Scripts\Audio\OggVorbisEncoder.min.js.mem" />
     <Content Include="Scripts\audioMP3\.DS_Store" />
     <Content Include="Scripts\audioMP3\vmsg.wasm" />
+    <None Include="Properties\PublishProfiles\CustomProfile5.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\chosen.jquery.js" />
     <Content Include="Scripts\daterangepicker.js" />

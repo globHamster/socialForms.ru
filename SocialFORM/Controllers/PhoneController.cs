@@ -1175,11 +1175,11 @@ namespace SocialFORM.Controllers
                     }
                 }
             }
-            string name_type = "(станц + моб)";
+            string name_type = "(стац + моб)";
             if (lst_setting[4])
             {
                 cmd_str_ += " AND (Type=0)";
-                name_type = "(станц)";
+                name_type = "(стац)";
             }
 
             if (lst_setting[5])
