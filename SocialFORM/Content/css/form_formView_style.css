@@ -151,6 +151,28 @@ input[type="radio"] {
     transition: 0.1s linear;
 }
 
+.InformWarm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: -50px;
+    width: 100%;
+    height: 50px;
+    border: 1px solid black;
+    background: #f44336;
+    left: 0px;
+}
+
+.NotCheckedTableItem {
+    background-color: #ff9999 !important;
+}
+
+.NotCheckedTableItem:hover {
+    background-color: rgb(114, 175, 255) !important;
+}
+
 @media (any-pointer: coarse) {
     @media screen and (max-width: 768px) {
         .previous {

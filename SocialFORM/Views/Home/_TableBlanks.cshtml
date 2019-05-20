@@ -298,7 +298,7 @@
             .success(function (server_data) {
                 var check_panel_date = $('div[name=panel_setting_load]');
                 $.each(server_data, function (i, item) {
-                    check_panel_date.append("<div style='grid-column: span 2;'><input type='checkbox' id='check" + item + "' name='" + item + "'/> <label for='check" + item + "'></label>" +
+                    check_panel_date.append("<div style='grid-column: span 2;'><input type='checkbox' id='check" + item + "' name='" + item + "' onchange='ChangColorBTNDate()'/> <label for='check" + item + "'></label>" +
                         "</div><div style='grid-column: span 8;'>" + item + "</div>");
                 });
             });
@@ -363,6 +363,14 @@
                     })
 
             })
+    }
+
+    function ChangColorBTNDate() {
+        if ($('div[name=panel_setting_load]').find('input:checked').length >= 1) {
+            $('div[name=btn_date_blank]').css("background-color", "#81c784");
+        } else {
+            $('div[name=btn_date_blank]').css("background-color", "#008dd2");
+        }
     }
 
     function WaitingLoad() {

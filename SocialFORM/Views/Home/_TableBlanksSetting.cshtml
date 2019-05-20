@@ -292,6 +292,7 @@
                 var user_id = $('input[name=user_id]').val();
                 var date_blank = $('input[name=date_blank]').val();
                 $('input[name=DateInput]').val(date_blank);
+                server_data.sort();
                 $.each(server_data, function (i, item) {
                     select_lst.append("<option value='" + item.UserId + "'" + (item.UserId == user_id ? "selected": "") + ">" + item.Family + " " + item.Name + "</option>");
                 })
@@ -302,12 +303,14 @@
                 var check_panel_date = $('div[name=panel_setting_load]');
                 var date_blank = $('input[name=date_blank]').val();
                 let hashDate = {};
-
+                if (date_blank != null && date_blank != "") {
+                    $('div[name=btn_date_blank]').css("background-color", "#81c784");
+                }
                 $.each(date_blank.split('|'), function (i, item) {
                     hashDate[item] = true;
                 })
                 $.each(server_data, function (i, item) {
-                    check_panel_date.append("<div style='grid-column: span 2;'><input type='checkbox' id='check" + item + "' name='" + item + "' " + (hashDate[item] ? "checked" : "") + "/> <label for='check" + item + "'></label>" +
+                    check_panel_date.append("<div style='grid-column: span 2;'><input type='checkbox' id='check" + item + "' name='" + item + "' " + (hashDate[item] ? "checked" : "") + " onchange='ChangColorBTNDate()'/> <label for='check" + item + "'></label>" +
                         "</div><div style='grid-column: span 8;'>" + item + "</div>");
                 });
             });
@@ -374,19 +377,27 @@
             })
     }
 
+    function ChangColorBTNDate() {
+        if ($('div[name=panel_setting_load]').find('input:checked').length >= 1) {
+            $('div[name=btn_date_blank]').css("background-color", "#81c784");
+        } else {
+            $('div[name=btn_date_blank]').css("background-color", "#008dd2");
+        }
+    }
+
     function WaitingLoad() {
         if (awayting_status >= 6) {
             CreateColumn();
             return;
         } else {
-            setTimeout(WaitingLoad, 2000);
+            setTimeout(WaitingLoad, 1000);
             return;
         }
     }
 
     setTimeout(function () {
         WaitingLoad();
-    }, 2000)
+    }, 1000)
 
     //Создание шапки таблицы результатов ответов
     function CreateColumn() {

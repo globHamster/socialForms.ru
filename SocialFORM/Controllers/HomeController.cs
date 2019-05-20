@@ -2988,7 +2988,7 @@ namespace SocialFORM.Controllers
             db.SetResultModels.Where(u => u.ProjectID == p_id).Select(u => u.UserID).Distinct().ToList().ForEach(u => {
                 lst_data_user.Add(db.SetDataUsers.First(t => t.UserId == u));
             });
-            return Json(lst_data_user, JsonRequestBehavior.AllowGet);
+            return Json(lst_data_user.OrderBy(u=>u.Family).ThenBy(u=>u.Name), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
