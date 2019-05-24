@@ -219,21 +219,9 @@
                                 <img src="~/Content/map-marker-icon.png" width="20" height="20" />
                             </div>
                             <div style="display: none" id="AudioDelID" name="AudioDelID">@item.BlankID</div>
-                            @{
-                                int RoleId = (Int32)ViewData["RoleIdForProject"];
-                                if (RoleId != 3)
-                                {
-                                    <div class="DeleteBlankButton" id="@item.Id">
-                                        &#10006;
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="DeleteBlankButton" id="@item.Id" style="pointer-events: none;cursor: default;">
-                                        &#10006;
-                                    </div>
-                                }
-                            }
+                            <div class="DeleteBlankButton" id="@item.Id">
+                                &#10006;
+                            </div>
                         </div>
                     </td>
                     <td><input type="hidden" name="UserID" value="@item.UserID" /> @item.BlankID</td>
@@ -297,6 +285,10 @@
     })
 
     function Init() {
+
+        if ($('span.RoleID').attr('id') == 3) {
+            $('table.export_table').find('.DeleteBlankButton').remove();
+        }
 
         $.get("/Home/GetListOperatorInProject", { p_id: Number($('div.table_blanks').attr('id')) })
             .success(function (server_data) {
@@ -734,7 +726,7 @@
                     $(".AudioName").append(codeName);
                     $(".AudioHtml").append(codeSRC);
                     audio.load();
-                    
+
                     audio.play();
                 } else {
                     alert('Файл не найден!');

@@ -30,7 +30,7 @@ namespace SocialFORM.Controllers
     {
         ApplicationContext db = new ApplicationContext();
         ProjectContext db2 = new ProjectContext();
-        public static int RoleID ;
+        public static int RoleID;
         public ActionResult Index()
         {
             return View();
@@ -78,7 +78,7 @@ namespace SocialFORM.Controllers
             ViewData["Role"] = result.First().RoleView;
             ViewData["RoleID"] = result.First().RoleIdView;
             System.Web.HttpContext.Current.Application.Lock();
-            System.Web.HttpContext.Current.Application["RoleID"] = result.First().RoleIdView; 
+            System.Web.HttpContext.Current.Application["RoleID"] = result.First().RoleIdView;
             System.Web.HttpContext.Current.Application.UnLock();
             RoleID = result.First().RoleIdView;
             //
@@ -95,7 +95,6 @@ namespace SocialFORM.Controllers
             }
 
             SetTimeAfk tmp = db.SetTimeAfk.Where(u => u.Id == 1).First();
-            System.Diagnostics.Debug.WriteLine("=====>>>>> time " + Convert.ToInt32(tmp.Time) * 1000);
             ViewBag.TimeID = (Convert.ToInt32(tmp.Time) * 1000).ToString();
 
             return View();
@@ -125,29 +124,18 @@ namespace SocialFORM.Controllers
         //
         //ОТРИСОВКА СПИСКА ПРОЕКТОВ
         ProjectContext db4 = new ProjectContext();
-        public static List<ProjectModel> listProject = new List<ProjectModel>();
         public static List<ProjectModel> tmp_listProject = new List<ProjectModel>();
         [HttpGet]
         //[Authorize(Roles = "Admin")]
         public ActionResult Project(int? page)
         {
             System.Web.HttpContext.Current.Application.Lock();
-            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            ViewData["RoleIdForProject"] = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
             System.Web.HttpContext.Current.Application.UnLock();
-            if (RoleID != 3)
-            {
-                tmp_listProject = db4.SetProjectModels.ToList();
-                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
-            }
-            else
-            {
-                tmp_listProject = db4.SetProjectModels.Where(u => u.CostumerProject == true).ToList();
-                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
-            }
+            tmp_listProject = db4.SetProjectModels.OrderByDescending(u => u.Id).ToList();
             int pageSize = 10;
             int pageNumber = (page ?? 1);
-
-            return PartialView("_Project", listProject.ToPagedList(pageNumber, pageSize));
+            return PartialView("_Project", tmp_listProject.ToPagedList(pageNumber, pageSize));
         }
 
         [HttpGet]
@@ -155,29 +143,31 @@ namespace SocialFORM.Controllers
         public ActionResult _Project(int? page)
         {
             System.Web.HttpContext.Current.Application.Lock();
-            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            ViewData["RoleIdForProject"] = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
             System.Web.HttpContext.Current.Application.UnLock();
-            if (RoleID != 3)
-            {
-                tmp_listProject = db4.SetProjectModels.ToList();
-                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
-            }
-            else
-            {
-                tmp_listProject = db4.SetProjectModels.Where(u => u.CostumerProject == true).ToList();
-                listProject = tmp_listProject.Reverse<ProjectModel>().ToList();
-            }
+            tmp_listProject = db4.SetProjectModels.OrderByDescending(u => u.Id).ToList();
             int pageSize = 10;
             int pageNumber = (page ?? 1);
-            return PartialView("_Project", listProject.ToPagedList(pageNumber, pageSize));
+            return PartialView("_Project", tmp_listProject.ToPagedList(pageNumber, pageSize));
         }
         //
+
+        [HttpGet]
+        [Authorize(Roles = "Customer")]
+        public ActionResult ProjectCustomer(int? page)
+        {
+            System.Web.HttpContext.Current.Application.Lock();
+            ViewData["RoleIdForProject"] = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            System.Web.HttpContext.Current.Application.UnLock();
+            IEnumerable<ProjectModel> customer_lst_project = db4.SetProjectModels.Where(u => u.CostumerProject == true).OrderByDescending(u => u.Id);
+            return PartialView(customer_lst_project);
+        }
 
         //[Authorize(Roles = "Operator")]
         public ActionResult ProjectOperator()
         {
             System.Web.HttpContext.Current.Application.Lock();
-            ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
+            ViewData["RoleIdForProject"] = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
             System.Web.HttpContext.Current.Application.UnLock();
             return PartialView(db4.SetProjectModels.Where(u => u.ActionProject == true));
         }
@@ -414,7 +404,7 @@ namespace SocialFORM.Controllers
                             DateTime etime = DateTime.Parse(u);
                             etime = etime.AddDays(1);
                             tmp_tableBlanks.AddRange(db.SetResultModels.Where(t => t.ProjectID == id_project && (t.Data > btime && t.Data < etime)));
-                        });                        
+                        });
                     }
                 }
                 else
@@ -431,7 +421,7 @@ namespace SocialFORM.Controllers
                             etime = etime.AddDays(1);
                             tmp_tableBlanks.AddRange(db.SetResultModels.Where(t => t.ProjectID == id_project && t.UserID == UserId && (t.Data > btime && t.Data < etime)));
                         });
-                        
+
                     }
                 }
                 if (tmp_tableBlanks != null && tmp_tableBlanks.Count > 0) tmp_tableBlanks.Reverse();
@@ -444,7 +434,8 @@ namespace SocialFORM.Controllers
                 ViewData["RoleIdForProject"] = RoleID = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
                 System.Web.HttpContext.Current.Application.UnLock();
                 return PartialView(tmp_tableBlanks.ToPagedList(pageNumber, pageSize));
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
                 System.Diagnostics.Debug.WriteLine(e.Data);
@@ -452,7 +443,7 @@ namespace SocialFORM.Controllers
                 System.Diagnostics.Debug.WriteLine(e.Message);
                 return PartialView(tmp_tableBlanks);
             }
-            
+
             //return PartialView(tmp);
         }
         //Отрисовка блока с результатами (ПО ПАНЕЛИ)
@@ -1844,7 +1835,7 @@ namespace SocialFORM.Controllers
             }
             return Json(info, JsonRequestBehavior.AllowGet);
         }
-        
+
         public ActionResult Options()
         {
             return PartialView();
@@ -1992,7 +1983,7 @@ namespace SocialFORM.Controllers
         {
             return Json(db2.SetProjectModels.ToList(), JsonRequestBehavior.AllowGet);
         }
-        
+
         //Таблица Статистика PATH 1
         public string GetDataStat(int id, int idop, string sd, string ed, string st, string et)
         {
@@ -2630,7 +2621,7 @@ namespace SocialFORM.Controllers
         {
             public string Tables_in_phone { get; set; }
         }
-        
+
         [HttpGet]
         public JsonResult GetListTable()
         {
@@ -3002,10 +2993,11 @@ namespace SocialFORM.Controllers
         public JsonResult GetListOperatorInProject(int p_id)
         {
             List<DataUser> lst_data_user = new List<DataUser>();
-            db.SetResultModels.Where(u => u.ProjectID == p_id).Select(u => u.UserID).Distinct().ToList().ForEach(u => {
+            db.SetResultModels.Where(u => u.ProjectID == p_id).Select(u => u.UserID).Distinct().ToList().ForEach(u =>
+            {
                 lst_data_user.Add(db.SetDataUsers.First(t => t.UserId == u));
             });
-            return Json(lst_data_user.OrderBy(u=>u.Family).ThenBy(u=>u.Name), JsonRequestBehavior.AllowGet);
+            return Json(lst_data_user.OrderBy(u => u.Family).ThenBy(u => u.Name), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

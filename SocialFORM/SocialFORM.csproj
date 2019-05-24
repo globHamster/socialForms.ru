@@ -883,6 +883,7 @@
     <Content Include="Views\Home\InstructionCostumer.cshtml" />
     <Content Include="Views\Home\TableBlanksSetting.cshtml" />
     <Content Include="Views\Home\_TableBlanksSetting.cshtml" />
+    <Content Include="Views\Home\ProjectCustomer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

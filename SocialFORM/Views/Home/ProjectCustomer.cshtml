@@ -1,4 +1,4 @@
-﻿@model PagedList.IPagedList<SocialFORM.Models.Project.ProjectModel>
+﻿@model IEnumerable<SocialFORM.Models.Project.ProjectModel>
 @using PagedList.Mvc;
 
 <link rel="stylesheet" href="~/Content/css/home_project.css" />
@@ -43,36 +43,18 @@
 </style>
 
 <h2 class="H2List">Список проектов</h2>
-<div name="PanelOfCreateProject">
-    <div style="display:inline-flex;justify-content:center;align-items:center;width:140px;height:30px;background:#008dd2;padding:1px;" onclick="ShowPanelCreateProject($(this))" name="ButtonOfCreateProject">
-        <div style="font-size:20px;font-weight:600;color:#CCFF90;margin-right:5px;">&#10010;</div>
-        <div style="font-size:11px;font-weight:600;color:#fff;">НОВЫЙ ПРОЕКТ</div>
-    </div>
-    <div style="position:relative;">
-        <div name="FieldOfCreateProject" style="width:300px;height:75px;display:none;background:#008dd2;position:relative;grid-template-columns: repeat(10, 1fr); padding: 5px;z-index:9999;">
-            <div style="grid-column: span 3;color: #fff;">Имя</div>
-            <div style="grid-column: span 7;"><input type="text" style="width:100%;" name="NameOfNewProject"></div>
-            <div style="grid-column: span 10;position:relative;height:30px;">
-                <div class="btn_create_project" style="right:103px;" onclick="CreateNewProject($(this))">
-                    <div>создать</div>
-                </div>
-                <div class="btn_create_project" style="right:0px;" onclick="HidePanelOfCreateProject($(this).parents('div[name=FieldOfCreateProject]'))">
-                    <div>отмена</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 <table class="table">
     @{
+        int RoleId = (Int32)ViewData["RoleIdForProject"];
+
         foreach (var item in Model)
         {
             <tr class="project_layer">
                 <td id="@item.Id">
-                    <div class="NameProjectDiv" id="@item.Id"> @Html.DisplayFor(modelItem => item.NameProject) </div>
+                    <div class="NameProjectDiv" style="pointer-events: none;cursor: default;"> @Html.DisplayFor(modelItem => item.NameProject) </div>
                 </td>
                 <td style="display: inline-flex;">
-                    <div class="infoP" id="@item.Id">?</div>
                     <div class="ShowDB" id="@item.Id">База данных</div>
                     <div style="width:2px;" />
                     <div class="SettingExport">
@@ -81,55 +63,17 @@
                         <div class="CheckEncode">&#9776;</div>
                     </div>
                     <div class="AudioDown_all" id="@item.Id"><img src="~/Content/downloads-i.png" width="20" height="20" /></div>
-                    @*@Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
-                        @Html.ActionLink("Удалить", "Delete", new { id = item.Id }) |*@
-                    <div style="width:5px;" />
-                    @if (item.ActionProject == true)
-                    {
-                        //<div class="actionProject Action" id="@item.Id">В работе</div>
-                        <input id="@item.Id" class="toggle-event toggle-action" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow" checked>
-                    }
-                    else
-                    {
-                        //<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>
-                        <input id="@item.Id" class="toggle-event toggle-action" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow">
-                    }
-                    <div style="width:5px;" />
-
-                    @if (item.CostumerProject == true)
-                    {
-                        //<div class="actionProject Action" id="@item.Id">В работе</div>
-                        <input id="@item.Id" class="toggle-event toggle-costumer" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow" checked>
-                    }
-                    else
-                    {
-                        //<div class="actionProject NonAction" id="@item.Id">Заблокирован</div>
-                        <input id="@item.Id" class="toggle-event toggle-costumer" type="checkbox" data-toggle="toggle" data-on="On" data-off="Off" data-height="30" data-style="slow">
-                    }
                 </td>
-            </tr>
-            <tr class="info_project" id="@item.Id" style="display:none">
-                <td><button class="infoP_close" id="@item.Id">X</button></td>
-                <td class="str_infoP" id="@item.Id"></td>
             </tr>
         }
     }
 </table>
 
-<div id="contentPager">
-    @Html.PagedListPager(
-                                         Model,
-                                         page => Url.Action("_Project", "Home", new { page = page }),
-                                         PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Tables" })
-                                         )
-</div>
 
 <div class="EncodingString" id="EncodingString">
     <div name="UTF-8"><input type="radio" name="setting" />UTF-8</div>
     <div name="Windows-1251"><input type="radio" name="setting">Windows-1251</div>
 </div>
-
-
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -177,33 +121,6 @@
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
-
-    function ShowPanelCreateProject(elemnt) {
-        elemnt.hide();
-        elemnt.parents('div[name=PanelOfCreateProject]').find('div[name=FieldOfCreateProject]').css({ "display": "grid" });
-    }
-
-    function CreateNewProject(elemnt) {
-        let name_project = elemnt.parents('div[name=FieldOfCreateProject]').find('input[name=NameOfNewProject]').val();
-        $.get('/Home/AddProject', { name_project: name_project })
-            .success(function (data) {
-                var code = '<tr class="project_layer">' +
-                    '<td id="' + data.Id + '">' +
-                    '<div class="NameProjectDiv" id="' + data.Id + '">' + data.NameProject + '</div>' +
-                    '</td>' +
-                    '</tr>'
-
-                $('.table').append(code);
-                HidePanelOfCreateProject(elemnt.parents('div[name=FieldOfCreateProject]'))
-            })
-            .error(function () { alert('Не удалось добавить проект') });
-    }
-
-    function HidePanelOfCreateProject(elemnt) {
-        elemnt.hide();
-        elemnt.find('input[name=NameOfNewProject]').val("");
-        elemnt.parents('div[name=PanelOfCreateProject]').find('div[name=ButtonOfCreateProject]').css({ "display": "inline-flex" });
-    }
 
     let projectID_audio;
     let userID_audio;
@@ -344,47 +261,6 @@
         }
     }
 
-
-
-
-
-    $('button.infoP_close').click(function () {
-        var id_project = $(this).attr('id');
-        $('tr.info_project[id =' + id_project + ']').attr('style', 'display:none');
-    });
-
-    $('div.infoP').click(function () {
-        var id_project = $(this).attr('id');
-        $('tr.info_project[id =' + id_project + ']').attr('style', 'display:normal');
-        var code = null;
-        $.get('/Home/getInfoProject', { id_project: id_project })
-            .success(function (str) {
-                if (str != "null") {
-                    var tmp_str = str.split("_");
-                    $('td.str_infoP[id =' + id_project + ']').empty();
-                    code = '<p><b>' + tmp_str[0] + '</b>' + tmp_str[1] + '</p>';
-                    code += '<p><b>' + tmp_str[2] + '</b>' + tmp_str[3] + '</p>';
-                    $('td.str_infoP[id =' + id_project + ']').append(code);
-                }
-                else {
-                    $('td.str_infoP[id =' + id_project + ']').empty();
-                    code = '<p>Список пуст</p>';
-                    $('td.str_infoP[id =' + id_project + ']').append(code);
-                }
-            });
-    });
-
-    //$('div.actionProject').click(function () {
-    //    var id_project = $(this).attr('id');
-    //    $.ajax({
-    //        type: "POST",
-    //        url: "/Home/actionProject",
-    //        async: false,
-    //        data: { id: id_project },
-
-    //    })
-    //});
-
     $('.toggle-action').change(function () {
         var id_project = $(this).attr('id');
         $.ajax({
@@ -466,21 +342,6 @@
         $(this).removeClass('Scaled');
     })
 
-    $('table.table').on("mouseenter", ".NameProjectDiv", function () {
-        $(this).addClass('Scaled');
-    })
-
-    $('table.table').on("mouseleave", ".NameProjectDiv", function () {
-        $(this).removeClass('Scaled');
-    })
-
-    $('table.table').on("click", ".NameProjectDiv", function () {
-        $(this).removeClass('Scaled').addClass('NotScaled');
-        var id = $(this).attr('id');
-        $('.PreLoader').show();
-        $("#Tables").load("/Group/Manager?id_project=" + id);
-    })
-
     $('table.table').on("mouseenter", ".ShowDB", function () {
         $(this).addClass('Scaled');
     })
@@ -542,19 +403,4 @@
         }
     })
 
-    $('table.table').on("mouseenter", ".infoP", function () {
-        $(this).addClass('Scaled')
-    });
-
-    $('table.table').on("mouseleave", ".infoP", function () {
-        $(this).removeClass('Scaled');
-    })
-
-    $('table.table').on("mouseenter", ".actionProject", function () {
-        $(this).addClass("Scaled");
-    })
-
-    $('table.table').on("mouseleave", ".actionProject", function () {
-        $(this).removeClass("Scaled");
-    })
 </script>
