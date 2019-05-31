@@ -1261,6 +1261,7 @@ namespace SocialFORM.Controllers
                         else
                         {
                             cmd_str_ += " AND ((Status='перезвонить')";
+                            prev_status = true;
                         }
                     }
 
@@ -1311,7 +1312,9 @@ namespace SocialFORM.Controllers
             }
             catch (Exception e)
             {
+                System.Diagnostics.Debug.WriteLine(">>>>> " + e.Data);
                 System.Diagnostics.Debug.WriteLine(">>>>> " + e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(">>>>> " + e.Message);
             }
 
             if (tmp_lst_PT != null && tmp_lst_PT.Count() >= 1)

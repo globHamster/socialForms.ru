@@ -40,6 +40,25 @@
         .btn_create_project:hover {
             background-color: #eee;
         }
+
+    .btn_copy_project {
+        width: 100px;
+        padding: 3px;
+        background-color: #008dd2;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 600;
+        margin-left: 2px;
+    }
+
+        .btn_copy_project:hover {
+            transform: scale(1.1,1.1);
+            box-shadow: 5px 5px black;
+            transition: 0.2s ease-in-out;
+        }
 </style>
 
 <h2 class="H2List">Список проектов</h2>
@@ -79,6 +98,9 @@
                         <input type="hidden" name="SettingEncodeProject" value="@item.SettingEncode" />
                         <div class="ExportButton" id="@item.Id">&#11015; Экспорт</div>
                         <div class="CheckEncode">&#9776;</div>
+                    </div>
+                    <div id="@item.Id" class="btn_copy_project" onclick="CopyProject($(this))">
+                        <div>Копировать</div>
                     </div>
                     <div class="AudioDown_all" id="@item.Id"><img src="~/Content/downloads-i.png" width="20" height="20" /></div>
                     @*@Html.ActionLink("Копировать", "Copi", new { id = item.Id }) |
@@ -177,6 +199,35 @@
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
+
+    function CopyProject(elm) {
+        var new_name = prompt("Имя проекта", $('td#' + elm.attr('id') + ' > div.NameProjectDiv').text())
+        $('.PreLoader').show();
+        if (new_name.length > 0) {
+            console.log("New project");
+            $.post("/Home/CopyProject", { id_p: elm.attr('id'), new_project_name: new_name })
+                .success(function (data, status, xhr) {
+                    $('.PreLoader').hide();
+                    $('.Tables').load("/Home/Project");
+                })
+                .error(function (data, status, xhr) {
+                    if (data.status == 409) {
+                        $('.PreLoader').hide();
+                        alert("Проект с таким названием уже существует!");
+                    } else if (data.status == 400) {
+                        $('.PreLoader').hide();
+                        console.log(xhr);
+                        console.log(data);
+                    } else {
+                        $('.PreLoader').hide();
+                        console.log(xhr);
+                        console.log(data);
+                    }
+
+                });
+        }
+        //
+    }
 
     function ShowPanelCreateProject(elemnt) {
         elemnt.hide();

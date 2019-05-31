@@ -18,6 +18,7 @@ namespace SocialFORM.Controllers
     {
         QuestionContext db = new QuestionContext();
         ApplicationContext db2 = new ApplicationContext();
+       
         // GET: Question
 
         public ActionResult ListQuestions(int project_id)

@@ -3010,5 +3010,246 @@ namespace SocialFORM.Controllers
                 });
             return Json(lst_date_blank.Distinct(), JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public void CopyProject(int id_p, string new_project_name)
+        {
+            int _new_id_project = 0;
+            Dictionary<int, int> _hashSetIdQuestion = new Dictionary<int, int>();
+            Dictionary<int, int> _hashSetIdGroup = new Dictionary<int, int>();
+            Dictionary<int, int> _hashSetIdAnswer = new Dictionary<int, int>();
+            Dictionary<int, int> _hashSetIdAnswerAll = new Dictionary<int, int>();
+            List<int> _lstIdTableRow = new List<int>();
+            List<int> _lstIdRange = new List<int>();
+            List<int> _lstIdTransition = new List<int>();
+            List<int> _lstIdBlock = new List<int>();
+            try
+            {
+                using (var groupContext = new GroupContext())
+                using (var questionContext = new QuestionContext())
+                {
+                    string name_project;
+                    new_project_name = new_project_name.Trim(' ');
+                    if (db2.SetProjectModels.Any(u => u.NameProject == new_project_name))
+                    {
+                        Response.StatusCode = (int)HttpStatusCode.Conflict;
+                        return;
+                    }
+                    ProjectModel new_project = db2.SetProjectModels.FirstOrDefault(u => u.Id == id_p);
+                    new_project.NameProject = new_project_name;
+
+                    //Копирование проекта
+                    name_project = db2.SetProjectModels.Add(new_project).NameProject;
+                    db2.SaveChanges();
+                    _new_id_project = db2.SetProjectModels.FirstOrDefault(u => u.NameProject == name_project && u.Id != id_p).Id;
+
+                    //Копирование вопросов
+                    questionContext.SetQuestions.Where(u => u.ProjectID == id_p).ToList().ForEach(u =>
+                    {
+                        int key_old_id = u.Id;
+                        u.ProjectID = _new_id_project;
+                        questionContext.SetQuestions.Add(u);
+                        questionContext.SaveChanges();
+                        _hashSetIdQuestion.Add(key_old_id, u.Id);
+                    });
+
+                    //Копирование группировки вопросов
+                    groupContext.SetGroupModels.Where(u => u.ProjectID == id_p).ToList().ForEach(u =>
+                    {
+                        int key_old_id = u.Id;
+                        u.ProjectID = _new_id_project;
+                        if (u.QuestionID != null)
+                            u.QuestionID = _hashSetIdQuestion[(int)u.QuestionID];
+                        groupContext.SetGroupModels.Add(u);
+                        groupContext.SaveChanges();
+                        _hashSetIdGroup.Add(key_old_id, u.Id);
+                    });
+
+                    
+                    //Копирование ответов
+                    foreach (var item_question in _hashSetIdQuestion.Keys)
+                    {
+                        questionContext.SetAnswers.Where(answer => answer.QuestionID == item_question).ToList().ForEach(u =>
+                        {
+                            int key_old_id_answer = u.Id;
+                            u.QuestionID = _hashSetIdQuestion[item_question];
+                            questionContext.SetAnswers.Add(u);
+                            questionContext.SaveChanges();
+                            _hashSetIdAnswer.Add(key_old_id_answer, u.Id);
+                        });
+                    }
+
+                    //Копирование последовательности ответов
+                    foreach (var item_question in _hashSetIdQuestion.Keys)
+                    {
+                        questionContext.SetAnswerAll.Where(answerall => answerall.QuestionID == item_question).ToList().ForEach(u =>
+                        {
+                            int key_old_id_answerall = u.Id;
+                            u.QuestionID = _hashSetIdQuestion[item_question];
+                            if (_hashSetIdAnswer.ContainsKey(u.AnswerKey))
+                                u.AnswerKey = _hashSetIdAnswer[u.AnswerKey];
+                            questionContext.SetAnswerAll.Add(u);
+                            questionContext.SaveChanges();
+                            _hashSetIdAnswerAll.Add(key_old_id_answerall, u.Id);
+                        });
+                    }
+
+                    //копирование строк для табличных вопросов
+                    foreach (var item_question in _hashSetIdQuestion.Keys)
+                    {
+                        questionContext.SetTableRows.Where(row => row.TableID == item_question).ToList().ForEach(u =>
+                        {
+                            u.TableID = _hashSetIdQuestion[item_question];
+                            questionContext.SetTableRows.Add(u);
+                            questionContext.SaveChanges();
+                            _lstIdTableRow.Add(u.Id);
+                        });
+                    }
+
+                    //Копирование диапозона возрастов
+                    questionContext.SetRangeModels.Where(range => range.ProjectID == id_p).ToList().ForEach(u =>
+                    {
+                        u.ProjectID = _new_id_project;
+                        u.BindQuestion = _hashSetIdQuestion[u.BindQuestion];
+                        questionContext.SetRangeModels.Add(u);
+                        questionContext.SaveChanges();
+                        _lstIdRange.Add(u.Id);
+                    });
+
+                    //Копирование переходов
+                    questionContext.SetTransition.Where(transition => transition.ProjectID == id_p).ToList().ForEach(u =>
+                    {
+                        u.ProjectID = _new_id_project;
+                        u.fromQuestion = _hashSetIdQuestion[u.fromQuestion];
+                        u.toQuestion = _hashSetIdQuestion[u.toQuestion];
+                        u.TriggerAnswer = _hashSetIdAnswerAll[u.TriggerAnswer];
+                        questionContext.SetTransition.Add(u);
+                        questionContext.SaveChanges();
+                        _lstIdTransition.Add(u.Id);
+                    });
+
+                    //Копирование блокировок
+                    questionContext.SetBlock.Where(block => block.ProjectID == id_p).ToList().ForEach(u =>
+                    {
+                        u.ProjectID = _new_id_project;
+                        u.fromQuestion = _hashSetIdQuestion[u.fromQuestion];
+                        u.toQuestion = _hashSetIdQuestion[u.toQuestion];
+                        questionContext.SetBlock.Add(u);
+                        questionContext.SaveChanges();
+                        _lstIdBlock.Add(u.Id);
+                    });
+
+                    //Изменение 
+                    questionContext.SetQuestions.Where(question => question.ProjectID == _new_id_project && question.Bind != null && question.Bind_Blocks != null).ToList().ForEach(u =>
+                        {
+                            u.Bind = _hashSetIdQuestion[(int)u.Bind];
+                            u.Bind_Blocks = _hashSetIdQuestion[(int)u.Bind_Blocks];
+                            questionContext.Entry<QuestionModel>(u).State = EntityState.Modified;
+                            questionContext.SaveChanges();
+                        });
+                }
+            }
+            catch (Exception e)
+            {
+                if (_new_id_project != 0)
+                {
+                    ProjectModel tmp_project_item = db2.SetProjectModels.FirstOrDefault(u => u.Id == _new_id_project);
+                    if (tmp_project_item != null)
+                    {
+                        db2.SetProjectModels.Remove(tmp_project_item);
+                        db2.SaveChanges();
+                    }
+                }
+                using (var questionContext = new QuestionContext())
+                using (var groupContext = new GroupContext())
+                {
+                    if (_hashSetIdQuestion != null)
+                    {
+                        if (_hashSetIdQuestion.Count > 0)
+                        {
+                            foreach (var item in _hashSetIdQuestion.Values)
+                            {
+                                questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.QuestionModels WHERE Id={item}");
+                            }
+                        }
+                    }
+                    if (_hashSetIdGroup != null)
+                    {
+                        if (_hashSetIdGroup.Count > 0)
+                        {
+                            foreach (var item in _hashSetIdGroup.Values)
+                            {
+                                groupContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.GroupModels WHERE Id={item}");
+                            }
+                        }
+                    }
+                    if (_hashSetIdAnswer != null)
+                    {
+                        if (_hashSetIdAnswer.Count > 0)
+                        {
+                            foreach (var item in _hashSetIdAnswer.Values)
+                            {
+                                questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.AnswerModels WHERE Id={item}");
+                            }
+                        }
+                    }
+                    if (_hashSetIdAnswerAll != null)
+                    {
+                        if (_hashSetIdAnswerAll.Count > 0)
+                        {
+                            foreach (var item in _hashSetIdAnswerAll.Values)
+                            {
+                                questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.AnswerAlls WHERE Id={item}");
+                            }
+                        }
+                    }
+                    if (_lstIdTableRow != null)
+                    {
+                        if (_lstIdTableRow.Count > 0)
+                        {
+                            foreach(var item in _lstIdTableRow)
+                            {
+                                questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.TableRows WHERE Id={item}");
+                            }
+                        }
+                    }
+                    if (_lstIdRange != null)
+                    {
+                        if (_lstIdRange.Count > 0)
+                        {
+                            foreach(var item in _lstIdRange)
+                            {
+                                questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.RangeModels WHERE Id={item}");
+                            }
+                        }
+                    }
+                    if (_lstIdTransition != null)
+                    {
+                        if (_lstIdTransition.Count > 0)
+                        {
+                            foreach(var item in _lstIdTransition)
+                            {
+                                questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.Transitions WHERE Id={item}");
+                            }
+                        }
+                    }
+                    if (_lstIdBlock != null)
+                    {
+                        if (_lstIdBlock.Count > 0)
+                        {
+                            foreach(var item in _lstIdBlock)
+                            {
+                                questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.Blocks WHERE Id={item}");
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                Response.StatusDescription = e.Message;
+                return;
+            }
+        }
     }
 }

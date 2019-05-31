@@ -598,6 +598,7 @@
                     SaveResult();
                     CheckQuota();
                     index++;
+                    CheckGroup();
                     getStart();
                 }
                 break;
@@ -619,7 +620,7 @@
                             $('input[name=group' + $(this).attr('id') + ']').parent().addClass('NotCheckedTableItem');
                         }
                     })
-                    $('body,html').animate({ scrollTop: $('.NotCheckedTableItem:first').offset().top - $('.NotCheckedTableItem:first').height()/2 }, 1000);
+                    $('body,html').animate({ scrollTop: $('.NotCheckedTableItem:first').offset().top - $('.NotCheckedTableItem:first').height() }, 1000);
                 }
                 break;
             case 5:
