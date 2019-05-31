@@ -6,9 +6,11 @@ using System.Web;
 using System.Web.Mvc;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
+using System.IO.Compression;
 using SocialFORM.Models;
 using SocialFORM.Models.Project;
 using System.Web.UI;
+using System.Threading;
 
 namespace SocialFORM.Controllers
 {
@@ -84,103 +86,188 @@ namespace SocialFORM.Controllers
             public bool? Selected { get; set; } // выбран ли файл для загрузки
         }
 
-        [HttpGet]
-        public FileResult AudioAllDownToZip(int id_project, int id_user, string date)
+        [HttpPost]
+        public ActionResult AudioAllDownToZip(string fileGuid, string mimeType, string filename)
         {
-            System.Diagnostics.Debug.WriteLine("nameProject === >>>>" + id_project + "  count === >>>>" + id_user + "  " + date);
-
-            ApplicationContext db = new ApplicationContext();
-            ProjectContext db2 = new ProjectContext();
-
-
-
-            int count = db.SetResultModels.Where(u => u.ProjectID == id_project).Count();
-            string name_project = db2.SetProjectModels.Where(u => u.Id == id_project).First().NameProject;
-            List<InputModel> inputModelsFiles = new List<InputModel>();
-
-            List<Models.Form.ResultModel> bd_tmp = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
-
-            if (id_user != 0) { bd_tmp = bd_tmp.Where(u => u.UserID == id_user).ToList(); }
-            if (date != "null")
+            if (Session[fileGuid] != null)
             {
-                DateTime StartDate = DateTime.Parse(date);
-                DateTime EndDate = DateTime.Parse(date);
-                EndDate = EndDate.AddDays(1);
-                bd_tmp = bd_tmp.Where(u => u.Data > StartDate && u.Data < EndDate).ToList();
-            }
+                List<string> data = Session[fileGuid] as List<string>;
+                Session.Remove(fileGuid);  // Cleanup session data
+                int idi = 0;
 
-            System.Diagnostics.Debug.WriteLine("nameProject === >>>>" + name_project + "  count === >>>>" + count);
-            ////Создание списка файлов//
-            foreach (var str in bd_tmp)
+                string time = DateTime.Now.ToString("HH.mm.ss");
+                ////
+                //  Объем файлов
+                long lenghtFile = 0;
+                ////
+                //  Количество Файлов ZIP
+                int countFile = 0;
+                ////
+                //  Пути файлов ZIP
+                string pathFiles = "";
+                ////
+                //  Имена файло ZIP
+                string nameFiles = "";
+                ////
+                //  Создаем файл ZIP
+                ZipArchive zip = System.IO.Compression.ZipFile.Open(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), ZipArchiveMode.Create);
+                ////
+                //  Запускаем цикл по списку аудио-файлов
+                data.ForEach(file =>
+                {
+                    ////
+                    //  Добовляем к объему размер файла
+                    lenghtFile += new FileInfo(Server.MapPath("~/uploads/" + file)).Length;
+                    ////
+                    //  Проверяем объем меньше ли требуемого объема
+                    if (lenghtFile < 4294967295)
+                    ////
+                    //  Меньше
+                    {
+                        ////
+                        //  Записываем текущий аудио файл в ZIP
+                        zip.CreateEntryFromFile(Server.MapPath("~/uploads/" + file), file);
+                        System.Diagnostics.Debug.WriteLine("ok === >>>>" + idi);
+                        idi++;
+                    }
+                    else
+                    ////
+                    //  Привысил
+                    {
+                        ////
+                        //  Закрываем предыдущий фаил ZIP
+                        zip.Dispose();
+                        ////
+                        //  Записываем путь Файла
+                        pathFiles += "~/zipfiles/bundle_" + time + ".zip#";
+                        ////
+                        //  Создаем новый TIME для нового файла ZIP
+                        time = DateTime.Now.ToString("HH.mm.ss");
+                        ////
+                        //  Создаем новый ZIP
+                        zip = System.IO.Compression.ZipFile.Open(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), ZipArchiveMode.Create);
+                        ////
+                        //  Записываем текущий аудио файл d ZIP
+                        zip.CreateEntryFromFile(Server.MapPath("~/uploads/" + file), file);
+                        ////
+                        //  Обнуляем объем
+                        lenghtFile = new FileInfo(Server.MapPath("~/uploads/" + file)).Length;
+                        ////
+                        //  Записываем имена файла
+                        nameFiles += filename + "_Часть_" + countFile + ".zip#";
+                        ////
+                        //  Увеличивам количество Файлов ZIP
+                        countFile++;
+
+                        System.Diagnostics.Debug.WriteLine("ok === >>>>" + idi);
+                        idi++;
+                    }
+                });
+
+                zip.Dispose();
+
+                if (lenghtFile < 4294967295) {
+                    ////
+                    //  Записываем путь Файла
+                    pathFiles += "~/zipfiles/bundle_" + time + ".zip#";
+                    ////
+                    //  Записываем имена файла
+                    nameFiles += filename + "_Часть_" + countFile + ".zip#";
+                    ////
+                    //  Увеличивам количество Файлов ZIP
+                    countFile++;
+                }
+                
+                System.Diagnostics.Debug.WriteLine("Complate");
+                System.Diagnostics.Debug.WriteLine("File === >>>>" + fileGuid + ".zip");
+
+                //return File(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), mimeType, filename);
+                return new JsonResult()
+                {
+                    Data = new
+                    {
+                        CountFile = countFile,
+                        FileGuid = pathFiles,
+                        MimeType = mimeType,
+                        FileName = nameFiles
+                    }
+                };
+
+            }
+            else
             {
-                if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), str.BlankID.ToString() + "_" + name_project + ".mp3")))
-                {
-                    inputModelsFiles.Add(new InputModel { Name = str.BlankID + "_" + name_project + ".mp3", Selected = true });
-                    System.Diagnostics.Debug.WriteLine("i === >>>>" + str.BlankID + "  state === >>>>" + true);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("i === >>>>" + str.BlankID + "  state === >>>>" + false);
-                    continue;
-                }
+                // Log the error if you want
+                return new EmptyResult();
             }
+        }
 
-            //for (int i = 1; i <= count; i++)
-            //{
-            //    if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), i.ToString() + "_" + name_project + ".mp3")))
-            //    {
-            //        inputModelsFiles.Add(new InputModel { Name = i + "_" + name_project + ".mp3", Selected = true });
-            //        System.Diagnostics.Debug.WriteLine("i === >>>>" + i + "  state === >>>>" + true);
-            //    }
-            //    else {
-            //        System.Diagnostics.Debug.WriteLine("i === >>>>" + i + "  state === >>>>" + false);
-            //        continue;
-            //    }
-            //}
-            System.Diagnostics.Debug.WriteLine("countFiles === >>>>" + inputModelsFiles.Count());
+        [HttpGet]
+        public FileResult Download(string fileGuid, string mimeType, string filename)
+        {
+            return File(Server.MapPath(fileGuid), mimeType, filename);
+        }
 
-            //Создание ZIP архива
-            List<string> filenames = inputModelsFiles.Where(m => m.Selected == true).Select(f => f.Name).ToList();
-            System.Diagnostics.Debug.WriteLine("filenames === >>>>" + filenames.Count());
-
-            string filename = name_project + ".zip";
-
-            MemoryStream outputMemStream = new MemoryStream();
-            ZipOutputStream zipStream = new ZipOutputStream(outputMemStream);
-
-            zipStream.SetLevel(3); // уровень сжатия от 0 до 9
-
-            foreach (string file in filenames)
+        [HttpPost]
+        public ActionResult RunReport(int id_project, int id_user, string date)
+        {
+            using (var stream = new MemoryStream())
             {
-                System.Diagnostics.Debug.WriteLine("filenames === >>>>" + file.ToString());
+                ApplicationContext db = new ApplicationContext();
+                ProjectContext db2 = new ProjectContext();
+                object locked = new object();
+                const int BufferSize = 8192;
+                byte[] buffer = new byte[BufferSize];
 
-                FileInfo fi = new FileInfo(Server.MapPath("~/uploads/" + file));
+                int count = db.SetResultModels.Where(u => u.ProjectID == id_project).Count();
+                string name_project = db2.SetProjectModels.Where(u => u.Id == id_project).First().NameProject;
+                Queue<InputModel> inputModelsQueue = new Queue<InputModel>();
 
-                string entryName = ZipEntry.CleanName(fi.Name);
-                ZipEntry newEntry = new ZipEntry(entryName);
-                newEntry.DateTime = fi.LastWriteTime;
-                newEntry.Size = fi.Length;
-                zipStream.PutNextEntry(newEntry);
+                List<Models.Form.ResultModel> bd_tmp = db.SetResultModels.Where(u => u.ProjectID == id_project).ToList();
 
-                byte[] buffer = new byte[4096];
-                using (FileStream streamReader = System.IO.File.OpenRead(fi.FullName))
+                if (id_user != 0)
                 {
-                    StreamUtils.Copy(streamReader, zipStream, buffer);
+                    bd_tmp = bd_tmp.Where(u => u.UserID == id_user).ToList();
                 }
-                zipStream.CloseEntry();
+                if (date != "null")
+                {
+                    DateTime StartDate = DateTime.Parse(date);
+                    DateTime EndDate = DateTime.Parse(date).AddDays(1);
+                    bd_tmp = bd_tmp.Where(u => u.Data > StartDate && u.Data < EndDate).ToList();
+                }
+                int idi = 0;
+
+                ////Создание списка файлов//
+                bd_tmp.AsParallel().ForAll(u =>
+                {
+                    lock (locked)
+                    {
+                        if (System.IO.File.Exists(Path.Combine(Server.MapPath("~\\uploads"), u.BlankID.ToString() + "_" + name_project + ".mp3")))
+                        {
+                            inputModelsQueue.Enqueue(new InputModel { Name = u.BlankID + "_" + name_project + ".mp3", Selected = true });
+                            System.Diagnostics.Debug.WriteLine("i === >>>>" + u.BlankID + "  state === >>>>" + true);
+                            idi++;
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("i === >>>>" + u.BlankID + "  state === >>>>" + false);
+                        }
+                    }
+                });
+
+                //Создание ZIP архива
+                List<string> filenames = inputModelsQueue.Where(m => m.Selected == true).Select(f => f.Name).ToList();
+
+                Session[name_project] = filenames;
+                return new JsonResult()
+                {
+                    Data = new
+                    {
+                        FileGuid = name_project,
+                        MimeType = "application/zip",
+                        FileName = name_project
+                    }
+                };
             }
-            zipStream.IsStreamOwner = false;
-            zipStream.Close();
-
-            outputMemStream.Position = 0;
-
-            System.Diagnostics.Debug.WriteLine("File === >>>>" + filename);
-            System.Diagnostics.Debug.WriteLine("outputMemStream === >>>>" + outputMemStream);
-
-            //ViewData["ZipInfo"] = name_project +";" +inputModelsFiles.Count();
-
-            string file_type = "application/zip";
-            return File(outputMemStream, file_type, filename);
         }
 
         [HttpPost]

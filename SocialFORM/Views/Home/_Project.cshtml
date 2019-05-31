@@ -172,30 +172,84 @@
     </div><!-- /.модальное окно-диалог -->
 </div><!-- /.модальное окно -->
 
+<link rel="stylesheet" type="text/css" href="https://loading.io/css/loading.css" />
+
 <div id="msg_audio" class="msg_audio" style="z-index: 999;">
-    <div class="TextDivAudio">
-        <label><input type="radio" class="inF inFA" name="faudio1" value="ALL" checked> Все</label>
-        <label><input type="radio" class="inF inFF" name="faudio1" value="fa1"> По Фильтру</label>
+    <div class="TextDivAudio" style="top: calc(50% - 350px) !important;height: 700px !important;">
+        <div class="namePR" style="color: #008dd2;font-size: 30px;"></div>
+
+        <label class="inFFLabel"><input type="radio" class="inF inFA" name="faudio1" value="ALL" checked> Все</label>
+        <label class="inFFLabel"><input type="radio" class="inF inFF" name="faudio1" value="fa1"> По Фильтру</label>
 
         <div id="Filter">
-            <input type="checkbox" id="fio" name="fio" value="hid" onchange="changeFIO($(this))" /><label for="fio">FIO</label>
+            <input type="checkbox" id="fio" name="fio" value="hid" onchange="changeFIO($(this))" /><label for="fio">Фамилия Имя - оператора</label>
             <div id="FilterFIO">
                 <select class="select_operator_audio" name="select_operator_audio" id="select_operator_audio"><option selected value="-1"> Все</option></select>
             </div>
-            <input type="checkbox" id="date" name="date" value="hid" onchange="changeDATE($(this))" /><label for="date">Date</label>
+            <input type="checkbox" id="date" name="date" value="hid" onchange="changeDATE($(this))" /><label for="date">Дата</label>
             <div id="FilterDate">
                 <select class="select_date_audio" name="select_date_audio" id="select_date_audio"><option selected value="-1"> Все</option></select>
             </div>
         </div>
+        <div class="downLoader" style="padding: 0 10px;margin-bottom: 5px;max-height: 55%;overflow-y: auto;/* height: 15%; *//* width: 50%; */">
+        </div>
+        <a class="RunReport" href="javascript: RunReport('@Url.Action("RunReport", "UserReport", null)')" style="background-color: #008dd2;padding: 0 5px;color: #fff;">Сформировать список</a>
     </div>
-    <div class="butn_filte_audio">
-        <div class="cssRec" onclick="down_zip()">Скачать</div>
-        <div style="margin:0 10px;"></div>
+    <div class="butn_filte_audio" style="top: 130px !important;">
+        @*<div class="cssRec" onclick="RunReport()">Скачать</div>
+            <div style="margin:0 10px;"></div>*@
         <div class="cssRec" onclick="down_close()">Отмена</div>
     </div>
 </div>
 
+<style>
+    ::-webkit-scrollbar-button {
+        background-image: url('');
+        background-repeat: no-repeat;
+        width: 6px;
+        height: 0px
+    }
 
+    ::-webkit-scrollbar-track {
+        border: 2px solid #008dd2;
+        border-radius: 5px;
+        box-shadow: 0px 0px 3px #008dd2 inset;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: #008dd2;
+        box-shadow: 0px 0px 1px #fff inset;
+        background-image: url(https://yraaa.ru/_pu/24/59610063.png);
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    ::-webkit-resizer {
+        background-image: url('');
+        background-repeat: no-repeat;
+        width: 7px;
+        height: 0px
+    }
+
+    ::-webkit-scrollbar {
+        width: 11px;
+    }
+    .blink {
+        animation: blink 2s linear infinite; /* Параметры анимации */
+        animation-direction: alternate;
+    }
+
+    @@keyframes blink {
+        from {
+            opacity: 1; /* Непрозрачный текст */
+        }
+
+        to {
+            opacity: 0; /* Прозрачный текст */
+        }
+    }
+</style>
 
 @Scripts.Render("~/Scripts/jquery-1.10.2.js")
 <script type="text/javascript">
@@ -229,6 +283,70 @@
         //
     }
 
+    function RunReport() {
+        $("#progress-spinner").show();
+        $('a.RunReport').hide();
+        $('label.inFFLabel').hide();
+
+        if ($('input:checkbox[name=fio]').val() == "sh") {
+            userID_audio = document.getElementById("select_operator_audio").options[document.getElementById("select_operator_audio").options.selectedIndex].value;
+            if (userID_audio == "-1") userID_audio = 0;
+        } else {
+            userID_audio = 0;
+        }
+
+        if ($('input:checkbox[name=date]').val() == "sh") {
+            date_audio = document.getElementById("select_date_audio").options[document.getElementById("select_date_audio").options.selectedIndex].value;
+            if (date_audio == "-1") date_audio = null;
+        } else {
+            date_audio = null;
+        }
+
+        var code = '<span class="blink">Сбор данных   </span><div class="ld ld-hourglass ld-spin-fast" style="font-size:24px;color:#008dd2"></div>';
+        $('.downLoader').empty();
+        $('.downLoader').append(code);
+
+        $.ajax({
+            cache: false,
+            url: '/Audio/RunReport?id_project=' + projectID_audio + '&id_user=' + userID_audio + '&date=' + date_audio,
+            type: "POST",
+            success: function (response) {
+                var code = '<span class="blink">Создание ZIP архива   </span><div class="ld ld-hourglass ld-spin-fast" style="font-size:24px;color:#81c784"></div>';
+                $('.downLoader').empty();
+                $('.downLoader').append(code);
+
+                $.ajax({
+                    cache: false,
+                    url: '/Audio/AudioAllDownToZip?fileGuid=' + response.FileGuid + '&mimeType=' + response.MimeType + '&filename=' + response.FileName,
+                    type: "POST",
+                    success: function (res) {
+                        var code = '<span>Подготовка завершена. Нажмите на ссылку для скачивания</span>';
+                        var sPath = res.FileGuid.split('#');
+                        var nFile = res.FileName.split('#');
+                        for (var i = 0; i < res.CountFile; i++) {
+                            code += '<p><a style="color:#81c784;font-size:16px;" href="/Audio/Download?fileGuid=' + sPath[i] + '&mimeType=' + res.MimeType + '&filename=' + nFile[i] + '">' + nFile[i] + '</a></p>';
+                        }
+                        $('.downLoader').empty();
+                        $('.downLoader').append(code);
+
+
+                        $('a.RunReport').show();
+                        $('label.inFFLabel').show();
+
+                        //window.location.href = '/Audio/Download?fileGuid=' + res.FileGuid + '&mimeType=' + res.MimeType + '&filename=' + res.FileName;
+                        $("#progress-spinner").hide();
+                    }
+                });
+
+                //window.location.href = '/Audio/AudioAllDownToZip?fileGuid=' + response.FileGuid + '&mimeType=' + response.MimeType + '&filename=' + response.FileName;
+                $("#progress-spinner").hide();
+            }
+        });
+
+    }
+
+
+
     function ShowPanelCreateProject(elemnt) {
         elemnt.hide();
         elemnt.parents('div[name=PanelOfCreateProject]').find('div[name=FieldOfCreateProject]').css({ "display": "grid" });
@@ -260,33 +378,34 @@
     let userID_audio;
     let date_audio;
 
-    function down_zip() {
+    //function down_zip() {
 
-        if ($('input:checkbox[name=fio]').val() == "sh") {
-            userID_audio = document.getElementById("select_operator_audio").options[document.getElementById("select_operator_audio").options.selectedIndex].value;
-            if (userID_audio == "-1") userID_audio = 0;
-        } else {
-            userID_audio = 0;
-        }
+    //    if ($('input:checkbox[name=fio]').val() == "sh") {
+    //        userID_audio = document.getElementById("select_operator_audio").options[document.getElementById("select_operator_audio").options.selectedIndex].value;
+    //        if (userID_audio == "-1") userID_audio = 0;
+    //    } else {
+    //        userID_audio = 0;
+    //    }
 
-        if ($('input:checkbox[name=date]').val() == "sh") {
-            date_audio = document.getElementById("select_date_audio").options[document.getElementById("select_date_audio").options.selectedIndex].value;
-            if (date_audio == "-1") date_audio = null;
-        } else {
-            date_audio = null;
-        }
+    //    if ($('input:checkbox[name=date]').val() == "sh") {
+    //        date_audio = document.getElementById("select_date_audio").options[document.getElementById("select_date_audio").options.selectedIndex].value;
+    //        if (date_audio == "-1") date_audio = null;
+    //    } else {
+    //        date_audio = null;
+    //    }
 
-        window.location.href = '/Audio/AudioAllDownToZip?id_project=' + projectID_audio + '&id_user=' + userID_audio + '&date=' + date_audio;
-
-
-    }
+    //    window.location.href = '/Audio/AudioAllDownToZip?id_project=' + projectID_audio + '&id_user=' + userID_audio + '&date=' + date_audio;
+    //}
 
     $('table.table').on("click", ".AudioDown_all", function () {
 
+        projectID_audio = $(this).attr('id');
 
+        $('div.namePR').empty();
+        $('div.namePR').append($('.NameProjectDiv[id=' + projectID_audio + ']').text());
         document.getElementById('msg_audio').style.display = 'block';
 
-        projectID_audio = $(this).attr('id');
+        $('.downLoader').empty();
 
     });
 
@@ -299,7 +418,6 @@
             document.getElementById('Filter').style.display = 'none';
         }
     });
-
 
     function down_close() {
 
@@ -364,7 +482,6 @@
         }
     }
 
-
     function changeDATE(el) {
         if (el.val() == "hid") {
             document.getElementById('FilterDate').style.display = 'block';
@@ -395,10 +512,6 @@
         }
     }
 
-
-
-
-
     $('button.infoP_close').click(function () {
         var id_project = $(this).attr('id');
         $('tr.info_project[id =' + id_project + ']').attr('style', 'display:none');
@@ -424,17 +537,6 @@
                 }
             });
     });
-
-    //$('div.actionProject').click(function () {
-    //    var id_project = $(this).attr('id');
-    //    $.ajax({
-    //        type: "POST",
-    //        url: "/Home/actionProject",
-    //        async: false,
-    //        data: { id: id_project },
-
-    //    })
-    //});
 
     $('.toggle-action').change(function () {
         var id_project = $(this).attr('id');
