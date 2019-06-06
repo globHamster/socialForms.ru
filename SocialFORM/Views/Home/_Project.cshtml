@@ -256,9 +256,8 @@
 
     function CopyProject(elm) {
         var new_name = prompt("Имя проекта", $('td#' + elm.attr('id') + ' > div.NameProjectDiv').text())
-        $('.PreLoader').show();
-        if (new_name.length > 0) {
-            console.log("New project");
+        if (new_name != undefined && new_name.length > 0) {
+            $('.PreLoader').show();
             $.post("/Home/CopyProject", { id_p: elm.attr('id'), new_project_name: new_name })
                 .success(function (data, status, xhr) {
                     $('.PreLoader').hide();
@@ -277,10 +276,8 @@
                         console.log(xhr);
                         console.log(data);
                     }
-
                 });
         }
-        //
     }
 
     function RunReport() {

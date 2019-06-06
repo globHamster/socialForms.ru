@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Net;
 using SocialFORM.Models.DB;
+using TableRow = SocialFORM.Models.Question.TableRow;
 
 namespace SocialFORM.Controllers
 {
@@ -558,47 +559,101 @@ namespace SocialFORM.Controllers
 
         public void ExportToEXCEL(int id_p, string name_file, string encode)
         {
-            List<ResultModel> listResultExport = db.SetResultModels.Where(u => u.ProjectID == id_p).ToList();
+            //List<ResultModel> listResultExport = db.SetResultModels.Where(u => u.ProjectID == id_p).ToList();
+            List<ResultModel> listResultExport = db.Database.SqlQuery<ResultModel>($"SELECT * FROM dbo.ResultModels WHERE ProjectID={id_p}").ToList();
             Dictionary<int, List<BlankModel>> listBlankExport = new Dictionary<int, List<BlankModel>>();
-            foreach (var item in listResultExport)
-            {
-                listBlankExport.Add(item.Id, db.SetBlankModels.Where(u => u.BlankID == item.Id).ToList());
-            }
-
             List<GroupModel> listGroupExport = new List<GroupModel>();
-            using (GroupContext group_context = new GroupContext())
-            {
-                listGroupExport.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u => u.IndexQuestion).ToList());
-            }
-
             Dictionary<int, QuestionModel> listQuestionExport = new Dictionary<int, QuestionModel>();
-            using (QuestionContext q_context = new QuestionContext())
-            {
-                foreach (var item in listGroupExport)
-                {
-                    listQuestionExport.Add((int)item.QuestionID, q_context.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID));
-                }
-            }
-
             Dictionary<int, List<AnswerModel>> listAnswerAllExport = new Dictionary<int, List<AnswerModel>>();
             Dictionary<int, List<Models.Question.TableRow>> listTableRow = new Dictionary<int, List<Models.Question.TableRow>>();
-            foreach (var item in listQuestionExport)
-            {
-                using (QuestionContext q_context = new QuestionContext())
-                {
-                    listAnswerAllExport.Add(item.Key, q_context.SetAnswers.Where(u => u.QuestionID == item.Key).ToList());
-                    listTableRow.Add(item.Key, q_context.SetTableRows.Where(u => u.TableID == item.Key).ToList());
-                }
-            }
-
             List<RangeModel> listRangeExport = new List<RangeModel>();
-            using (QuestionContext q_context = new QuestionContext())
+            QuestionContext q_context = new QuestionContext();
+            var min_date_blank = listResultExport.Min(u => u.Data).AddHours(-1);
+            var max_date_blank = listResultExport.Max(u => u.Data).AddHours(1);
+            try
             {
-                listRangeExport = q_context.SetRangeModels.Where(u => u.ProjectID == id_p).ToList();
+                //List<ResultModel> listResultExport = db.SetResultModels.Where(u => u.ProjectID == id_p).ToList();
+                //Dictionary<int, List<BlankModel>> listBlankExport = new Dictionary<int, List<BlankModel>>();
+                Queue<string> cmd_line = new Queue<string>();
+                object locker = new object();
+                listResultExport.AsParallel().ForAll(u =>
+                {
+                    lock (locker)
+                    {
+                        cmd_line.Enqueue($"(BlankID={u.Id})");
+                    }
+                });
+
+                listBlankExport = db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE {String.Join(" OR ", cmd_line)}").GroupBy(u => u.BlankID).ToDictionary(u => u.Key, u => u.ToList());
+
+                //listResultExport.ForEach(u =>
+                //{
+                //    listBlankExport.Add(u.Id, db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE BlankID={u.Id}").ToList());
+                //});
+
+                //foreach (var item in listResultExport)
+                //{
+                //    listBlankExport.Add(item.Id, db.SetBlankModels.Where(u => u.BlankID == item.Id).ToList());
+                //}
+
+                //List<GroupModel> listGroupExport = new List<GroupModel>();
+                using (GroupContext group_context = new GroupContext())
+                {
+                    listGroupExport = group_context.Database.SqlQuery<GroupModel>($"SELECT * FROM dbo.GroupModels WHERE (ProjectID={id_p}) AND (GroupID IS NOT NULL) AND ([Group] IS NULL)").OrderBy(u => u.IndexQuestion).ToList();
+                    //listGroupExport.AddRange(group_context.SetGroupModels.Where(u => u.ProjectID == id_p && u.GroupID != null && u.Group == null).OrderBy(u => u.IndexQuestion).ToList());
+                }
+
+                //Dictionary<int, QuestionModel> listQuestionExport = new Dictionary<int, QuestionModel>();
+                //using (QuestionContext q_context = new QuestionContext())
+                //{
+                //listGroupExport.ForEach(u =>
+                //{
+                //    listQuestionExport.Add((int)u.QuestionID, q_context.Database.SqlQuery<QuestionModel>($"SELECT TOP(1) * FROM dbo.QuestionModels WHERE Id={u.QuestionID}").FirstOrDefault());
+                //});
+                listQuestionExport = q_context.Database.SqlQuery<QuestionModel>($"SELECT * FROM dbo.QuestionModels WHERE ProjectID={id_p}").ToDictionary(u => u.Id, u => u);
+
+                //foreach (var item in listGroupExport)
+                //{
+                //    listQuestionExport.Add((int)item.QuestionID, q_context.SetQuestions.FirstOrDefault(u => u.Id == item.QuestionID));
+                //}
+                //}
+
+                //Dictionary<int, List<AnswerModel>> listAnswerAllExport = new Dictionary<int, List<AnswerModel>>();
+                //Dictionary<int, List<Models.Question.TableRow>> listTableRow = new Dictionary<int, List<Models.Question.TableRow>>();
+                //foreach (var item in listQuestionExport)
+                //{
+                //using (QuestionContext q_context = new QuestionContext())
+                //{
+                listQuestionExport.Keys.ToList().ForEach(u =>
+                {
+                    listAnswerAllExport.Add(u, q_context.Database.SqlQuery<AnswerModel>($"SELECT * FROM dbo.AnswerModels WHERE QuestionID={u}").ToList());
+                    listTableRow.Add(u, q_context.Database.SqlQuery<TableRow>($"SELECT * FROM dbo.TableRows WHERE TableID={u}").ToList());
+                        //listAnswerAllExport.Add(u, q_context.SetAnswers.Where(u => u.QuestionID == item.Key).ToList());
+                        //listTableRow.Add(u, q_context.SetTableRows.Where(u => u.TableID == item.Key).ToList());
+                    });
+
+                //}
+                //}
+
+                //List<RangeModel> listRangeExport = new List<RangeModel>();
+                //using (QuestionContext q_context = new QuestionContext())
+                //{
+                //listRangeExport = q_context.SetRangeModels.Where(u => u.ProjectID == id_p).ToList();
+                listRangeExport = q_context.Database.SqlQuery<RangeModel>($"SELECT * FROM dbo.RangeModels WHERE ProjectID={id_p}").ToList();
+                //}
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                Response.StatusDescription = e.Message;
+                return;
             }
 
             var products = new System.Data.DataTable();
-
             products.Columns.Add("Номер");
             products.Columns.Add("ФИО");
             products.Columns.Add("Номер телефона");
@@ -606,6 +661,7 @@ namespace SocialFORM.Controllers
             products.Columns.Add("Конец анкеты");
             products.Columns.Add("Учебный день");
             products.Columns.Add("Координаты");
+
             foreach (var item in listGroupExport)
             {
                 QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
@@ -631,7 +687,6 @@ namespace SocialFORM.Controllers
                             {
                                 tmp_count = (int)listQuestionExport[(int)item.QuestionID].LimitCount;
                             }
-                            //System.Diagnostics.Debug.WriteLine("Limit count  >>>>> " + (int)listQuestionExport[(int)item.QuestionID].LimitCount);
                             for (int i = 1; i <= tmp_count; i++)
                             {
                                 if (item.GroupID > 0)
@@ -705,7 +760,6 @@ namespace SocialFORM.Controllers
                             if (listQuestionExport[(int)item.QuestionID].Bind != null)
                             {
                                 count_row = (null_count_row + max_cont_row);
-                                System.Diagnostics.Debug.WriteLine("ALL count Rows >>>> " + (null_count_row + max_cont_row));
                             }
                             for (int i = 1; i <= count_row; i++)
                             {
@@ -734,7 +788,7 @@ namespace SocialFORM.Controllers
             }
 
             List<string> tmp_str = new List<string>();
-
+            List<SchoolDay> list_schoolday = db.SetSchoolDay.Where(u => u.Date > min_date_blank && u.Date < max_date_blank).ToList();
             foreach (var item in listResultExport)
             {
                 tmp_str.Add(item.BlankID.ToString());
@@ -742,7 +796,7 @@ namespace SocialFORM.Controllers
                 tmp_str.Add(item.PhoneNumber);
                 tmp_str.Add(item.Data.ToString());
                 tmp_str.Add(item.Time);
-                List<SchoolDay> list_schoolday = db.SetSchoolDay.ToList();
+
                 string is_introduce_day = "0";
                 foreach (var item_schoolday in list_schoolday)
                 {
@@ -803,7 +857,7 @@ namespace SocialFORM.Controllers
                                 if (tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).Count() > 0)
                                 {
                                     List<BlankModel> tmp_list_blank = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
-                                    List<AnswerModel> list_answer = new QuestionContext().SetAnswers.Where(u => u.QuestionID == group_item.QuestionID).ToList();
+                                    //List<AnswerModel> list_answer = new QuestionContext().SetAnswers.Where(u => u.QuestionID == group_item.QuestionID).ToList();
                                     bool is_non_limited = true;
                                     int count_all_answer = listAnswerAllExport[(int)group_item.QuestionID].Count();
                                     if (listQuestionExport[(int)group_item.QuestionID].LimitCount > 1)
@@ -815,16 +869,15 @@ namespace SocialFORM.Controllers
                                     List<string> other_column = new List<string>();
                                     if (is_non_limited & name_file.Contains("население"))
                                     {
-                                        foreach (var item_answer in list_answer)
+                                        //foreach (var item_answer in list_answer)
+                                        listAnswerAllExport[(int)group_item.QuestionID].ForEach(item_answer =>
                                         {
                                             BlankModel blank_tmp_arg = tmp_list_blank.FirstOrDefault(u => u.AnswerIndex == item_answer.Index & u.AnswerID == item_answer.Id);
                                             if (blank_tmp_arg != null)
                                             {
-                                                System.Diagnostics.Debug.WriteLine("AnswerID : " + item_answer.Id + " isFreeArea :" + item_answer.isFreeArea + " Text : " + blank_tmp_arg.Text + " ID: " + blank_tmp_arg.AnswerID);
                                                 tmp_str.Add(blank_tmp_arg.AnswerIndex.ToString());
                                                 if (item_answer.isFreeArea)
                                                 {
-                                                    System.Diagnostics.Debug.WriteLine("Text >> " + blank_tmp_arg.Text);
                                                     other_column.Add(blank_tmp_arg.Text);
                                                 }
                                             }
@@ -836,7 +889,7 @@ namespace SocialFORM.Controllers
                                                     other_column.Add(" ");
                                                 }
                                             }
-                                        }
+                                        });
                                         for (int iter = 0; iter < other_column.Count(); iter++)
                                         {
                                             tmp_str.Add(other_column[iter]);
@@ -965,7 +1018,6 @@ namespace SocialFORM.Controllers
                                 if (listQuestionExport[(int)group_item.QuestionID].Bind != null)
                                 {
                                     count_row = (null_count_row + max_cont_row);
-                                    System.Diagnostics.Debug.WriteLine("ALL count Rows >>>> " + (null_count_row + max_cont_row));
                                 }
                                 List<BlankModel> _blank_list = tmp_blank.Where(u => u.QuestionID == group_item.QuestionID).ToList();
                                 for (int i = 0; i < count_row; i++)
@@ -1012,6 +1064,10 @@ namespace SocialFORM.Controllers
                     tmp_str.RemoveAt(0);
                     products.Rows.Add(tmp_str.ToArray());
                     System.Diagnostics.Debug.WriteLine(r);
+                    Response.AppendToLog(r.StackTrace);
+                    Response.AppendToLog(r.Message);
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
 
                 }
                 tmp_str.Clear();
@@ -1021,18 +1077,19 @@ namespace SocialFORM.Controllers
             grid.DataSource = products;
             grid.DataBind();
 
-
-            Response.ClearContent();
             Response.Clear();
-            Response.ContentEncoding = Encoding.GetEncoding(encode);
+            Response.Buffer = true;
             Response.ContentType = "application/ms-excel";
-            Response.AddHeader("Content-Disposition", "attachment; filename=" + name_file + ".xls");
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + name_file.Trim(' ') + ".xls");
             Response.Charset = "";
+            Response.ContentEncoding = Encoding.UTF8;
+            Response.BinaryWrite(Encoding.UTF8.GetPreamble());
+
             StringWriter sw = new StringWriter();
             HtmlTextWriter htmlTextWriter = new HtmlTextWriter(sw);
             grid.RenderControl(htmlTextWriter);
-            //Response.ContentEncoding = System.Text.Encoding.UTF8;
-            Response.Write(sw.ToString());
+
+            Response.Output.Write(sw.ToString());
             Response.Flush();
             Response.End();
         }
@@ -3065,7 +3122,7 @@ namespace SocialFORM.Controllers
                         _hashSetIdGroup.Add(key_old_id, u.Id);
                     });
 
-                    
+
                     //Копирование ответов
                     foreach (var item_question in _hashSetIdQuestion.Keys)
                     {
@@ -3207,7 +3264,7 @@ namespace SocialFORM.Controllers
                     {
                         if (_lstIdTableRow.Count > 0)
                         {
-                            foreach(var item in _lstIdTableRow)
+                            foreach (var item in _lstIdTableRow)
                             {
                                 questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.TableRows WHERE Id={item}");
                             }
@@ -3217,7 +3274,7 @@ namespace SocialFORM.Controllers
                     {
                         if (_lstIdRange.Count > 0)
                         {
-                            foreach(var item in _lstIdRange)
+                            foreach (var item in _lstIdRange)
                             {
                                 questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.RangeModels WHERE Id={item}");
                             }
@@ -3227,7 +3284,7 @@ namespace SocialFORM.Controllers
                     {
                         if (_lstIdTransition.Count > 0)
                         {
-                            foreach(var item in _lstIdTransition)
+                            foreach (var item in _lstIdTransition)
                             {
                                 questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.Transitions WHERE Id={item}");
                             }
@@ -3237,7 +3294,7 @@ namespace SocialFORM.Controllers
                     {
                         if (_lstIdBlock.Count > 0)
                         {
-                            foreach(var item in _lstIdBlock)
+                            foreach (var item in _lstIdBlock)
                             {
                                 questionContext.Database.ExecuteSqlCommand($"DELETE FROM dbo.Blocks WHERE Id={item}");
                             }
