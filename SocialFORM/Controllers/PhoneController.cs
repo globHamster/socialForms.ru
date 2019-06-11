@@ -1644,47 +1644,59 @@ namespace SocialFORM.Controllers
 
         //Сбор информации по номеру из базы анкет
         [HttpGet]
-        public JsonResult SyncBlankWithDB(string FO_kod, string OB_kod, int p_id, int gor_id, int s_id = 0, int a_id = 0, int np_id = 0, int typeNP_id = 0)
+        public async Task<JsonResult> SyncBlankWithDB(string FO_kod, string OB_kod, int p_id, int gor_id, int s_id = 0, int a_id = 0, int np_id = 0, int typeNP_id = 0)
         {
             try
             {
-                List<ResultModel> lst_blank = form_db.SetResultModels.Where(u => u.ProjectID == p_id).ToList();
+                //List<ResultModel> lst_blank = form_db.SetResultModels.Where(u => u.ProjectID == p_id).ToList();
+                List<ResultModel> lst_blank = await form_db.Database.SqlQuery<ResultModel>($"SELECT * FROM dbo.ResultModels WHERE ProjectID={p_id}").ToListAsync();
                 lst_blank.AsParallel().ForAll(u =>
                 {
                     u.PhoneNumber = u.PhoneNumber.Remove(0, 1).Insert(0, "7");
                 });
-                List<AnswerModel> lst_answer = q_db.SetAnswers.Where(u => u.QuestionID == s_id).ToList();
-                List<BlankModel> lst_answer_gor = form_db.SetBlankModels.Where(u => u.QuestionID == gor_id).ToList();
-                List<BlankModel> lst_sex = new List<BlankModel>();
+                //List<AnswerModel> lst_answer = q_db.SetAnswers.Where(u => u.QuestionID == s_id).ToList();
+                //List<AnswerModel> lst_answer = await q_db.Database.SqlQuery<AnswerModel>($"SELECT * FROM dbo.AnswerModels WHERE QuestionID={s_id}").ToListAsync();
+                //List<BlankModel> lst_answer_gor = form_db.SetBlankModels.Where(u => u.QuestionID == gor_id).ToList();
+                List<BlankModel> lst_answer_gor = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={gor_id}").ToListAsync();
+                //List<BlankModel> lst_sex = new List<BlankModel>();
+                Dictionary<int, BlankModel> lst_sex = new Dictionary<int, BlankModel>();
                 if (s_id != 0)
                 {
-                    lst_sex = form_db.SetBlankModels.Where(u => u.QuestionID == s_id).ToList();
+                    //lst_sex = form_db.SetBlankModels.Where(u => u.QuestionID == s_id).ToList();
+                    lst_sex = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={s_id}").ToDictionaryAsync(u => u.BlankID, u => u);
                 }
-                List<BlankModel> lst_age = new List<BlankModel>();
+                //List<BlankModel> lst_age = new List<BlankModel>();
+                Dictionary<int, BlankModel> lst_age = new Dictionary<int, BlankModel>();
                 if (a_id != 0)
                 {
-                    lst_age = form_db.SetBlankModels.Where(u => u.QuestionID == a_id).ToList();
+                    //lst_age = form_db.SetBlankModels.Where(u => u.QuestionID == a_id).ToList();
+                    lst_age = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={a_id}").ToDictionaryAsync(u => u.BlankID);
                 }
-                List<BlankModel> lst_np = new List<BlankModel>();
+                //List<BlankModel> lst_np = new List<BlankModel>();
+                Dictionary<int, BlankModel> lst_np = new Dictionary<int, BlankModel>();
                 if (np_id != 0)
                 {
-                    lst_np = form_db.SetBlankModels.Where(u => u.QuestionID == np_id).ToList();
+                    //lst_np = form_db.SetBlankModels.Where(u => u.QuestionID == np_id).ToList();
+                    lst_np = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={np_id}").ToDictionaryAsync(u => u.BlankID, u => u);
                 }
-                List<BlankModel> lst_typeNP = new List<BlankModel>();
+                //List<BlankModel> lst_typeNP = new List<BlankModel>();
+                Dictionary<int, BlankModel> lst_typeNP = new Dictionary<int, BlankModel>();
                 if (typeNP_id != 0)
                 {
-                    lst_typeNP = form_db.SetBlankModels.Where(u => u.QuestionID == typeNP_id).ToList();
+                    //lst_typeNP = form_db.SetBlankModels.Where(u => u.QuestionID == typeNP_id).ToList();
+                    lst_typeNP = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={typeNP_id}").ToDictionaryAsync(u => u.BlankID, u => u);
                 }
                 List<FormNumber> lst_form_numbers = new List<FormNumber>();
                 string FO = FO_kod;
                 string OB = OB_kod;
                 List<FormNumber> not_PTs_lst = new List<FormNumber>();
-                foreach (var item in lst_blank)
+                //foreach (var item in lst_blank)
+                lst_blank.ForEach(item =>
                 {
                     PT tmp = db.SetPTs.FirstOrDefault(u => u.Phone == item.PhoneNumber);
                     if (lst_form_numbers.FirstOrDefault(u => u.Phone == item.PhoneNumber) != null)
                     {
-                        continue;
+                        return;
                     }
                     if (tmp != null) // Номер анкеты встречается в PTs
                     {
@@ -1695,20 +1707,24 @@ namespace SocialFORM.Controllers
                         tmp_form_number.Phone = tmp.Phone;
                         if (s_id != 0)
                         {
-                            tmp_form_number.Sex = lst_answer.First(u => u.Index == lst_sex.First(x => x.BlankID == item.Id).AnswerIndex).Index == 1 ? false : true;
+                            //tmp_form_number.Sex = lst_answer.First(u => u.Index == lst_sex.First(x => x.BlankID == item.Id).AnswerIndex).Index == 1 ? false : true;
+                            tmp_form_number.Sex = lst_sex[item.Id].AnswerIndex == 1 ? false : true;
                         }
                         if (a_id != 0)
                         {
-                            tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age.First(u => u.BlankID == item.Id).Text);
+                            //tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age.First(u => u.BlankID == item.Id).Text);
+                            tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age[item.Id].Text);
                         }
                         tmp_form_number.Type = tmp.Type;
                         if (np_id != 0)
                         {
-                            tmp_form_number.NP = lst_np.First(u => u.BlankID == item.Id).Text;
+                            //tmp_form_number.NP = lst_np.First(u => u.BlankID == item.Id).Text;
+                            tmp_form_number.NP = lst_np[item.Id].Text;
                         }
                         if (typeNP_id != 0)
                         {
-                            tmp_form_number.TypeNP = lst_typeNP.First(u => u.BlankID == item.Id).AnswerIndex == 1 ? false : true;
+                            //tmp_form_number.TypeNP = lst_typeNP.First(u => u.BlankID == item.Id).AnswerIndex == 1 ? false : true;
+                            tmp_form_number.TypeNP = lst_typeNP[item.Id].AnswerIndex == 1 ? false : true;
                         }
                         lst_form_numbers.Add(tmp_form_number);
                     }
@@ -1723,27 +1739,30 @@ namespace SocialFORM.Controllers
                         skip_tmp_form_number.Phone = item.PhoneNumber;
                         if (s_id != 0)
                         {
-                            skip_tmp_form_number.Sex = lst_answer.First(u => u.Index == lst_sex.First(x => x.BlankID == item.Id).AnswerIndex).Index == 1 ? false : true;
+                            //skip_tmp_form_number.Sex = lst_answer.First(u => u.Index == lst_sex.First(x => x.BlankID == item.Id).AnswerIndex).Index == 1 ? false : true;
+                            skip_tmp_form_number.Sex = lst_sex[item.Id].AnswerIndex == 1 ? false : true;
                         }
                         if (a_id != 0)
                         {
-                            skip_tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age.First(u => u.BlankID == item.Id).Text);
+                            //skip_tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age.First(u => u.BlankID == item.Id).Text);
+                            skip_tmp_form_number.Age = DateTime.Now.Year - Int32.Parse(lst_age[item.Id].Text);
                         }
                         if (np_id != 0)
                         {
-                            skip_tmp_form_number.NP = lst_np.First(u => u.BlankID == item.Id).Text;
+                            //skip_tmp_form_number.NP = lst_np.First(u => u.BlankID == item.Id).Text;
+                            skip_tmp_form_number.NP = lst_np[item.Id].Text;
                         }
                         if (typeNP_id != 0)
                         {
-                            skip_tmp_form_number.TypeNP = lst_typeNP.First(u => u.BlankID == item.Id).AnswerIndex == 1 ? false : true;
+                            //skip_tmp_form_number.TypeNP = lst_typeNP.First(u => u.BlankID == item.Id).AnswerIndex == 1 ? false : true;
+                            skip_tmp_form_number.TypeNP = lst_typeNP[item.Id].AnswerIndex == 1 ? false : true;
                         }
                         skip_tmp_form_number.Type = item.PhoneNumber.CompareTo("79000000000") == -1 ? 0 : 1;
                         lst_form_numbers.Add(skip_tmp_form_number);
-                        not_PTs_lst.Add(skip_tmp_form_number);
                     }
-                }
+                });
 
-                foreach (var item in lst_form_numbers)
+                lst_form_numbers.ForEach(item =>
                 {
                     PT tmp = db.SetPTs.FirstOrDefault(u => u.Phone == item.Phone);
                     if (tmp != null)
@@ -1769,7 +1788,12 @@ namespace SocialFORM.Controllers
                         db.SetPTs.Add(tmp);
                         db.SaveChanges();
                     }
-                }
+                });
+                //uint count_blank = 1;
+                //lst_form_numbers.ForEach(u =>
+                //{
+                //    System.Diagnostics.Debug.WriteLine("#" + (count_blank++) + " | Phone: " + u.Phone + " | FO: " + u.FO + " | OB: " + u.OB + " | GOR: " + u.GOR + " | Age: " + u.Age + " | Sex: " + u.Sex + " | NP: " + u.NP + " | TypeNP: " + u.TypeNP);
+                //});
                 int count_lst_form_numbers = lst_form_numbers.Count();
                 int iter = 0;
                 do
@@ -1787,10 +1811,6 @@ namespace SocialFORM.Controllers
                     }
                 } while (iter < count_lst_form_numbers);
 
-                //lst_form_numbers.ForEach(u =>
-                //{
-                //    System.Diagnostics.Debug.WriteLine("Phone: " + u.Phone + " | FO: " + u.FO + " | OB: " + u.OB + " | GOR: " + u.GOR + " | Age: " + u.Age + " | Sex: " + u.Sex + " | NP: " + u.NP + " | TypeNP: "+u.TypeNP);
-                //});
                 db.SetFormNumbers.AddRange(lst_form_numbers);
                 db.SaveChanges();
                 return Json(lst_form_numbers.Count, JsonRequestBehavior.AllowGet);

@@ -568,8 +568,8 @@ namespace SocialFORM.Controllers
             Dictionary<int, List<Models.Question.TableRow>> listTableRow = new Dictionary<int, List<Models.Question.TableRow>>();
             List<RangeModel> listRangeExport = new List<RangeModel>();
             QuestionContext q_context = new QuestionContext();
-            var min_date_blank = listResultExport.Min(u => u.Data).AddHours(-1);
-            var max_date_blank = listResultExport.Max(u => u.Data).AddHours(1);
+            var min_date_blank = DateTime.Parse(listResultExport.Min(u => u.Data).ToShortDateString());
+            var max_date_blank = DateTime.Parse(listResultExport.Max(u => u.Data).AddDays(1).ToShortDateString());
             try
             {
                 //List<ResultModel> listResultExport = db.SetResultModels.Where(u => u.ProjectID == id_p).ToList();
