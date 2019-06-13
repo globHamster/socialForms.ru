@@ -302,7 +302,7 @@
         var code = '<span class="blink">Сбор данных   </span><div class="ld ld-hourglass ld-spin-fast" style="font-size:24px;color:#008dd2"></div>';
         $('.downLoader').empty();
         $('.downLoader').append(code);
-
+        console.log('Начало формирования данных');
         $.ajax({
             cache: false,
             url: '/Audio/RunReport?id_project=' + projectID_audio + '&id_user=' + userID_audio + '&date=' + date_audio,
@@ -311,12 +311,17 @@
                 var code = '<span class="blink">Создание ZIP архива   </span><div class="ld ld-hourglass ld-spin-fast" style="font-size:24px;color:#81c784"></div>';
                 $('.downLoader').empty();
                 $('.downLoader').append(code);
+                console.log('Конец формирования данных');
+                console.log('Начало формирования ZIP');
 
                 $.ajax({
                     cache: false,
+                    contentType: "application/json",
                     url: '/Audio/AudioAllDownToZip?fileGuid=' + response.FileGuid + '&mimeType=' + response.MimeType + '&filename=' + response.FileName,
                     type: "POST",
                     success: function (res) {
+                        console.log('Конец формирования ZIP');
+
                         var code = '<span>Подготовка завершена. Нажмите на ссылку для скачивания</span>';
                         var sPath = res.FileGuid.split('#');
                         var nFile = res.FileName.split('#');

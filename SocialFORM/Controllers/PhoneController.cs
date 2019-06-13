@@ -1308,6 +1308,7 @@ namespace SocialFORM.Controllers
                         cmd_str_ += " ORDER BY NEWID()";
                     }
                 }
+                System.Diagnostics.Debug.WriteLine($"SQL Query -> {cmd_str_}");
                 tmp_lst_PT = db.Database.SqlQuery<PT>(cmd_str_).ToList();
             }
             catch (Exception e)

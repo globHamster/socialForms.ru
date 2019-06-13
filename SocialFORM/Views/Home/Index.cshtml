@@ -1,15 +1,17 @@
 ﻿@{
     ViewBag.Title = "Домашняя страница";
 }
+<link href="~/Content/css/mainCSS.css" rel="stylesheet" />
+
 <div class="container">
     <div class="row">
-        <p><h2>ifsocialForms</h2> - это веб-приложение позволяющее создовать анкеты</p>
+        <p><h2 class="H2List">ifsocialForms</h2><span style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important"> - это веб-приложение позволяющее создовать анкеты</span></p>
     </div>
     <div class="row">
         <div class="col-md-4">
-            <h3 align="center">Функционал</h3>
-            <p>Типы вопросов:</p>
-            <ul>
+            <h3 class="H3List" align="center" style="width: 100%;">Функционал</h3>
+            <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; font-weight:bold;">Типы вопросов:</p>
+            <ul style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important">
                 <li>Обычный текст(Text)</li>
                 <li>С одиночным выбором(Single)</li>
                 <li>С множественным выбором(Multi)</li>
@@ -19,9 +21,9 @@
             </ul>
         </div>
         <div class="col-md-4">
-            <h3 align="center">Логика</h3>
-            <p>Типы блокировок и переходов</p>
-            <ul>
+            <h3 class="H3List" align="center" style="width: 100%;">Логика</h3>
+            <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; font-weight:bold;">Типы блокировок и переходов</p>
+            <ul style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important">
                 <li>Скрываем ответы выбранных результатов</li>
                 <li>Скрываем ответы не выбранных результатов</li>
                 <li>Переход от вопроса к вопросам</li>
@@ -29,24 +31,30 @@
             </ul>
         </div>
         <div class="col-md-4">
-            <h3 align="center">Опция 3</h3>
+            <h3 class="H3List" align="center" style="width: 100%;">Опция 3</h3>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4">
-            <h3 align="center">Политика</h3>
+            <h3 class="H3List" align="center" style="width: 100%;">Политика</h3>
         </div>
         <div class="col-md-4">
-            <h3 align="center">Наркоситуация</h3>
-            <p align="center" style="border:2px solid #0094ff; border-radius:10px; padding:10px; background:#b4b1b1">
-                <b>@Html.ActionLink("Наркоситуация в молодежной среде в Ярославская область (Население)", "OprosNarkNas", "Home")</b>
+            <h3 class="H3List" align="center" style="width: 100%;">Наркоситуация</h3>
+            <p align="center" style="border:2px solid #008dd2; border-radius:10px; padding:10px; background:#008dd2;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important">
+                <b style="color:white !important">@Html.ActionLink("Наркоситуация в молодежной среде в Ярославская область (Население)", "OprosNarkNas", "Home", new { @class = "linkMain" })</b>
             </p>
         </div>
         <div class="col-md-4">
-            <h3 align="center">Коррупция</h3>
-            <p align="center" style="border:2px solid #0094ff; border-radius:10px; padding:10px; background:#b4b1b1 ">
-                <b>@Html.ActionLink("Коррупция в Ярославской области (Предприятия)", "OprosYaroslavl", "Home")</b>
+            <h3 class="H3List" align="center" style="width: 100%;">Коррупция</h3>
+            <p align="center" style="border:2px solid #008dd2; border-radius:10px; padding:10px; background:#008dd2;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important ">
+                <b>@Html.ActionLink("Коррупция в Ярославской области (Предприятия)", "OprosYaroslavl", "Home", new { @class = "linkMain" })</b>
             </p>
         </div>
     </div>
 </div>
+
+<style>
+    .linkMain {
+        color: white !important;
+    }
+</style>
