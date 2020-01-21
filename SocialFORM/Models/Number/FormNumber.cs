@@ -23,5 +23,7 @@ namespace SocialFORM.Models.Number
         public string Education { get; set; }
         public int Type { get; set; }
         public bool TypeNP { get; set; }
+        public string AO { get; set; }
+        public string VGMR { get; set; }
     }
 }

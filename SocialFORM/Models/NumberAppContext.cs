@@ -17,5 +17,7 @@ namespace SocialFORM.Models
         public DbSet<Diap> SetDiap { get; set; }
         public DbSet<FormNumber> SetFormNumbers { get; set; }
         public DbSet<PT> SetPTs { get; set; }
+        public DbSet<AO> SetAOs { get; set; }
+        public DbSet<VGMR> SetVGMRs { get; set; }
     }
 }

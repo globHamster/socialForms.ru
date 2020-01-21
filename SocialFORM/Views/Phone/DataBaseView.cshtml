@@ -25,107 +25,193 @@
             font-weight: 600;
             transition: .1s linear;
         }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        table thead tr {
+            color: #ffffff;
+            font-weight: bold;
+            background: #00bf80;
+        }
+
+            table thead tr th {
+                border: 1px solid #ffffff;
+                min-width: 10vw;
+            }
+
+        table tbody tr td {
+            border: 1px solid #e8e9eb;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        table tbody tr:nth-child(2n) {
+            background: #7bb7ff;
+        }
+
+        table tbody tr:hover {
+            background: #ebffe8;
+        }
+
 </style>
 @*<div style="padding:5px;background-color:#66bb6a;">
         <div><input type="file" id="backup_file_number" /></div>
         <div><input type="button" value="Load..." onclick="LoadBackupFile()" /></div>
     </div>*@
-<input type="file" name="TestImport" />
+
+<input class="form-control" type="file" name="TestImport" />
 
 <div name="panel_filter" style="border-radius: 10px 10px 0 0;background:#81c784;width:100%;padding:5px;">
-    <select name="ListFO" onchange="ChangeFO($(this).find('option:selected').val())">
+    <select class="form-control" name="ListFO" onchange="ChangeFO($(this).find('option:selected').val())">
         <option value="" disabled selected>Выберите из списка ...</option>
     </select>
-    <select name="ListOB" onchange="ChangeOB($(this).parent().find('select[name=ListFO]').find('option:selected').val(), $(this).find('option:selected').val())">
+    <select class="form-control" name="ListOB" onchange="ChangeOB($(this).parent().find('select[name=ListFO]').find('option:selected').val(), $(this).find('option:selected').val())">
         <option value="" disabled selected>Выберите из списка ...</option>
     </select>
-    <select name="ListGOR">
+    <select class="form-control" name="ListGOR">
         <option value="" disabled selected>Выберите из списка ...</option>
     </select>
+
+</div>
+<div name="panel_filter_optionally" class="form-inline">
 
 </div>
 <div style="display:inline-flex;padding:5px;background:#81c784;width:100%;">
-    <div class="search_btn" style="border-radius:10px;" onclick="BeginSearch()">Поиск</div>
-    <div class="search_btn NotLoader" style="border-radius:10px;" onclick="GetInfoNumber($(this))">Информация</div>
-    <div class="search_btn" style="border-radius:10px;" onclick="GetFilePhone()">Excel</div>
-    <div class="search_btn" style="border-radius:10px;" onclick="ImportToCSV()">CSV</div>
-    <div>
-        <div class="search_btn" style="border-radius:10px;" onclick="FormImportToOktell($(this))">в Oktell</div>
+    <button type="button" class="btn btn-primary" style="width:100%;" onclick="BeginSearch()">Поиск</button>
+    <button type="button" class="btn btn-danger" style="width:100%;margin-left:2px;" onclick="GetInfoNumber($(this))">Информация</button>
+    <button type="button" class="btn btn-primary" style="width:100%;margin-left:2px;" onclick="GetFilePhone()">Excel</button>
+    <button type="button" class="btn btn-primary" style="width:100%;margin-left:2px;" onclick="ImportToCSV()">CSV</button>
+    <div style="width:100%;">
+        <button type="button" class="btn btn-primary" style="width:100%;margin-left:2px;" onclick="FormImportToOktell($(this))">в Oktell</button>
     </div>
 </div>
-<div name="second_panel_filter" style="display: none;background:#81c784;width:100%;padding:5px;">
-    <div name="filter_NP" hidden>
-        <select>
-            <option value="0" selected>Выберите из списка ...</option>
-        </select>
+<div name="second_panel_filter" style="display: none;background:#81c784;width:100%;padding:5px;align-items:stretch;">
+    <div style="width:100%;" name="filter_Age">
+        <small>Возраст: от</small>
+        <input type="text" class="form-control" name="text_age_from" />
+        <small>до</small>
+        <input type="text" class="form-control" name="text_age_to" />
     </div>
-    <div name="filter_Age">Возраст: от <input type="text" name="text_age_from" style="width:50px" /> до <input type="text" name="text_age_to" style="width:50px;" /></div>
-    <div name="filter_Sex">
-        Пол
-        <select>
+    <div class="fixed-bottom" style="width:100%;" name="filter_Sex">
+        <small>Пол</small>
+        <select class="form-control">
             <option value="-1" selected>Все</option>
             <option value="0">Мужской</option>
             <option value="1">Женский</option>
         </select>
     </div>
-    <div name="type_phone">
-        Тип номера
-        <select>
+    <div style="width:100%;" name="type_phone">
+        <small>Тип номера</small>
+        <select class="form-control">
             <option value="" selected>Все</option>
             <option value="0">Станционарный</option>
             <option value="1">Мобильный</option>
         </select>
     </div>
-    <div name="type_np">
-        Тип поселения
-        <select>
+    <div style="width:100%;" name="type_np">
+        <small>Тип поселения</small>
+        <select class="form-control">
             <option value="" selected>Все</option>
             <option value="0">Город</option>
             <option value="1">Село</option>
         </select>
     </div>
-    <div>
-        <div name="second_filter_btn" style="border-radius:10px;" class="search_btn" onclick="CheckFiltredItem()">Фильтр</div>
+    <div style="width:100%;display:flex;flex-wrap:wrap;margin-left:5px;">
+        <button type="button" name="second_filter_btn" style="width:100%;" class="btn btn-primary" onclick="CheckFiltredItem()">Фильтр</button>
         <div style="height:5px;"></div>
-        <div name="reset_filter_btn" style="border-radius:10px;" class="search_btn" onclick="ResetMassive()">Сброс</div>
+        <button type="button" name="reset_filter_btn" style="width:100%;" class="btn btn-primary" onclick="ResetMassive()">Сброс</button>
     </div>
 </div>
 <div name="panel_find_number" style="width:100%;background:#81c784;display:inline-flex;padding:5px;">
-    <input type="text" placeholder="Номер телефона" name="input_number_phone" />
-    <div class="search_btn" style="border-radius:10px;" onclick="FindNumberInList()">Найти</div>
+    <input class="form-control" type="text" placeholder="Номер телефона" name="input_number_phone" />
+    <button type="button" class="btn btn-primary" onclick="FindNumberInList()">Найти</button>
 </div>
 <div style="width:100%;background-color:#008dd2;display:grid;grid-template-columns: repeat(10, 1fr);">
     <div style="color:#fff;grid-column: span 2;padding:3px;font-size:13px;font-weight:600;">Общее количество</div>
     <div name="common_count_array" style="width:80%;color:#fff;grid-column: span 8;padding:3px;font-size:14px;font-weight:600;"></div>
 </div>
-<div class="TablePhone">
-    <div class="TableCont">
+<div style="overflow-x:auto;" name="TableFormNumber">
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">Населенный пункт</th>
+                <th scope="col">Внутригородской район</th>
+                <th scope="col" hidden>Адм. округ</th>
+                <th scope="col" hidden>Внутрегород. муниц. образование</th>
+                <th scope="col" style="min-width:7vw !important;">Телефон</th>
+                <th scope="col" style="min-width:2vw !important;">Пол</th>
+                <th scope="col" style="min-width:4vw !important;">Возраст</th>
+                <th scope="col" style="min-width:18vw !important;">Адрес</th>
+                <th scope="col" style="min-width:6vw !important;">Тип поселения</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<div>
+    
+    @*<div class="TableCont" hidden>
         <div class='item_form_numb'>
             <div name='NP' class="size" onclick="SortToNP($(this))">Населенный пункт</div>
             <div name='VGOR' class="size">Внутригородской район</div>
+            <div name='AO' class="size" style="display:none">Адм. округ</div>
+            <div name='VGMR' class="size" style="display:none">Внутрегород. муниц. образование</div>
             <div name='Phone' class="size" onclick="SortToPhone($(this))">Телефон</div>
             <div name='Sex' class="size" onclick="SortToSex($(this))">Пол</div>
             <div name='Age' class="size" onclick="SortToAge($(this))">Возраст</div>
             <div name='Address' class="size">Адрес</div>
             <div name="TypeNP" class="size">Тип поселения</div>
         </div>
-    </div>
+    </div>*@
     <div class="TableCont">
         <div name="content_table" style="height:90%;">
             <div name="paging_number" id="1" style="display:none;"></div>
         </div>
         <div name="paging" style="height:10%;display:inline-flex;width:100%;justify-content:center;align-items:center;padding:5px;">
-            <div name="previos" style="border-radius:20px;display:flex;justify-content:center;align-items:center;font-weight:900;" class="page_btn" onclick="Page_Move_Previos()"><div style="margin-left:-2px;"><</div></div>
-            <input type="text" style="width:50px;height:30px;" placeholder="page" />
+            <button type="button" class="btn btn-primary" onclick="Page_Move_Previos()"><</button>
+            <input type="text" class="form-control" style="width:75px;margin:5px;" placeholder="page" />
             <div style="padding: 3px; font-weight:900;" name="count_page">/?</div>
-            <div class="page_btn" style="display:flex;justify-content:center;align-items:center;border-radius:10px;width:auto;padding:5px;" onclick="ChangePage($(this).parent().find('input').val()) "><div>Переход</div></div>
-            <div name="next" style="display:flex;border-radius:20px;justify-content:center;align-items:center;font-weight:900;" class="page_btn" onclick="Page_Move_Next()"><div>></div></div>
+            <button type="button" class="btn btn-primary" style="margin:5px;" onclick="ChangePage($(this).parent().find('input').val()) ">Переход</button>
+            <button  type="button" class="btn btn-primary" onclick="Page_Move_Next()">></button>
+        </div>
+    </div>
+</div>
+
+<button name="OpenModalWindow"  type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="display:none">
+    Launch demo modal
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModelLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Изменение информации</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer modal-">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="SaveChangeFormNumb()">Сохранить</button>
+            </div>
         </div>
     </div>
 </div>
 <script>
     let form_number_massive, backup_form_number_massive;
     let lst_form_numb = [];
+
+    function ShowModal(container) {
+        //alert("Item " + container.find('td:eq(4)').text() + " - " + container.find('td:eq(9)').text())
+        let phone = container.find('td:eq(4)').text();
+        let iter = container.find('td:eq(9)').text();
+        LoadEditer(phone, iter)
+        $('button[name=OpenModalWindow]').trigger('click');
+    }
 
     $(function () {
         $.get("/Phone/getListFO")
@@ -147,53 +233,84 @@
     //Функция отрисовки листа с номерами
     function WriteTable(container, mass, page_iter) {
         container.find('.item_form_numb').remove()
+
         var length_lst = mass.length;
         var page_length = Math.ceil(length_lst / 30);
         $('div[name=count_page]').text("/" + page_length);
         var limit_iter = (page_iter * 30) > mass.length ? mass.length : (page_iter * 30);
+
+        let cont_table = $('div[name=TableFormNumber]').find('tbody');
+        cont_table.find('tr').remove();
+
         for (var i = (page_iter * 30) - 30; i < limit_iter; i++) {
-            container.append("<div class='item_form_numb phone_form' onclick='LoadEditer($(this).find(\"div[name=Phone]\").text(), $(this).find(\"input\").val())'>" +
-                "<input type='hidden' value='" + i + "' />" +
-                "<div name='NP'>" + mass[i].NP + "</div>" +
-                "<div name='VGOR'>" + mass[i].VGOR + "</div>" +
-                "<div name='Phone'>" + mass[i].Phone + "</div>" +
-                "<div name='Sex'>" + (mass[i].Sex == false ? "М" : "Ж") + "</div>" +
-                "<div name='Age'>" + mass[i].Age + "</div>" +
-                "<div name='Address'>" + mass[i].Address + "</div>" +
-                "<div name='TypeNP'>" + (mass[i].TypeNP == false ? "город" : "село/деревня") + "</div>" +
-                "</div>")
+            //container.append("<div class='item_form_numb phone_form' onclick='LoadEditer($(this).find(\"div[name=Phone]\").text(), $(this).find(\"input\").val())'>" +
+            //    "<input type='hidden' value='" + i + "' />" +
+            //    "<div name='NP'>" + mass[i].NP + "</div>" +
+            //    "<div name='VGOR'>" + mass[i].VGOR + "</div>" +
+            //    "<div name='AO' style='display:none'>" + mass[i].AO + "</div>" +
+            //    "<div name='VGMR' style='display:none'>" + mass[i].VGMR + "</div>" +
+            //    "<div name='Phone'>" + mass[i].Phone + "</div>" +
+            //    "<div name='Sex'>" + (mass[i].Sex == false ? "М" : "Ж") + "</div>" +
+            //    "<div name='Age'>" + mass[i].Age + "</div>" +
+            //    "<div name='Address'>" + mass[i].Address + "</div>" +
+            //    "<div name='TypeNP'>" + (mass[i].TypeNP == false ? "город" : "село/деревня") + "</div>" +
+            //    "</div>")
+            cont_table.append("<tr data-toggle='modal' onclick='ShowModal($(this))'><td>" + mass[i].NP + "</div>" + //запись в таблицу (новая)
+                "<td>" + mass[i].VGOR + "</td>" +
+                "<td hidden>" + mass[i].AO + "</td>" +
+                "<td hidden>" + mass[i].VGMR + "</td>" +
+                "<td>" + mass[i].Phone + "</td>" +
+                "<td>" + (mass[i].Sex == false ? "М" : "Ж") + "</td>" +
+                "<td>" + mass[i].Age + "</td>" +
+                "<td>" + mass[i].Address + "</td>" +
+                "<td>" + (mass[i].TypeNP == false ? "город" : "село/деревня") + "</td>" +
+                "<td hidden>"+i+"</td>"+
+                "</tr>")
+        }
+        let FO = $('select[name=ListFO]').find('option:selected').val();
+        let OB = $('select[name=ListOB]').find('option:selected').val();
+        let AO = $('select[name=ListAO]').find('option:selected').val();
+        if ((FO == "FO1" & OB == "OB18" & AO!="") || (FO == "FO2" & OB == "OB10" & AO!="")) {
+            $('div[name=TableFormNumber]').find('th:hidden').show();
+            $('div[name=TableFormNumber]').find('th:eq(1)').hide();
+            $('div[name=TableFormNumber]').find('td:hidden').show();
+            $('div[name=TableFormNumber]').find('tbody').find('tr').each(function () {
+                $(this).find('td:eq(1)').hide();
+                $(this).find('td:eq(9)').hide();
+            })
+        } else {
+            $('div[name=TableFormNumber]').find('th:eq(1)').show();
+            $('div[name=TableFormNumber]').find('th:eq(2)').hide();
+            $('div[name=TableFormNumber]').find('th:eq(3)').hide();
         }
     }
     //Загрузка панели редактора информации по номеру
     function LoadEditer(numb_phone, iter) {
+        $('div#exampleModal').find('div.modal-body').empty();
         $.get("/Phone/GetFormNumber", { numb: numb_phone })
             .success(function (server_data) {
-                $('body').append("<div class='block_panel_editer' style='width:100%; height: 100%; position: fixed; left:0;top:0;background: rgba(100,100,100,0.5); display: flex;justify-content: center;align-content:space-between;align-items:center;flex-direction:column;'>" +
-                    "<div class='panel_editer'>" +
-                    "<div class='close_panel_editer' onclick='$(this).parents(\".block_panel_editer\").remove()'>X</div>" +
+                $('div#exampleModal').find('div.modal-body').append(
                     "<input type='hidden' name='hidden_iter' value='" + iter + "'/>" +
                     "<input type='hidden' name='hidden_FO' value='" + server_data.FO + "'' />" +
                     "<input type='hidden' name='hidden_OB' value='" + server_data.OB + "'' />" +
                     "<input type='hidden' name='hidden_GOR' value='" + server_data.GOR + "'' />" +
                     "<input type='hidden' name='hidden_Phone' value='" + server_data.Phone + "'' />" +
                     "<div class='editer_form_numb'>" +
-                    "<div name='rename_NP' class='col1_grid'>Населенный пункт</div><div name='text_rename_NP' class='col2_grid'><input type='text' value='" + server_data.NP + "'/></div>" +
-                    "<div name='rename_VGOR' class='col1_grid'>Внутигородской район</div><div name='text_rename_VGOR' class='col2_grid'><input type='text' value='" + server_data.VGOR + "'/></div>" +
-                    "<div name='rename_Sex' class='col1_grid'>Пол</div><div name='text_rename_Sex' class='col2_grid'>" +
-                    "<select>" +
+                    "<div name='rename_NP' class='col1_grid lead'>Населенный пункт</div><div name='text_rename_NP' class='col2_grid'><input class='form-control' type='text' value='" + server_data.NP + "'/></div>" +
+                    "<div name='rename_VGOR' class='col1_grid lead'>Внутигородской район</div><div name='text_rename_VGOR' class='col2_grid'><input class='form-control' type='text' value='" + server_data.VGOR + "'/></div>" +
+                    "<div name='rename_Sex' class='col1_grid lead'>Пол</div><div name='text_rename_Sex' class='col2_grid'>" +
+                    "<select class='form-control'>" +
                     "<option value='0' " + (server_data.Sex == 0 ? "selected" : "") + ">Мужской</option>" +
                     "<option value='1' " + (server_data.Sex == 1 ? "selected" : "") + ">Женский</option>" +
                     "</select>" +
                     "</div>" +
-                    "<div name='rename_Age' class='col1_grid'>Возрост</div><div name='text_rename_Age' class='col2_grid'><input type='text' value='" + server_data.Age + "'/></div>" +
-                    "<div name='rename_Address' class='col1_grid'>Адрес</div><div name='text_rename_Address' class='col2_grid'><input type='text' value='" + server_data.Address + "'/></div>" +
-                    "<div name='rename_Education' class='col1_grid'>Образование</div><div name='text_rename_Education' class='col2_grid'><input type='text' value='" + server_data.Education + "'/></div>" +
-                    "<div name='rename_Type' class='col1_grid'>Тип телефона</div><div name='text_rename_Type' class='col2_grid'><select><option value='0' " + (server_data.Type == 0 ? "selected" : "") + ">Станционарный</option><option value='1' " + (server_data.Type == 1 ? "selected" : "") + ">Мобильный</option></select></div>" +
-                    "<div name='rename_TypeNP' class='col1_grid'>Тип поселения</div><div name='text_rename_TypeNP' class='col2_grid'><select><option value='0' " + (server_data.TypeNP == 0 ? "selected" : "") + ">Город</option><option value='1' " + (server_data.TypeNP == 1 ? "selected" : "") + ">Село/Деревня/Поселок</option></select></div>" +
-                    "</div>" +
-                    "<div style='width:120px;height:30px;background:#008dd2;border-radius:10px;display:flex;justify-content:center;align-items:center;color:#fff;font-width:600;' name='save_info' onclick='SaveChangeFormNumb()'><div>Сохранить</div></div>" +
-                    "</div>" +
-                    "</div>");
+                    "<div name='rename_Age' class='col1_grid lead'>Возрост</div><div name='text_rename_Age' class='col2_grid'><input class='form-control' type='text' value='" + server_data.Age + "'/></div>" +
+                    "<div name='rename_Address' class='col1_grid lead'>Адрес</div><div name='text_rename_Address' class='col2_grid'><input class='form-control' type='text' value='" + server_data.Address + "'/></div>" +
+                    "<div name='rename_Education' class='col1_grid lead'>Образование</div><div name='text_rename_Education' class='col2_grid'><input class='form-control' type='text' value='" + server_data.Education + "'/></div>" +
+                    "<div name='rename_Type' class='col1_grid lead'>Тип телефона</div><div name='text_rename_Type' class='col2_grid'><select class='form-control'><option value='0' " + (server_data.Type == 0 ? "selected" : "") + ">Станционарный</option><option value='1' " + (server_data.Type == 1 ? "selected" : "") + ">Мобильный</option></select></div>" +
+                    "<div name='rename_TypeNP' class='col1_grid lead'>Тип поселения</div><div name='text_rename_TypeNP' class='col2_grid'><select class='form-control'><option value='0' " + (server_data.TypeNP == 0 ? "selected" : "") + ">Город</option><option value='1' " + (server_data.TypeNP == 1 ? "selected" : "") + ">Село/Деревня/Поселок</option></select></div>"+
+                    "</div>"
+                    );
             })
     }
 
@@ -206,7 +323,7 @@
 
     //Сохранение новой информации по номеру
     function SaveChangeFormNumb() {
-        var container = $('body').find('div.panel_editer');
+        var container = $('div#exampleModal').find('div.modal-body');
         var iter_update = Number(container.find('input[name=hidden_iter]').val());
         var query = {
             FO: container.find('input[name=hidden_FO]').val(),
@@ -274,6 +391,8 @@
                     })
                 }
             })
+        $('select[name=ListAO]').remove();
+        $('select[name=ListVGMR]').remove();
     }
 
     //Загрузка и перерисовка списка городских округов
@@ -288,6 +407,45 @@
                     })
                 }
             })
+        if (codeFO == "FO1" || codeFO == "FO2") {
+            if (codeOB == "OB18" && codeFO == "FO1") {
+                if ($('div[name=panel_filter_optionally]').find('select[name=ListAO]').length == 0)
+                    $('div[name=panel_filter_optionally]').append('<select class="form-control" name="ListAO" onchange="ChangeAO($(\'div[name=panel_filter]\').find(\'select[name=ListFO]\').find(\'option:selected\').val(), $(\'div[name=panel_filter]\').find(\'select[name=ListOB]\').find(\'option:selected\').val(), $(this).find(\'option:selected\').val())"><option value disabled selected>Выберите из списка</option></select>')
+                $.get("/Phone/GetAOList", { FO_kod: codeFO, OB_kod: codeOB })
+                    .success(function (server_data) {
+                        $.each(server_data, function (i, item) {
+                            $('select[name=ListAO]').append('<option value="' + item.KodAO + '">' + item.NameAO + '</option>');
+                        })
+                    })
+            } else if (codeOB == "OB10" && codeFO == "FO2") {
+                if ($('div[name=panel_filter_optionally]').find('select[name=ListAO]').length == 0)
+                    $('div[name=panel_filter_optionally]').append('<select class="form-control" name="ListAO"  onchange="ChangeAO($(\'div[name=panel_filter]\').find(\'select[name=ListFO]\').find(\'option:selected\').val(), $(\'div[name=panel_filter]\').find(\'select[name=ListOB]\').find(\'option:selected\').val(), $(this).find(\'option:selected\').val())"><option value disabled selected>Выберите из списка</option></select>')
+                $.get("/Phone/GetAOList", { FO_kod: codeFO, OB_kod: codeOB })
+                    .success(function (server_data) {
+                        $.each(server_data, function (i, item) {
+                            $('select[name=ListAO]').append('<option value="' + item.KodAO + '">' + item.NameAO + '</option>');
+                        })
+                    })
+            }
+            else {
+                $('select[name=ListAO]').remove();
+                $('select[name=ListVGMR]').remove();
+            }
+        }
+    }
+
+    //Загрузка и отрисовка списка административных округов
+    function ChangeAO(codeFO, codeOB, codeAO) {
+        $('select[name=ListVGMR]').find('option:not(:disabled)').remove();
+        $('select[name=ListVGMR]').find('option:disabled').prop('selected', true);
+        if ($('div[name=panel_filter_optionally]').find('select[name=ListVGMR]').length == 0)
+            $('div[name=panel_filter_optionally]').append('<select class="form-control" name="ListVGMR"><option value disabled selected>Выберите из списка</option></select>')
+        $.get("/Phone/GetVGMRList", { FO_kod: codeFO, OB_kod: codeOB, AO_kod: codeAO })
+            .success(function (server_data) {
+                $.each(server_data, function (i, item) {
+                    $('select[name=ListVGMR]').append('<option value="' + item.KodVGMR + '">' + item.NameVGMR + '</option>');
+                })
+            })
     }
 
     //Загрузка номеров из базы
@@ -295,41 +453,61 @@
         var KodFO = $('select[name=ListFO]').find('option:selected').val();
         var KodOB = $('select[name=ListOB]').find('option:selected').val();
         var KodGOR = $('select[name=ListGOR]').find('option:selected').val();
-        $.get("/Phone/getListFormNumber", { KodFO: KodFO, KodOB: KodOB, KodGOR: KodGOR })
-            .success(function (server_data) {
-                $('div[name=paging_number]').attr('id', 1);
-                $('div[name=paging]').find('input').val(1);
-                var paging_number = Number(1);
-                form_number_massive = server_data.clone();
-                backup_form_number_massive = server_data.clone();
-                WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
-                $('div[name=common_count_array]').text(form_number_massive.length);
-                $('div[name=second_panel_filter]').css("display", "inline-flex");
-                var lst_NP = {};
-                var lst_VGOR = {};
-                $.each(form_number_massive, function (i, item) {
-                    if (item.NP != null && item.NP != "" && item.NP != " ") {
-                        lst_NP[item.NP] = item.NP;
-                    }
+        var KodAO = $('select[name=ListAO]').find('option:selected').val();
+        var KodVGMR = $('select[name=ListVGMR]').find('option:selected').val();
+        if ($('select[name=ListAO]').is(':visible') && (KodAO != '' || KodVGMR != '') && !($('select[name=ListAO]').find('option:selected').is(':disabled'))) {
+            $.get("/Phone/getListFormNumberOptionally", { KodFO: KodFO, KodOB: KodOB, KodAO: KodAO, KodVGMR: KodVGMR })
+                .success(function (server_data) {
+                    $('div[name=paging_number]').attr('id', 1);
+                    $('div[name=paging]').find('input').val(1);
+                    var paging_number = Number(1);
+                    form_number_massive = server_data.clone();
+                    backup_form_number_massive = server_data.clone();
+                    WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
+                    $('div[name=common_count_array]').text(form_number_massive.length);
+                    $('div[name=second_panel_filter]').css("display", "inline-flex");
+                    var lst_NP = {};
+                    $.each(form_number_massive, function (i, item) {
+                        if (item.NP != null && item.NP != "" && item.NP != " ") {
+                            lst_NP[item.NP] = item.NP;
+                        }
+                    })
                 })
-                var container_NP = $('div[name=second_panel_filter]').find('div[name=filter_NP]').find('select');
-                container_NP.find('option:not([value=0])').remove();
-                $.each(lst_NP, function (i, item) {
-                    container_NP.append("<option value='" + item + "'>" + item + "</option>");
+                .error(function (xhr, ajaxOptions, thrownError) {
+                    console.log(xhr);
+                    console.log(thrownError);
+                    console.log(ajaxOptions)
                 })
-            })
-            .error(function (xhr, ajaxOptions, thrownError) {
-                console.log(xhr);
-                console.log(thrownError);
-                console.log(ajaxOptions)
-            })
+        } else {
+            
+            $.get("/Phone/getListFormNumber", { KodFO: KodFO, KodOB: KodOB, KodGOR: KodGOR })
+                .success(function (server_data) {
+                    $('div[name=paging_number]').attr('id', 1);
+                    $('div[name=paging]').find('input').val(1);
+                    var paging_number = Number(1);
+                    form_number_massive = server_data.clone();
+                    backup_form_number_massive = server_data.clone();
+                    WriteTable($('div[name=content_table]'), form_number_massive, paging_number);
+                    $('div[name=common_count_array]').text(form_number_massive.length);
+                    $('div[name=second_panel_filter]').css("display", "inline-flex");
+                    var lst_NP = {};
+                    $.each(form_number_massive, function (i, item) {
+                        if (item.NP != null && item.NP != "" && item.NP != " ") {
+                            lst_NP[item.NP] = item.NP;
+                        }
+                    })
+                })
+                .error(function (xhr, ajaxOptions, thrownError) {
+                    console.log(xhr);
+                    console.log(thrownError);
+                    console.log(ajaxOptions)
+                })
+        }
     }
 
     //Отфильтровать номера по параметрам
     function CheckFiltredItem() {
         form_number_massive = backup_form_number_massive.clone();
-        let _filter_NP = $('div[name=second_panel_filter]').find('div[name=filter_NP]').find('option:selected').val();
-        let _filter_VGOR = $('div[name=second_panel_filter]').find('div[name=filter_VGOR]').find('option:selected').val();
         let _sex = $('div[name=second_panel_filter]').find('div[name=filter_Sex]').find('option:selected').val();
         let _age_from = $('div[name=second_panel_filter]').find('input[name=text_age_from]').val();
         let _age_to = $('div[name=second_panel_filter]').find('input[name=text_age_to]').val();
@@ -349,12 +527,6 @@
 
         var limit_mass = form_number_massive.length;
         for (var i = 0; i < limit_mass; i++) {
-            if (_filter_NP != 0 && form_number_massive[i].NP != _filter_NP) {
-                form_number_massive.splice(i, 1);
-                limit_mass--;
-                i--;
-                continue;
-            }
             if (_sex != -1 && form_number_massive[i].Sex != (_sex == 0 ? false : true)) {
                 form_number_massive.splice(i, 1);
                 limit_mass--;
@@ -384,8 +556,6 @@
                 }
             }
         }
-        $('div.TablePhone').find('.SortUp').removeClass('SortUp');
-        $('div.TablePhone').find('.SortDown').removeClass('SortDown');
         $('div[name=paging_number]').attr('id', 1);
         $('div[name=paging]').find('input').val(1);
         WriteTable($('div[name=content_table]'), form_number_massive, 1);
@@ -393,8 +563,6 @@
     }
 
     function ResetMassive() {
-        $('div.TablePhone').find('.SortUp').removeClass('SortUp');
-        $('div.TablePhone').find('.SortDown').removeClass('SortDown');
         $('div[name=paging_number]').attr('id', 1);
         $('div[name=paging]').find('input').val(1);
         form_number_massive = backup_form_number_massive.clone();
@@ -403,17 +571,13 @@
     }
 
     $('input[name=TestImport]').change(function (e) {
-
-        var file_elem = $(this);
         var files = e.target.files;
-        var name_file;
         if (files.length > 0) {
             if (window.FormData !== undefined) {
                 var data = new FormData();
                 for (var x = 0; x < files.length; x++) {
                     data.append("file" + x, files[x]);
                     var file = files[x];
-                    name_file = file.name;
                 }
                 $.ajax({
                     type: "POST",
@@ -435,142 +599,6 @@
         return this.slice(0);
     }
 
-    //BEGIN BLOCK "Sort"
-    function sortUP_String(option) {
-        return function (a, b) {
-            return a[option].toLowerCase().localeCompare(b[option].toLowerCase());
-        }
-    }
-    function sortDOWN_String(option) {
-        return function (a, b) {
-            return (-1) * a[option].toLowerCase().localeCompare(b[option].toLowerCase());
-        }
-    }
-    function sortUP_Number(option) {
-        return function (a, b) {
-            return a[option] - b[option];
-        }
-    }
-    function sortDOWN_Number(option) {
-        return function (a, b) {
-            return -1 * (a[option] - b[option]);
-        }
-    }
-    //END BLOCK
-
-    //Сортирова по населенному пункту
-    function SortToNP(container) {
-        if (container.parents('.TablePhone').find('.phone_form').length == 0) {
-            return;
-        }
-        $('div[name=paging_number]').attr('id', 1);
-        $('div[name=paging]').find('input').val(1);
-        if (!container.hasClass('SortUp') && !container.hasClass('SortDown')) {
-            container.parent().find('.SortUp').removeClass('SortUp');
-            container.parent().find('.SortDown').removeClass('SortDown');
-            form_number_massive = form_number_massive.sort(sortUP_String("NP"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.addClass('SortUp');
-            return;
-        }
-        if (container.hasClass('SortUp')) {
-            form_number_massive = form_number_massive.sort(sortDOWN_String("NP"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortUp').addClass('SortDown');
-            return;
-        }
-        if (container.hasClass('SortDown')) {
-            form_number_massive = form_number_massive.sort(sortUP_String("NP"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortDown').addClass('SortUp');
-            return;
-        }
-    }
-    //Сортировка по полу
-    function SortToSex(container) {
-        if (container.parents('.TablePhone').find('.phone_form').length == 0) {
-            return;
-        }
-        $('div[name=paging_number]').attr('id', 1);
-        $('div[name=paging]').find('input').val(1);
-        if (!container.hasClass('SortUp') && !container.hasClass('SortDown')) {
-            container.parent().find('.SortUp').removeClass('SortUp');
-            container.parent().find('.SortDown').removeClass('SortDown');
-            form_number_massive = form_number_massive.sort(sortUP_Number("Sex"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.addClass('SortUp');
-            return;
-        }
-        if (container.hasClass('SortUp')) {
-            form_number_massive = form_number_massive.sort(sortDOWN_Number("Sex"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortUp').addClass('SortDown');
-            return;
-        }
-        if (container.hasClass('SortDown')) {
-            form_number_massive = form_number_massive.sort(sortUP_Number("Sex"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortDown').addClass('SortUp');
-            return;
-        }
-    }
-    //Сортировка по возрасту
-    function SortToAge(container) {
-        if (container.parents('.TablePhone').find('.phone_form').length == 0) {
-            return;
-        }
-        $('div[name=paging_number]').attr('id', 1);
-        $('div[name=paging]').find('input').val(1);
-        if (!container.hasClass('SortUp') && !container.hasClass('SortDown')) {
-            container.parent().find('.SortUp').removeClass('SortUp');
-            container.parent().find('.SortDown').removeClass('SortDown');
-            form_number_massive = form_number_massive.sort(sortUP_Number("Age"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.addClass('SortUp');
-            return;
-        }
-        if (container.hasClass('SortUp')) {
-            form_number_massive = form_number_massive.sort(sortDOWN_Number("Age"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortUp').addClass('SortDown');
-            return;
-        }
-        if (container.hasClass('SortDown')) {
-            form_number_massive = form_number_massive.sort(sortUP_Number("Age"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortDown').addClass('SortUp');
-            return;
-        }
-
-    }
-    //Сортировка по номерам телефонов
-    function SortToPhone(container) {
-        if (container.parents('.TablePhone').find('.phone_form').length == 0) {
-            return;
-        }
-        $('div[name=paging_number]').attr('id', 1);
-        $('div[name=paging]').find('input').val(1);
-        if (!container.hasClass('SortUp') && !container.hasClass('SortDown')) {
-            container.parent().find('.SortUp').removeClass('SortUp');
-            container.parent().find('.SortDown').removeClass('SortDown');
-            form_number_massive = form_number_massive.sort(sortUP_String("Phone"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.addClass('SortUp');
-            return;
-        }
-        if (container.hasClass('SortUp')) {
-            form_number_massive = form_number_massive.sort(sortDOWN_String("Phone"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortUp').addClass('SortDown');
-            return;
-        }
-        if (container.hasClass('SortDown')) {
-            form_number_massive = form_number_massive.sort(sortUP_String("Phone"));
-            WriteTable($('div[name=content_table]'), form_number_massive, 1);
-            container.removeClass('SortDown').addClass('SortUp');
-            return;
-        }
-    }
     //Переход на следующий лист
     function Page_Move_Next() {
         var page = Number($('div[name=paging_number]').attr('id')) + 1;

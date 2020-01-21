@@ -18,12 +18,14 @@ using System.Web.UI.WebControls;
 using PagedList;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using System.Net;
 using SocialFORM.Models.DB;
 using TableRow = SocialFORM.Models.Question.TableRow;
+using System.Web.Security;
 
 namespace SocialFORM.Controllers
 {
@@ -157,10 +159,23 @@ namespace SocialFORM.Controllers
         [Authorize(Roles = "Customer")]
         public ActionResult ProjectCustomer(int? page)
         {
+            System.Diagnostics.Debug.WriteLine("Here");
             System.Web.HttpContext.Current.Application.Lock();
             ViewData["RoleIdForProject"] = (Int32)System.Web.HttpContext.Current.Application["RoleID"];
             System.Web.HttpContext.Current.Application.UnLock();
-            IEnumerable<ProjectModel> customer_lst_project = db4.SetProjectModels.Where(u => u.CostumerProject == true).OrderByDescending(u => u.Id);
+            System.Diagnostics.Debug.WriteLine("Here 2");
+            var name = System.Web.HttpContext.Current.User.Identity.Name;
+            System.Diagnostics.Debug.WriteLine($"Customer name -> {name}");
+            System.Diagnostics.Debug.WriteLine("Here 3");
+            int id_customer = db.SetUser.First(u => u.Login == name).Id;
+            List<ProjectModel> customer_lst_project = new List<ProjectModel>();
+            db4.SetCustomerProjects.Where(u => u.CustomerID == id_customer).ToList().ForEach(u =>
+            {
+                customer_lst_project.Add(db4.SetProjectModels.First(t => t.Id == u.ProjectID));
+            });
+            System.Diagnostics.Debug.WriteLine("Here 4");
+            //IEnumerable<ProjectModel> customer_lst_project = db4.SetProjectModels.Where(u => u.)
+            //db4.SetProjectModels.Where(u => u.CostumerProject == true).OrderByDescending(u => u.Id);
             return PartialView(customer_lst_project);
         }
 
@@ -662,129 +677,136 @@ namespace SocialFORM.Controllers
             products.Columns.Add("Учебный день");
             products.Columns.Add("Координаты");
 
-            foreach (var item in listGroupExport)
+            try
             {
-                QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
-                switch (tmp.TypeQuestion)
+                foreach (var item in listGroupExport)
                 {
-                    case Models.Question.Type.Single:
-                        if (item.GroupID > 0)
-                            products.Columns.Add(("Г" + item.GroupID + " " + item.GroupName.ToString()).ToString());
-                        else
-                            products.Columns.Add(item.GroupName.ToString());
-                        if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
-                        {
+                    System.Diagnostics.Debug.WriteLine($"QuestionID : {item.Id} -> {item.QuestionID}");
+                    QuestionModel tmp = listQuestionExport[(int)item.QuestionID];
+                    switch (tmp.TypeQuestion)
+                    {
+                        case Models.Question.Type.Single:
                             if (item.GroupID > 0)
-                                products.Columns.Add("Г" + item.GroupID + "\n\a" + item.GroupName + "_др");
+                                products.Columns.Add(("Г" + item.GroupID + " " + item.GroupName.ToString()).ToString());
                             else
-                                products.Columns.Add(item.GroupName + "_др");
-                        }
-                        break;
-                    case Models.Question.Type.Multiple:
-                        {
-                            int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
-                            if (listQuestionExport[(int)item.QuestionID].LimitCount > 1)
-                            {
-                                tmp_count = (int)listQuestionExport[(int)item.QuestionID].LimitCount;
-                            }
-                            for (int i = 1; i <= tmp_count; i++)
+                                products.Columns.Add(item.GroupName.ToString());
+                            if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 0)
                             {
                                 if (item.GroupID > 0)
-                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_в" + i);
-                                else
-                                    products.Columns.Add(item.GroupName + "_в" + i);
-                            }
-                            if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
-                            {
-                                if (item.GroupID > 0)
-                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др");
+                                    products.Columns.Add("Г" + item.GroupID + "\n\a" + item.GroupName + "_др");
                                 else
                                     products.Columns.Add(item.GroupName + "_др");
                             }
-                            else if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 1)
+                            break;
+                        case Models.Question.Type.Multiple:
                             {
-                                int count = 1;
-                                foreach (var item_answer in listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true))
+                                int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
+                                if (listQuestionExport[(int)item.QuestionID].LimitCount > 1)
                                 {
-                                    if (item.GroupID > 0)
-                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др_в" + count);
-                                    else
-                                        products.Columns.Add(item.GroupName + "_др_в" + count);
-                                    count++;
+                                    tmp_count = (int)listQuestionExport[(int)item.QuestionID].LimitCount;
                                 }
-                            }
-                        }
-                        break;
-                    case Models.Question.Type.Free:
-                        {
-                            int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
-                            if (tmp_count == 1)
-                            {
-                                if (item.GroupID > 0)
-                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName);
-                                else
-                                    products.Columns.Add(item.GroupName.ToString());
-                            }
-                            else
-                            {
                                 for (int i = 1; i <= tmp_count; i++)
                                 {
                                     if (item.GroupID > 0)
-                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
+                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_в" + i);
                                     else
-                                        products.Columns.Add(item.GroupName + "_" + i);
+                                        products.Columns.Add(item.GroupName + "_в" + i);
                                 }
-                            }
-                            if (listQuestionExport[(int)item.QuestionID].IsKvot == true)
-                            {
-                                products.Columns.Add("Диапозон");
-                            }
-                        }
-                        break;
-                    case Models.Question.Type.Table:
-                        {
-                            int count_row = listTableRow[(int)item.QuestionID].Count();
-                            int null_count_row = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == 0).Count();
-                            int max_cont_row = 0;
-                            foreach (var item_row in listTableRow[(int)item.QuestionID])
-                            {
-                                if (item_row.IndexRow != null && item_row.IndexRow != 0)
+                                if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() == 1)
                                 {
-                                    int tmp_max = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == item_row.IndexRow).Count();
-                                    if (max_cont_row < tmp_max)
+                                    if (item.GroupID > 0)
+                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др");
+                                    else
+                                        products.Columns.Add(item.GroupName + "_др");
+                                }
+                                else if (listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true).Count() > 1)
+                                {
+                                    int count = 1;
+                                    foreach (var item_answer in listAnswerAllExport[(int)item.QuestionID].Where(u => u.isFreeArea == true))
                                     {
-                                        max_cont_row = tmp_max;
+                                        if (item.GroupID > 0)
+                                            products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_др_в" + count);
+                                        else
+                                            products.Columns.Add(item.GroupName + "_др_в" + count);
+                                        count++;
                                     }
                                 }
                             }
-                            if (listQuestionExport[(int)item.QuestionID].Bind != null)
+                            break;
+                        case Models.Question.Type.Free:
                             {
-                                count_row = (null_count_row + max_cont_row);
-                            }
-                            for (int i = 1; i <= count_row; i++)
-                            {
-                                if (item.GroupID > 0)
-                                    products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_стр" + i);
+                                int tmp_count = listAnswerAllExport[(int)item.QuestionID].Count();
+                                if (tmp_count == 1)
+                                {
+                                    if (item.GroupID > 0)
+                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName);
+                                    else
+                                        products.Columns.Add(item.GroupName.ToString());
+                                }
                                 else
-                                    products.Columns.Add(item.GroupName + "_стр" + i);
+                                {
+                                    for (int i = 1; i <= tmp_count; i++)
+                                    {
+                                        if (item.GroupID > 0)
+                                            products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_" + i);
+                                        else
+                                            products.Columns.Add(item.GroupName + "_" + i);
+                                    }
+                                }
+                                if (listQuestionExport[(int)item.QuestionID].IsKvot == true)
+                                {
+                                    products.Columns.Add("Диапозон");
+                                }
                             }
-                        }
-                        break;
-                    case Models.Question.Type.Filter:
-                        if (item.GroupID > 0)
-                        {
-                            products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_инд");
-                            products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_текст");
-                        }
-                        else
-                        {
-                            products.Columns.Add(item.GroupName + "_инд");
-                            products.Columns.Add(item.GroupName + "_текст");
-                        }
-                        break;
-                    default:
-                        break;
+                            break;
+                        case Models.Question.Type.Table:
+                            {
+                                int count_row = listTableRow[(int)item.QuestionID].Count();
+                                int null_count_row = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == 0).Count();
+                                int max_cont_row = 0;
+                                foreach (var item_row in listTableRow[(int)item.QuestionID])
+                                {
+                                    if (item_row.IndexRow != null && item_row.IndexRow != 0)
+                                    {
+                                        int tmp_max = listTableRow[(int)item.QuestionID].Where(u => u.IndexRow == item_row.IndexRow).Count();
+                                        if (max_cont_row < tmp_max)
+                                        {
+                                            max_cont_row = tmp_max;
+                                        }
+                                    }
+                                }
+                                if (listQuestionExport[(int)item.QuestionID].Bind != null)
+                                {
+                                    count_row = (null_count_row + max_cont_row);
+                                }
+                                for (int i = 1; i <= count_row; i++)
+                                {
+                                    if (item.GroupID > 0)
+                                        products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_стр" + i);
+                                    else
+                                        products.Columns.Add(item.GroupName + "_стр" + i);
+                                }
+                            }
+                            break;
+                        case Models.Question.Type.Filter:
+                            if (item.GroupID > 0)
+                            {
+                                products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_инд");
+                                products.Columns.Add("Г" + item.GroupID + " " + item.GroupName + "_текст");
+                            }
+                            else
+                            {
+                                products.Columns.Add(item.GroupName + "_инд");
+                                products.Columns.Add(item.GroupName + "_текст");
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
+            } catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
             }
 
             List<string> tmp_str = new List<string>();
@@ -2682,7 +2704,6 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public JsonResult GetListTable()
         {
-
             using (PhoneContext pc = new PhoneContext())
             {
                 var tmp = pc.Database.SqlQuery<TableInfo>("SHOW TABLES FROM phone").ToList();
@@ -2777,7 +2798,6 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public void ClearTable(int id)
         {
-            System.Diagnostics.Debug.WriteLine("ID >>> " + id);
             using (PhoneContext pc = new PhoneContext())
             {
                 pc.Database.ExecuteSqlCommand("UPDATE name_table SET Name=null WHERE Id=" + id);
@@ -2798,10 +2818,8 @@ namespace SocialFORM.Controllers
 
         public void TimeAfkBase(string time)
         {
-
             SetTimeAfk tmp = db.SetTimeAfk.Where(u => u.Id == 1).First();
             tmp.Time = (Convert.ToInt32(time) * 60).ToString();
-
             db.Entry(tmp).State = EntityState.Modified;
             db.SaveChanges();
         }
@@ -3173,17 +3191,23 @@ namespace SocialFORM.Controllers
                         _lstIdRange.Add(u.Id);
                     });
 
-                    //Копирование переходов
-                    questionContext.SetTransition.Where(transition => transition.ProjectID == id_p).ToList().ForEach(u =>
-                    {
-                        u.ProjectID = _new_id_project;
-                        u.fromQuestion = _hashSetIdQuestion[u.fromQuestion];
-                        u.toQuestion = _hashSetIdQuestion[u.toQuestion];
-                        u.TriggerAnswer = _hashSetIdAnswerAll[u.TriggerAnswer];
-                        questionContext.SetTransition.Add(u);
-                        questionContext.SaveChanges();
-                        _lstIdTransition.Add(u.Id);
-                    });
+                    //foreach(var item_ in _hashSetIdAnswerAll)
+                    //{
+                    //    System.Diagnostics.Debug.WriteLine("Triger -> " + item_.Key + " " + item_.Value);
+                    //}
+
+                    ////Копирование переходов
+                    //questionContext.SetTransition.Where(transition => transition.ProjectID == id_p).ToList().ForEach(u =>
+                    //{
+                    //    u.ProjectID = _new_id_project;
+                    //    u.fromQuestion = _hashSetIdQuestion[u.fromQuestion];
+                    //    u.toQuestion = _hashSetIdQuestion[u.toQuestion];
+                    //    System.Diagnostics.Debug.WriteLine("Triger -> " + u.TriggerAnswer);
+                    //    u.TriggerAnswer = _hashSetIdAnswerAll[u.TriggerAnswer];
+                    //    questionContext.SetTransition.Add(u);
+                    //    questionContext.SaveChanges();
+                    //    _lstIdTransition.Add(u.Id);
+                    //});
 
                     //Копирование блокировок
                     questionContext.SetBlock.Where(block => block.ProjectID == id_p).ToList().ForEach(u =>
@@ -3303,6 +3327,8 @@ namespace SocialFORM.Controllers
                 }
                 System.Diagnostics.Debug.WriteLine(e.Message);
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 Response.StatusDescription = e.Message;
                 return;

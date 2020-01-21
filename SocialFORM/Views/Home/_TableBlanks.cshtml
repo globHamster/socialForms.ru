@@ -658,16 +658,19 @@
         $(this).removeClass("Scaled");
     })
     $('div.table_blanks').on("click", ".DeleteBlankButton", function () {
-        $(this).removeClass("Scaled").addClass('NotScaled');
-        var elem = $(this);
-        var id_result = $(this).attr('id');
-        var AudioID = $(this).find("div[name=AudioDelID]").text();
-        var AudioName = $("div.title").text();
-        var name = AudioID + '_' + AudioName;
-        $.post("/Form/DeleteBlankResult", { id_res: id_result })
-            .success(function () {
-                elem.parents('.answer_row').remove();
-            });
+        let isDelete = confirm("Вы действительно хотите удалить анкету?");
+        if (isDelete == true) {
+            $(this).removeClass("Scaled").addClass('NotScaled');
+            var elem = $(this);
+            var id_result = $(this).attr('id');
+            var AudioID = $(this).find("div[name=AudioDelID]").text();
+            var AudioName = $("div.title").text();
+            var name = AudioID + '_' + AudioName;
+            $.post("/Form/DeleteBlankResult", { id_res: id_result })
+                .success(function () {
+                    elem.parents('.answer_row').remove();
+                });
+        }
     })
 
     $('div.table_blanks').on("mouseenter", ".GEOButton", function () {

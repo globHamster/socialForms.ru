@@ -89,6 +89,11 @@
     var list_quota = {};
     var list_range = {};
     var loop_result = [];
+    let count_cycle, revers_count;
+    let back_id_question = [2733, 2734, 2735, 2736, 2737, 2738, 2813, 2820, 2828, 2835, 2934, 2946, 2958, 2970, 2982, 2994, 3006, 3018, 3030, 3042,
+        2749, 2755, 2761, 2767, 2773, 2779, 2814, 2821, 2829, 2836, 2935, 2947, 2959, 2971, 2983, 2995, 3007, 3019, 3031, 3043,
+        2754, 2760, 2766, 2772, 2778, 2784, 2819, 2827, 2834, 2841, 2945, 2957, 2969, 2981, 2993, 3005, 3017, 3028, 3041, 3053];
+    let drop_index = [];
     //Блок выгрузки данных
     {
 
@@ -160,6 +165,7 @@
                         list_answer[item.Id] = item;
                     })
                     count_ajax++;
+                    console.log("Answer ->", list_answer);
                 })
                 .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
         })
@@ -213,7 +219,7 @@
                 $.each(server_data, function (i, item) {
                     var mas_tmp = [];
                     if (item.GroupID > 0)
-                        active_group[item.GroupID] = false;
+                        active_group[item.GroupID] = { isActive: false, Questions: [] };
                     if (list_id_question_group[item.GroupID] == null) {
                         mas_tmp.push(item);
                         list_id_question_group[item.GroupID] = mas_tmp;
@@ -323,7 +329,172 @@
             id_q = massiv_question_id[index];
             type_q = list_question[id_q].TypeQuestion;
             var is_rotate = list_question[id_q].IsRotate;
-            $('.view_form').html(list_question[id_q].TextQuestion);
+            switch (id_q) {
+                case 2750:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2733)] != null && text_other[massiv_question_id.indexOf(2733)] != undefined && text_other[massiv_question_id.indexOf(2733)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2733)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2733)]].AnswerText));
+                    }
+                    break;
+                case 2756:
+                    {
+                        if (text_other[massiv_question_id.indexOf(27334)] != null && text_other[massiv_question_id.indexOf(2734)] != undefined && text_other[massiv_question_id.indexOf(2734)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2734)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2734)]].AnswerText));
+                    }
+                    break;
+                case 2762:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2735)] != null && text_other[massiv_question_id.indexOf(2735)] != undefined && text_other[massiv_question_id.indexOf(2735)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2735)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2735)]].AnswerText));
+                    }
+                    break;
+                case 2768:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2736)] != null && text_other[massiv_question_id.indexOf(2736)] != undefined && text_other[massiv_question_id.indexOf(2736)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2736)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2736)]].AnswerText));
+                    }
+                    break;
+                case 2774:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2737)] != null && text_other[massiv_question_id.indexOf(2737)] != undefined && text_other[massiv_question_id.indexOf(2737)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2737)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2737)]].AnswerText));
+                    }
+                    break;
+                case 2780:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2738)] != null && text_other[massiv_question_id.indexOf(2738)] != undefined && text_other[massiv_question_id.indexOf(2738)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2738)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2738)]].AnswerText));
+                    }
+                    break;
+                case 2815:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2813)] != null && text_other[massiv_question_id.indexOf(2813)] != undefined && text_other[massiv_question_id.indexOf(2813)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2813)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2813)]].AnswerText));
+                    }
+                    break;
+                case 2822:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2820)] != null && text_other[massiv_question_id.indexOf(2820)] != undefined && text_other[massiv_question_id.indexOf(2820)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2820)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2820)]].AnswerText));
+                    }
+                    break;
+                case 2830:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2828)] != null && text_other[massiv_question_id.indexOf(2828)] != undefined && text_other[massiv_question_id.indexOf(2828)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2828)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2828)]].AnswerText));
+                    }
+                    break;
+                case 2837:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2835)] != null && text_other[massiv_question_id.indexOf(2835)] != undefined && text_other[massiv_question_id.indexOf(2835)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2835)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2835)]].AnswerText));
+                    }
+                    break;
+                case 2936:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2934)] != null && text_other[massiv_question_id.indexOf(2934)] != undefined && text_other[massiv_question_id.indexOf(2934)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2934)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2934)]].AnswerText));
+                    }
+                    break;
+                case 2948:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2946)] != null && text_other[massiv_question_id.indexOf(2946)] != undefined && text_other[massiv_question_id.indexOf(2946)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2946)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2946)]].AnswerText));
+                    }
+                    break;
+                case 2960:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2958)] != null && text_other[massiv_question_id.indexOf(2958)] != undefined && text_other[massiv_question_id.indexOf(2958)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2958)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2958)]].AnswerText));
+                    }
+                    break;
+                case 2972:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2970)] != null && text_other[massiv_question_id.indexOf(2970)] != undefined && text_other[massiv_question_id.indexOf(2970)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2970)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2970)]].AnswerText));
+                    }
+                    break;
+                case 2984:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2982)] != null && text_other[massiv_question_id.indexOf(2982)] != undefined && text_other[massiv_question_id.indexOf(2982)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2982)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2982)]].AnswerText));
+                    }
+                    break;
+                case 2996:
+                    {
+                        if (text_other[massiv_question_id.indexOf(2994)] != null && text_other[massiv_question_id.indexOf(2994)] != undefined && text_other[massiv_question_id.indexOf(2994)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(2994)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(2994)]].AnswerText));
+                    }
+                    break;
+                case 3008:
+                    {
+                        if (text_other[massiv_question_id.indexOf(3006)] != null && text_other[massiv_question_id.indexOf(3006)] != undefined && text_other[massiv_question_id.indexOf(3006)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(3006)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(3006)]].AnswerText));
+                    }
+                    break;
+                case 3020:
+                    {
+                        if (text_other[massiv_question_id.indexOf(3018)] != null && text_other[massiv_question_id.indexOf(3018)] != undefined && text_other[massiv_question_id.indexOf(3018)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(3018)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(3018)]].AnswerText));
+                    }
+                    break;
+                case 3032:
+                    {
+                        if (text_other[massiv_question_id.indexOf(3030)] != null && text_other[massiv_question_id.indexOf(3030)] != undefined && text_other[massiv_question_id.indexOf(3030)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(3030)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(3030)]].AnswerText));
+                    }
+                    break;
+                case 3044:
+                    {
+                        if (text_other[massiv_question_id.indexOf(3042)] != null && text_other[massiv_question_id.indexOf(3042)] != undefined && text_other[massiv_question_id.indexOf(3042)] != 'null')
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", text_other[massiv_question_id.indexOf(3042)]))
+                        else
+                            $('.view_form').html(list_question[id_q].TextQuestion.replace("###", list_answer[result[massiv_question_id.indexOf(3042)]].AnswerText));
+                    }
+                    break;
+                default:
+                    $('.view_form').html(list_question[id_q].TextQuestion);
+                    break;
+            }
+            //$('.view_form').html(list_question[id_q].TextQuestion.replace("###","ДОМ"));
             $('.answer_table').empty();
             switch (type_q) {
                 // Прорисовка ответос Single
@@ -336,7 +507,7 @@
                             var array_base_anwer = [];
                             $.each(list_id_answer_all, function (i, item) {
                                 if (item.QuestionID == id_q) {
-                                    if (item.AnswerType == 1) 
+                                    if (item.AnswerType == 1)
                                         array_answer.push(item);
                                     else
                                         array_base_anwer.push(item);
@@ -418,52 +589,69 @@
                     if (id_massk > 0) {
                         BindMassk(id_massk);
                     }
+                    if (back_id_question.indexOf(id_q) != -1) {
+                        $('input.free_text').mask("99:99").on('click', function () {
+                            if ($(this).val() === '__:__') {
+                                $(this).get(0).setSelectionRange(0, 0);
+                            }
+                        });
+                    }
                     FindAnswer();
                     break;
                 case 4:
-                    var skip = false;
-                    var tmp_table_row = {};
-                    var count_table_row = 1;
-                    var count_table_colum = 1;
-                    var code = '';
-                    code += '<tr class="table_answer beginer"><td class="table_answer"> </td>'
-                    $.each(list_id_answer_all, function (i, item) {
-                        if (item.QuestionID == id_q) {
-                            code += '<td  class="table_answer" id="' + count_table_colum + '" name="' + item.AnswerKey + '">' + list_answer[item.AnswerKey].AnswerText + '</td>';
-                            count_table_colum++;
-                        }
-                    })
-                    code += '</tr>';
-                    var array_row = [];
-                    $.each(list_table_row, function (i, item) {
-                        if (item.TableID == id_q) {
-                            array_row.push(item);
-                        }
-                    });
-                    if (is_rotate) { array_row.rand(); } // Осуществляет перетасовку ответов в случайном порядке
-
-                    $.each(array_row, function (i, item) {
-                        if (item.TableID == id_q) {
-                            if (list_question[massiv_question_id[index]].Bind != null) {
-                                if (list_question[list_question[massiv_question_id[index]].Bind].TypeQuestion == 6) {
-                                    if (item.IndexRow != null && item.IndexRow != result[massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind)]) {
+                    {
+                        var skip = false;
+                        var tmp_table_row = {};
+                        var count_table_row = 1;
+                        var count_table_colum = 1;
+                        var count_res_row = 0;
+                        var code = '';
+                        code += '<tr class="table_answer beginer"><td class="table_answer"> </td>'
+                        $.each(list_id_answer_all, function (i, item) {
+                            if (item.QuestionID == id_q) {
+                                code += '<td  class="table_answer" id="' + count_table_colum + '" name="' + item.AnswerKey + '">' + list_answer[item.AnswerKey].AnswerText + '</td>';
+                                count_table_colum++;
+                            }
+                        })
+                        code += '</tr>';
+                        var array_row = [];
+                        $.each(list_table_row, function (i, item) {
+                            if (item.TableID == id_q) {
+                                array_row.push(item);
+                            }
+                        });
+                        if (is_rotate) { array_row.rand(); } // Осуществляет перетасовку ответов в случайном порядке
+                        console.log("Rows ---> ", array_row);
+                        
+                        $.each(array_row, function (i, item) {
+                            if (item.TableID == id_q) {
+                                if (list_question[massiv_question_id[index]].Bind != null) {
+                                    if (list_question[list_question[massiv_question_id[index]].Bind].TypeQuestion == 6) {
+                                        if (item.IndexRow != null && item.IndexRow != result[massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind)]) {
+                                            return;
+                                        }
+                                    } else if (item.IndexRow != null && (item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index && item.IndexRow != 0))
                                         return;
+                                }
+                                skip = Check_blocks_Row(item);
+                                if (skip) { skip = false; return; }
+                                
+
+                                code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer" id="' + item.Id + '">' + item.TableRowText + '</td>';
+                                for (var c = 1; c < count_table_colum; c++) {
+                                    if (id_q == 3092 && c == 2) {
+                                        code += '<td class="table_answer tool_layer" style="background-color:#FFF;"><input type="radio" name="group' + count_table_row + '" id="' + c + '" ><label for="' + c + '"><span></span></label><input type="text" name="text_of_sum"/></td>';
+                                    } else {
+                                        code += '<td class="table_answer tool_layer" style="background-color:#FFF;"><input type="radio" name="group' + count_table_row + '" id="' + c + '"><label for="' + c + '"><span></span></label></td>';
                                     }
-                                } else if (item.IndexRow != null && (item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index && item.IndexRow != 0))
-                                    return;
+                                }
+                                code += '</tr>';
+                                count_table_row++;
                             }
-                            skip = Check_blocks_Row(item);
-                            if (skip) { skip = false; return; }
-                            code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer">' + item.TableRowText + '</td>';
-                            for (var c = 1; c < count_table_colum; c++) {
-                                code += '<td class="table_answer tool_layer" style="background-color:#FFF;"><input type="radio" name="group' + count_table_row + '" id="' + c + '"><label for="' + c + '"><span></span></label></td>';
-                            }
-                            code += '</tr>';
-                            count_table_row++;
-                        }
-                    })
-                    $('.answer_table').append(code);
-                    FindAnswer();
+                        })
+                        $('.answer_table').append(code);
+                        FindAnswer();
+                    }
                     break;
                 case 5:
                     break;
@@ -501,7 +689,7 @@
     function CheckGroup() {
         if (list_group[massiv_question_id[index]] != null) {
             var number_group = list_group[massiv_question_id[index]];
-            if (active_group[number_group] == false) {
+            if (active_group[number_group].isActive == false) {
                 var length_group = list_id_question_group[number_group].length;
                 for (var i = index; i < index + length_group; i++) {
                     result[i] = -404;
@@ -519,12 +707,9 @@
     function CheckGroup_Back() {
         if (list_group[massiv_question_id[index]] != null) {
             var number_group = list_group[massiv_question_id[index]];
-            if (active_group[number_group] == false) {
+            if (active_group[number_group].isActive == false) {
                 var length_group = list_id_question_group[number_group].length;
-                for (var i = index; i < index + length_group; i++) {
-                    result[i] = -404;
-                    text_other[i] = ['null'];
-                }
+
                 index -= length_group;
                 CheckGroup_Back();
             } else {
@@ -558,6 +743,46 @@
                     CheckQuota();
                     CheckGroupGo();
                     checkTransitionGo();
+                    if (id_q == 3106) {
+                        console.log("HEREE");
+                        if (result[6] == -404) {
+                            result[index] = -404;
+                            text_other[index] = "null";
+                            index++;
+                        }
+                    }
+                    if (id_q == 2733 || id_q == 2734 || id_q == 2735 || id_q == 2736 || id_q == 2737 || id_q == 2738 || id_q == 2813 || id_q == 2820 || id_q == 2828 || id_q == 2835 ||
+                        id_q == 2934 || id_q == 2946 || id_q == 2958 || id_q == 2970 || id_q == 2982 || id_q == 2994 || id_q == 3006 || id_q == 3018 || id_q == 3030 || id_q == 3042) {
+                        revers_count--;
+                        // console.log("Revers ---->", revers_count);
+                        if (revers_count == 0) {
+                            //  console.log("Prev ->", index);
+                            for (var i = index; i < index + (20 - count_cycle); i++) {
+                                result[i] = [-404];
+                                text_other[i] = ['null'];
+                            }
+                            index += (20 - count_cycle);
+                            revers_count = count_cycle;
+                            //  console.log("Present ->", index);
+                        }
+                    }
+                    if (id_q == 2749 || id_q == 2755 || id_q == 2761 || id_q == 2767 || id_q == 2773 || id_q == 2779 || id_q == 2814 || id_q == 2821 || id_q == 2829 || id_q == 2836 || id_q == 2935 ||
+                        id_q == 2947 || id_q == 2959 || id_q == 2971 || id_q == 2983 || id_q == 2995 || id_q == 3007 || id_q == 3019 || id_q == 3031 || id_q == 3043) {
+                        revers_count--;
+                        // console.log("Revers ---->", revers_count);
+                        if (revers_count == 0) {
+                            //     console.log("Prev ->", index);
+                            for (var i = index; i < index + (20 - count_cycle); i++) {
+                                result[i] = [-404];
+                                text_other[i] = ['null'];
+                            }
+                            index += (20 - count_cycle);
+                            revers_count = count_cycle;
+                            //     console.log("Present ->", index);
+                        }
+                    }
+
+                    // console.log("REsult massive  ----> ", result);
                     CheckGroup();
                     getStart();
                     //    goNext();
@@ -581,6 +806,13 @@
                         }
                     }
                     SaveResult();
+                    if (id_q == 3111) {
+                        if (result[index].indexOf("11233") == -1 & result[index].indexOf("11234") == -1) {
+                            index++;
+                            result[index] = -404;
+                            text_other[index] = "null";
+                        }
+                    }
                     CheckGroupGo();
                     index++;
                     CheckGroup();
@@ -589,6 +821,7 @@
             }
                 break;
             case 3:
+                console.log("Text -> ", $("input:text").val());
                 if ($("input:text").val().length == 0) {
                     $('div.wrong_choise').fadeIn('slow');
                     //             $('div.limit_checked_div').remove();
@@ -598,18 +831,73 @@
                     SaveResult();
                     CheckQuota();
                     index++;
+                    if (id_q == 2754 || id_q == 2760 || id_q == 2766 || id_q == 2772 || id_q == 2778 || id_q == 2784 || id_q == 2819 || id_q == 2827 || id_q == 2834 || id_q == 2841 || id_q == 2945 ||
+                        id_q == 2957 || id_q == 2969 || id_q == 2981 || id_q == 2993 || id_q == 3005 || id_q == 3017 || id_q == 3028 || id_q == 3041) {
+                        revers_count--;
+                        console.log("Revers ---->", revers_count);
+                        if (revers_count == 0) {
+                            console.log("Prev ->", index);
+                            for (var i = index; i < index + (10 * 20 - 10 * count_cycle); i++) {
+                                result[i] = [-404];
+                                text_other[i] = ['null'];
+                            }
+                            index += (10 * 20 - 10 * count_cycle);
+                            console.log("Index -->", index);
+                            revers_count = count_cycle;
+                            console.log("Present ->", index);
+                        }
+                    }
+                    console.log("Index ----- ", massiv_question_id.indexOf(2785))
                     CheckGroup();
                     getStart();
                 }
                 break;
             case 4:
-                var count_row = $('tr.table_answer').length - 1;
+                var count_row = $('tr.table_answer:not(:hidden)').length - 1;
                 if ($('input[name^=group]:checked').length == count_row) {
 
                     $('div.wrong_choise').fadeOut('fast');
                     SaveResult();
+                    //проверка таблицы
+                    if (id_q == 3088) {
+                        console.log("here1 3088")
+                        let count_id_answer = 0;
+                        for (let ind = 0; ind < result[index].length; ind++) {
+                            if (result[index][ind] == "11139") count_id_answer++;
+                        }
+                        if (count_id_answer == result[index].length) {
+                            console.log("here2 3088");
+
+                            for (let ind = index + 1; ind <= index + 5; ind++) {
+                                result[ind] = -404;
+                                text_other[ind] = "null";
+                            }
+                            index += 4;
+                        }
+                        console.log("RESULT 3088--->", result);
+                    }
+
+                    if (id_q == 3089) {
+                        console.log("here1 3089")
+                        let count_id_answer = 0;
+                        for (let ind = 0; ind < result[index].length; ind++) {
+                            if (result[index][ind] == "11149") count_id_answer++;
+                        }
+                        if (count_id_answer == result[index].length) {
+                            console.log("here2 3089");
+
+                            for (let ind = index + 1; ind <= index + 3; ind++) {
+                                result[ind] = -404;
+                                text_other[ind] = "null";
+                            }
+                            index += 2;
+                        }
+                        console.log("RESULT 3088--->", result);
+                    }
+                    console.log("Result --> ", result[index]);
                     CheckGroupGo();
                     index++;
+                    if (id_q == 3088 || id_q == 3089 || id_q == 3092) index++;
                     CheckGroup();
                     getStart();
                 } else {
@@ -626,6 +914,7 @@
             case 5:
                 SaveResult();
                 index++;
+                CheckGroup();
                 getStart();
                 break;
             case 6:
@@ -641,13 +930,17 @@
             default:
                 break;
         }
+        
     });
+
+   
 
     //Сохранении выбранного ответа в массиве result
     function SaveResult() {
         var mas = [];
         switch (type_q) {
             case 1:
+
                 id_a = $("input:radio:checked").attr('id');
                 if ($("input:radio:checked").hasClass("base_answer")) {
                     result[index] = [$("input:radio:checked").parent().parent().attr('id')];
@@ -659,6 +952,13 @@
                 } else {
                     text_other[index] = ['null'];
                 }
+                if (id_q == 2731) {
+                    count_cycle = Number(text_other[index]);
+                    revers_count = Number(text_other[index]);
+                    console.log("Count ---->", count_cycle);
+                    console.log("Count ---->", revers_count);
+                }
+
                 break;
             case 2:
                 var text_mass = '';
@@ -677,6 +977,8 @@
                 } else {
                     text_other[index] = ['null'];
                 }
+                
+                console.log("MAss ---> ", result[index]);
                 break;
             case 3:
                 $('input.free_text').each(function () {
@@ -686,15 +988,158 @@
                 text_other[index] = ['null'];
                 break;
             case 4:
+                let count_row_m = 1;
+                let multi = [];
+                let multi_text = ""; 
                 $('tr.table_answer').each(function () {
                     var id;
+                    var id_row;
                     if ($(this).find('input:radio:checked').attr('id') != undefined) {
+                        id_row = $(this).find('td.table_answer').attr("id");
                         id = $(this).find('input:radio:checked').attr('id');
                         mas.push($('tr.beginer').find('td[id=' + id + ']').attr('name'));
                     }
+                    if (id_q == 3088) {
+                        //for (var ind = 0; ind < multi; ind++) {
+                        if (id != 1) {
+                            if (id_row == 1648) multi.push("11269");
+                            if (id_row == 1649) multi.push("11270");
+                            if (id_row == 1650) multi.push("11271");
+                            if (id_row == 1651) multi.push("11272");
+                            if (id_row == 1652) multi.push("11273");
+                            if (id_row == 1653) multi.push("11274");
+                            if (id_row == 1654) multi.push("11275");
+                            if (id_row == 1655) multi.push("11276");
+                            if (id_row == 1656) multi.push("11277");
+                            if (id_row == 1657) multi.push("11278");
+                            if (id_row == 1658) multi.push("11279");
+                            if (id_row == 1659) multi.push("11280");
+                            if (id_row == 1660) multi.push("11281");
+                            if (id_row == 1661) multi.push("11282");
+                            if (id_row == 1662) multi.push("11283");
+                            if (id_row == 1663) multi.push("11284");
+                            }
+                        //}
+                    }
+                    if (id_q == 3089) {
+                        if (id != 5) {
+                            if (id_row == 1664) multi.push("11285");
+                            if (id_row == 1665) multi.push("11286");
+                            if (id_row == 1666) multi.push("11287");
+                            if (id_row == 1667) multi.push("11288");
+                            if (id_row == 1668) multi.push("11289");
+                            if (id_row == 1669) multi.push("11290");
+                            if (id_row == 1670) multi.push("11291");
+                            if (id_row == 1671) multi.push("11292");
+                            if (id_row == 1672) multi.push("11293");
+                            if (id_row == 1673) multi.push("11294");
+                            if (id_row == 1674) multi.push("11295");
+                            if (id_row == 1675) multi.push("11296");
+                            if (id_row == 1676) multi.push("11297");
+                            if (id_row == 1677) multi.push("11298");
+                            if (id_row == 1678) multi.push("11299");
+                            if (id_row == 1679) multi.push("11300");
+                        }
+                    }
+                    if (id_q == 3092) {
+                        
+                        if (id_row == 1680) {
+                            multi.push("11301");
+                            if (id == 2) multi_text += "11301#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1681) {
+                            multi.push("11302");
+                            if (id == 2) multi_text += "11302#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1682) {
+                            multi.push("11303");
+                            if (id == 2) multi_text += "11303#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1683) {
+                            multi.push("11304");
+                            if (id == 2) multi_text += "11304#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1684) {
+                            multi.push("11305");
+                            if (id == 2) multi_text += "11305#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1685) {
+                            multi.push("11306");
+                            if (id == 2) multi_text += "11306#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1686) {
+                            multi.push("11307");
+                            if (id == 2) multi_text += "11307#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1687) {
+                            multi.push("11308");
+                            if (id == 2) multi_text += "11308#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1688) {
+                            multi.push("11309");
+                            if (id == 2) multi_text += "11309#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1689) {
+                            multi.push("11310");
+                            if (id == 2) multi_text += "11310#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1690) {
+                            multi.push("11311");
+                            if (id == 2) multi_text += "11311#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1691) {
+                            multi.push("11312");
+                            if (id == 2) multi_text += "11312#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1692) {
+                            multi.push("11313");
+                            if (id == 2) multi_text += "11313#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1693) {
+                            multi.push("11314");
+                            if (id == 2) multi_text += "11314#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1694) {
+                            multi.push("11315");
+                            if (id == 2) multi_text += "11315#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        if (id_row == 1695) {
+                            multi.push("11316");
+                            if (id == 2) multi_text += "11316#" + $(this).find('input[name=text_of_sum]').val() + ",";
+                        }
+                        
+                    }
                 });
+               
                 result[index] = mas;
                 text_other[index] = ['null'];
+                if (id_q == 3101) {
+                    let count_q_3101 = 0;
+                    for (var ind = 0; ind < mas.length; ind++) {
+                        if (mas[ind] == 11188 || mas[ind] == 4) count_q_3101++;
+                    }
+                    if (count_q_3101 == 3) {
+                        index++;
+                        result[index] = [-404];
+                        text_other[index] = ['null'];
+                    }
+                }
+                
+
+                if (id_q == 3088 && multi.length != 0) {
+                    result[index + 1] = multi;
+                    text_other[index + 1] = ['null'];
+                }
+                if (id_q == 3089 && multi.length != 0) {
+                    result[index + 1] = multi;
+                    text_other[index + 1] = ['null'];
+                }
+                if (id_q == 3092 && multi.length != 0) {
+                    result[index + 1] = multi;
+                    text_other[index + 1] = [multi_text.substr(0, multi_text.length - 1)];
+                }
+                
+                console.log("AMSS ---> ", result[index + 1]);
                 break;
             case 5:
                 result[index] = [-1];
@@ -712,6 +1157,8 @@
             default:
                 break;
         }
+        console.log("Switch question --->", id_q);
+        console.log("Switch save ----> ", result);
     }
 
     function TranslitIterarot(id_q, iter_all) {
@@ -749,7 +1196,7 @@
                     var jump_index;
                     list_transition[code_transition].ActiveTransition = true;
                     jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
-                    for (var i = index + 1; i < jump_index; i++) {
+                    for (var i = index+1; i < jump_index; i++) {
                         result[i] = [-404];
                         text_other[i] = ['null'];
                     }
@@ -782,31 +1229,37 @@
                     var number_group = list_bind_answer_group[result[index]].BindGroup;
                     var mas_tmp = list_question_bind_group[id_q];
                     $.each(mas_tmp, function (i, item) {
-                        active_group[item] = false;
+                        //active_group[item] = false;
                     })
-                    active_group[number_group] = true;
+                    active_group[number_group].isActive = true;
+                    active_group[number_group].Questions.push(id_q);
                 } else if (list_question_bind_group[id_q] != null) {
                     var mas_tmp = list_question_bind_group[id_q];
                     $.each(mas_tmp, function (i, item) {
-                        active_group[item] = false;
+                        // active_group[item] = false;
                     })
                 }
+                console.log("active group->", active_group);
                 break;
             case 2: {
                 var mas_tmp = result[index];
                 var mas_tmp_2 = list_question_bind_group[id_q];
                 if (mas_tmp_2 != undefined) {
                     $.each(mas_tmp_2, function (i, item) {
-                        active_group[item] = false;
+                        //active_group[item].isActive = false;
                     })
                     $.each(mas_tmp, function (i, item) {
                         if (list_bind_answer_group[item] != null) {
                             var number_group = list_bind_answer_group[item].BindGroup;
-                            active_group[number_group] = true;
+                            if (active_group[number_group].Questions.indexOf(id_q) == -1) {
+                                active_group[number_group].isActive = true;
+                                active_group[number_group].Questions.push(id_q);
+                            }
                         }
                     })
                 }
             }
+                console.log("active group->", active_group);
                 break;
             case 4: {
                 var mas_tmp = result[index];
@@ -832,9 +1285,22 @@
     //Сброс активных групп при переходе на вопрос связаный с ними
     function ResetGroup() {
         if (list_question_bind_group[massiv_question_id[index]] != null) {
-            $.each(list_question_bind_group[massiv_question_id[index]], function (i, item) {
-                active_group[item] = false;
-            })
+            let id_index = massiv_question_id[index];
+            console.log("massive -> ", list_question_bind_group[id_index]);
+            let mas_group_quest = list_question_bind_group[id_index]
+            for (var i = 0; i < mas_group_quest.length; i++) {
+                if (active_group[mas_group_quest[i]].Questions.indexOf(id_index) >= 0) {
+                    active_group[mas_group_quest[i]].Questions.pop();
+                    if (active_group[mas_group_quest[i]].Questions.length == 0)
+                        active_group[mas_group_quest[i]].isActive = false;
+                }
+            }
+            //$.each(list_question_bind_group[massiv_question_id[index]], function (i, item) {
+            //   // if (active_group[item].Questions.length)
+            //    active_group[item].isActive = false;
+            //})
+
+            console.log("Back active group -> ", active_group);
         }
     }
 
@@ -886,9 +1352,27 @@
                 case 4:
                     var massive = result[index];
                     var count = 0;
-                    for (var i = 1; i <= massive.length; i++) {
-                        var id_radio = $('tr.beginer td[name="' + massive[i - 1] + '"').attr('id');
-                        $('tr[id="' + i + '"').find('input[id="' + id_radio + '"]').prop('checked', true);
+                    if (id_q != 3092) {
+                        for (var i = 1; i <= massive.length; i++) {
+                            var id_radio = $('tr.beginer td[name="' + massive[i - 1] + '"').attr('id');
+                            $('tr[id="' + i + '"').find('input[id="' + id_radio + '"]').prop('checked', true);
+                        }
+                    } else {
+                        var mas_ans = [];
+                        var tmp_str = String(text_other[massiv_question_id.indexOf(3123)]).split(',');
+                        $.each(tmp_str, function (i, item) {
+                            var str = item.split('#');
+                            if (str[1] == "") return;
+                            mas_ans.push(str[1]);
+                        });
+                        mas_ans = mas_ans.reverse();
+                        for (var i = 1; i <= massive.length; i++) {
+                            var id_radio = $('tr.beginer td[name="' + massive[i - 1] + '"').attr('id');
+                            $('tr[id="' + i + '"').find('input[id="' + id_radio + '"]').prop('checked', true);
+                            if (id_radio == 2) {
+                                $('tr[id="' + i + '"').find('input[name=text_of_sum]').val(mas_ans.pop());
+                            }
+                        }
                     }
                     break;
                 default:
@@ -974,11 +1458,12 @@
 
     //Осуществление шага назад по анкете
     $('.previous').click(function () {
+        console.log("INDEX HERE ---> ", index);
         if (index > 0) {
             if (type_q == 2) $('div.limit_checked_div').remove();
             if (type_q == 4) {
                 var count_row = $('tr.table_answer').length - 1;
-                if ($('input[name^=group]:checked').length != count_row)  {
+                if ($('input[name^=group]:checked').length != count_row) {
                     $('tr.table_answer').each(function () {
                         if ($(this).find('input[name^=group]:checked').length < 1) {
                             $('input[name=group' + $(this).attr('id') + ']').parent().addClass('NotCheckedTableItem');
@@ -989,11 +1474,21 @@
                 }
             }
             $('div.wrong_choise').hide();
+            console.log("last index----", index);
+            console.log("last question----", id_q);
             SaveResult();
             checkTransitionBack();
             CheckQuotaBack();
             CheckGroup_Back();
             ResetGroup();
+            if (id_q == 3093 || id_q == 3092 || id_q == 3089) index--;
+            if (back_id_question.indexOf(massiv_question_id[index]) != -1 && revers_count != 0)
+                revers_count++;
+            while (result[index] == -404) {
+                index--;
+            }
+            console.log("Res ---> ", result);
+            console.log("INDEX HERE2  ---> ", index);
             getStart();
         }
     });

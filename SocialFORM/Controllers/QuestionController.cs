@@ -435,12 +435,13 @@ namespace SocialFORM.Controllers
         [HttpGet]
         public async Task<JsonResult> getIdAnswerAllGrow(string massiv) // Асинхронный метод выгрузки всех id ответов по вопросам
         {
-            var myArrayInt = massiv.Split(',').Select(x => Int32.Parse(x)).ToArray();
+            //var myArrayInt = massiv.Split(',').Select(x => Int32.Parse(x)).ToArray();
             List<AnswerAll> list_answer_all = new List<AnswerAll>();
-            foreach(var item in myArrayInt)
-            {
-                list_answer_all.AddRange(await db.SetAnswerAll.Where(u => u.QuestionID == item).ToListAsync());
-            }
+            list_answer_all.AddRange(await db.Database.SqlQuery<AnswerAll>($"SELECT * FROM dbo.AnswerAlls WHERE QuestionID IN ({massiv})").ToListAsync());
+            //foreach(var item in myArrayInt)
+            //{
+            //    list_answer_all.AddRange(await db.SetAnswerAll.Where(u => u.QuestionID == item).ToListAsync());
+            //}
             return Json(list_answer_all, JsonRequestBehavior.AllowGet);
         }
 

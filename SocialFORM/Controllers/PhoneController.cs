@@ -59,6 +59,7 @@ namespace SocialFORM.Controllers
         {
             try
             {
+                List<VGMR> lst_VGMR_for_AO = db.SetVGMRs.ToList();
                 var fileContent = Request.Files[0];
                 if (fileContent != null && fileContent.ContentLength > 0)
                 {
@@ -122,6 +123,12 @@ namespace SocialFORM.Controllers
                             }
 
                             tmp.Address = tmp_str[5];
+                            tmp.AO = tmp_str[10];
+                            tmp.VGMR = tmp_str[11];
+                            if (tmp.VGMR!="" && tmp.VGMR != null)
+                            {
+                                tmp.AO = lst_VGMR_for_AO.Find(u => u.KodFO == tmp.FO && u.KodOB == tmp.OB && u.KodVGMR == tmp.VGMR).KodAO;
+                            }
                             tmp.Education = "";
                             tmp.Type = tmp.Phone.ElementAt(1) == '9' ? 1 : 0;
                             tmp.TypeNP = false;
@@ -138,7 +145,7 @@ namespace SocialFORM.Controllers
                     {
                         if (!all_phone_FN.ContainsKey(u))
                         {
-                            db.Database.ExecuteSqlCommand("INSERT INTO dbo.FormNumbers (FO, OB, GOR, NP, VGOR, Phone, Sex, Age, Address, Education, Type, TypeNP) VALUES({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11})",
+                            db.Database.ExecuteSqlCommand("INSERT INTO dbo.FormNumbers (FO, OB, GOR, NP, VGOR, Phone, Sex, Age, Address, Education, Type, TypeNP, AO, VGMR) VALUES({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13})",
                                 lst_phone[u].FO,
                                 lst_phone[u].OB,
                                 lst_phone[u].GOR,
@@ -150,20 +157,37 @@ namespace SocialFORM.Controllers
                                 lst_phone[u].Address,
                                 lst_phone[u].Education,
                                 lst_phone[u].Type,
-                                lst_phone[u].TypeNP);
+                                lst_phone[u].TypeNP,
+                                lst_phone[u].AO,
+                                lst_phone[u].VGMR);
                         }
-                        if (!db_phone_PT.ContainsKey(u))
-                        {
-                            db.Database.ExecuteSqlCommand("INSERT INTO dbo.PTs (FO, OB, GOR, Phone, Status, Type, isActual, TimeCall) VALUES ({0},{1},{2},{3},{4},{5},{6},{7})",
-                                lst_phone[u].FO,
-                                lst_phone[u].OB,
-                                lst_phone[u].GOR,
-                                u,
-                                "connect",
-                                lst_phone[u].Type,
-                                false,
-                                new DateTime(2000, 1, 1).ToString());
-                        }
+                        //if (!db_phone_PT.ContainsKey(u))
+                        //{
+                        //    db.Database.ExecuteSqlCommand("INSERT INTO dbo.PTs (FO, OB, GOR, Phone, Status, Type, isActual, TimeCall) VALUES ({0},{1},{2},{3},{4},{5},{6},{7})",
+                        //        lst_phone[u].FO,
+                        //        lst_phone[u].OB,
+                        //        lst_phone[u].GOR,
+                        //        u,
+                        //        "connect",
+                        //        lst_phone[u].Type,
+                        //        false,
+                        //        new DateTime(2000, 1, 1).ToString());
+                        //}
+                        System.Diagnostics.Debug.WriteLine($"Item -> " +
+                            $"{lst_phone[u].FO}/" +
+                            $"{lst_phone[u].OB}/" +
+                            $"{lst_phone[u].GOR}/" +
+                            $"{lst_phone[u].NP}/" +
+                            $"{lst_phone[u].VGOR}/" +
+                            $"{lst_phone[u].TypeNP}/" +
+                            $"{lst_phone[u].AO}/" +
+                            $"{lst_phone[u].VGMR}/" +
+                            $"{lst_phone[u].Phone}/" +
+                            $"{lst_phone[u].Type}/" +
+                            $"{lst_phone[u].Sex}/" +
+                            $"{lst_phone[u].Age}/" +
+                            $"{lst_phone[u].Address}/" +
+                            $"");
                     });
                 }
             }
@@ -173,6 +197,8 @@ namespace SocialFORM.Controllers
                 System.Diagnostics.Debug.WriteLine(e.Data);
                 System.Diagnostics.Debug.WriteLine(e.Source);
                 System.Diagnostics.Debug.WriteLine(e.Message);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
             }
             finally
             {
@@ -186,22 +212,22 @@ namespace SocialFORM.Controllers
         {
             try
             {
-                List<FormNumber> tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO).ToList();
-                if (KodOB != "")
-                {
-                    tmp_list = tmp_list.Where(u => u.OB == KodOB).ToList();
-                    if (KodGOR != "")
-                    {
-                        tmp_list = tmp_list.Where(u => u.GOR == KodGOR).ToList();
-                    }
-                }
-                foreach (var item in tmp_list)
-                {
-                    if (item.Age > 1000)
-                    {
-                        item.Age = DateTime.Now.Year - item.Age;
-                    }
-                }
+                List<FormNumber> tmp_list;
+                //if (KodOB != "")
+                //{
+                //    tmp_list = tmp_list.Where(u => u.OB == KodOB).ToList();
+                //    if (KodGOR != "")
+                //    {
+                //        tmp_list = tmp_list.Where(u => u.GOR == KodGOR).ToList();
+                //    }
+                //}
+                if (KodGOR != "") tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO && u.OB == KodOB && u.GOR == KodGOR).ToList();
+                else if (KodOB != "") tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO && u.OB == KodOB).ToList();
+                else if (KodFO != "") tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO).ToList();
+                else throw new Exception("Uncorrect data for filter");
+
+
+                tmp_list.AsParallel().ForAll(u => { if (u.Age > 1000) u.Age = DateTime.Now.Year - u.Age; });
                 var jsonResult = Json(tmp_list, JsonRequestBehavior.AllowGet);
                 jsonResult.MaxJsonLength = int.MaxValue;
                 return jsonResult;
@@ -212,9 +238,52 @@ namespace SocialFORM.Controllers
                 System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Message);
                 System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Source);
                 System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Data);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
 
+        }
+
+        [HttpGet]
+        public JsonResult getListFormNumberOptionally(string KodFO, string KodOB, string KodGOR, string KodAO, string KodVGMR)
+        {
+            try
+            {
+                Dictionary<string, string> tmp_lstAO = null;
+                Dictionary<string, string> tmp_lstVGMR = null;
+                tmp_lstAO = db.SetAOs.Where(u => u.KodFO == KodFO && u.KodOB == KodOB).ToDictionary(t => t.KodAO, u => u.NameAO);
+                tmp_lstVGMR = db.SetVGMRs.Where(u => u.KodFO == KodFO && u.KodOB == KodOB && u.KodAO == KodAO).ToDictionary(t => t.KodVGMR, u => u.NameVGMR);
+
+                List<FormNumber> tmp_list;
+                if (KodVGMR != "") tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO && u.OB == KodOB && u.AO == KodAO && u.VGMR == KodVGMR).ToList();
+                else if (KodAO != "") tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO && u.OB == KodOB && u.AO == KodAO).ToList();
+                else if (KodOB != "") tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO && u.OB == KodOB).ToList();
+                else if (KodFO != "") tmp_list = db.SetFormNumbers.Where(u => u.FO == KodFO).ToList();
+                else throw new Exception("Uncorrect data for filter");
+                tmp_list.AsParallel().ForAll(u =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"AO -> {u.AO}");
+                    System.Diagnostics.Debug.WriteLine($"VGMR -> {u.VGMR}");
+
+                    u.AO = tmp_lstAO[u.AO];
+                    if(u.VGMR!=null) u.VGMR = tmp_lstVGMR[u.VGMR];
+                    if (u.Age > 1000) u.Age = DateTime.Now.Year - u.Age;
+                });
+                var jsonResult = Json(tmp_list, JsonRequestBehavior.AllowGet);
+                jsonResult.MaxJsonLength = int.MaxValue;
+                return jsonResult;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.StackTrace);
+                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Message);
+                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Source);
+                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Data);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
         }
 
         //Выгрузка листа с кодом FO
@@ -929,6 +998,7 @@ namespace SocialFORM.Controllers
                 }
             }
             string count_phone;
+
             try
             {
                 using (SqlConnection sql_c = new SqlConnection(db.Database.Connection.ConnectionString))
@@ -943,6 +1013,8 @@ namespace SocialFORM.Controllers
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
                 return 0;
             }
         }
@@ -1144,6 +1216,8 @@ namespace SocialFORM.Controllers
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
                 System.Diagnostics.Debug.WriteLine(e.Data);
                 System.Diagnostics.Debug.WriteLine(e.Message);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
         }
@@ -1315,6 +1389,8 @@ namespace SocialFORM.Controllers
                 System.Diagnostics.Debug.WriteLine(">>>>> " + e.Data);
                 System.Diagnostics.Debug.WriteLine(">>>>> " + e.StackTrace);
                 System.Diagnostics.Debug.WriteLine(">>>>> " + e.Message);
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
             }
 
             if (tmp_lst_PT != null && tmp_lst_PT.Count() >= 1)
@@ -1348,6 +1424,8 @@ namespace SocialFORM.Controllers
                     System.Diagnostics.Debug.WriteLine(">>>>> " + e.StackTrace);
                     System.Diagnostics.Debug.WriteLine(">>>>> " + e.Data);
                     System.Diagnostics.Debug.WriteLine(">>>>> " + e.Message);
+                    Response.AppendToLog(e.StackTrace);
+                    Response.AppendToLog(e.Message);
                 }
             }
         }
@@ -1529,7 +1607,7 @@ namespace SocialFORM.Controllers
                           u.Phone = tmp_number_phone.ToString();
                           return u;
                       }).ToList();
-
+                    System.Diagnostics.Debug.WriteLine($"Count {lst_phone.Count}");
                     DataTable dtPhone = new DataTable();
                     DataColumn dcNameFO = new DataColumn("FO", System.Type.GetType("System.String"));
                     DataColumn dcNameOB = new DataColumn("OB", System.Type.GetType("System.String"));
@@ -1644,7 +1722,7 @@ namespace SocialFORM.Controllers
 
         //Сбор информации по номеру из базы анкет
         [HttpGet]
-        public async Task<JsonResult> SyncBlankWithDB(string FO_kod, string OB_kod, int p_id, int gor_id, int s_id = 0, int a_id = 0, int np_id = 0, int typeNP_id = 0)
+        public async Task<JsonResult> SyncBlankWithDB(string FO_kod, string OB_kod, int p_id, int gor_id, int s_id = 0, int a_id = 0, int np_id = 0, int typeNP_id = 0, int ao_id = 0, int vgmr_id = 0)
         {
             try
             {
@@ -1686,6 +1764,21 @@ namespace SocialFORM.Controllers
                     //lst_typeNP = form_db.SetBlankModels.Where(u => u.QuestionID == typeNP_id).ToList();
                     lst_typeNP = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={typeNP_id}").ToDictionaryAsync(u => u.BlankID, u => u);
                 }
+
+                Dictionary<int, BlankModel> lst_AO = new Dictionary<int, BlankModel>();
+                if (ao_id != 0)
+                {
+                    lst_AO = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={ao_id}").ToDictionaryAsync(u => u.BlankID, u => u);
+                    System.Diagnostics.Debug.WriteLine($"AO -> {lst_AO.Count()}");
+                }
+
+                Dictionary<int, BlankModel> lst_VGMR = new Dictionary<int, BlankModel>();
+                if (vgmr_id != 0)
+                {
+                    lst_VGMR = await form_db.Database.SqlQuery<BlankModel>($"SELECT * FROM dbo.BlankModels WHERE QuestionID={vgmr_id}").ToDictionaryAsync(u => u.BlankID, u => u);
+                    System.Diagnostics.Debug.WriteLine($"VGMR -> {lst_VGMR.Count()}");
+                }
+
                 List<FormNumber> lst_form_numbers = new List<FormNumber>();
                 string FO = FO_kod;
                 string OB = OB_kod;
@@ -1726,13 +1819,25 @@ namespace SocialFORM.Controllers
                             //tmp_form_number.TypeNP = lst_typeNP.First(u => u.BlankID == item.Id).AnswerIndex == 1 ? false : true;
                             tmp_form_number.TypeNP = lst_typeNP[item.Id].AnswerIndex == 1 ? false : true;
                         }
+                        if (ao_id != 0)
+                        {
+                            tmp_form_number.AO = "AO" + lst_AO[item.Id].AnswerIndex;
+                        }
+                        if (vgmr_id != 0)
+                        {
+                            tmp_form_number.VGMR = "VGMR" + lst_VGMR[item.Id].AnswerIndex;
+                        }
                         lst_form_numbers.Add(tmp_form_number);
                     }
                     else // Номер не встречается в PTs
                     {
                         FormNumber skip_tmp_form_number = new FormNumber();
-                        int GOR_index = lst_answer_gor.First(u => u.BlankID == item.Id).AnswerIndex;
-                        string GOR = "GOR" + GOR_index;
+                        string GOR;
+                        if ((FO == "FO1" & OB == "OB18") || (FO == "FO2" & OB == "OB10")) GOR = "GOR1";
+                        else
+                        {
+                            GOR = "GOR" + lst_answer_gor.First(u => u.BlankID == item.Id).AnswerIndex; ;
+                        }
                         skip_tmp_form_number.FO = FO;
                         skip_tmp_form_number.OB = OB;
                         skip_tmp_form_number.GOR = GOR;
@@ -1757,11 +1862,20 @@ namespace SocialFORM.Controllers
                             //skip_tmp_form_number.TypeNP = lst_typeNP.First(u => u.BlankID == item.Id).AnswerIndex == 1 ? false : true;
                             skip_tmp_form_number.TypeNP = lst_typeNP[item.Id].AnswerIndex == 1 ? false : true;
                         }
+                        if (ao_id != 0)
+                        {
+                            skip_tmp_form_number.AO = "AO" + lst_AO[item.Id].AnswerIndex;
+                        }
+                        if (vgmr_id != 0)
+                        {
+                            skip_tmp_form_number.VGMR = "VGMR" + lst_VGMR[item.Id].AnswerIndex;
+                        }
                         skip_tmp_form_number.Type = item.PhoneNumber.CompareTo("79000000000") == -1 ? 0 : 1;
                         lst_form_numbers.Add(skip_tmp_form_number);
                     }
                 });
 
+                /*
                 lst_form_numbers.ForEach(item =>
                 {
                     PT tmp = db.SetPTs.FirstOrDefault(u => u.Phone == item.Phone);
@@ -1789,6 +1903,8 @@ namespace SocialFORM.Controllers
                         db.SaveChanges();
                     }
                 });
+                */
+
                 //uint count_blank = 1;
                 //lst_form_numbers.ForEach(u =>
                 //{
@@ -1811,15 +1927,20 @@ namespace SocialFORM.Controllers
                     }
                 } while (iter < count_lst_form_numbers);
 
-                db.SetFormNumbers.AddRange(lst_form_numbers);
-                db.SaveChanges();
+                //db.SetFormNumbers.AddRange(lst_form_numbers);
+                //db.SaveChanges();
+                lst_form_numbers.ForEach(u =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"Item -> {u.FO}/{u.OB}/{u.GOR}/{u.AO}/{u.VGMR}/{u.Phone}/{u.Sex}/{u.Age}");
+                });
+                
                 return Json(lst_form_numbers.Count, JsonRequestBehavior.AllowGet);
             }
             catch (Exception e)
             {
-                //System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
-                //System.Diagnostics.Debug.WriteLine(e.Data.ToString());
-                //System.Diagnostics.Debug.WriteLine(e.Message.ToString());
+                System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
+                System.Diagnostics.Debug.WriteLine(e.Data.ToString());
+                System.Diagnostics.Debug.WriteLine(e.Message.ToString());
                 Response.AppendToLog(e.StackTrace.ToString());
                 Response.AppendToLog(e.Data.ToString());
                 Response.AppendToLog(e.Message.ToString());
@@ -1827,5 +1948,40 @@ namespace SocialFORM.Controllers
             return Json(null, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public void FixedTables()
+        {
+            List<FormNumber> lst_form_number = db.SetFormNumbers.ToList();
+            Dictionary<string, string> numbers_PTs = db.SetPTs.Select(u => u.Phone).ToDictionary(u => u, u => u);
+            System.Diagnostics.Debug.WriteLine($"Count FormNumbers: {lst_form_number.Count}");
+            System.Diagnostics.Debug.WriteLine($"Count PTs: {numbers_PTs.Count}");
+
+            lst_form_number.ForEach(item =>
+            {
+                if (numbers_PTs.ContainsKey(item.Phone))
+                {
+                    db.Database.ExecuteSqlCommand($"UPDATE dbo.PTs SET FO='{item.FO}', OB='{item.OB}', GOR='{item.GOR}', Status='завершено' WHERE Phone='{item.Phone}'");
+                }
+                else
+                {
+                    db.Database.ExecuteSqlCommand($"INSERT INTO dbo.PTs (FO, OB, GOR, Phone, Status, Type, isActual, TimeCall) VALUES ('{item.FO}', '{item.OB}', '{item.GOR}', '{item.Phone}', 'завершено', {item.Type}, 0, CAST('2000-01-01 00:00:00.000' AS DateTime))");
+                }
+            });
+            System.Diagnostics.Debug.WriteLine("Proccess is done");
+        }
+
+        //Выгрузка списка названий административных округо для Москва и Санкт-Петербурга
+        [HttpGet]
+        public async Task<JsonResult> GetAOList(string FO_kod, string OB_kod)
+        {
+            return Json(await db.SetAOs.Where(u => (u.KodFO == FO_kod) && (u.KodOB == OB_kod)).ToListAsync(), JsonRequestBehavior.AllowGet);
+        }
+
+        //Выгрузка списка названий внутригородских муниципальных образований
+        [HttpGet]
+        public async Task<JsonResult> GetVGMRList(string FO_kod, string OB_kod, string AO_kod)
+        {
+            return Json(await db.SetVGMRs.Where(u => u.KodFO == FO_kod && u.KodOB == OB_kod && u.KodAO == AO_kod).ToListAsync(), JsonRequestBehavior.AllowGet);
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace SocialFORM.Models.Project
     {
         public ProjectContext() : base("DefaultConnection") { }
         public DbSet<ProjectModel> SetProjectModels { get; set; }
+        public DbSet<CustomerProject> SetCustomerProjects { get; set; }
     }
 }

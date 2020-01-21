@@ -2,56 +2,71 @@
     <div style="display:grid; grid-template-columns:repeat(10, 1fr); background: #008dd2;padding:10px;border-radius: 10px;">
         <div style="grid-column:span 2;font-family:'Century Gothic';font-weight:900;color:#fff;">Список проектов</div>
         <div style="grid-column: span 8;margin-bottom:5px;">
-            <select style="height:100%;" name="list_Project_sync" onchange="LoadQuestionFromProject($(this).find('option:selected').val())">
+            <select class="form-control" style="height:100%;" name="list_Project_sync" onchange="LoadQuestionFromProject($(this).find('option:selected').val())">
                 <option value="" selected disabled>Выберите проект</option>
             </select>
         </div>
         <div style="grid-column:span 2;font-family:'Century Gothic';font-weight:900;color:#fff;">Фед. округ</div>
         <div style="grid-column:span 8;margin-bottom:5px;">
-            <select style="height:100%;" name="list_FO_sync" onchange="ChangeFO_sync($(this).find('option:selected').val())">
+            <select class="form-control" style="height:100%;" name="list_FO_sync" onchange="ChangeFO_sync($(this).find('option:selected').val())">
                 <option value="" selected disabled>Выберите округ</option>
             </select>
         </div>
         <div style="grid-column:span 2;font-family:'Century Gothic';font-weight:900;color:#fff;">Область</div>
         <div style="grid-column:span 8;">
-            <select style="height:100%;" name="list_OB_sync">
+            <select class="form-control" style="height:100%;" name="list_OB_sync" onchange=" ChangeAO_sync($('select[name=list_FO_sync]').find('option:selected').val(), $(this).find('option:selected').val())">
                 <option value="" selected disabled>Выберите ообласть</option>
             </select>
         </div>
     </div>
         
     <div style="width:100%; display:grid ;grid-template-columns: repeat(8, 1fr);margin: 5px 0px; background:#81c784; border-radius:10px;padding:15px;">
-        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Городской округ</div><div style="grid-column:span 5;">
-            <select name="list_Q_GOR">
+        <div name="TextListQAO" style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;align-self:center;" hidden>Административный округ</div>
+        <div name="DropListQAO" style="grid-column:span 5;" hidden>
+            <select class="form-control" name="list_Q_AO">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
-        <div style="height:2px;width:100%;background:#fff;grid-column:span 8;margin-bottom:5px;" />
-        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Населенный пункт</div><div style="grid-column:span 5;">
-            <select name="list_Q_NP">
+        <div style="height:2px;width:100%;grid-column:span 8;margin-bottom:5px;" />
+        <div name="TextListQVGMR" style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;align-self:center;" hidden>Внутрнегор. муниц. образование</div>
+        <div name="DropListQVGMR" style="grid-column:span 5;" hidden>
+            <select class="form-control" name="list_Q_VGMR">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
-        <div style="height:2px;width:100%;background:#fff;grid-column:span 8;margin-bottom:5px;" />
-        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Пол</div><div style="grid-column: span 5;">
-            <select name="list_Q_Sex">
+        <div style="height:2px;width:100%;grid-column:span 8;margin-bottom:5px;" />
+        <div name="TextListQGOR" style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;align-self:center;">Городской округ</div>
+        <div name="DropListQGOR" style="grid-column:span 5;">
+            <select class="form-control" name="list_Q_GOR">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
-        <div style="height:2px;width:100%;background:#fff;grid-column:span 8;margin-bottom:5px;" />
-        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Возраст</div><div style="grid-column: span 5;">
-            <select name="list_Q_Age">
+        <div style="height:2px;width:100%;grid-column:span 8;margin-bottom:5px;" />
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;align-self:center;">Населенный пункт</div><div style="grid-column:span 5;">
+            <select class="form-control" name="list_Q_NP">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
-        <div style="height:2px;width:100%;background:#fff;grid-column:span 8;margin-bottom:5px;" />
-        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;">Тип поселения</div><div style="grid-column: span 5;">
-            <select name="list_Q_Type_NP">
+        <div style="height:2px;width:100%;grid-column:span 8;margin-bottom:5px;" />
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;align-self:center;">Пол</div><div style="grid-column: span 5;">
+            <select class="form-control" name="list_Q_Sex">
+                <option value="" selected disabled>Выберите вопрос</option>
+            </select>
+        </div>
+        <div style="height:2px;width:100%;grid-column:span 8;margin-bottom:5px;" />
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;align-self:center;">Возраст</div><div style="grid-column: span 5;">
+            <select class="form-control" name="list_Q_Age">
+                <option value="" selected disabled>Выберите вопрос</option>
+            </select>
+        </div>
+        <div style="height:2px;width:100%;grid-column:span 8;margin-bottom:5px;" />
+        <div style="grid-column: span 3;font-family:'Century Gothic';font-weight:900;color:#fff;height:25px;align-self:center;">Тип поселения</div><div style="grid-column: span 5;">
+            <select class="form-control" name="list_Q_Type_NP">
                 <option value="" selected disabled>Выберите вопрос</option>
             </select>
         </div>
     </div>
-    <div class="search_btn" style="width:150px;border-radius:10px;font-family:'Century Gothic';font-weight:900;" onclick="SyncBlank()">Синхронизировать</div>
+    <button type="button" class="btn btn-primary" onclick="SyncBlank()">Синхронизировать</button>
 </div>
 <script>
 
@@ -85,6 +100,50 @@
             })
     }
 
+    function ChangeAO_sync(FO, OB) {
+        if (FO == "FO1") {
+            if (OB == "OB18") {
+                $('div[name=TextListQAO]').show();
+                $('div[name=TextListQVGMR]').show();
+                $('div[name=DropListQAO]').show();
+                $('div[name=DropListQVGMR]').show();
+                $('div[name=TextListQGOR]').hide();
+                $('div[name=DropListQGOR]').hide();
+            } else {
+                $('div[name=TextListQAO]').hide();
+                $('div[name=TextListQVGMR]').hide();
+                $('div[name=DropListQAO]').hide();
+                $('div[name=DropListQVGMR]').hide();
+                $('div[name=TextListQGOR]').show();
+                $('div[name=DropListQGOR]').show();
+            }
+        } else if (FO == "FO2") {
+            if (OB == "OB10") {
+                $('div[name=TextListQAO]').show();
+                $('div[name=TextListQVGMR]').show();
+                $('div[name=DropListQAO]').show();
+                $('div[name=DropListQVGMR]').show();
+                $('div[name=TextListQGOR]').hide();
+                $('div[name=DropListQGOR]').hide();
+            } else {
+                $('div[name=TextListQAO]').hide();
+                $('div[name=TextListQVGMR]').hide();
+                $('div[name=DropListQAO]').hide();
+                $('div[name=DropListQVGMR]').hide();
+                $('div[name=TextListQGOR]').show();
+                $('div[name=DropListQGOR]').show();
+            }
+
+        } else {
+            $('div[name=TextListQAO]').hide();
+            $('div[name=TextListQVGMR]').hide();
+            $('div[name=DropListQAO]').hide();
+            $('div[name=DropListQVGMR]').hide();
+            $('div[name=TextListQGOR]').show();
+            $('div[name=DropListQGOR]').show();
+        }
+    }
+
     function LoadQuestionFromProject(code_p) {
         $('select[name=list_Q_GOR]').find('option:not(:disabled)').remove();
         $('select[name=list_Q_GOR]').find('option:disabled').prop("selected", true);
@@ -96,6 +155,11 @@
         $('select[name=list_Q_Age]').find('option:disabled').prop("selected", true);
         $('select[name=list_Q_Type_NP]').find('option:not(:disabled)').remove();
         $('select[name=list_Q_Type_NP]').find('option:disabled').prop("selected", true);
+
+        $('select[name=list_Q_AO]').find('option:not(:disabled)').remove();
+        $('select[name=list_Q_AO]').find('option:disabled').prop("selected", true);
+        $('select[name=list_Q_VGMR]').find('option:not(:disabled)').remove();
+        $('select[name=list_Q_VGMR]').find('option:disabled').prop("selected", true);
         $.get("/Group/getGroup", { id_p: code_p })
             .success(function (server_data) {
                 $.each(server_data, function (i, item) {
@@ -104,6 +168,8 @@
                     $('select[name=list_Q_Sex]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                     $('select[name=list_Q_Age]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                     $('select[name=list_Q_Type_NP]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
+                    $('select[name=list_Q_AO]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
+                    $('select[name=list_Q_VGMR]').append("<option value='" + item.QuestionID + "'>" + item.GroupName + "</option>");
                 })
 
             })
@@ -119,6 +185,8 @@
         let GOR_id = $('select[name=list_Q_GOR]').find('option:selected').val();
         let FO_kod = $('select[name=list_FO_sync]').find('option:selected').val();
         let OB_kod = $('select[name=list_OB_sync]').find('option:selected').val();
+        let AO_kod = $('select[name=list_Q_AO]').find('option:selected').val();
+        let VGMR_kod = $('select[name=list_Q_VGMR]').find('option:selected').val();
         if (FO_kod == '') {
             alert("Не выбран федеральный округ")
             return;
@@ -128,8 +196,9 @@
             return;
         }
         if (GOR_id == '') {
-            alert("Не выбран вопрос содержащий код GOR");
-            return;
+            //alert("Не выбран вопрос содержащий код GOR");
+            //return;
+            GOR_id = 0;
         }
         if (NP_id == '') {
             NP_id = 0;
@@ -143,8 +212,14 @@
         if (TypeNP_id == '') {
             TypeNP_id = 0;
         }
+        if (AO_kod == '') {
+            AO_kod = 0; 
+        }
+        if (VGMR_kod == '') {
+            VGMR_kod = 0;
+        }
 
-        $.get("/Phone/SyncBlankWithDB", { FO_kod: FO_kod, OB_kod: OB_kod, p_id: project_id, gor_id: GOR_id, s_id: Sex_id, a_id: Age_id, np_id: NP_id, typeNP_id: TypeNP_id })
+        $.get("/Phone/SyncBlankWithDB", { FO_kod: FO_kod, OB_kod: OB_kod, p_id: project_id, gor_id: GOR_id, s_id: Sex_id, a_id: Age_id, np_id: NP_id, typeNP_id: TypeNP_id, ao_id: AO_kod, vgmr_id: VGMR_kod })
             .success(function (server_data) {
                 if (server_data == null) {
                     $('.PreLoader').hide();
