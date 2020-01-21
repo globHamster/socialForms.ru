@@ -89,114 +89,127 @@ namespace SocialFORM.Controllers
         [HttpPost]
         public ActionResult AudioAllDownToZip(string fileGuid, string mimeType, string filename)
         {
-            if (Session[fileGuid] != null)
+            try
             {
-                List<string> data = Session[fileGuid] as List<string>;
-                Session.Remove(fileGuid);  // Cleanup session data
-                int idi = 0;
-
-                string time = DateTime.Now.ToString("HH.mm.ss");
-                ////
-                //  Объем файлов
-                long lenghtFile = 0;
-                ////
-                //  Количество Файлов ZIP
-                int countFile = 0;
-                ////
-                //  Пути файлов ZIP
-                string pathFiles = "";
-                ////
-                //  Имена файло ZIP
-                string nameFiles = "";
-                ////
-                //  Создаем файл ZIP
-                ZipArchive zip = System.IO.Compression.ZipFile.Open(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), ZipArchiveMode.Create);
-                ////
-                //  Запускаем цикл по списку аудио-файлов
-                data.ForEach(file =>
+                if (Session[fileGuid] != null)
                 {
+                    List<string> data = Session[fileGuid] as List<string>;
+                    Session.Remove(fileGuid);  // Cleanup session data
+                    int idi = 0;
+
+                    string time = DateTime.Now.ToString("HH.mm.ss");
                     ////
-                    //  Добовляем к объему размер файла
-                    lenghtFile += new FileInfo(Server.MapPath("~/uploads/" + file)).Length;
+                    //  Объем файлов
+                    long lenghtFile = 0;
                     ////
-                    //  Проверяем объем меньше ли требуемого объема
+                    //  Количество Файлов ZIP
+                    int countFile = 0;
+                    ////
+                    //  Пути файлов ZIP
+                    string pathFiles = "";
+                    ////
+                    //  Имена файло ZIP
+                    string nameFiles = "";
+                    ////
+                    //  Создаем файл ZIP
+                    ZipArchive zip = System.IO.Compression.ZipFile.Open(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), ZipArchiveMode.Create);
+                    ////
+                    //  Запускаем цикл по списку аудио-файлов
+                    data.ForEach(file =>
+                    {
+                        ////
+                        //  Добовляем к объему размер файла
+                        lenghtFile += new FileInfo(Server.MapPath("~/uploads/" + file)).Length;
+                        ////
+                        //  Проверяем объем меньше ли требуемого объема
+                        if (lenghtFile < 4294967295)
+                        ////
+                        //  Меньше
+                        {
+                            ////
+                            //  Записываем текущий аудио файл в ZIP
+                            zip.CreateEntryFromFile(Server.MapPath("~/uploads/" + file), file);
+                            System.Diagnostics.Debug.WriteLine("ok === >>>>" + idi);
+                            idi++;
+                        }
+                        else
+                        ////
+                        //  Привысил
+                        {
+                            ////
+                            //  Закрываем предыдущий фаил ZIP
+                            zip.Dispose();
+                            ////
+                            //  Записываем путь Файла
+                            pathFiles += "~/zipfiles/bundle_" + time + ".zip#";
+                            ////
+                            //  Создаем новый TIME для нового файла ZIP
+                            time = DateTime.Now.ToString("HH.mm.ss");
+                            ////
+                            //  Создаем новый ZIP
+                            zip = System.IO.Compression.ZipFile.Open(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), ZipArchiveMode.Create);
+                            ////
+                            //  Записываем текущий аудио файл d ZIP
+                            zip.CreateEntryFromFile(Server.MapPath("~/uploads/" + file), file);
+                            ////
+                            //  Обнуляем объем
+                            lenghtFile = new FileInfo(Server.MapPath("~/uploads/" + file)).Length;
+                            ////
+                            //  Записываем имена файла
+                            nameFiles += filename + "_Часть_" + countFile + ".zip#";
+                            ////
+                            //  Увеличивам количество Файлов ZIP
+                            countFile++;
+
+                            System.Diagnostics.Debug.WriteLine("ok === >>>>" + idi);
+                            idi++;
+                        }
+                    });
+
+                    zip.Dispose();
+
                     if (lenghtFile < 4294967295)
-                    ////
-                    //  Меньше
                     {
-                        ////
-                        //  Записываем текущий аудио файл в ZIP
-                        zip.CreateEntryFromFile(Server.MapPath("~/uploads/" + file), file);
-                        System.Diagnostics.Debug.WriteLine("ok === >>>>" + idi);
-                        idi++;
-                    }
-                    else
-                    ////
-                    //  Привысил
-                    {
-                        ////
-                        //  Закрываем предыдущий фаил ZIP
-                        zip.Dispose();
                         ////
                         //  Записываем путь Файла
                         pathFiles += "~/zipfiles/bundle_" + time + ".zip#";
-                        ////
-                        //  Создаем новый TIME для нового файла ZIP
-                        time = DateTime.Now.ToString("HH.mm.ss");
-                        ////
-                        //  Создаем новый ZIP
-                        zip = System.IO.Compression.ZipFile.Open(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), ZipArchiveMode.Create);
-                        ////
-                        //  Записываем текущий аудио файл d ZIP
-                        zip.CreateEntryFromFile(Server.MapPath("~/uploads/" + file), file);
-                        ////
-                        //  Обнуляем объем
-                        lenghtFile = new FileInfo(Server.MapPath("~/uploads/" + file)).Length;
                         ////
                         //  Записываем имена файла
                         nameFiles += filename + "_Часть_" + countFile + ".zip#";
                         ////
                         //  Увеличивам количество Файлов ZIP
                         countFile++;
-
-                        System.Diagnostics.Debug.WriteLine("ok === >>>>" + idi);
-                        idi++;
                     }
-                });
 
-                zip.Dispose();
+                    System.Diagnostics.Debug.WriteLine("Complate");
+                    System.Diagnostics.Debug.WriteLine("File === >>>>" + fileGuid + ".zip");
 
-                if (lenghtFile < 4294967295) {
-                    ////
-                    //  Записываем путь Файла
-                    pathFiles += "~/zipfiles/bundle_" + time + ".zip#";
-                    ////
-                    //  Записываем имена файла
-                    nameFiles += filename + "_Часть_" + countFile + ".zip#";
-                    ////
-                    //  Увеличивам количество Файлов ZIP
-                    countFile++;
-                }
-                
-                System.Diagnostics.Debug.WriteLine("Complate");
-                System.Diagnostics.Debug.WriteLine("File === >>>>" + fileGuid + ".zip");
-
-                //return File(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), mimeType, filename);
-                return new JsonResult()
-                {
-                    Data = new
+                    //return File(Server.MapPath("~/zipfiles/bundle_" + time + ".zip"), mimeType, filename);
+                    return new JsonResult()
                     {
-                        CountFile = countFile,
-                        FileGuid = pathFiles,
-                        MimeType = mimeType,
-                        FileName = nameFiles
-                    }
-                };
+                        Data = new
+                        {
+                            CountFile = countFile,
+                            FileGuid = pathFiles,
+                            MimeType = mimeType,
+                            FileName = nameFiles
+                        }
+                    };
 
+                }
+                else
+                {
+                    Exception e = new Exception();
+                    Response.AppendToLog(e.StackTrace);
+                    Response.AppendToLog(e.Message);
+                    // Log the error if you want
+                    return new EmptyResult();
+                }
             }
-            else
+            catch (Exception e)
             {
-                // Log the error if you want
+                Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Message);
                 return new EmptyResult();
             }
         }

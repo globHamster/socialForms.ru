@@ -20,10 +20,8 @@
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort>44343</IISExpressSSLPort>
-    <IISExpressAnonymousAuthentication>
-    </IISExpressAnonymousAuthentication>
-    <IISExpressWindowsAuthentication>
-    </IISExpressWindowsAuthentication>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
@@ -438,6 +436,16 @@
     <Content Include="Content\daterangepicker.css" />
     <Content Include="Content\images\gear_setting.png" />
     <Content Include="Content\images\icsv.png" />
+    <Content Include="Content\images\instNEW\backNEW.jpg" />
+    <Content Include="Content\images\instNEW\button_startNEW2.jpg" />
+    <Content Include="Content\images\instNEW\exitNEW.jpg" />
+    <Content Include="Content\images\instNEW\filterNEW.jpg" />
+    <Content Include="Content\images\instNEW\listNEW1.jpg" />
+    <Content Include="Content\images\instNEW\listNEW2.jpg" />
+    <Content Include="Content\images\instNEW\menuNEW2.jpg" />
+    <Content Include="Content\images\instNEW\menuNEW2_1.jpg" />
+    <Content Include="Content\images\instNEW\menuNEW2_2.jpg" />
+    <Content Include="Content\images\instNEW\spiskNEW2.jpg" />
     <Content Include="Content\images\instruction\bd.png" />
     <Content Include="Content\images\instruction\button_start.png" />
     <Content Include="Content\images\instruction\down1.png" />
@@ -867,16 +875,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>50573</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44343/</IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
     </VisualStudio>
