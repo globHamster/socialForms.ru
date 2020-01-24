@@ -59,7 +59,17 @@ namespace SocialFORM.Controllers
         {
             try
             {
+                db.SetAOs.ToList().ForEach(x =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"{x.KodFO}/{x.KodOB}/{x.KodAO}/{x.NameAO}");
+                });
+                System.Diagnostics.Debug.WriteLine("Start function ... ");
                 List<VGMR> lst_VGMR_for_AO = db.SetVGMRs.ToList();
+                System.Diagnostics.Debug.WriteLine($"Count of list VGMR : {lst_VGMR_for_AO.Count}");
+                lst_VGMR_for_AO.ForEach(x =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"{x.KodFO}/{x.KodOB}/{x.KodAO}/{x.KodVGMR}/{x.NameVGMR}");
+                });
                 var fileContent = Request.Files[0];
                 if (fileContent != null && fileContent.ContentLength > 0)
                 {
@@ -69,8 +79,10 @@ namespace SocialFORM.Controllers
                     StreamReader streamReader = new StreamReader(stream, Encoding.GetEncoding(1251));
                     String str;
                     Dictionary<string, FormNumber> lst_phone = new Dictionary<string, FormNumber>();
-                    Dictionary<string, PT> db_phone_PT = db.SetPTs.ToDictionary(u => u.Phone, u => u);
-                    Dictionary<string, FormNumber> all_phone_FN = db.SetFormNumbers.ToDictionary(u => u.Phone, u => u);
+                    //Dictionary<string, PT> db_phone_PT = db.SetPTs.ToDictionary(u => u.Phone, u => u);
+                    //Dictionary<string, FormNumber> all_phone_FN = db.SetFormNumbers.ToDictionary(u => u.Phone, u => u);
+                    uint count_write_table = 1;
+                    System.Diagnostics.Debug.WriteLine("Start proccesing creating table ...");
                     do
                     {
                         str = streamReader.ReadLine();
@@ -127,23 +139,26 @@ namespace SocialFORM.Controllers
                             tmp.VGMR = tmp_str[11];
                             if (tmp.VGMR!="" && tmp.VGMR != null)
                             {
+                                System.Diagnostics.Debug.WriteLine($"ROW-{count_write_table} -> {tmp.FO}/{tmp.OB}/{tmp.VGMR}");
                                 tmp.AO = lst_VGMR_for_AO.Find(u => u.KodFO == tmp.FO && u.KodOB == tmp.OB && u.KodVGMR == tmp.VGMR).KodAO;
                             }
                             tmp.Education = "";
                             tmp.Type = tmp.Phone.ElementAt(1) == '9' ? 1 : 0;
                             tmp.TypeNP = false;
                             if (!lst_phone.ContainsKey(tmp.Phone)) { lst_phone.Add(tmp.Phone, tmp); }
+                            System.Diagnostics.Debug.WriteLine($"Row -> {(count_write_table++)}");
                         }
                         else
                         {
                             break;
                         }
                     } while (true);
-
+                    System.Diagnostics.Debug.WriteLine("End proccesing creating table...");
                     List<string> lst_only_phone = lst_phone.Keys.ToList();
                     lst_only_phone.ForEach(u =>
                     {
-                        if (!all_phone_FN.ContainsKey(u))
+                        //if (!all_phone_FN.ContainsKey(u))
+                        if (!db.SetFormNumbers.Any(t => t.Phone == u))
                         {
                             db.Database.ExecuteSqlCommand("INSERT INTO dbo.FormNumbers (FO, OB, GOR, NP, VGOR, Phone, Sex, Age, Address, Education, Type, TypeNP, AO, VGMR) VALUES({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13})",
                                 lst_phone[u].FO,
@@ -161,44 +176,59 @@ namespace SocialFORM.Controllers
                                 lst_phone[u].AO,
                                 lst_phone[u].VGMR);
                         }
+                        else {
+                            db.Database.ExecuteSqlCommand("UPDATE dbo.FormNumbers SET FO={0},OB={1},GOR={2},NP={3},VGOR={4},Sex={5},Age={6},Address={7},Education={8},Type={9},TypeNP={10},AO={11},VGMR={12} WHERE Phone={13}",
+                                lst_phone[u].FO,
+                                lst_phone[u].OB,
+                                lst_phone[u].GOR,
+                                lst_phone[u].NP,
+                                lst_phone[u].VGOR,
+                                lst_phone[u].Sex,
+                                lst_phone[u].Age,
+                                lst_phone[u].Address,
+                                lst_phone[u].Education,
+                                lst_phone[u].Type,
+                                lst_phone[u].TypeNP,
+                                lst_phone[u].AO,
+                                lst_phone[u].VGMR,
+                                lst_phone[u].Phone);
+                        }
                         //if (!db_phone_PT.ContainsKey(u))
-                        //{
-                        //    db.Database.ExecuteSqlCommand("INSERT INTO dbo.PTs (FO, OB, GOR, Phone, Status, Type, isActual, TimeCall) VALUES ({0},{1},{2},{3},{4},{5},{6},{7})",
-                        //        lst_phone[u].FO,
-                        //        lst_phone[u].OB,
-                        //        lst_phone[u].GOR,
-                        //        u,
-                        //        "connect",
-                        //        lst_phone[u].Type,
-                        //        false,
-                        //        new DateTime(2000, 1, 1).ToString());
-                        //}
-                        System.Diagnostics.Debug.WriteLine($"Item -> " +
-                            $"{lst_phone[u].FO}/" +
-                            $"{lst_phone[u].OB}/" +
-                            $"{lst_phone[u].GOR}/" +
-                            $"{lst_phone[u].NP}/" +
-                            $"{lst_phone[u].VGOR}/" +
-                            $"{lst_phone[u].TypeNP}/" +
-                            $"{lst_phone[u].AO}/" +
-                            $"{lst_phone[u].VGMR}/" +
-                            $"{lst_phone[u].Phone}/" +
-                            $"{lst_phone[u].Type}/" +
-                            $"{lst_phone[u].Sex}/" +
-                            $"{lst_phone[u].Age}/" +
-                            $"{lst_phone[u].Address}/" +
-                            $"");
+                        if (!db.SetPTs.Any(t=>t.Phone == u))
+                        {
+                            db.Database.ExecuteSqlCommand("INSERT INTO dbo.PTs (FO, OB, GOR, Phone, Status, Type, isActual, TimeCall) VALUES ({0},{1},{2},{3},{4},{5},{6},{7})",
+                                lst_phone[u].FO,
+                                lst_phone[u].OB,
+                                lst_phone[u].GOR,
+                                u,
+                                "connect",
+                                lst_phone[u].Type,
+                                false,
+                                new DateTime(2000, 1, 1).ToString());
+                        } else
+                        {
+                            db.Database.ExecuteSqlCommand("UPDATE dbo.PTs SET FO={0},OB={1},GOR={2},Status={3},Type={4},isActual={5} WHERE Phone={6}",
+                                lst_phone[u].FO,
+                                lst_phone[u].OB,
+                                lst_phone[u].GOR,
+                                "connect",
+                                lst_phone[u].Type,
+                                false, 
+                                u);
+                        }
                     });
                 }
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
-                System.Diagnostics.Debug.WriteLine(e.Data);
-                System.Diagnostics.Debug.WriteLine(e.Source);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                Response.AppendToLog(e.StackTrace);
+                //System.Diagnostics.Debug.WriteLine(e.StackTrace.ToString());
+                //System.Diagnostics.Debug.WriteLine(e.Data);
+                //System.Diagnostics.Debug.WriteLine(e.Source);
+                //System.Diagnostics.Debug.WriteLine(e.Message);
+                Response.AppendToLog(e.StackTrace.ToString());
                 Response.AppendToLog(e.Message);
+                Response.AppendToLog(e.Data.ToString());
+                Response.AppendToLog(e.Source);
             }
             finally
             {
@@ -234,11 +264,13 @@ namespace SocialFORM.Controllers
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.StackTrace);
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Message);
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Source);
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Data);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.StackTrace);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Message);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Source);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Data);
                 Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Data.ToString());
+                Response.AppendToLog(e.Source);
                 Response.AppendToLog(e.Message);
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
@@ -263,9 +295,8 @@ namespace SocialFORM.Controllers
                 else throw new Exception("Uncorrect data for filter");
                 tmp_list.AsParallel().ForAll(u =>
                 {
-                    System.Diagnostics.Debug.WriteLine($"AO -> {u.AO}");
-                    System.Diagnostics.Debug.WriteLine($"VGMR -> {u.VGMR}");
-
+                    //System.Diagnostics.Debug.WriteLine($"AO -> {u.AO}");
+                    //System.Diagnostics.Debug.WriteLine($"VGMR -> {u.VGMR}");
                     u.AO = tmp_lstAO[u.AO];
                     if(u.VGMR!=null) u.VGMR = tmp_lstVGMR[u.VGMR];
                     if (u.Age > 1000) u.Age = DateTime.Now.Year - u.Age;
@@ -276,11 +307,13 @@ namespace SocialFORM.Controllers
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.StackTrace);
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Message);
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Source);
-                System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Data);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.StackTrace);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Message);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Source);
+                //System.Diagnostics.Debug.WriteLine("Exception >>> " + e.Data);
                 Response.AppendToLog(e.StackTrace);
+                Response.AppendToLog(e.Data.ToString());
+                Response.AppendToLog(e.Source);
                 Response.AppendToLog(e.Message);
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
