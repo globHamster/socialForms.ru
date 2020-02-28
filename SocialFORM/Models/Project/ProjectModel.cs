@@ -12,5 +12,6 @@ namespace SocialFORM.Models.Project
         public bool? ActionProject { get; set; }
         public bool? CostumerProject { get; set; }
         public string SettingEncode { get; set; }
+        public string CodeProject { get; set; }
     }
 }

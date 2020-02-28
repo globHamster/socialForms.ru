@@ -1,0 +1,1668 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link href="~/Content/chosen.css" rel="stylesheet" />
+    <link href="~/Content/css/form_formView_style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="~/Scripts/jquery.maskedinput.js"></script>
+    <script src="~/Scripts/device.js"></script>
+    <script>
+        $('.PreLoader').show();
+    </script>
+
+    <style>
+
+        @@media only screen and (max-width:1080px) and (orientation:portrait) {
+            button[name=button_next],
+            button[name=button_previos] {
+                min-width: 6em !important;
+                height: 6em !important;
+            }
+
+            div[name=answer_text_area] label.btn {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 250%;
+                vertical-align: middle;
+                min-height: 5em;
+            }
+
+            div[name=working_space] {
+                width: 97%;
+                margin-left: 1.5%;
+                margin-right: 1.5%;
+            }
+
+            div[name=question_text_area] {
+                font-size: 225% !important;
+            }
+
+            textarea.text_free_area {
+                font-size: 1em !important;
+            }
+
+            div[name=working_space] {
+                height: 100vh;
+                height: calc(var(--vh,1vh)*100);
+            }
+
+            div[name=text_status] {
+                font-size: 2em !important;
+            }
+
+            button[name=SaveResultBtn] {
+                height: 4em;
+                font-size: 2em !important;
+            }
+
+            input.free_text {
+                font-size: 2.5em !important;
+            }
+
+            td.tool_layer {
+                width: 10em !important;
+                height: 10em !important;
+                min-height: 10em !important;
+                min-width: 10em !important;
+            }
+        }
+
+        @@media only screen and (min-width:1080px) {
+            div[name=working_space] {
+                width: 90%;
+                margin-left: 5%;
+                margin-right: 5%;
+            }
+
+            div[name=question_text_area] {
+                font-size: 125% !important;
+            }
+        }
+    </style>
+
+    @*//<script src="~/Scripts/device.js"></script>*@
+    <style>
+        td.table_q_a > input[type="checked"] ~ label {
+            background-color: #007bff;
+        }
+
+        div[name=answer_text_area] {
+            position: relative;
+        }
+
+        body {
+            height: 100vh !important;
+        }
+
+        .PreLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(105,151,219, 0.7);
+            align-items: center;
+            text-align: center;
+            display: none;
+            z-index: 99999;
+        }
+
+        .BoxLoad {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            position: absolute;
+            animation: animate .5s linear infinite;
+            left: 50%;
+            top: 50%;
+            border-radius: 3px;
+        }
+
+        @@keyframes loader {
+            0% {
+                left: -100px
+            }
+
+            100% {
+                left: 110%;
+            }
+        }
+
+        @@keyframes animate {
+            17% {
+                border-bottom-right-radius: 3px;
+            }
+
+            25% {
+                transform: translateY(9px) rotate(22.5deg);
+            }
+
+            50% {
+                transform: translateY(18px) scale(1,.9) rotate(45deg);
+                border-bottom-right-radius: 40px;
+            }
+
+            75% {
+                transform: translateY(9px) rotate(67.5deg);
+            }
+
+            100% {
+                transform: translateY(0) rotate(90deg);
+            }
+        }
+
+        .ShadowLoad {
+            width: 50px;
+            height: 5px;
+            background: #000;
+            opacity: 0.1;
+            position: absolute;
+            left: 50%;
+            top: calc(50% + 59px);
+            border-radius: 50%;
+            animation: shadow .5s linear infinite;
+        }
+
+        @@keyframes shadow {
+            50% {
+                transform: scale(1.2,1);
+            }
+        }
+    </style>
+
+    <title>@ViewBag.Title</title>
+</head>
+<body style="padding0;margin:0;">
+
+    <div name="projectID" id="@ViewBag.ProjectID" hidden></div>
+    <div name="operatorID" id="@ViewBag.ProjectID" hidden></div>
+    <div name="userIP" id="@ViewBag.UserIP" hidden></div>
+    <div name="working_space">
+        <div class="shadow p-3 mb-5 bg-white rounded overflow-auto" style="height:30vh;font-size:100%;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" name="question_text_area"></div>
+        <div name="alert_form" class="alert alert-danger" role="alert" style="display: none;position:fixed;top:calc(30vh);">
+            Это уведомление об опасности — check it out!
+        </div>
+        <div style="height:58vh;overflow:auto;" name="answer_text_area"></div>
+        <div style="width:100%;display:inline-flex;" name="navigation_area">
+            <div style="display:block;"><button type="button" class="btn btn-primary btn-lg" name="button_previos" onclick="PreviousQuestion()" style="display:none;"><</button></div>
+            <div style="display:block;width:100%;justify-content:center;align-self:center;padding-left:20px;padding-right:20px;">
+                <div class="progress" style="border:1px solid #007bff;">
+                    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            <div style="display:block;"><button type="button" class="btn btn-primary btn-lg" name="button_next" onclick="NextQuestion()">></button></div>
+        </div>
+    </div>
+
+    <div class="TextLimitQuota">
+        <div class="TextDiv">
+            Квотный лимит превышен
+            Завершите разговор
+        </div>
+    </div>
+
+    <div name="block_showResult" style="position:fixed;width:100vw;height:100vh;top:0;left:0;background-color:rgba(8, 8, 8, 0.74);display:none">
+        <div name="display_info_form" style="position:absolute;background-color:#fff;padding:10px;">
+            <div style="width:100%;font-weight:600;text-align:center;font-size:20px;line-height:250%;" name="text_status">
+                Спасибо за участие в опросе!
+            </div>
+            <div style="width:100%;">
+                <button name="SaveResultBtn" class="btn btn-primary" onclick="SendingResult()" style="width:100%;">Сохраить результат</button>
+            </div>
+        </div>
+    </div>
+
+    <div name="block_comment" style="position:fixed;width:100vw;height:100vh;top:0;left:0;background-color:rgba(8, 8, 8, 0.74);display:none">
+        <div name="display_comment_form" style="position:absolute;background-color:#fff;padding:10px;">
+            <div style="width:100%;font-weight:600;text-align:center;font-size:20px;line-height:250%;" name="text_status">
+                Если есть предложения по улучшению, пожалуйста, поделитесь с Нами!
+            </div>
+            <div>
+                <textarea name="text_comment" style="resize:none;width:40em;height:30em;"></textarea>
+            </div>
+            <div style="width:100%;">
+                <button name="SendCommentBtn" class="btn btn-primary" onclick="SendComment()" style="width:100%;">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="PreLoader">
+        <div class="BoxLoad"></div>
+        <div class="ShadowLoad"></div>
+    </div>
+
+    <script type="text/javascript">
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        window.addEventListener('resize', () => {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        })
+
+        function SendComment() {
+            let string_comment = $('textarea[name=text_comment]').val();
+            console.log(string_comment);
+            $.post("/Form/SaveComment", { comment: string_comment })
+                .success(function () {
+                    $('body').empty().html("<h1>Спасибо за участие</h1>");
+                })
+        }
+
+        var type_q;
+        var id_q, id_a;
+        var id_project = $('div[name=projectID]').attr('id');
+        var id_operator = $('div[name=operatorID]').attr('id');
+        var isReload = false;
+        let index = 0, max_index = 0;
+        var massiv_question_id;
+        var result = [];
+        var text_other = [];
+        var list_base_answer = {};
+        var list_transition;
+        var list_blocks = {};
+        var list_question = {};
+        var list_answer = {};
+        var list_id_answer_all = {};
+        var list_bind_answer_group = {};
+        var list_table_row;
+        var list_massk = {};
+        var list_file = {};
+        var list_text_file = {};
+        var list_id_question_group = {};
+        var list_group = {};
+        var list_question_bind_group = {};
+        var begin_time = undefined, end_time = undefined; //Время начала анкетирования
+        var status = 0;
+        var is_load_id = false;
+        var active_group = {};
+        var q1, q2, q3, q4, q5, q6, q7;
+        let count_ajax = 0;
+        var massive_quota_id = [];
+        let massive_string_chain = [];
+        var list_quota = {};
+        var list_range = {};
+        //Блок выгрузки данных
+        {
+            //подгрузка листа сс базовыми ответами
+            q1 = $.get("/Question/getListAnswerBase")
+                .success(function (server_data) {
+                    $.each(server_data, function (i, item) {
+                        list_base_answer[item.Id] = item;
+                    })
+                    count_ajax++;
+                })
+                .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListAnswerBase ", err) });
+            //Подгрузка таблицы переходов
+            q2 = $.get("/Question/getListTransition", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (data) {
+                    list_transition = data;
+                    count_ajax++;
+                })
+                .error(function (err) { console.error('Ошибка загрузки таблицы переходов .../Question/getListTransition ', err); });
+            //Подгрузка таблицы переходов
+            $.get("/Question/getListBlocks", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (data) {
+                    $.each(data, function (i, item) {
+                        if (list_blocks[item.fromQuestion] == null || list_blocks[item.fromQuestion] == undefined)
+                            list_blocks[item.fromQuestion] = [item];
+                        else
+                            list_blocks[item.fromQuestion].push(item);
+                    });
+                    count_ajax++;
+                })
+                .error(function (err) { console.error('Ошибка загрузки таблицы блокировок .../Question/getListBlocks ', err); });
+            //Подгузка листа вопросов относящихся к проекту
+            q3 = $.get("/Question/getListQuestion", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (server_data) {
+                    $.each(server_data, function (i, item) {
+                        list_question[item.Id] = item;
+                    })
+                    count_ajax++;
+                })
+                .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/getListQuestion", err) });
+            //Подгрузка упорядоченного листа id вопросов
+            q4 = $.get("/Group/getIdQuestionGroup", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (server_data) {
+                    massiv_question_id = server_data;
+                    count_ajax++;
+                    is_load_id = true;
+                })
+                .error(function (err) { console.error("Ошибка выгрузки данных ... /Group/getIdQuestionGroup ", err) });
+
+            //Подгрузка листа масок
+            $.get("/Question/getListMassk")
+                .success(function (server_data) {
+                    $.each(server_data, function (i, data) {
+                        list_massk[data.Id] = data.TextMassk;
+                    })
+                    count_ajax++;
+                })
+                .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getListMassk", err) })
+
+            //Подгрузка листа ответов
+            $.when(q4).then(function () {
+                q5 = $.get("/Question/getAllAnswerGrow", { massiv: massiv_question_id.join() })
+                    .success(function (server_data) {
+                        $.each(server_data, function (i, item) {
+                            list_answer[item.Id] = item;
+                        })
+                        count_ajax++;
+                    })
+                    .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllAnswerGrow ", err) })
+            })
+
+            //Подгрузка листа id всех ответов
+            $.when(q4).then(function () {
+                q6 = $.get("/Question/getIdAnswerAllGrow", { massiv: massiv_question_id.join() })
+                    .success(function (server_data) {
+                        list_id_answer_all = server_data;
+                        $.each(server_data, function (i, item) {
+                            if (item.BindGroup != null) {
+                                list_bind_answer_group[item.AnswerKey] = item;
+                                if (list_question_bind_group[item.QuestionID] == null)
+                                    list_question_bind_group[item.QuestionID] = [item.BindGroup];
+                                else
+                                    list_question_bind_group[item.QuestionID].push(item.BindGroup);
+                            }
+                        })
+                        count_ajax++;
+                    })
+                    .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getIdAnswerAllGrow", err) })
+            })
+
+            //Подгрузка листа строк табличного вопроса
+            $.when(q4).then(function () {
+                q7 = $.get("/Question/getAllTableRow", { massiv: massiv_question_id.join() })
+                    .success(function (server_data) {
+                        list_table_row = server_data;
+                        count_ajax++;
+                    })
+                    .error(function (err) { console.error("Ошибка выгрузка данных ... /Question/getAllTableRow", err) })
+            })
+
+            //Выгрузка листа путей файлов для фильтрующего вопроса
+            $.get("/Question/GetListFile", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (server_data) {
+                    $.each(server_data, function (i, item) {
+                        list_file[item.QuestionID] = item;
+                        $.get("/Group/Load", { path: item.PathFile })
+                            .success(function (server_file) {
+                                list_text_file[item.QuestionID] = server_file;
+                            });
+                    })
+                })
+                .error(function (err) { console.error("Ошибка выгрузки данных ... /Question/GetListFile", err); })
+
+            //Выгрузка листа групп
+            $.get("/Group/GetListALLGoup", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (server_data) {
+                    $.each(server_data, function (i, item) {
+                        var mas_tmp = [];
+                        if (item.GroupID > 0)
+                            active_group[item.GroupID] = { isActive: false, Questions: [] };
+                        if (list_id_question_group[item.GroupID] == null) {
+                            mas_tmp.push(item);
+                            list_id_question_group[item.GroupID] = mas_tmp;
+                        } else {
+                            list_id_question_group[item.GroupID].push(item);
+                        }
+                        if (item.GroupID > 0)
+                            list_group[item.QuestionID] = item.GroupID;
+                    });
+                })
+
+            $.get("/Question/GetAllRange", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (server_data) {
+                    $.each(server_data, function (i, item) {
+                        if (list_range[item.BindQuestion] == undefined) {
+                            list_range[item.BindQuestion] = [item];
+                        } else {
+                            list_range[item.BindQuestion].push(item);
+                        }
+
+                    })
+                })
+
+            $.get("/Question/GetQuota", { id_p: $('div[name=projectID]').attr('id') })
+                .success(function (server_data) {
+                    $.each(server_data, function (i, item) {
+                        item.IsActive = false;
+                        list_quota[i] = item;
+                    });
+                })
+        }
+
+        function TestFunc() {
+            if (count_ajax > 8) {
+                $('body').unbind();
+                $('.PreLoader').hide();
+                getStart();
+            } else {
+                setTimeout(TestFunc, 50);
+            }
+        }
+
+        $(function () {
+            let user_ip = $('div[name=userIP]').attr('id');
+            $('.PreLoader').show();
+            TestFunc();
+        })
+
+        //Ожидание выгрузки данных с сервера
+        //setTimeout(TestFunc(), 50);
+
+        // Функция тасовки элементов ответов в случайном порядке
+        Array.prototype.rand = function () {
+            return this.sort(function () { return 0.5 - Math.random(); })
+        }
+
+        //Блок отрисовки анкеты
+        function getStart() {
+            if (index == 0) $('button[name=button_previos]').hide();
+            if (index >= massiv_question_id.length) {
+                $('div[name=block_showResult]').fadeIn(200);
+                let div_block = $('div[name=display_info_form]');
+                div_block.css({
+                    'top': `${window.innerHeight / 2 - div_block.height() / 2}px`,
+                    'left': `${window.innerWidth / 2 - div_block.width() / 2}px`
+                });
+                return;
+            } else {
+                if (index == 1) {
+                    $.get("/Form/GetServerTime")
+                        .success(function (server_time) {
+                            if (begin_time == undefined)
+                                begin_time = server_time;
+                            status = 1;
+                        })
+                        .error(function () { alert("Error"); })
+                    $('button[name=button_previos]').show();
+                }
+                if (index == massiv_question_id.length - 1) {
+                    $.get("/Form/GetServerTime")
+                        .success(function (server_time) {
+                            if (end_time == undefined)
+                                end_time = server_time;
+                        })
+                }
+                if (index >= massiv_question_id.length - 1) $('button[name=button_next]').text("Завершить");
+                if (index == 1) {
+                    $('button.previous').hide();
+                } else if (index > 1) {
+                    $('button.previous').show();
+                }
+
+                id_q = massiv_question_id[index];
+                type_q = list_question[id_q].TypeQuestion;
+                $('div[name=question_text_area]').html(list_question[id_q].TextQuestion);
+                let procent = Math.floor((index + 1) * 100 / massiv_question_id.length);
+                $('div.progress-bar').animate({ 'width': `${Math.floor((index + 1) * 100 / massiv_question_id.length)}%` }, 100).text(`${procent}%`);
+                switch (type_q) {
+                    // Прорисовка ответос Single
+                    case 1:
+                        {
+                            var skip = false;
+                            var array_answer = [];
+                            var array_base_anwer = [];
+                            $('div[name=answer_text_area]').empty().append(`<div name="radio_group_btn" class="btn-group-toggle"></div>`);
+                            $.each(list_id_answer_all, function (i, item) {
+                                if (item.QuestionID == id_q) {
+                                    if (item.AnswerType == 1)
+                                        array_answer.push(item);
+                                    else
+                                        array_base_anwer.push(item);
+                                }
+                            });
+                            //  if (is_rotate) { array_answer.rand(); } // Осуществляет перетасовку ответов в случайном порядке
+                            array_answer = array_answer.concat(array_base_anwer);
+                            $.each(array_answer, function (i, item) {
+                                if (item.QuestionID == id_q) {
+                                    skip = Check_blocks(item);
+                                    if (skip) { skip = false; return; }
+                                    if (item.AnswerType == 1) {
+                                        if (list_answer[item.AnswerKey].isFreeArea) {
+                                            $('div[name=radio_group_btn]').append(`<label class="btn btn-outline-primary btn-lg btn-block my-2 sing_q_a"><input name="group" id="${item.AnswerKey}" type="radio"/><span>${list_answer[item.AnswerKey].AnswerText}</span></label><input type="checkbox" class="is_free_area" hidden checked/>`);
+                                        } else {
+                                            $('div[name=radio_group_btn]').append(`<label class="btn btn-outline-primary btn-lg btn-block my-2 sing_q_a"><input name="group" id="${item.AnswerKey}" type="radio"/>${list_answer[item.AnswerKey].AnswerText}</label><input type="checkbox" class="is_free_area" hidden/>`);
+                                        }
+                                    }
+                                    else {
+                                        $('div[name=radio_group_btn]').append(`<label class="btn btn-outline-primary btn-lg btn-block my-2 base_answer sing_q_a"><input name="group" id="${list_base_answer[item.AnswerKey].BaseIndex}" type="radio"/>${list_base_answer[item.AnswerKey].AnswerText}</label><input type="checkbox" class="is_free_area" hidden/>`);
+                                    }
+                                }
+                            })
+
+                            FindAnswer();
+                        }
+                        break;
+                    // Прорисовка ответов Multi
+                    case 2:
+                        {
+                            var skip = false;
+                            var array_answer = [];
+                            var array_base_anwer = [];
+                            $('div[name=answer_text_area]').empty().append(`<div name="radio_group_btn" class="btn-group-toggle"></div>`);
+                            $.each(list_id_answer_all, function (i, item) {
+                                if (item.QuestionID == id_q) {
+                                    if (item.AnswerType == 1) {
+                                        if (!(list_answer[item.AnswerKey].AnswerText.toLowerCase() == "другое")) {
+                                            array_answer.push(item);
+                                        } else {
+                                            array_base_anwer.push(item);
+                                        }
+                                    }
+                                    else
+                                        array_base_anwer.push(item);
+                                }
+                            });
+                            // if (is_rotate) {
+                            //     array_answer.rand();
+                            //  } // Осуществляет перетасовку ответов в случайном порядке
+                            array_answer = array_answer.concat(array_base_anwer);
+                            $.each(array_answer, function (i, item) {
+                                if (item.QuestionID == id_q) {
+                                    skip = Check_blocks(item);
+                                    if (skip) { skip = false; return; }
+                                    if (item.AnswerType == 1) {
+                                        if (list_answer[item.AnswerKey].isFreeArea) {
+                                            $('div[name=radio_group_btn]').append(`<label class="btn btn-outline-primary btn-lg btn-block my-2 mult_q_a"><input name="group" id="${item.AnswerKey}" type="checkbox"/><span>${list_answer[item.AnswerKey].AnswerText}</span></label><input type="checkbox" class="is_free_area" hidden checked/>`);
+                                        } else {
+                                            $('div[name=radio_group_btn]').append(`<label class="btn btn-outline-primary btn-lg btn-block my-2 mult_q_a"><input name="group" id="${item.AnswerKey}" type="checkbox"/><span>${list_answer[item.AnswerKey].AnswerText}</span></label><input type="checkbox" class="is_free_area" hidden/>`);
+                                        }
+                                    }
+                                    else {
+                                        $('div[name=radio_group_btn]').append(`<label class="btn btn-outline-primary btn-lg btn-block my-2 base_answer mult_q_a"><input name="group" id="${list_base_answer[item.AnswerKey].BaseIndex}" type="checkbox" autocomplete="off"/>${list_base_answer[item.AnswerKey].AnswerText}</label><input type="checkbox" class="is_free_area" hidden/>`);
+                                    }
+                                }
+                            })
+                            FindAnswer();
+                        }
+                        break;
+                    case 3:
+                        $('div[name=answer_text_area]').empty().append(`<div name="radio_group_btn" class="btn-group-toggle" data-toggle="buttons"></div>`);
+                        $.each(list_id_answer_all, function (i, item) {
+                            if (item.QuestionID == id_q) {
+                                $('div[name=answer_text_area]').append(`<input type="text" class="form-control my-2 free_text" name="group" id="${item.AnswerKey}" autocomplete="off" placeholder="${list_answer[item.AnswerKey].AnswerText}" style="background-color: #ddd"/>`);
+                            }
+                        });
+                        var id_massk = list_question[massiv_question_id[index]].TypeMassk;
+                        if (id_massk > 0) {
+                            console.log("wqeipoew")
+                            BindMassk(id_massk);
+                        }
+                        FindAnswer();
+                        break;
+                    case 4:
+                        {
+                            var skip = false;
+                            var count_table_row = 1;
+                            var count_table_colum = 1;
+                            $('div[name=answer_text_area]').empty();
+                            var code = '';
+                            code += '<table><tr class="table_answer beginer"><td class="table_answer" style="border:0px;opacity:1;background-color:#00000000;"> </td>'
+                            $.each(list_id_answer_all, function (i, item) {
+                                if (item.QuestionID == id_q) {
+                                    code += '<td  class="table_answer header-field" id="' + count_table_colum + '" name="' + item.AnswerKey + '" style="padding:5px;border-left:1px solid white;">' + list_answer[item.AnswerKey].AnswerText + '</td>';
+                                    count_table_colum++;
+                                }
+                            })
+                            code += '</tr>';
+                            var array_row = [];
+                            $.each(list_table_row, function (i, item) {
+                                if (item.TableID == id_q) {
+                                    array_row.push(item);
+                                }
+                            });
+                            // if (is_rotate) { array_row.rand(); } // Осуществляет перетасовку ответов в случайном порядке
+                            $.each(array_row, function (i, item) {
+                                if (item.TableID == id_q) {
+                                    if (list_question[massiv_question_id[index]].Bind != null) {
+                                        if (list_question[list_question[massiv_question_id[index]].Bind].TypeQuestion == 6) {
+                                            if (item.IndexRow != null && item.IndexRow != result[massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind)]) {
+                                                return;
+                                            }
+                                        } else if (item.IndexRow != null && (item.IndexRow != list_answer[result[Number(massiv_question_id.indexOf(list_question[massiv_question_id[index]].Bind))]].Index && item.IndexRow != 0))
+                                            return;
+                                    }
+                                    skip = Check_blocks_Row(item);
+                                    if (skip) { skip = false; return; }
+                                    code += '<tr class="table_answer" id="' + count_table_row + '"><td class="table_answer header-field" id="' + item.Id + '" style="min-width:200px !important; max-width:350px !important;border-bottom:1px solid white;">' + item.TableRowText + '</td>';
+                                    for (var c = 1; c < count_table_colum; c++) {
+                                        code += '<td class="table_answer tool_layer table_q_a"><input type="radio" name="group' + count_table_row + '" id="' + c + '"><label for="' + c + '"><span></span></label></td>';
+                                    }
+                                    code += '</tr>';
+                                    count_table_row++;
+                                }
+                            })
+                            code += '</table>';
+                            $('div[name=answer_text_area]').append(code);
+                            FindAnswer();
+                        }
+                        break;
+                    case 5:
+                        $('div[name=answer_text_area]').empty();
+                        break;
+                    case 6:
+                        var availableTags = [];
+                        var tmp_massive = {};
+                        $.each(list_text_file[massiv_question_id[index]], function (i, item) {
+                            var tmp_str = item.split('#');
+                            availableTags.push(tmp_str[0]);
+                            tmp_massive[tmp_str[0]] = tmp_str[1];
+                        })
+
+                        var code = '';
+                        code += '<select data-placeholder="Choose a Country..." class="chosen-select-new">';
+                        code += '<option value="">Выберите вариант ответа.</option>';
+                        $.each(availableTags, function (i, item) {
+                            code += '<option value="' + tmp_massive[item] + '">' + item + '</option>';
+                        })
+                        code += '</select>'
+                        $('.answer_table').append(code);
+                        $('.chosen-select-new').chosen();
+                        $('.chosen-select-new').change(function () {
+                            $('span.uik').remove();
+                            code = '<span class="uik">' + $(this).find('option:checked').val() + '</span>';
+                            $('.answer_table').append(code);
+                        })
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        //Проверка активности группы при проходе вперед
+        function CheckGroup() {
+            if (list_group[massiv_question_id[index]] != null) {
+                var number_group = list_group[massiv_question_id[index]];
+                if (active_group[number_group].isActive == false) {
+                    var length_group = list_id_question_group[number_group].length;
+                    for (var i = index; i < index + length_group; i++) {
+                        result[i] = -404;
+                        text_other[i] = ['null'];
+                    }
+                    index += length_group;
+                    CheckGroup();
+                } else {
+
+                }
+            }
+        }
+
+        //Проверка активности группы при возврате назад
+        function CheckGroup_Back() {
+            if (list_group[massiv_question_id[index]] != null) {
+                var number_group = list_group[massiv_question_id[index]];
+                if (active_group[number_group].isActive == false) {
+                    var length_group = list_id_question_group[number_group].length;
+
+                    index -= length_group;
+                    CheckGroup_Back();
+                } else {
+
+                }
+            }
+        }
+
+        //Вывод предупреждающего сообщения
+        function ShowAlertWindow(str_message) {
+            if (!$('div[name=alert_form]').is(':visible')) {
+                $('div[name=alert_form]').text(str_message);
+                $('div[name=alert_form]').fadeIn(200);
+                setTimeout(function () {
+                    $('div[name=alert_form]').fadeOut(200);
+                }, 5000);
+            }
+        }
+
+        //Осуществление шага вперед по анкете
+        function NextQuestion() {
+            switch (type_q) {
+                case 1:
+                    if ($("input[name=group]:radio:checked").length == 0) {
+                        ShowAlertWindow("Не выбран вариант ответа");
+                    }
+                    else {
+                        if ($('textarea.text_free_area').length > 0 && $('textarea.text_free_area').is(":visible")) {
+                            if ($('textarea.text_free_area').val() == "") {
+                                $('textarea.text_free_area').parent().removeClass('btn-outline-primary').addClass('btn-outline-danger');
+                                ShowAlertWindow("Не заполнено поле для рукописного ввода");
+                                setTimeout(function () {
+                                    $('textarea.text_free_area').parent().removeClass('btn-outline-danger').addClass('btn-outline-primary');
+                                }, 1000);
+                                break;
+                            }
+                        }
+                        SaveResult();
+                        CheckQuota();
+                        CheckGroupGo();
+                        checkTransitionGo();
+                        CheckGroup();
+                        getStart();
+                    }
+                    break;
+                case 2: {
+                    if ($("input[name=group]:checkbox:checked").length == 0) {
+                        ShowAlertWindow("Не выбран вариант ответа");
+                    }
+                    else {
+                        if ($('textarea.text_free_area').length > 0 && $('textarea.text_free_area').is(":visible")) {
+                            if ($('textarea.text_free_area').val() == "") {
+                                $('textarea.text_free_area').animate({
+                                    backgroundColor: 'red'
+                                }, 500).animate({ backgroundColor: 'white' }, 500);
+                                break;
+                            }
+                        }
+                        SaveResult();
+                        CheckGroupGo();
+                        index++;
+                        CheckGroup();
+                        getStart();
+                    }
+                }
+                    break;
+                case 3:
+                    if ($("input:text").val().length == 0) {
+                        ShowAlertWindow("Не заполнено поле для рукописного ввода");
+                        $('input:text').css({ border: "0 solid red" }).animate({ borderWidth: 2 }, 500).animate({ borderWidth: 0 }, 200);
+                    }
+                    else {
+                        SaveResult();
+                        CheckQuota();
+                        index++;
+                        CheckGroup();
+                        getStart();
+                    }
+                    break;
+                case 4:
+                    var count_row = $('tr.table_answer:not(:hidden)').length - 1;
+                    if ($('input[name^=group]:checked').length == count_row) {
+                        $('div.wrong_choise').fadeOut('fast');
+                        SaveResult();
+                        CheckGroupGo();
+                        index++;
+                        CheckGroup();
+                        getStart();
+                    } else {
+                        $('div.wrong_choise').fadeIn('slow');
+                        ShowAlertWindow("Отмечены не все позиции");
+                        $('tr.table_answer').each(function () {
+                            if ($(this).find('input[name^=group]:checked').length < 1) {
+                                $('input[name=group' + $(this).attr('id') + ']').parent().addClass('NotCheckedTableItem');
+                            }
+                        })
+                        $('div[name=answer_text_area]').animate({ scrollTop: $('.NotCheckedTableItem:first').offset().top - $('div[name=question_q_a]').height }, 1000);
+                    }
+                    break;
+                case 5:
+                    SaveResult();
+                    index++;
+                    CheckGroup();
+                    getStart();
+                    break;
+                case 6:
+                    if ($('span.uik').text() == "") {
+                        $('div.wrong_choise').fadeIn('slow');
+                    } else {
+                        $('div.wrong_choise').fadeOut('fast');
+                        SaveResult();
+                        index++;
+                        getStart();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        //Сохранении выбранного ответа в массиве result
+        function SaveResult() {
+            var mas = [];
+            switch (type_q) {
+                case 1:
+
+                    id_a = $("label.active").find('input').attr('id');
+                    result[index] = [id_a];
+                    if ($("label.active").next().prop('checked')) {
+                        text_other[index] = [$("label.active").find('textarea.text_free_area').val()];
+                    } else {
+                        text_other[index] = ['null'];
+                    }
+
+                    break;
+                case 2:
+                    var text_mass = '';
+                    $.each($("div[name=answer_text_area] label.active"), function () {
+                        if ($(this).hasClass('base_answer'))
+                            mas.push($(this).find('input').attr('id'));
+                        else
+                            mas.push($(this).find('input').attr('id'));
+                        if ($(this).next().prop('checked')) {
+                            text_mass += $(this).find('input').attr('id') + '#' + $(this).find('textarea.text_free_area').val() + ',';
+                        }
+                    });
+                    result[index] = mas;
+                    if (text_mass != '') {
+                        text_other[index] = [text_mass.substr(0, text_mass.length - 1)];
+                    } else {
+                        text_other[index] = ['null'];
+                    }
+                    break;
+                case 3:
+                    $('input[name=group]').each(function () {
+                        mas.push($(this).attr('id') + "#" + $(this).val().replace(/[,]/g, ';'));
+                    });
+                    result[index] = mas;
+                    text_other[index] = ['null'];
+                    break;
+                case 4:
+                    let count_row_m = 1;
+                    let multi = [];
+                    let multi_text = "";
+                    $('tr.table_answer').each(function () {
+                        var id;
+                        var id_row;
+                        if ($(this).find('input:radio:checked').attr('id') != undefined) {
+                            id_row = $(this).find('td.table_answer').attr("id");
+                            id = $(this).find('input:radio:checked').attr('id');
+                            mas.push($('tr.beginer').find('td[id=' + id + ']').attr('name'));
+                        }
+                    });
+
+                    result[index] = mas;
+                    text_other[index] = ['null'];
+
+                    break;
+                case 5:
+                    result[index] = [-1];
+                    text_other[index] = ['null'];
+                    break;
+                case 6:
+                    if (!isNaN($('span.uik').text())) {
+                        result[index] = Number($('span.uik').text());
+                        text_other[index] = $('select.chosen-select-new option:checked').text();
+                    } else {
+                        result[index] = Number($('select.chosen-select-new option:checked').text());
+                        text_other[index] = $('span.uik').text();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function TranslitIterarot(id_q, iter_all) {
+            let id_base_answer;
+            $.each(list_id_answer_all, function (i, item) {
+                if (item.QuestionID == id_q) {
+                    if (item.Id == iter_all) {
+                        id_base_answer = item.AnswerKey;
+                        return;
+                    }
+                }
+            })
+            return id_base_answer;
+        }
+
+        //Проверка перехода при проходе вперед
+        function checkTransitionGo() {
+            var code_transition = find_transition_move(id_q, result[index]);
+            if (code_transition >= 0) {
+                if (Number(result[index]) > 0) {
+                    if (result[index] == list_transition[code_transition].TriggerAnswer) {
+                        var jump_index;
+                        list_transition[code_transition].ActiveTransition = true;
+                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                        for (var i = index + 1; i < jump_index; i++) {
+                            result[i] = [-404];
+                            text_other[i] = ['null'];
+                        }
+                        index = jump_index;
+                    } else {
+                        index++;
+                    }
+                } else {
+                    if (result[index] == list_base_answer[TranslitIterarot(id_q, list_transition[code_transition].TriggerAnswer)].BaseIndex) {
+                        var jump_index;
+                        list_transition[code_transition].ActiveTransition = true;
+                        jump_index = massiv_question_id.indexOf(list_transition[code_transition].toQuestion);
+                        for (var i = index + 1; i < jump_index; i++) {
+                            result[i] = [-404];
+                            text_other[i] = ['null'];
+                        }
+                        index = jump_index;
+                    } else {
+                        index++;
+                    }
+                }
+            } else {
+                index++;
+            }
+        }
+
+        //Проверка перехода при возращении назад
+        function checkTransitionBack() {
+            var code_transition = find_transition_back(massiv_question_id[index]);
+            if (code_transition >= 0) {
+                index = massiv_question_id.indexOf(list_transition[code_transition].fromQuestion);
+                list_transition[code_transition].ActiveTransition = false;
+            } else {
+                index--;
+            }
+        }
+
+        //Проверка выбраного ответа на прикрепленность к переходу к группе
+        function CheckGroupGo() {
+            switch (type_q) {
+                case 1:
+                    if (list_bind_answer_group[result[index]] != null) {
+                        var number_group = list_bind_answer_group[result[index]].BindGroup;
+                        active_group[number_group].isActive = true;
+                        active_group[number_group].Questions.push(id_q);
+                    }
+                    console.log("active group->", active_group);
+                    break;
+                case 2: {
+                    var mas_tmp = result[index];
+                    var mas_tmp_2 = list_question_bind_group[id_q];
+                    if (mas_tmp_2 != undefined) {
+                        $.each(mas_tmp_2, function (i, item) {
+                            //active_group[item].isActive = false;
+                        })
+                        $.each(mas_tmp, function (i, item) {
+                            if (list_bind_answer_group[item] != null) {
+                                var number_group = list_bind_answer_group[item].BindGroup;
+                                if (active_group[number_group].Questions.indexOf(id_q) == -1) {
+                                    active_group[number_group].isActive = true;
+                                    active_group[number_group].Questions.push(id_q);
+                                }
+                            }
+                        })
+                    }
+                }
+                    console.log("active group->", active_group);
+                    break;
+                case 4: {
+                    var mas_tmp = result[index];
+                    var mas_tmp_2 = list_question_bind_group[id_q];
+                    if (mas_tmp_2 != undefined) {
+                        $.each(mas_tmp_2, function (i, item) {
+                            active_group[item] = false;
+                        });
+                        $.each(mas_tmp, function (i, item) {
+                            if (list_bind_answer_group[item] != null) {
+                                var number_group = list_bind_answer_group[item].BindGroup;
+                                active_group[number_group] = true;
+                            }
+                        });
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        //Сброс активных групп при переходе на вопрос связаный с ними
+        function ResetGroup() {
+            if (list_question_bind_group[massiv_question_id[index]] != null) {
+                let id_index = massiv_question_id[index];
+                console.log("massive -> ", list_question_bind_group[id_index]);
+                let mas_group_quest = list_question_bind_group[id_index]
+                for (var i = 0; i < mas_group_quest.length; i++) {
+                    if (active_group[mas_group_quest[i]].Questions.indexOf(id_index) >= 0) {
+                        active_group[mas_group_quest[i]].Questions.pop();
+                        if (active_group[mas_group_quest[i]].Questions.length == 0)
+                            active_group[mas_group_quest[i]].isActive = false;
+                    }
+                }
+                console.log("Back active group -> ", active_group);
+            }
+        }
+
+        //Поиск выбранных ответ в массиве result
+        function FindAnswer() {
+            if (result[index] != null) {
+                switch (type_q) {
+                    case 1:
+                        var tmp = $('div[name=answer_text_area]').find('input[id=' + result[index] + ']');
+                        tmp.prop('checked', true);
+                        tmp.parent().addClass('active');
+                        if (tmp.parent().next().is(':checked')) {
+                            tmp.parent().append('<textarea class= "md-textarea form-control text_free_area" row = "10" style = "resize: none; display: none" ></textarea >');
+                            //tmp.parent().find('span').slideUp(100);
+                            tmp.parent().find('.text_free_area').slideDown(200).text(text_other[index]);
+                        }
+                        break;
+                    case 2:
+                        var mas_ans = {};
+                        var tmp_str = String(text_other[index]).split(',');
+                        var is_check_base_answer = false;
+                        $.each(tmp_str, function (i, item) {
+                            var str = item.split('#');
+                            mas_ans[str[0]] = str[1];
+                        });
+                        $.each(result[index], function (i, item) {
+                            var tmp = $('div[name=answer_text_area]').find('input[id=' + item + ']').parent();
+                            tmp.addClass('active');
+                            tmp.find('input').prop('checked', true);
+                            if (tmp.hasClass('base_answer')) {
+                                is_check_base_answer = true;
+                                //checkedAnswerBase(tmp);
+                                $('div[name=answer_text_area]').find('label').removeClass('active').addClass('disabled');
+                                tmp.removeClass('disabled').addClass('active');
+                                tmp.find('input').prop('checked', true);
+                            } else if (tmp.next().is(':checked')) {
+                                tmp.append('<textarea class="md-textarea form-control text_free_area" style="resize: none; display: none"></textarea>');
+                               // tmp.find('span').slideUp(200);
+                                tmp.find('textarea').slideDown(200).text(mas_ans[item]);
+                            }
+                        })
+                        if (!is_check_base_answer) CheckLimitAnswer();
+                        break;
+                    case 3:
+                        var mas_ans = [];
+                        var tmp_str = String(result[index]).split(',');
+                        $.each(tmp_str, function (i, item) {
+                            var str = item.split('#');
+                            mas_ans.push(str);
+                        });
+                        $.each(mas_ans, function (i, item) {
+                            var tmp = $('div[name=answer_text_area]').find('input[id=' + item[0] + ']');
+                            tmp.val(item[1]);
+                        })
+                        break;
+                    case 4:
+                        var massive = result[index];
+                        var count = 0;
+                        if (id_q != 3092) {
+                            for (var i = 1; i <= massive.length; i++) {
+                                var id_radio = $('tr.beginer td[name="' + massive[i - 1] + '"').attr('id');
+                                $('tr[id="' + i + '"').find('input[id="' + id_radio + '"]').prop('checked', true);
+                            }
+                        } else {
+                            var mas_ans = [];
+                            var tmp_str = String(text_other[massiv_question_id.indexOf(3123)]).split(',');
+                            $.each(tmp_str, function (i, item) {
+                                var str = item.split('#');
+                                if (str[1] == "") return;
+                                mas_ans.push(str[1]);
+                            });
+                            mas_ans = mas_ans.reverse();
+                            for (var i = 1; i <= massive.length; i++) {
+                                var id_radio = $('tr.beginer td[name="' + massive[i - 1] + '"').attr('id');
+                                $('tr[id="' + i + '"').find('input[id="' + id_radio + '"]').prop('checked', true);
+                                if (id_radio == 2) {
+                                    $('tr[id="' + i + '"').find('input[name=text_of_sum]').val(mas_ans.pop());
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+
+        function BindMassk(id_massk) {
+            if (id_massk == 1) {
+                $.mask.definitions['H'] = '[1-9]';
+                $('input.free_text').mask("H9", {
+                    completed: function () {
+                        if (this.val() < 18) {
+                            this.val("");
+                            $('input.free_text').val("").focus();
+                        }
+                    }
+                });
+            }
+            if (id_massk != 1) {
+                $('div[name=answer_text_area] input[name=group]').bind("change keyup input", function () {
+                    if (this.value.match(RegExp(String(list_massk[id_massk])))) {
+                        this.value = this.value.substr(0, this.value.length - 1);
+                    }
+                });
+            }
+        }
+
+        function CheckCountAnswer(check_id_question) {
+            var count = 0;
+            $.each(list_id_answer_all, function (i, data) {
+                if (data.QuestionID == check_id_question) {
+                    count++;
+                }
+            })
+            return count;
+        }
+
+        //Осуществление шага назад по анкете
+        function PreviousQuestion() {
+            if (index > 0) {
+                if (type_q == 4) {
+                    var count_row = $('tr.table_answer').length - 1;
+                    if ($('input[name^=group]:checked').length != count_row) {
+                        $('tr.table_answer').each(function () {
+                            if ($(this).find('input[name^=group]:checked').length < 1) {
+                                $('input[name=group' + $(this).attr('id') + ']').parent().addClass('NotCheckedTableItem');
+                            }
+                        })
+                        $('body,html').animate({ scrollTop: $('.NotCheckedTableItem:first').offset().top - $('.NotCheckedTableItem:first').height() / 2 }, 1000);
+                        return;
+                    }
+                }
+                SaveResult();
+                if (index >= massiv_question_id.length - 1) $('button[name=button_next]').text(">");
+                checkTransitionBack();
+                CheckQuotaBack();
+                CheckGroup_Back();
+                ResetGroup();
+                getStart();
+            }
+        }
+
+        $('div[name=answer_text_area]').on('mouseenter', 'textarea.text_free_area', function () {
+            switch (type_q) {
+                case 1:
+                    $(this).parent().removeClass('sing_q_a');
+                    break;
+                case 2:
+                    $(this).parent().removeClass('mult_q_a');
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('div[name=answer_text_area]').on('mouseleave', 'textarea.text_free_area', function () {
+            switch (type_q) {
+                case 1:
+                    $(this).parent().addClass('sing_q_a');
+                    break;
+                case 2:
+                    $(this).parent().addClass('mult_q_a');
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        //Дополнительные функции
+        function Check_blocks(item) {
+            var skip = false;
+            if (list_blocks[id_q] != null) {
+                if (list_blocks[id_q].length >= 1) {
+                    $.each(list_blocks[id_q], function (i, item_block) {
+                        if (item_block.fromQuestion == id_q && item_block.typeBlock == 1) {
+                            $.each(result[massiv_question_id.indexOf(Number(item_block.toQuestion))], function (i, item_tmp) {
+                                if (Number(item_tmp) <= 1) {
+                                    skip = false; return;
+                                }
+                                if (item.AnswerType != 2) {
+                                    if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
+                                        skip = true; return;
+                                }
+                            });
+                            if (skip == true) { return false; }
+                        }
+                        if (item_block.fromQuestion == id_q && item_block.typeBlock == 2) {
+                            skip = true;
+                            $.each(result[massiv_question_id.indexOf(Number(item_block.toQuestion))], function (i, item_tmp) {
+                                if (Number(item_tmp) <= 1) {
+                                    skip = false; return;
+                                }
+                                if (item.AnswerType != 2) {
+                                    if (list_answer[item.AnswerKey].Index == list_answer[Number(item_tmp)].Index)
+                                        skip = false; return;
+                                }
+                                else {
+                                    skip = false;
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+            return skip;
+        }
+        function Check_blocks_Row(item) {
+            var skip = false;
+            if (list_question[id_q].Bind_Blocks != null) {
+                if (list_blocks[id_q][0].fromQuestion == id_q && list_blocks[id_q][0].typeBlock == 1) {
+                    $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                        if (item.AnswerType != 2) {
+                            if (item.IndexRow == list_answer[Number(item_tmp)].Index)
+                                skip = true; return;
+                        }
+                    });
+                }
+                if (list_blocks[id_q][0].fromQuestion == id_q && list_blocks[id_q][0].typeBlock == 2) {
+                    skip = true;
+                    $.each(result[massiv_question_id.indexOf(list_question[id_q].Bind_Blocks)], function (i, item_tmp) {
+                        if (Number(item_tmp) <= 1) {
+                            skip = false; return;
+                        }
+                        if (item.AnswerType != 2) {
+                            if (item.IndexRow == list_answer[Number(item_tmp)].Index) {
+                                skip = false; return;
+                            }
+                        }
+                        else {
+                            skip = false;
+                        }
+                    });
+                }
+            }
+            return skip;
+        }
+
+        $('div[name=answer_text_area]').on('click', 'label.mult_q_a', function (e) {
+            e.preventDefault();
+            if (!$(this).is('.active')) {
+                if (!$(this).is('.disabled')) {
+                    $(this).addClass('active');
+                    $(this).find('input').prop('checked', true);
+                    if ($(this).hasClass('base_answer')) {
+                        console.log('base_answer');
+                        $('div[name=answer_text_area]').find('label').addClass('disabled').removeClass('active');
+                        $(this).removeClass('disabled').addClass('active');
+                        $('div[name=answer_text_area]').find('label.disabled').each(function () {
+                            $(this).find('input').prop('checked', false);
+                        })
+                        $('textarea.text_free_area').remove();
+                        $('div[name=answer_text_area]').find('span').slideDown(200);
+                    } else {
+                        if ($(this).next().prop('checked')) {
+                            if ($(this).find('textarea.text_free_area').length == 0) {
+                                $(this).append('<textarea class="md-textarea form-control text_free_area" row="10" style="resize: none; display: none"></textarea>');
+                            }
+                            $(this).find('textarea.text_free_area').slideDown(100);
+                            $(this).css("display", "block");
+                        }
+                    }
+                }
+            } else {
+                $(this).removeClass('active');
+                $(this).find('input').prop('checked', false);
+                if ($(this).hasClass('base_answer')) {
+                    $('div[name=answer_text_area] label').removeClass('disabled');
+                } else {
+                    if ($(this).next().prop('checked')) {
+                        $(this).find('textarea.text_free_area').hide();
+                        if (device.mobile()) {
+                            $(this).css("display", "inline-flex");
+                        } else {
+                            $(this).css("display", "block");
+                        }
+
+                    }
+                }
+            }
+            let is_check_base_answer = true;
+            $('div[name=answer_text_area]').find('label.base_answer').each(function () {
+                if ($(this).find('input').is(":checked")) {
+                    is_check_base_answer = false;
+                }
+            });
+            if (is_check_base_answer) CheckLimitAnswer();
+        })
+        $('div[name=answer_text_area]').on('click', 'label.sing_q_a', function (e) {
+            e.preventDefault();
+            if (!$(this).is('.active')) {
+                $('div[name=answer_text_area]').find('label.active').each(function () {
+                    $(this).prop('checked', false);
+                    if (device.mobile()) {
+                        $(this).css("display", "inline-flex");
+                    } else {
+                        $(this).css("display", "block");
+                    }
+
+                })
+                $('div[name=answer_text_area]').find('label.active').removeClass('active');
+
+                $(this).addClass('active');
+                $(this).find('input').prop('checked', true);
+                $('div[name=answer_text_area]').find('textarea.text_free_area').remove();
+                if ($(this).next().is(':checked')) {
+                    $(this).append('<textarea class="md-textarea form-control text_free_area" row="10" style="resize: none; display: none"></textarea>');
+                    $(this).css("display", "block")
+                }
+                $(this).find('textarea').slideDown(200);
+            }
+        })
+        $('div[name=answer_text_area]').on('click', 'td.table_q_a', function (e) {
+            e.preventDefault();
+            $(this).find('input[name^=group]').prop('checked', true);
+            if ($(this).hasClass('NotCheckedTableItem')) {
+                $(this).parent('tr').find('.NotCheckedTableItem').removeClass('NotCheckedTableItem');
+            }
+        })
+
+        function checkedAnswerBase(tmp) {
+            if (type_q == 2) {
+                if (!tmp.is('.active')) {
+                    $('div[name=answer_text_area] label').addClass('disabled').removeClass('active');
+                    tmp.removeClass('disabled').addClass('active');
+                    $('div[name=answer_text_area] label.disabled').each(function () {
+                        $(this).find('input').prop('checked', false);
+                    })
+                    $('textarea.text_free_area').remove();
+                } else {
+                    $('div[name=answer_text_area] label').removeClass('disabled');
+                }
+            }
+        }
+
+        function find_transition_move(id_question, list_result) {
+            for (var i = 0; i < list_transition.length; i++) {
+                if (list_transition[i].fromQuestion == id_question) {
+                    for (var j = 0; j < list_result.length; j++) {
+                        if (Number(list_result[j]) < 0) {
+                            var is_find = false;
+                            var item_find;
+                            $.each(list_base_answer, function (index_, item) {
+                                if (Number(item.BaseIndex) == Number(list_result[j])) {
+                                    item_find = item;
+                                    is_find = true; return;
+                                }
+                            })
+                            let id_base_answer_all = 0;
+                            $.each(list_id_answer_all, function (j, _item) {
+                                if (_item.QuestionID == id_question && _item.AnswerType == 2) {
+                                    if (_item.AnswerKey == item_find.Id) {
+                                        id_base_answer_all = _item.Id;
+                                        return;
+                                    }
+                                }
+                            })
+                            if (list_transition[i].TriggerAnswer == id_base_answer_all) return i;
+                        } else if (list_transition[i].TriggerAnswer == list_result[j]) return i;
+                    }
+                }
+            }
+            return -1;
+        }
+
+        function find_transition_back(id_question) {
+            for (var i = 0; i < list_transition.length; i++) {
+                if (list_transition[i].toQuestion == id_question && list_transition[i].ActiveTransition == true) return i;
+            }
+            return -1;
+        }
+
+        function CheckLimitAnswer() {
+            var limit_count = list_question[id_q].LimitCount;
+            if (limit_count > 0 && limit_count != null) {
+                if ($('div[name=answer_text_area]').find('input[name=group]:checked').length == limit_count) {
+                    $('div[name=answer_text_area]').find('label:not(.active)').each(function () {
+                        $(this).removeClass('btn-outline-primary').addClass('disabled btn-outline-danger');
+                    })
+                    ShowAlertWindow("Выбрано максимальное количество ответов. Для выбора другого ответа отмените любой из уже выбранных.");
+                    $('div.limit_checked_div').fadeIn(500);
+                } else if ($('div[name=answer_text_area]').find('input[name=group]:checked').length < limit_count) {
+                    $('div[name=answer_text_area]').find('label.disabled').each(function () {
+                        $(this).removeClass('disabled btn-outline-danger').addClass('btn-outline-primary');
+                    })
+                }
+            }
+        }
+
+        /*Поиск и проверка квот (Осуществляется только при движении вперед по анкете)
+         *Запись цепочек осуществляется в массив massive_string_chain
+         */
+        function CheckQuota() {
+            var res;
+            if (list_question[id_q].IsKvot == true) {
+                massive_quota_id.push(id_q);
+                if (list_question[id_q].TypeQuestion == 3) {
+                    var age = Number(String(result[index]).split('#')[1]);
+                    $.each(list_range[id_q], function (i, item) {
+                        var lower_limit = !isNaN(Number(String(item.RangeString).split('-')[0])) ? Number(String(item.RangeString).split('-')[0]) : -Infinity;
+                        var upper_limit = !isNaN(Number(String(item.RangeString).split('-')[1])) ? Number(String(item.RangeString).split('-')[1]) : Infinity;
+                        if ((lower_limit <= age) && (age <= upper_limit)) {
+                            res = item.Id;
+                            return false;
+                        }
+                    })
+                } else {
+                    res = result[index];
+                }
+                var break_loop = false;
+                $.each(list_quota, function (i, item) {
+                    if (item.ChainString.indexOf(id_q + '/') == 0) {
+                        var str_chain = id_q + '/' + res;
+                        $.each(list_quota, function (i, item) {
+                            if (item.ChainString == str_chain) {
+                                item.IsActive = true;
+                                break_loop = true;
+                                CheckCountQuota(item.Id);
+                                return false;
+                            }
+                        });
+                        if (break_loop) {
+                            break_loop = false;
+                            massive_string_chain.push(str_chain);
+                            return false;
+                        } else {
+                            massive_string_chain.push(str_chain);
+                        }
+                        return false;
+                    } else {
+                        $.each(massive_string_chain, function (index_chain, item_chain) {
+                            var str_chain = item_chain + '#' + id_q + '/' + res;
+                            $.each(list_quota, function (i, item) {
+                                if (item.ChainString == str_chain) {
+                                    item.IsActive = true;
+                                    break_loop = true;
+                                    CheckCountQuota(item.Id);
+                                }
+                                if (item.ChainString.indexOf(str_chain) == 0) {
+                                    massive_string_chain[index_chain] = str_chain;
+                                    break_loop = true;
+                                    return false;
+                                }
+                            });
+                            if (break_loop) {
+                                break_loop = false;
+                                return false;
+                            }
+                        })
+                    }
+                });
+            }
+        }
+
+        function CheckQuotaBack() {
+            var question_id = massiv_question_id[index];
+            var res;
+            if (list_question[question_id].IsKvot == true) {
+                if (list_question[question_id].TypeQuestion == 3) {
+                    var age = Number(String(result[index]).split('#')[1]);
+                    $.each(list_range[question_id], function (i, item) {
+                        var lower_limit = !isNaN(Number(String(item.RangeString).split('-')[0])) ? Number(String(item.RangeString).split('-')[0]) : -Infinity;
+                        var upper_limit = !isNaN(Number(String(item.RangeString).split('-')[1])) ? Number(String(item.RangeString).split('-')[1]) : Infinity;
+                        if ((lower_limit <= age) && (age <= upper_limit)) {
+                            res = item.Id;
+                            return false;
+                        }
+                    })
+                } else {
+                    res = result[index];
+                }
+                var str_chain = question_id + "/" + res;
+                $.each(massive_string_chain, function (i, item) {
+                    if (item.indexOf(str_chain) >= 0) {
+                        var item_string_chain = item;
+                        $.each(list_quota, function (i, item) {
+                            if (item.ChainString == item_string_chain) {
+                                list_quota[i].IsActive = false;
+                            }
+                        });
+                        if (item.indexOf(str_chain) == 0) {
+                            if (i == 0) {
+                                massive_string_chain = [];
+                            } else {
+                                massive_string_chain.splice(i, i);
+                            }
+                        } else {
+                            massive_string_chain[i] = item.substring(0, item.indexOf(str_chain) - 1);
+                        }
+                    }
+                })
+            }
+        }
+
+        //Функция проверки счетчика квот
+        function CheckCountQuota(id_quota) {
+            $.get("/Question/CheckQuotaCount", { id_quota: id_quota })
+                .success(function (server_data) {
+                    if (server_data.QuotaCount <= 0) {
+                        $('.TextLimitQuota').show();
+                    }
+                })
+        }
+
+        // END
+    </script>
+
+    <script type="text/javascript">
+
+        let coord_lat = 0;
+        let coord_long = 0;
+
+        function SendingResult() {
+            var query, query_q = {};
+            var count = 0;
+            $.each(massiv_question_id, function (i, item) {
+
+                switch (list_question[item].TypeQuestion) {
+                    case 1:
+                        query_q[count] = {
+                            Id: Number(result[i]),
+                            QuestionID: Number(item),
+                            Text: String(text_other[i])
+                        }
+                        count++;
+                        break;
+                    case 2:
+                        var mas = String(text_other[i]).split(',');
+                        var tmp_mas = {};
+                        $.each(mas, function (i, data) {
+                            var tmp = data.split('#');
+                            tmp_mas[tmp[0]] = tmp[1];
+                        })
+                        $.each(result[i], function (i, data) {
+                            query_q[count] = {
+                                Id: Number(data),
+                                QuestionID: Number(item),
+                                Text: String(tmp_mas[data])
+                            }
+                            count++;
+                        })
+                        break;
+                    case 3:
+                        var mas = String(result[i]).split(',');
+                        var tmp_mas = [];
+                        $.each(mas, function (i, data) {
+                            var tmp = data.split('#');
+                            tmp_mas.push(tmp);
+                        })
+                        $.each(tmp_mas, function (i, data) {
+                            query_q[count] = {
+                                Id: Number(data[0]),
+                                QuestionID: Number(item),
+                                Text: String(data[1])
+                            }
+                            count++;
+                        })
+                        break;
+                    case 4:
+                        var mas = result[i];
+                        $.each(mas, function (i, data) {
+                            query_q[count] = {
+                                Id: Number(data),
+                                QuestionID: Number(item),
+                                Text: String('null')
+                            }
+                            count++;
+                        })
+                        break;
+                    case 6:
+                        query_q[count] = {
+                            Id: Number(result[i]),
+                            QuestionID: Number(item),
+                            Text: String(text_other[i])
+                        }
+                        count++;
+                        break;
+                    default:
+                        break;
+                }
+
+            })
+
+            var str_number = "00000000000" //$("#phone_number").val().replace(/[^0-9]/ig, '');
+            str_number = "8" + str_number.substr(1, str_number.length);
+            query = {
+                name: $('p.name_operator').text(),
+                project_id: id_project,
+                operator_id: id_operator,
+                phone_number: str_number,
+                list: query_q,
+                time_begin: begin_time,
+                time_end: end_time,
+                c_lat: coord_lat,
+                c_long: coord_long
+            }
+            sendData(query);
+        }
+
+        String.prototype.replaceAt = function (index, replacement) {
+            return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+        }
+
+        function sendData(query) {
+            $.post("/Form/SaveData", query)
+                .success(function (data) {
+                    $('div[name=text_status]').text("Анкета сохранена").addClass('text-success');
+                    $('button[name=SaveResultBtn]').hide();
+                    let div_block = $('div[name=display_info_form]');
+                    div_block.css({
+                        'top': `${window.innerHeight / 2 - div_block.height() / 2}px`,
+                        'left': `${window.innerWidth / 2 - div_block.width() / 2}px`
+                    });
+                    setTimeout(() => {
+                        $('div[name=block_showResult]').remove();
+                        $('div[name=block_comment]').show();
+                        let div_block = $('div[name=display_comment_form]');
+                        div_block.css({
+                            'top': `${window.innerHeight / 2 - div_block.height() / 2}px`,
+                            'left': `${window.innerWidth / 2 - div_block.width() / 2}px`
+                        });
+                    }, 1000);
+                })
+                .error(function () {
+                    $('div[name=text_status]').text("Ошибка сохранения").addClass('text-danger');
+                    $('button[name=SaveResultBtn]').hide();
+                    let div_block = $('div[name=display_info_form]');
+                    div_block.css({
+                        'top': `${window.innerHeight / 2 - div_block.height() / 2}px`,
+                        'left': `${window.innerWidth / 2 - div_block.width() / 2}px`
+                    });
+                })
+        }
+    </script>
+</body>
+</html>

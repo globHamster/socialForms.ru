@@ -616,7 +616,7 @@ namespace SocialFORM.Controllers
                     dict_phone[u].TimeCall });
             });
 
-            using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=192.168.0.4, 55501 ;Network Library=DBMSSOCN;Initial Catalog=BD_IFsocialforms_Number;User ID=sa;Password=7oDK35jqS;",
+            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(@"Server=WEBSERVER\SQLEXPRESS;Database=BD_IFsocialforms_Number;User ID=sa;Password=7oDK35jqS;",
                 SqlBulkCopyOptions.TableLock))
             {
                 bulkCopy.DestinationTableName = "dbo.PTs";
@@ -1665,7 +1665,7 @@ namespace SocialFORM.Controllers
                         dtPhone.Rows.Add(new object[] { u.FO, u.OB, u.GOR, u.Phone, u.Status, u.Type, u.isActual, u.TimeCall });
                     });
 
-                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=192.168.0.4, 55501 ;Network Library=DBMSSOCN;Initial Catalog=BD_IFsocialforms_Number;User ID=sa;Password=7oDK35jqS;",
+                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy(@"Data Source=192.168.0.254, 1433 ;Network Library=DBMSSOCN;Initial Catalog=BD_IFsocialforms_Number;User ID=sa;Password=7oDK35jqS;",
                         SqlBulkCopyOptions.TableLock))
                     {
                         bulkCopy.DestinationTableName = "dbo.PTs";

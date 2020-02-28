@@ -27,6 +27,8 @@ namespace SocialFORM.Models
         public DbSet<OprosYaroslav> SetOprosYaroslav { get; set; }
         public DbSet<OprosNN> SetOprosNN { get; set; }
         public DbSet<SetTimeAfk> SetTimeAfk { get; set; }
+        public DbSet<CommentModel> SetComment { get; set; }
+        public DbSet<VisitorModel> SetVisitor { get; set; }
 
     }
 }

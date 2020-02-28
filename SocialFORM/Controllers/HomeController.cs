@@ -353,6 +353,7 @@ namespace SocialFORM.Controllers
             tmp.NameProject = name_project;
             tmp.ActionProject = false;
             tmp.SettingEncode = "UTF-8";
+            tmp.CodeProject = Convert.ToBase64String(Encoding.UTF8.GetBytes((db4.SetProjectModels.Count()+1).ToString())).Replace('=', 'D');
             db4.SetProjectModels.Add(tmp);
             db4.SaveChanges();
             tmp = db4.SetProjectModels.ToList().Last();

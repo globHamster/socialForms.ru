@@ -34,6 +34,35 @@ namespace SocialFORM.Controllers
             return PartialView();
         }
 
+        public async Task<ActionResult> OnlineForm(string form)
+        {
+            var remoteIpAddress = this.Request.UserHostAddress;
+            db2.SetVisitor.Add(new VisitorModel() { AddressIP = remoteIpAddress, EnterTime = DateTime.Now });
+            await db2.SaveChangesAsync();
+
+            if (form == "" || form == null) return HttpNotFound();
+            using (ProjectContext db3 = new ProjectContext())
+            {
+                try
+                {
+                    var project = db3.SetProjectModels.First(u => u.CodeProject == form);
+                    ViewBag.Title = project.NameProject;
+                    ViewBag.ProjectID = project.Id;
+                } catch (Exception e)
+                {
+                    return HttpNotFound();
+                }
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public void SaveComment(string comment)
+        {
+            db2.SetComment.Add(new CommentModel() { Comment = comment });
+            db2.SaveChanges();
+        }
+
         public JsonResult getQuestion(int id_q)
         {
             QuestionModel tmp = db.SetQuestions.First(u => u.Id == id_q);

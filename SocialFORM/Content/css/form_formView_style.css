@@ -1,5 +1,4 @@
 ﻿.tool_layer {
-    background-color: #FFF;
     border-bottom: 1px solid black;
     height: 35px;
 }
@@ -34,22 +33,45 @@ div.wrong_choise {
     background-color: #ff9999;
 }
 
-tr.table_answer:first-child {
+td.header-field {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: #0071af;
+    color: #fff;
+}
+
+/*tr.table_answer:first-child {
     background-color: #72afff;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: #0071af;
+    color: #fff;
 }
 
 td.table_answer:first-child {
     background-color: #72afff;
-}
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: #0071af;
+    color: #fff;
+}*/
 
 td.table_answer {
-    border: 1px solid black;
     text-align: center;
     min-width: 20px;
+    min-height: 20px;
+}
+
+td.table_q_a{
+    border-right: 1px solid rgba(100, 100, 100, 0.4);
+    border-bottom: 1px solid rgba(100, 100, 100, 0.4);
+}
+
+td.table_q_a:hover{
+    background-color: #a2c9ff;
+    cursor: pointer;
 }
 
 tr.beginer > td {
     min-width: 100px;
+    min-height: 100px;
 }
 
 #map {

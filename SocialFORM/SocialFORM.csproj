@@ -386,6 +386,8 @@
     <Compile Include="Models\ChatUser.cs" />
     <Compile Include="Models\DB\Diap.cs" />
     <Compile Include="Models\DB\listRange.cs" />
+    <Compile Include="Models\Form\CommentModel.cs" />
+    <Compile Include="Models\Form\VisitorModel.cs" />
     <Compile Include="Models\NumberAppContext.cs" />
     <Compile Include="Models\Number\AO.cs" />
     <Compile Include="Models\Number\FormNumber.cs" />
@@ -434,6 +436,7 @@
     <Content Include="Content\css\tableexport.css" />
     <Content Include="Content\css\tableexport.min.css" />
     <Content Include="Content\daterangepicker.css" />
+    <Content Include="Content\defaultTheme.css" />
     <Content Include="Content\images\gear_setting.png" />
     <Content Include="Content\images\icsv.png" />
     <Content Include="Content\images\instNEW\backNEW.jpg" />
@@ -667,6 +670,7 @@
     <Content Include="Scripts\i18n\grid.locale-ua.js" />
     <Content Include="Scripts\i18n\grid.locale-vi.js" />
     <Content Include="Scripts\ifvisible.js" />
+    <Content Include="Scripts\jquery.fixedheadertable.js" />
     <Content Include="Scripts\jquery.HUB.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -739,6 +743,7 @@
     <Content Include="Views\Group\FilterForm.cshtml" />
     <Content Include="Views\Home\DataBeseAll.cshtml" />
     <Content Include="Views\Form\showResultCostumer.cshtml" />
+    <Content Include="Views\Form\OnlineForm.cshtml" />
     <None Include="Views\Home\demo01.cshtml" />
     <Content Include="Content\emoticons\alien.png" />
     <Content Include="Content\emoticons\angel.png" />
